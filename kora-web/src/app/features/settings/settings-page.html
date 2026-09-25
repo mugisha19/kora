@@ -1,0 +1,68 @@
+<kora-page-header
+  [heading]="'settings.title' | transloco"
+  [subtitle]="'settings.subtitle' | transloco"
+/>
+
+<div class="cards">
+  <mat-card appearance="outlined">
+    <mat-card-header>
+      <h2 mat-card-title>{{ 'settings.appearance.title' | transloco }}</h2>
+      <mat-card-subtitle>{{ 'settings.appearance.description' | transloco }}</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <h3 id="theme-label" class="field-label">{{ 'settings.appearance.theme' | transloco }}</h3>
+      <mat-button-toggle-group
+        aria-labelledby="theme-label"
+        hideSingleSelectionIndicator
+        [value]="theme.mode()"
+        (change)="setTheme($event.value)"
+      >
+        @for (mode of themeModes; track mode) {
+          <mat-button-toggle [value]="mode">
+            <mat-icon [svgIcon]="themeIcons[mode]" aria-hidden="true" />
+            {{ 'theme.' + mode | transloco }}
+          </mat-button-toggle>
+        }
+      </mat-button-toggle-group>
+
+      <h3 id="language-label" class="field-label">
+        {{ 'settings.appearance.language' | transloco }}
+      </h3>
+      <mat-button-toggle-group
+        aria-labelledby="language-label"
+        hideSingleSelectionIndicator
+        [value]="language.current()"
+        (change)="setLanguage($event.value)"
+      >
+        @for (locale of language.available; track locale) {
+          <mat-button-toggle [value]="locale" [attr.lang]="locale">
+            {{ languageNames[locale] }}
+          </mat-button-toggle>
+        }
+      </mat-button-toggle-group>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card appearance="outlined">
+    <mat-card-header>
+      <h2 mat-card-title>{{ 'settings.about.title' | transloco }}</h2>
+    </mat-card-header>
+    <mat-card-content>
+      <dl class="about">
+        <dt>{{ 'settings.about.webVersion' | transloco }}</dt>
+        <dd>{{ environment.appVersion }}</dd>
+        <dt>{{ 'settings.about.contractVersion' | transloco }}</dt>
+        <dd>{{ environment.contractVersion }}</dd>
+        <dt>{{ 'settings.about.mode' | transloco }}</dt>
+        <dd>
+          @if (environment.useMocks) {
+            <kora-status-chip tone="info" [label]="'settings.about.mockApi' | transloco" />
+            <p class="hint">{{ 'settings.about.mockApiHint' | transloco }}</p>
+          } @else {
+            <kora-status-chip tone="success" [label]="'settings.about.liveApi' | transloco" />
+          }
+        </dd>
+      </dl>
+    </mat-card-content>
+  </mat-card>
+</div>

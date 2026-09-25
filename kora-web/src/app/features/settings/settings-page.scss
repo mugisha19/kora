@@ -1,0 +1,52 @@
+.cards {
+  display: grid;
+  gap: var(--kora-space-4);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr));
+  align-items: start;
+}
+
+.field-label {
+  margin: var(--kora-space-4) 0 var(--kora-space-2);
+  font: var(--mat-sys-title-small);
+}
+
+// Segmented controls share the card width evenly instead of wrapping (375 px screens).
+mat-button-toggle-group {
+  display: flex;
+  max-inline-size: 480px;
+}
+
+mat-button-toggle {
+  flex: 1;
+}
+
+.about {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: var(--kora-space-2) var(--kora-space-4);
+  margin: var(--kora-space-2) 0 0;
+
+  dt {
+    color: var(--mat-sys-on-surface-variant);
+  }
+
+  dd {
+    margin: 0;
+  }
+}
+
+.hint {
+  margin: var(--kora-space-1) 0 0;
+  font: var(--mat-sys-body-small);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+@media (max-width: 480px) {
+  .about {
+    grid-template-columns: 1fr;
+
+    dd {
+      margin-block-end: var(--kora-space-2);
+    }
+  }
+}
