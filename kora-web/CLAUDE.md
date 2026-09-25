@@ -46,6 +46,15 @@ facade, store, pages, components) · `src/app/mocks` (MSW handlers and demo data
 - Singleton services use `@Service()` (Angular 22) or `@Injectable({ providedIn: 'root' })`.
 - Signals: `set`/`update`, never mutate. `NgOptimizedImage` for static images.
 
+## Testing
+
+- Unit tests render with `provideTestUi()` from `src/testing/test-providers.ts` (real translation
+  files, fake icons, animations off). Query by role and accessible name.
+- Every new string goes into `public/i18n/en.json`, `fr.json` and `rw.json` in the same commit
+  (the parity test fails otherwise).
+- e2e runs its own dev server on port 4210 (never reuses another app on 4200) and scans pages
+  with axe via `e2e/a11y.ts`.
+
 ## Commands (run in `kora-web/`)
 
 `npm start` (mock API) · `npm run start:api` (proxy to :8080) · `npm run lint` · `npm run test:ci` ·

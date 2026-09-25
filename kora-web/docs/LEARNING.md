@@ -71,3 +71,49 @@ start a pipeline only when that app's folder changed.
 **Playwright** drives a real browser against the running app for the critical user flows, at desktop
 size and at 375 px. Each e2e page also runs an **axe** scan for WCAG 2.1 AA violations. axe catches
 only part of accessibility problems automatically, so keyboard and screen-reader checks still matter.
+
+## One theme for light and dark: `light-dark()` (Phase 1)
+
+CSS `light-dark(#fff, #111)` picks a value based on the element's `color-scheme`. Material 3 can
+emit all of its design tokens this way, so a single theme covers both schemes. Switching theme is
+then one attribute on `<html>` (`data-theme="dark"` → `color-scheme: dark`), and "System" simply
+removes the attribute so the OS preference applies. **Interview line:** "Theme switching is a
+`color-scheme` change, not a stylesheet swap."
+
+## Design tokens and "not colour alone" (Phase 1)
+
+Status colours (on track / at risk / off track) are tokens with a foreground and background pair
+checked for contrast in both schemes. WCAG 1.4.1 says colour must not be the only way to convey
+information, so `StatusChip` always adds a different icon shape and a text label: a colour-blind
+user or a screen reader gets the same meaning.
+
+## Runtime i18n and the parity test (Phase 1)
+
+Transloco loads `public/i18n/<lang>.json` on demand and re-renders text when the language changes,
+without a reload. Three details make it accessible: `<html lang>` follows the language so screen
+readers switch pronunciation; each language option carries its own `lang` attribute ("Français" is
+read in French); and page titles are translated too. A unit test compares fr and rw with en key by
+key, so a missing translation fails CI instead of showing English (or a raw key) to users.
+
+## Focus management in a single-page app (Phase 1)
+
+In a classic website, loading a new page resets focus to the top. In an SPA the URL changes but
+focus stays on the clicked link, so a screen-reader user doesn't know the content changed. After
+every navigation the shell focuses the new page's `<h1>` (made focusable with `tabindex="-1"`),
+which announces the page name. The **skip link** is the first Tab stop and jumps past the toolbar
+and navigation to the same heading.
+
+## Accessible menus and toggles (Phase 1)
+
+The theme and language menus use `role="menuitemradio"` with `aria-checked`, so assistive tech says
+"Dark, radio, checked". The settings page uses Material button toggles, which render as a
+`radiogroup` labelled by the section heading. Changes are announced through a polite **live region**
+(CDK `LiveAnnouncer`), which speaks without moving focus.
+
+## Deterministic UI tests (Phase 1)
+
+jsdom has no layout and never fires CSS `transitionend`, so animated components (drawer, dialog)
+finish on fallback timers and tests become flaky under load. Unit tests therefore provide
+`MATERIAL_ANIMATIONS: { animationsDisabled: true }`. Tests also load the real translation files and
+query by **role and accessible name** (Testing Library), which checks accessibility and behaviour
+at the same time.
