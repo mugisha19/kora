@@ -1,0 +1,5 @@
+# Runs from the repository root. Only lint the web app when web files are staged,
+# so commits that touch only kora-api are not slowed down or blocked by Node tooling.
+if git diff --cached --name-only | grep -q '^kora-web/'; then
+  cd kora-web && npx --no -- lint-staged
+fi
