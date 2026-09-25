@@ -21,3 +21,13 @@ lands in code; a pattern that doesn't earn its place is rejected in an ADR.
 No application patterns yet; Phase 0 is tooling. Two structural rules are already enforced by the build:
 module boundaries (Spring Modulith `verify()`) and inward-only layering inside a module (ArchUnit), see
 ADR 0004.
+
+## Phase 1
+
+Still plumbing rather than domain patterns, but two structural ideas landed in the `platform` module:
+
+- **Exceptions as a port to HTTP.** Domain and application code throw `ProblemException` subclasses that know a
+  `ProblemKind` and a `code` but nothing about HTTP; `ProblemDetailsHandler` is the one adapter that turns them into
+  status codes and Problem Details (`platform/error`, `platform/web/ProblemDetailsHandler.java`).
+- **Servlet filter chain** (a Chain of Responsibility provided by the Servlet API): `CorrelationIdFilter` then
+  `AccessLogFilter`, each doing one job and passing the request on (`platform/web`).

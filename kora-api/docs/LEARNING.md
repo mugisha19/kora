@@ -56,3 +56,42 @@ Java 21+ can run each request on a **virtual thread**: a cheap thread managed by
 carrier thread while it waits on I/O (a database query, an HTTP call). With one property
 (`spring.threads.virtual.enabled`) the classic blocking Spring MVC style scales to many concurrent requests
 without switching to reactive programming.
+
+## Problem Details and stable error codes (Phase 1)
+
+RFC 9457 defines one JSON shape for HTTP errors: `type`, `title`, `status`, `detail`, `instance`, plus your own
+fields. We add `code` (e.g. `members.last_admin`), `correlationId` and `errors[]`. The client never parses the
+English `detail`; it looks up `code` in its translation files (English, French, Kinyarwanda). That's what makes
+error messages translatable and lets the API reword a message without breaking any screen.
+**Interview line:** "Errors are part of the contract: a stable code for machines, a message for humans, and a
+correlation id to find the server log."
+
+## 404 vs 403 across tenants (Phase 1)
+
+If user A asks for a project that belongs to another organization, answering `403 Forbidden` tells A the id
+exists. Answering `404 Not Found` reveals nothing. So `403` is used only when the caller may know the resource
+exists but lacks the role (`access.denied`) or isn't a member of the organization they named in the header.
+
+## Optimistic locking with ETag and If-Match (Phase 1)
+
+Two admins open the organization settings. Both edit and save. Without protection, the second save silently
+overwrites the first (a *lost update*). With optimistic locking, every read returns the version (`ETag: "3"`) and
+every update must send it back (`If-Match: "3"`). If someone saved in between, the version is now 4 and the API
+answers `412 Precondition Failed`; the UI says "someone else saved first" and reloads. It's "optimistic" because
+nothing is locked while people edit; conflicts are rare and detected at save time. `428` means the client forgot
+`If-Match` altogether, which would otherwise be a silent last-write-wins.
+
+## Correlation ids (Phase 1)
+
+Every request gets an id (the client may supply one). It's in the response header, in every log line of that
+request (via SLF4J's MDC) and in every error body. When a user reports an error, the id in the toast leads
+straight to the exact server logs. We only accept short ids of safe characters: anything else could inject fake
+lines into logs or extra headers into responses.
+
+## Contract-first (Phase 1)
+
+The OpenAPI file was written before any endpoint, agreed with the front end, and is now the source of truth.
+The web app generates its client and mocks from it; the API is tested against it. Tests also lint the contract
+itself, so conventions (error format, headers, tenant scoping) can't be forgotten on a new endpoint.
+**Why not generate the spec from code?** Then the contract only exists after the code, and renaming a Java field
+would silently break the client. See ADR 0006.

@@ -2,21 +2,22 @@
 
 ## Current status
 
-Phase 0 complete (tag `api-v0.0.1`). Waiting for "continue".
+Phase 1 complete (tag `api-v0.1.0`). Waiting for "continue".
 
-Integration tests (`*IT`) were skipped locally because Docker is not installed yet; they run in CI and will
-run locally once Docker Desktop is available.
+Contract 0.1.0 is in `docs/openapi.yaml` and announced to the web session. The whole build, including the
+Testcontainers integration tests, passes locally with Docker Desktop.
 
 ## Next step
 
-Phase 1 — contract 0.1.0 and platform conventions: `docs/openapi.yaml` (auth, organization, me, members,
-invitations) with the shapes agreed with the web session, RFC 9457 Problem Details with stable codes,
-correlation ids, pagination, ETag / If-Match, structured JSON logging, and a contract-conformance test.
+Phase 2 — identity and tenancy (features 01–03, 23): users and Argon2id passwords, JWT access tokens with key
+rotation, refresh-token rotation with reuse detection in Redis, rate limiting, register-organization, tenant
+resolution with a repository filter and PostgreSQL row-level security, members, invitations, `/me`, email via
+Mailpit, and response validation against the contract.
 
 ## Checklist
 
 - [x] 0. Scaffold, Maven wrapper, quality gates (Spotless, Checkstyle, ArchUnit, Modulith, JaCoCo), Testcontainers, CI (GitHub + GitLab), docs
-- [ ] 1. Contract 0.1.0, Problem Details, correlation ids, pagination, optimistic locking, logging
+- [x] 1. Contract 0.1.0, Problem Details, correlation ids, pagination, optimistic locking, logging, contract lint
 - [ ] 2. Identity & tenancy: users, JWT + refresh rotation, rate limits, organizations, RLS, members, invitations, `/me` (features 01–03, 23)
 - [ ] 3. Portfolios, programs, projects, charter, WBS, dashboard read model (04–07)
 - [ ] 4. Tasks, board, lexorank, backlog, sprints, burndown, velocity (08–09)
@@ -33,3 +34,5 @@ correlation ids, pagination, ETag / If-Match, structured JSON logging, and a con
 - ADR 0002 — one repository, two parallel sessions, commits on `main`, tags per phase
 - ADR 0003 — toolchain baseline (Java 25, Spring Boot 4.1, Modulith 2.1, Maven, Testcontainers, quality gates)
 - ADR 0004 — modular monolith with pragmatic hexagonal modules
+- ADR 0005 — REST API conventions (errors, tenancy header, paging, If-Match, correlation ids)
+- ADR 0006 — contract-first with a hand-written OpenAPI 3.0.3 document, linted and enforced by tests
