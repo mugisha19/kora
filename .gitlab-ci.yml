@@ -1,0 +1,10 @@
+# Root GitLab pipeline for the Kora monorepo.
+# Each app owns its jobs in its own file; path rules inside them keep pipelines fast.
+stages:
+  - test
+  - e2e
+  - image
+
+include:
+  - local: kora-web/.gitlab-ci.yml
+  - local: kora-api/.gitlab-ci.yml
