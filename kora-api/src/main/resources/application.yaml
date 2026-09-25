@@ -1,0 +1,38 @@
+# Defaults shared by every environment. Secrets and connection details come from environment variables
+# (SPRING_DATASOURCE_URL, ...) in deployed environments, and from compose.yaml when running locally.
+spring:
+  application:
+    name: kora-api
+  threads:
+    virtual:
+      # Request handling on virtual threads: blocking JDBC calls stop pinning platform threads.
+      enabled: true
+  jpa:
+    # No lazy loading during view rendering: every query happens inside a use case (no hidden N+1).
+    open-in-view: false
+    hibernate:
+      # Flyway owns the schema; Hibernate only checks that the mappings match it.
+      ddl-auto: validate
+  flyway:
+    locations: classpath:db/migration
+  docker:
+    compose:
+      # `spring-boot:run` starts the services in compose.yaml and wires their connection details.
+      lifecycle-management: start-only
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, prometheus
+  endpoint:
+    health:
+      # /actuator/health/liveness and /readiness for container orchestrators.
+      probes:
+        enabled: true
+  info:
+    java:
+      enabled: true
