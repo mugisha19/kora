@@ -1,0 +1,43 @@
+# GitLab pipeline for the Spring Boot API, included from the root .gitlab-ci.yml.
+# Mirrors .github/workflows/api-ci.yml so both platforms show the same green checks.
+
+.api-rules:
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^(api-)?v/
+    - changes:
+        - kora-api/**/*
+        - .gitlab-ci.yml
+
+api:verify:
+  stage: test
+  extends: [.api-rules]
+  image: maven:3.9-eclipse-temurin-25
+  # Testcontainers needs a Docker daemon: run one as a service and point the client at it.
+  services:
+    - name: docker:dind
+      alias: docker
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ''
+    DOCKER_DRIVER: overlay2
+    TESTCONTAINERS_HOST_OVERRIDE: docker
+    MAVEN_OPTS: -Dmaven.repo.local=$CI_PROJECT_DIR/kora-api/.m2/repository
+  cache:
+    key:
+      files:
+        - kora-api/pom.xml
+    paths:
+      - kora-api/.m2/repository/
+  script:
+    - cd kora-api
+    - ./mvnw -B -ntp verify
+  coverage: '/Total.*?([0-9]{1,3})%/'
+  artifacts:
+    when: always
+    expire_in: 7 days
+    reports:
+      junit:
+        - kora-api/target/surefire-reports/TEST-*.xml
+        - kora-api/target/failsafe-reports/TEST-*.xml
+    paths:
+      - kora-api/target/site/jacoco/
