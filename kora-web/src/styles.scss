@@ -1,17 +1,62 @@
-// Global styles. The Material theme, design tokens and typography arrive in Phase 1.
-:root {
+// Global styles: Material 3 theme, Kora design tokens, and accessibility foundations.
+@use '@angular/material' as mat;
+@use 'styles/tokens';
+@use 'styles/base';
+
+html {
+  // `color-scheme` theme type makes Material emit `light-dark()` tokens: one theme serves both schemes,
+  // and switching is just changing `color-scheme` (see ThemeService), with no second stylesheet.
   color-scheme: light dark;
-  font-family:
-    system-ui,
-    -apple-system,
-    'Segoe UI',
-    Roboto,
-    sans-serif;
-  line-height: 1.5;
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$azure-palette,
+        tertiary: mat.$violet-palette,
+        theme-type: color-scheme,
+      ),
+      typography: (
+        plain-family: tokens.$font-family,
+        brand-family: tokens.$font-family,
+      ),
+      density: 0,
+    )
+  );
+  // Visible, high-contrast focus rings for keyboard users on every Material component.
+  @include mat.strong-focus-indicators(
+    (
+      border-style: solid,
+      border-width: 3px,
+      border-radius: 4px,
+    )
+  );
+  @include mat.strong-focus-indicators-theme(
+    (
+      color: (
+        primary: mat.$azure-palette,
+        theme-type: color-scheme,
+      ),
+    )
+  );
 }
 
-body {
-  margin: 0;
-  background: Canvas;
-  color: CanvasText;
+html[data-theme='light'] {
+  color-scheme: light;
+}
+
+html[data-theme='dark'] {
+  color-scheme: dark;
+}
+
+// Users who ask the OS for more contrast get darker outlines and text on both schemes.
+@media (prefers-contrast: more) {
+  html {
+    @include mat.theme-overrides(
+      (
+        outline: light-dark(#000, #fff),
+        outline-variant: light-dark(#1b1b1f, #e3e3e8),
+        on-surface-variant: light-dark(#000, #fff),
+        primary: light-dark(#00315e, #d6e3ff),
+      )
+    );
+  }
 }

@@ -1,0 +1,39 @@
+// Kora design tokens that Material doesn't provide. Colors use `light-dark()` so they follow the
+// active `color-scheme` like the Material system tokens do. Every foreground/background pair below
+// has a contrast ratio of at least 7:1 (WCAG AAA) in both schemes.
+
+$font-family:
+  system-ui,
+  -apple-system,
+  'Segoe UI',
+  Roboto,
+  'Helvetica Neue',
+  Arial,
+  sans-serif;
+
+:root {
+  --kora-font-family: #{$font-family};
+
+  // Spacing scale (4 px grid).
+  --kora-space-1: 0.25rem;
+  --kora-space-2: 0.5rem;
+  --kora-space-3: 0.75rem;
+  --kora-space-4: 1rem;
+  --kora-space-6: 1.5rem;
+  --kora-space-8: 2rem;
+
+  --kora-radius: 12px;
+  --kora-content-max-width: 1200px;
+
+  // Status tones (RAG health, severities, statuses). Always paired with an icon and text.
+  --kora-success-fg: light-dark(#0f5132, #7ee2a8);
+  --kora-success-bg: light-dark(#d1f0dc, #0f3a24);
+  --kora-warning-fg: light-dark(#5c3f00, #ffd479);
+  --kora-warning-bg: light-dark(#fff0c2, #3d2e00);
+  --kora-danger-fg: light-dark(#8c1d18, #ffb4ab);
+  --kora-danger-bg: light-dark(#fde2df, #4c1512);
+  --kora-info-fg: light-dark(#0b4a7a, #9ecaff);
+  --kora-info-bg: light-dark(#dcecfb, #0d2f4d);
+  --kora-neutral-fg: light-dark(#30373e, #c2c9d1);
+  --kora-neutral-bg: light-dark(#e7ebef, #2b3137);
+}
