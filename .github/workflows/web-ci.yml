@@ -1,0 +1,73 @@
+# CI for the Angular web app. Runs only when kora-web (or this workflow) changes,
+# so API-only commits don't spend minutes on Node tooling.
+name: web-ci
+
+on:
+  push:
+    branches: ['**']
+    tags: ['web-v*', 'v*']
+    paths: ['kora-web/**', '.github/workflows/web-ci.yml']
+  pull_request:
+    paths: ['kora-web/**', '.github/workflows/web-ci.yml']
+
+# A newer push to the same branch cancels the run that is now out of date.
+concurrency:
+  group: web-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    working-directory: kora-web
+
+jobs:
+  quality:
+    name: Format, lint, unit tests, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: kora-web/.nvmrc
+          cache: npm
+          cache-dependency-path: kora-web/package-lock.json
+      - run: npm ci
+      - run: npm run format:check
+      - run: npm run lint
+      - run: npm run test:ci
+      - run: npm run build
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: web-coverage
+          path: kora-web/coverage
+          if-no-files-found: ignore
+
+  e2e:
+    name: Playwright end-to-end (with axe)
+    needs: quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: kora-web/.nvmrc
+          cache: npm
+          cache-dependency-path: kora-web/package-lock.json
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run e2e
+        env:
+          CI: 'true'
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: playwright-report
+          path: kora-web/playwright-report
+          retention-days: 7
+
+  # The Nginx image job is added in Phase 10 together with the Dockerfile (see kora-web/docs/adr/0003).
