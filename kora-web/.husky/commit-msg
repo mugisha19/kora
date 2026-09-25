@@ -1,0 +1,8 @@
+# Enforce Conventional Commits for every commit in the monorepo (API and web alike).
+# Hooks start in the repository root. Git passes the message file relative to it (or absolute in a
+# worktree); make it absolute because commitlint resolves relative paths from the git top level.
+case "$1" in
+  /*) msg_file="$1" ;;
+  *) msg_file="$(pwd)/$1" ;;
+esac
+cd kora-web && npx --no -- commitlint --edit "$msg_file"
