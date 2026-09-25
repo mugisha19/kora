@@ -1,0 +1,10 @@
+dist
+coverage
+.angular
+node_modules
+playwright-report
+test-results
+public/mockServiceWorker.js
+public/icons
+src/app/core/api/generated
+package-lock.json
