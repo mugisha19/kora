@@ -1,0 +1,24 @@
+# Local development services. `./mvnw spring-boot:run` starts them automatically (spring-boot-docker-compose)
+# and points the app at them; `docker compose up -d` starts them by hand.
+# Redis and Mailpit arrive in Phase 2 (sessions, rate limits, emails); S3-compatible storage in Phase 8.
+services:
+  postgres:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_DB: kora
+      POSTGRES_USER: kora
+      # Local-only credentials for a throwaway container; never used outside development.
+      POSTGRES_PASSWORD: kora
+    ports:
+      # 5433 on the host so it doesn't clash with a locally installed PostgreSQL on 5432.
+      - '127.0.0.1:5433:5432'
+    volumes:
+      - postgres-data:/var/lib/postgresql
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U kora -d kora']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  postgres-data:
