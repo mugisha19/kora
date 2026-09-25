@@ -1,0 +1,1315 @@
+openapi: 3.0.3
+info:
+  title: Kora API
+  version: 0.1.0
+  description: |
+    Multi-tenant project and portfolio management built on PMI practices.
+
+    This file is the contract between `kora-api` and `kora-web` (ADR 0006). The web client is generated
+    from it, and the API's responses are validated against it in tests.
+
+    ## Conventions (ADR 0005)
+    - **Tenancy:** tenant-scoped operations require `X-Organization-Id`. It is checked against the caller's
+      memberships; a non-member gets `403 tenant.forbidden`. The organization is never part of the token.
+    - **Errors:** RFC 9457 Problem Details (`application/problem+json`) with a stable machine-readable
+      `code`, the request's `correlationId` and, for validation failures, `errors[]`. Clients translate by
+      `code`; `detail` is for developers.
+    - **Paging:** `page` is 0-based, `size` defaults to 20 and is capped at 100, `sort=field,asc|desc` may
+      repeat. Unknown sort fields are rejected with `400 validation.failed`.
+    - **Optimistic locking:** versioned resources return `ETag: "<version>"` and a `version` field. Updates
+      must send `If-Match` with that value: missing → `428 concurrency.if_match_required`, stale →
+      `412 concurrency.stale_version`.
+    - **Correlation:** send `X-Correlation-Id` (1–64 chars of `[A-Za-z0-9-]`) or one is generated. It is
+      echoed on every response and in `correlationId`.
+    - **Ids** are UUIDs. An id belonging to another organization returns `404`, never `403`.
+    - **Times** are ISO 8601 UTC instants; dates are ISO 8601 dates.
+  license:
+    name: Proprietary (portfolio project)
+    url: https://github.com/mugisha19/kora
+
+servers:
+  - url: /api/v1
+    description: Same origin (the web dev server proxies /api to http://localhost:8080)
+
+tags:
+  - name: Auth
+    description: Sign-in, sessions and password recovery (feature 01)
+  - name: Me
+    description: The signed-in user's profile and memberships (features 02, 23)
+  - name: Organization
+    description: The active organization (feature 02)
+  - name: Members
+    description: People in the active organization and their roles (feature 03)
+  - name: Invitations
+    description: Expiring, single-use email invitations (feature 03)
+
+security:
+  - bearerAuth: []
+
+paths:
+  /auth/login:
+    post:
+      tags: [Auth]
+      operationId: login
+      summary: Sign in with email and password
+      description: |
+        Returns a short-lived access token and sets the `kora_refresh` cookie. Unknown email and wrong
+        password produce the same `401 auth.invalid_credentials` with the same timing.
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Signed in
+          headers:
+            Set-Cookie:
+              $ref: '#/components/headers/SetRefreshCookie'
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/InvalidCredentials'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /auth/refresh:
+    post:
+      tags: [Auth]
+      operationId: refreshSession
+      summary: Exchange the refresh cookie for a new access token
+      description: |
+        Rotates the refresh token: the old one stops working and a new cookie is set. Presenting a token that
+        was already rotated revokes the whole session family (theft detection).
+      security:
+        - refreshCookie: []
+      parameters:
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: Session refreshed
+          headers:
+            Set-Cookie:
+              $ref: '#/components/headers/SetRefreshCookie'
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionResponse'
+        '401':
+          description: 'Missing, expired, revoked or reused refresh token. Code: `auth.refresh_invalid`.'
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /auth/logout:
+    post:
+      tags: [Auth]
+      operationId: logout
+      summary: Sign out and revoke the session
+      description: Revokes the refresh token family and expires the cookie. Always succeeds.
+      security:
+        - refreshCookie: []
+        - {}
+      parameters:
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '204':
+          description: Signed out
+          headers:
+            Set-Cookie:
+              $ref: '#/components/headers/ClearRefreshCookie'
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /auth/register-organization:
+    post:
+      tags: [Auth]
+      operationId: registerOrganization
+      summary: Create an organization and its first administrator
+      description: The new user becomes `ORG_ADMIN` of the new organization and is signed in.
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterOrganizationRequest'
+      responses:
+        '201':
+          description: Organization created and user signed in
+          headers:
+            Set-Cookie:
+              $ref: '#/components/headers/SetRefreshCookie'
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          description: 'Email already has an account. Code: `auth.email_taken` with `errors[{field: "email"}]`.'
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /auth/password/forgot:
+    post:
+      tags: [Auth]
+      operationId: forgotPassword
+      summary: Request a password reset email
+      description: Always `202`, whether or not the email has an account, so accounts can't be discovered.
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForgotPasswordRequest'
+      responses:
+        '202':
+          description: Accepted; an email is sent if the account exists
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /auth/password/reset:
+    post:
+      tags: [Auth]
+      operationId: resetPassword
+      summary: Set a new password with a reset token
+      description: The token is single-use. A successful reset signs the user out everywhere.
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordRequest'
+      responses:
+        '204':
+          description: Password changed; all sessions revoked
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '410':
+          description: 'Token unknown, expired or already used. Code: `auth.reset_token_invalid`.'
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /me:
+    get:
+      tags: [Me]
+      operationId: getMe
+      summary: The signed-in user with all memberships
+      description: Drives the organization switcher. Not tenant-scoped.
+      parameters:
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: Current user
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MeResponse'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    patch:
+      tags: [Me]
+      operationId: updateMe
+      summary: Update your name or preferred language
+      description: Only the fields present are changed. No `If-Match`; a profile has a single editor.
+      parameters:
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateMeRequest'
+      responses:
+        '200':
+          description: Updated user
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MeResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /organization:
+    get:
+      tags: [Organization]
+      operationId: getOrganization
+      summary: The active organization
+      parameters:
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: Active organization
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organization'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    patch:
+      tags: [Organization]
+      operationId: updateOrganization
+      summary: Change the organization's name, currency or time zone
+      description: '`ORG_ADMIN` only.'
+      parameters:
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/IfMatch'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateOrganizationRequest'
+      responses:
+        '200':
+          description: Updated organization
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organization'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '412':
+          $ref: '#/components/responses/PreconditionFailed'
+        '428':
+          $ref: '#/components/responses/PreconditionRequired'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /members:
+    get:
+      tags: [Members]
+      operationId: listMembers
+      summary: Search the organization's members
+      description: 'Sortable by `fullName`, `email`, `role`, `joinedAt`. Default sort: `fullName,asc`.'
+      parameters:
+        - $ref: '#/components/parameters/OrganizationId'
+        - name: q
+          in: query
+          description: Case-insensitive match on name or email
+          schema:
+            type: string
+            maxLength: 100
+        - name: role
+          in: query
+          schema:
+            $ref: '#/components/schemas/Role'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+        - $ref: '#/components/parameters/Sort'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: One page of members
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MemberPage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /members/{memberId}:
+    parameters:
+      - $ref: '#/components/parameters/MemberId'
+    patch:
+      tags: [Members]
+      operationId: changeMemberRole
+      summary: Change a member's role
+      description: '`ORG_ADMIN` only. The organization always keeps at least one `ORG_ADMIN`.'
+      parameters:
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/IfMatch'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangeMemberRoleRequest'
+      responses:
+        '200':
+          description: Updated member
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Member'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'Would leave the organization without an administrator. Code: `members.last_admin`.'
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '412':
+          $ref: '#/components/responses/PreconditionFailed'
+        '428':
+          $ref: '#/components/responses/PreconditionRequired'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    delete:
+      tags: [Members]
+      operationId: removeMember
+      summary: Remove a member from the organization
+      description: '`ORG_ADMIN` only. You can''t remove yourself.'
+      parameters:
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '204':
+          description: Member removed
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'Tried to remove yourself. Code: `members.self_removal`.'
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /invitations:
+    get:
+      tags: [Invitations]
+      operationId: listInvitations
+      summary: List invitations by status
+      description: '`ORG_ADMIN` only. Sortable by `createdAt`, `expiresAt`, `email`. Default sort: `createdAt,desc`.'
+      parameters:
+        - $ref: '#/components/parameters/OrganizationId'
+        - name: status
+          in: query
+          description: Omit for all statuses
+          schema:
+            $ref: '#/components/schemas/InvitationStatus'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+        - $ref: '#/components/parameters/Sort'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: One page of invitations
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvitationPage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      tags: [Invitations]
+      operationId: createInvitation
+      summary: Invite someone by email
+      description: '`ORG_ADMIN` only. Sends an email with a link valid for 14 days.'
+      parameters:
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateInvitationRequest'
+      responses:
+        '201':
+          description: Invitation created and sent
+          headers:
+            Location:
+              description: URL of the new invitation
+              schema:
+                type: string
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invitation'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          description: |
+            `invitations.already_member` (with `errors[{field: "email"}]`) or `invitations.already_pending`.
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /invitations/{invitationId}:
+    parameters:
+      - $ref: '#/components/parameters/InvitationId'
+    delete:
+      tags: [Invitations]
+      operationId: revokeInvitation
+      summary: Revoke a pending invitation
+      description: '`ORG_ADMIN` only.'
+      parameters:
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '204':
+          description: Invitation revoked
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'Invitation is no longer pending. Code: `invitations.not_pending`.'
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /invitations/token/{token}:
+    parameters:
+      - $ref: '#/components/parameters/InvitationToken'
+    get:
+      tags: [Invitations]
+      operationId: previewInvitation
+      summary: Public preview of an invitation link
+      description: Shows who invited whom to what, and whether the email already has an account. Signs nobody in.
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: Invitation preview
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvitationPreview'
+        '404':
+          $ref: '#/components/responses/InvitationNotFound'
+        '410':
+          $ref: '#/components/responses/InvitationGone'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /invitations/token/{token}/accept:
+    parameters:
+      - $ref: '#/components/parameters/InvitationToken'
+    post:
+      tags: [Invitations]
+      operationId: acceptInvitation
+      summary: Accept an invitation and sign in
+      description: |
+        New account (`existingAccount: false` in the preview): send `fullName` and a new `password`.
+        Existing account: send the account's current `password` only. On success the user joins the
+        organization and is signed in.
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AcceptInvitationRequest'
+      responses:
+        '200':
+          description: Joined the organization and signed in
+          headers:
+            Set-Cookie:
+              $ref: '#/components/headers/SetRefreshCookie'
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/InvalidCredentials'
+        '404':
+          $ref: '#/components/responses/InvitationNotFound'
+        '410':
+          $ref: '#/components/responses/InvitationGone'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: 'Access token from `SessionResponse`, valid 15 minutes. Kept in memory by the client.'
+    refreshCookie:
+      type: apiKey
+      in: cookie
+      name: kora_refresh
+      description: 'Opaque refresh token. `HttpOnly; Secure; SameSite=Strict; Path=/api/v1/auth`.'
+
+  parameters:
+    OrganizationId:
+      name: X-Organization-Id
+      in: header
+      required: true
+      description: The active organization; must be one of the caller's memberships
+      schema:
+        type: string
+        format: uuid
+    CorrelationId:
+      name: X-Correlation-Id
+      in: header
+      required: false
+      description: Optional client-generated id echoed in the response and logs
+      schema:
+        type: string
+        pattern: '^[A-Za-z0-9-]{1,64}$'
+    IfMatch:
+      name: If-Match
+      in: header
+      required: true
+      description: The `ETag` of the version being updated, e.g. `"3"`
+      schema:
+        type: string
+        example: '"3"'
+    Page:
+      name: page
+      in: query
+      description: 0-based page index
+      schema:
+        type: integer
+        format: int32
+        minimum: 0
+        default: 0
+    Size:
+      name: size
+      in: query
+      description: Page size (values above 100 are capped at 100)
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        maximum: 100
+        default: 20
+    Sort:
+      name: sort
+      in: query
+      description: '`field,asc` or `field,desc`; repeat for secondary sorts'
+      style: form
+      explode: true
+      schema:
+        type: array
+        items:
+          type: string
+          pattern: '^[A-Za-z]+(,(asc|desc))?$'
+    MemberId:
+      name: memberId
+      in: path
+      required: true
+      description: Membership id (not the user id)
+      schema:
+        type: string
+        format: uuid
+    InvitationId:
+      name: invitationId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    InvitationToken:
+      name: token
+      in: path
+      required: true
+      description: Opaque token from the invitation email
+      schema:
+        type: string
+        minLength: 20
+        maxLength: 200
+
+  headers:
+    CorrelationId:
+      description: The request's correlation id
+      schema:
+        type: string
+    ETag:
+      description: Current version of the resource, quoted, e.g. `"4"`
+      schema:
+        type: string
+    RetryAfter:
+      description: Seconds to wait before retrying
+      schema:
+        type: integer
+    SetRefreshCookie:
+      description: '`kora_refresh=<token>; Max-Age=...; Path=/api/v1/auth; HttpOnly; Secure; SameSite=Strict`'
+      schema:
+        type: string
+    ClearRefreshCookie:
+      description: '`kora_refresh=; Max-Age=0; Path=/api/v1/auth; HttpOnly; Secure; SameSite=Strict`'
+      schema:
+        type: string
+
+  responses:
+    BadRequest:
+      description: 'Invalid input. Code: `validation.failed` with `errors[]`, or `tenant.header_invalid`.'
+      headers:
+        X-Correlation-Id:
+          $ref: '#/components/headers/CorrelationId'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    Unauthenticated:
+      description: 'Missing, invalid or expired access token. Code: `auth.unauthenticated`. Refresh and retry.'
+      headers:
+        X-Correlation-Id:
+          $ref: '#/components/headers/CorrelationId'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    InvalidCredentials:
+      description: 'Wrong email or password (indistinguishable). Code: `auth.invalid_credentials`.'
+      headers:
+        X-Correlation-Id:
+          $ref: '#/components/headers/CorrelationId'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    Forbidden:
+      description: 'Not a member of the organization (`tenant.forbidden`) or role not allowed (`access.denied`).'
+      headers:
+        X-Correlation-Id:
+          $ref: '#/components/headers/CorrelationId'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    NotFound:
+      description: 'No such resource in this organization. Code: `resource.not_found`.'
+      headers:
+        X-Correlation-Id:
+          $ref: '#/components/headers/CorrelationId'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    InvitationNotFound:
+      description: 'Unknown invitation token. Code: `invitations.not_found`.'
+      headers:
+        X-Correlation-Id:
+          $ref: '#/components/headers/CorrelationId'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    InvitationGone:
+      description: 'Invitation no longer usable: `invitations.expired`, `invitations.revoked` or `invitations.already_accepted`.'
+      headers:
+        X-Correlation-Id:
+          $ref: '#/components/headers/CorrelationId'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    PreconditionFailed:
+      description: 'Someone else saved first; reload and retry. Code: `concurrency.stale_version`.'
+      headers:
+        X-Correlation-Id:
+          $ref: '#/components/headers/CorrelationId'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    PreconditionRequired:
+      description: '`If-Match` header missing or malformed. Code: `concurrency.if_match_required`.'
+      headers:
+        X-Correlation-Id:
+          $ref: '#/components/headers/CorrelationId'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    TooManyRequests:
+      description: 'Rate limit hit. Code: `rate_limited`.'
+      headers:
+        Retry-After:
+          $ref: '#/components/headers/RetryAfter'
+        X-Correlation-Id:
+          $ref: '#/components/headers/CorrelationId'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    InternalError:
+      description: 'Unexpected failure; details are only in the server logs. Code: `internal.error`.'
+      headers:
+        X-Correlation-Id:
+          $ref: '#/components/headers/CorrelationId'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+
+  schemas:
+    # ---------- Errors ----------
+    Problem:
+      type: object
+      description: RFC 9457 Problem Details with Kora extensions
+      required: [type, title, status, code, correlationId]
+      properties:
+        type:
+          type: string
+          description: '`urn:kora:problem:<code>`'
+          example: urn:kora:problem:members.last_admin
+        title:
+          type: string
+          description: Short, human-readable summary of the status
+          example: Conflict
+        status:
+          type: integer
+          format: int32
+          example: 409
+        detail:
+          type: string
+          description: Developer-oriented explanation; clients show a translated message chosen by `code`
+        instance:
+          type: string
+          description: Path of the request that failed
+          example: /api/v1/members/2b4b1f2e-7c1a-4f61-9d1e-3a8f0b5c6d7e
+        code:
+          $ref: '#/components/schemas/ErrorCode'
+        correlationId:
+          type: string
+          example: 7f3c9a2e-5b1d-4e8f-a6c4-2d9b0e1f3a5c
+        errors:
+          type: array
+          description: Field-level problems (present for `validation.failed` and some conflicts)
+          items:
+            $ref: '#/components/schemas/FieldError'
+    FieldError:
+      type: object
+      required: [field, code, message]
+      properties:
+        field:
+          type: string
+          description: Request field path, e.g. `email` or `objectives[2].metric`; `body` for unreadable JSON
+          example: password
+        code:
+          type: string
+          description: |
+            Field-agnostic reason: `required`, `length`, `format`, `email`, `range`, `invalid`,
+            `password.breached`, or a domain code such as `invitations.already_member`.
+          example: length
+        message:
+          type: string
+          description: English developer message
+          example: size must be between 12 and 128
+        params:
+          type: object
+          description: 'Values for the translated message, e.g. `{ "min": 12, "max": 128 }`'
+          additionalProperties: true
+    ErrorCode:
+      type: string
+      description: |
+        Stable machine-readable error code. New codes may be added in minor versions; clients should fall
+        back to a generic message for unknown codes.
+      enum:
+        - validation.failed
+        - auth.unauthenticated
+        - auth.invalid_credentials
+        - auth.refresh_invalid
+        - auth.email_taken
+        - auth.reset_token_invalid
+        - tenant.forbidden
+        - tenant.header_invalid
+        - access.denied
+        - resource.not_found
+        - method.not_allowed
+        - media_type.unsupported
+        - concurrency.stale_version
+        - concurrency.if_match_required
+        - members.last_admin
+        - members.self_removal
+        - invitations.already_member
+        - invitations.already_pending
+        - invitations.not_pending
+        - invitations.not_found
+        - invitations.expired
+        - invitations.revoked
+        - invitations.already_accepted
+        - rate_limited
+        - internal.error
+
+    # ---------- Shared ----------
+    Role:
+      type: string
+      enum: [ORG_ADMIN, PMO, PROJECT_MANAGER, MEMBER, VIEWER]
+    Locale:
+      type: string
+      enum: [en, fr, rw]
+    Email:
+      type: string
+      format: email
+      maxLength: 254
+      example: pm@kora.demo
+    NewPassword:
+      type: string
+      format: password
+      minLength: 12
+      maxLength: 128
+      description: 12–128 characters; rejected if found in a breached-password list (`password.breached`)
+    FullName:
+      type: string
+      minLength: 1
+      maxLength: 120
+      example: Aline Uwase
+    PageMetadata:
+      type: object
+      required: [page, size, totalElements, totalPages]
+      properties:
+        page:
+          type: integer
+          format: int32
+          description: 0-based index of this page
+          example: 0
+        size:
+          type: integer
+          format: int32
+          example: 20
+        totalElements:
+          type: integer
+          format: int64
+          example: 57
+        totalPages:
+          type: integer
+          format: int32
+          example: 3
+
+    # ---------- Auth ----------
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          $ref: '#/components/schemas/Email'
+        password:
+          type: string
+          format: password
+          minLength: 1
+          maxLength: 128
+    RegisterOrganizationRequest:
+      type: object
+      required: [organizationName, fullName, email, password]
+      properties:
+        organizationName:
+          type: string
+          minLength: 2
+          maxLength: 100
+          example: Akagera Digital Ltd
+        fullName:
+          $ref: '#/components/schemas/FullName'
+        email:
+          $ref: '#/components/schemas/Email'
+        password:
+          $ref: '#/components/schemas/NewPassword'
+        currency:
+          type: string
+          pattern: '^[A-Z]{3}$'
+          description: ISO 4217 code
+          default: RWF
+        timeZone:
+          type: string
+          description: IANA time zone id
+          default: Africa/Kigali
+    ForgotPasswordRequest:
+      type: object
+      required: [email]
+      properties:
+        email:
+          $ref: '#/components/schemas/Email'
+    ResetPasswordRequest:
+      type: object
+      required: [token, newPassword]
+      properties:
+        token:
+          type: string
+          minLength: 20
+          maxLength: 200
+        newPassword:
+          $ref: '#/components/schemas/NewPassword'
+    SessionResponse:
+      type: object
+      required: [accessToken, tokenType, expiresIn, user]
+      properties:
+        accessToken:
+          type: string
+          description: 'JWT; send as `Authorization: Bearer <token>`'
+        tokenType:
+          type: string
+          enum: [Bearer]
+        expiresIn:
+          type: integer
+          format: int32
+          description: Seconds until the access token expires
+          example: 900
+        user:
+          $ref: '#/components/schemas/MeResponse'
+
+    # ---------- Me ----------
+    MeResponse:
+      type: object
+      required: [id, email, fullName, locale, memberships]
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          $ref: '#/components/schemas/Email'
+        fullName:
+          $ref: '#/components/schemas/FullName'
+        locale:
+          $ref: '#/components/schemas/Locale'
+        memberships:
+          type: array
+          items:
+            $ref: '#/components/schemas/Membership'
+    Membership:
+      type: object
+      required: [organizationId, organizationName, organizationSlug, role]
+      properties:
+        organizationId:
+          type: string
+          format: uuid
+        organizationName:
+          type: string
+          example: Akagera Digital Ltd
+        organizationSlug:
+          type: string
+          example: akagera-digital-ltd
+        role:
+          $ref: '#/components/schemas/Role'
+    UpdateMeRequest:
+      type: object
+      minProperties: 1
+      properties:
+        fullName:
+          $ref: '#/components/schemas/FullName'
+        locale:
+          $ref: '#/components/schemas/Locale'
+
+    # ---------- Organization ----------
+    Organization:
+      type: object
+      required: [id, name, slug, currency, timeZone, createdAt, version]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: Akagera Digital Ltd
+        slug:
+          type: string
+          pattern: '^[a-z0-9]+(-[a-z0-9]+)*$'
+          example: akagera-digital-ltd
+        currency:
+          type: string
+          pattern: '^[A-Z]{3}$'
+          example: RWF
+        timeZone:
+          type: string
+          example: Africa/Kigali
+        createdAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+          format: int64
+          example: 3
+    UpdateOrganizationRequest:
+      type: object
+      minProperties: 1
+      properties:
+        name:
+          type: string
+          minLength: 2
+          maxLength: 100
+        currency:
+          type: string
+          pattern: '^[A-Z]{3}$'
+        timeZone:
+          type: string
+
+    # ---------- Members ----------
+    Member:
+      type: object
+      required: [id, userId, email, fullName, role, joinedAt, version]
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Membership id
+        userId:
+          type: string
+          format: uuid
+        email:
+          $ref: '#/components/schemas/Email'
+        fullName:
+          $ref: '#/components/schemas/FullName'
+        role:
+          $ref: '#/components/schemas/Role'
+        joinedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+          format: int64
+    MemberPage:
+      allOf:
+        - $ref: '#/components/schemas/PageMetadata'
+        - type: object
+          required: [content]
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/Member'
+    ChangeMemberRoleRequest:
+      type: object
+      required: [role]
+      properties:
+        role:
+          $ref: '#/components/schemas/Role'
+
+    # ---------- Invitations ----------
+    InvitationStatus:
+      type: string
+      enum: [PENDING, ACCEPTED, REVOKED, EXPIRED]
+    Invitation:
+      type: object
+      required: [id, email, role, status, invitedByName, createdAt, expiresAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          $ref: '#/components/schemas/Email'
+        role:
+          $ref: '#/components/schemas/Role'
+        status:
+          $ref: '#/components/schemas/InvitationStatus'
+        invitedByName:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+    InvitationPage:
+      allOf:
+        - $ref: '#/components/schemas/PageMetadata'
+        - type: object
+          required: [content]
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/Invitation'
+    CreateInvitationRequest:
+      type: object
+      required: [email, role]
+      properties:
+        email:
+          $ref: '#/components/schemas/Email'
+        role:
+          $ref: '#/components/schemas/Role'
+    InvitationPreview:
+      type: object
+      required: [organizationName, email, role, invitedByName, expiresAt, existingAccount]
+      properties:
+        organizationName:
+          type: string
+        email:
+          $ref: '#/components/schemas/Email'
+        role:
+          $ref: '#/components/schemas/Role'
+        invitedByName:
+          type: string
+        expiresAt:
+          type: string
+          format: date-time
+        existingAccount:
+          type: boolean
+          description: True when the email already has a Kora account (accept with current password only)
+    AcceptInvitationRequest:
+      type: object
+      required: [password]
+      properties:
+        fullName:
+          allOf:
+            - $ref: '#/components/schemas/FullName'
+          description: Required for a new account; ignored for an existing one
+        password:
+          type: string
+          format: password
+          minLength: 1
+          maxLength: 128
+          description: New account — a new password (12–128, not breached). Existing account — the current password.
