@@ -6,12 +6,14 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Import;
 
 /**
- * Full application context against real PostgreSQL (Testcontainers), with MockMvc for HTTP-level assertions.
+ * Full application context against real PostgreSQL (Testcontainers), with MockMvc for HTTP-level assertions and
+ * metrics export switched back on (Spring Boot disables it in tests by default) so the Prometheus endpoint is tested.
  *
  * <p>Every integration test uses exactly this set of annotations, so Spring caches one context and the
  * containers start once per test run instead of once per class. Name test classes {@code *IT} so that
@@ -23,5 +25,6 @@ import org.springframework.context.annotation.Import;
 @ExtendWith(RequiresDockerCondition.class)
 @SpringBootTest
 @AutoConfigureMockMvc
+@AutoConfigureMetrics
 @Import(TestcontainersConfiguration.class)
 public @interface IntegrationTest {}
