@@ -1,0 +1,15 @@
+# kora-web specific output (the root .gitignore covers node_modules, dist, secrets and editor files)
+/out-tsc
+/tmp
+/.angular/cache
+/coverage
+/playwright-report
+/test-results
+/blob-report
+/playwright/.cache
+__screenshots__/
+.sass-cache/
+
+# Editor files: only the shared extension recommendations are committed
+/.vscode/*
+!/.vscode/extensions.json

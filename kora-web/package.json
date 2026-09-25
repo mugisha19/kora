@@ -1,0 +1,77 @@
+{
+  "name": "kora-web",
+  "version": "0.1.0",
+  "description": "Kora — project & portfolio management web app (Angular)",
+  "license": "MIT",
+  "private": true,
+  "engines": {
+    "node": "^22.22.3 || ^24.15.0 || >=26.0.0"
+  },
+  "packageManager": "npm@11.17.0",
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve",
+    "start:api": "ng serve --configuration development",
+    "build": "ng build",
+    "build:mock": "ng build --configuration mock",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test --watch=false",
+    "test:watch": "ng test",
+    "lint": "ng lint",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "icons": "node scripts/copy-icons.mjs",
+    "test:ci": "ng test --watch=false --coverage",
+    "e2e": "playwright test",
+    "e2e:ui": "playwright test --ui",
+    "verify": "npm run format:check && npm run lint && npm run test:ci && npm run build",
+    "prepare": "cd .. && husky kora-web/.husky"
+  },
+  "dependencies": {
+    "@angular/animations": "^22.2.0",
+    "@angular/cdk": "^22.2.0",
+    "@angular/common": "^22.2.0",
+    "@angular/compiler": "^22.2.0",
+    "@angular/core": "^22.2.0",
+    "@angular/forms": "^22.2.0",
+    "@angular/material": "^22.2.0",
+    "@angular/platform-browser": "^22.2.0",
+    "@angular/router": "^22.2.0",
+    "@jsverse/transloco": "^8.4.0",
+    "@ngrx/signals": "^22.0.1",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0"
+  },
+  "devDependencies": {
+    "@angular/build": "^22.2.0",
+    "@angular/cli": "^22.2.0",
+    "@angular/compiler-cli": "^22.2.0",
+    "@axe-core/playwright": "^4.13.0",
+    "@commitlint/cli": "^21.2.3",
+    "@commitlint/config-conventional": "^21.2.3",
+    "@eslint/js": "^10.0.1",
+    "@material-symbols/svg-400": "^0.47.5",
+    "@playwright/test": "^1.63.0",
+    "@testing-library/angular": "^19.5.0",
+    "@testing-library/dom": "^10.4.2",
+    "@testing-library/user-event": "^14.6.7",
+    "@types/node": "^24.13.6",
+    "@vitest/coverage-v8": "^5.0.2",
+    "angular-eslint": "22.5.0",
+    "eslint": "^10.9.1",
+    "eslint-config-prettier": "^10.1.8",
+    "husky": "^9.1.7",
+    "jsdom": "^30.0.0",
+    "lint-staged": "^17.5.1",
+    "msw": "^2.15.0",
+    "prettier": "^3.9.9",
+    "typescript": "~6.0.2",
+    "typescript-eslint": "8.69.0",
+    "vitest": "^5.0.0"
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
+  }
+}
