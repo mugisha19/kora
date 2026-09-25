@@ -1,0 +1,46 @@
+# ---------------------------------------------------------------
+# Kora monorepo — root ignore rules shared by kora-api and kora-web.
+# Each app may add its own .gitignore for tool-specific output.
+# ---------------------------------------------------------------
+
+# Secrets and local environment — never committed (see .env.example files instead)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.jks
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*~
+.idea/
+*.iml
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# Java / Maven (kora-api)
+target/
+*.class
+hs_err_pid*
+.mvn/wrapper/maven-wrapper.jar
+
+# Node / Angular (kora-web)
+node_modules/
+dist/
+.angular/
+coverage/
+playwright-report/
+test-results/
+blob-report/
+*.tsbuildinfo
+npm-debug.log*
+
+# Logs
+*.log
+logs/

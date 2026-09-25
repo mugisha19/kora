@@ -1,0 +1,22 @@
+# Normalise line endings in the repository to LF.
+# Without this, commits made on Windows (core.autocrlf) and Linux CI would
+# produce whole-file diffs and break shell scripts and Husky hooks.
+* text=auto eol=lf
+
+# Windows-only scripts keep CRLF
+*.cmd text eol=crlf
+*.bat text eol=crlf
+*.ps1 text eol=crlf
+
+# Binary assets
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.woff binary
+*.woff2 binary
+*.pdf binary
+*.xlsx binary
+*.jar binary
