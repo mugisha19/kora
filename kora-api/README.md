@@ -29,6 +29,7 @@ skipped (in CI they fail instead, so a broken runner can't pass).
 
 ## Documentation
 
+- [API contract (OpenAPI 3.0)](docs/openapi.yaml) · [change requests](docs/contract-requests.md)
 - [Architecture decisions](docs/adr/)
 - [Design patterns](docs/PATTERNS.md)
 - [Learning notes](docs/LEARNING.md)
