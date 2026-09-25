@@ -1,0 +1,74 @@
+{
+  "app": {
+    "name": "Kora",
+    "tagline": "Gucunga imishinga n'amatsinda y'imishinga, hashingiwe ku mikorere ya PMI.",
+    "skipToContent": "Jya ku bikubiye by'ingenzi",
+    "home": "Ahabanza ha Kora"
+  },
+  "nav": {
+    "label": "Urutonde rw'ingenzi",
+    "openMenu": "Fungura urutonde",
+    "dashboard": "Ikibaho",
+    "settings": "Igenamiterere"
+  },
+  "theme": {
+    "label": "Isura",
+    "change": "Hindura isura (iriho: {{ name }})",
+    "light": "Umucyo",
+    "dark": "Umwijima",
+    "system": "Nk'iya sisitemu",
+    "changed": "Isura yahinduwe kuri {{ name }}"
+  },
+  "language": {
+    "label": "Ururimi",
+    "change": "Hindura ururimi (ururiho: {{ name }})",
+    "changed": "Ururimi rwahinduwe kuri {{ name }}"
+  },
+  "common": {
+    "cancel": "Reka",
+    "confirm": "Emeza",
+    "close": "Funga",
+    "retry": "Ongera ugerageze",
+    "loading": "Birimo gufunguka…",
+    "delete": "Siba",
+    "errorTitle": "Habaye ikibazo",
+    "errorMessage": "Ntibyashobotse gufungura ibi. Genzura interineti yawe wongere ugerageze."
+  },
+  "status": {
+    "success": "Biragenda neza",
+    "warning": "Hari ibyago",
+    "danger": "Byarahagaze",
+    "info": "Amakuru",
+    "neutral": "Ntibiratangira"
+  },
+  "dashboard": {
+    "title": "Ikibaho",
+    "subtitle": "Imishinga ikeneye kwitabwaho, n'impamvu.",
+    "emptyTitle": "Incamake y'imishinga yawe izagaragara hano",
+    "emptyMessage": "Uko imishinga ihagaze, iyubahirizwa ry'igihe n'ingengo y'imari, ibyago by'ingenzi n'ibyemezo bitegerejwe ku mishinga ushobora kubona."
+  },
+  "settings": {
+    "title": "Igenamiterere",
+    "subtitle": "Hitamo uko Kora igaragara n'ururimi ikoresha.",
+    "appearance": {
+      "title": "Isura",
+      "description": "Bibikwa kuri iki gikoresho.",
+      "theme": "Isura",
+      "language": "Ururimi"
+    },
+    "about": {
+      "title": "Ibyerekeye",
+      "webVersion": "Verisiyo ya porogaramu",
+      "contractVersion": "Verisiyo y'amasezerano ya API",
+      "mode": "Uburyo bwa API",
+      "mockApi": "API y'igerageza",
+      "mockApiHint": "Amakuru ni ay'igerageza ari muri mushakisha yawe; nta na kimwe cyoherezwa kuri seriveri.",
+      "liveApi": "API nyayo"
+    }
+  },
+  "notFound": {
+    "title": "Paji ntiyabonetse",
+    "message": "Paji ushaka ntibaho cyangwa yimuriwe ahandi.",
+    "back": "Jya ku kibaho"
+  }
+}

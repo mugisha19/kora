@@ -1,0 +1,74 @@
+{
+  "app": {
+    "name": "Kora",
+    "tagline": "Gestion de projets et de portefeuilles, fondée sur les pratiques du PMI.",
+    "skipToContent": "Aller au contenu principal",
+    "home": "Accueil Kora"
+  },
+  "nav": {
+    "label": "Navigation principale",
+    "openMenu": "Ouvrir le menu de navigation",
+    "dashboard": "Tableau de bord",
+    "settings": "Paramètres"
+  },
+  "theme": {
+    "label": "Thème",
+    "change": "Changer de thème (actuel : {{ name }})",
+    "light": "Clair",
+    "dark": "Sombre",
+    "system": "Système",
+    "changed": "Thème défini sur {{ name }}"
+  },
+  "language": {
+    "label": "Langue",
+    "change": "Changer de langue (actuelle : {{ name }})",
+    "changed": "Langue changée en {{ name }}"
+  },
+  "common": {
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "close": "Fermer",
+    "retry": "Réessayer",
+    "loading": "Chargement…",
+    "delete": "Supprimer",
+    "errorTitle": "Une erreur s'est produite",
+    "errorMessage": "Impossible de charger ce contenu. Vérifiez votre connexion et réessayez."
+  },
+  "status": {
+    "success": "Dans les temps",
+    "warning": "À risque",
+    "danger": "Hors trajectoire",
+    "info": "Information",
+    "neutral": "Non démarré"
+  },
+  "dashboard": {
+    "title": "Tableau de bord",
+    "subtitle": "Quels projets demandent de l'attention, et pourquoi.",
+    "emptyTitle": "La vue d'ensemble de votre portefeuille apparaîtra ici",
+    "emptyMessage": "Santé, performance des délais et des coûts, principaux risques et décisions en attente pour les projets auxquels vous avez accès."
+  },
+  "settings": {
+    "title": "Paramètres",
+    "subtitle": "Choisissez l'apparence et la langue de Kora.",
+    "appearance": {
+      "title": "Apparence",
+      "description": "Mémorisé sur cet appareil.",
+      "theme": "Thème",
+      "language": "Langue"
+    },
+    "about": {
+      "title": "À propos",
+      "webVersion": "Version de l'application web",
+      "contractVersion": "Version du contrat d'API",
+      "mode": "Mode de l'API",
+      "mockApi": "API simulée",
+      "mockApiHint": "Les données sont simulées dans votre navigateur ; rien n'est envoyé à un serveur.",
+      "liveApi": "API réelle"
+    }
+  },
+  "notFound": {
+    "title": "Page introuvable",
+    "message": "La page que vous cherchez n'existe pas ou a été déplacée.",
+    "back": "Aller au tableau de bord"
+  }
+}

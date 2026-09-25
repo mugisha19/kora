@@ -1,0 +1,74 @@
+{
+  "app": {
+    "name": "Kora",
+    "tagline": "Project and portfolio management, built on PMI practice.",
+    "skipToContent": "Skip to main content",
+    "home": "Kora home"
+  },
+  "nav": {
+    "label": "Main navigation",
+    "openMenu": "Open navigation menu",
+    "dashboard": "Dashboard",
+    "settings": "Settings"
+  },
+  "theme": {
+    "label": "Theme",
+    "change": "Change theme (current: {{ name }})",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System",
+    "changed": "Theme set to {{ name }}"
+  },
+  "language": {
+    "label": "Language",
+    "change": "Change language (current: {{ name }})",
+    "changed": "Language changed to {{ name }}"
+  },
+  "common": {
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "close": "Close",
+    "retry": "Try again",
+    "loading": "Loading…",
+    "delete": "Delete",
+    "errorTitle": "Something went wrong",
+    "errorMessage": "We couldn't load this. Check your connection and try again."
+  },
+  "status": {
+    "success": "On track",
+    "warning": "At risk",
+    "danger": "Off track",
+    "info": "Information",
+    "neutral": "Not started"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Which projects need attention, and why.",
+    "emptyTitle": "Your portfolio overview will appear here",
+    "emptyMessage": "Health, schedule and cost performance, top risks and pending decisions for the projects you can access."
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Choose how Kora looks and speaks to you.",
+    "appearance": {
+      "title": "Appearance",
+      "description": "Remembered on this device.",
+      "theme": "Theme",
+      "language": "Language"
+    },
+    "about": {
+      "title": "About",
+      "webVersion": "Web app version",
+      "contractVersion": "API contract version",
+      "mode": "API mode",
+      "mockApi": "Mock API",
+      "mockApiHint": "Data is simulated in your browser; nothing is sent to a server.",
+      "liveApi": "Live API"
+    }
+  },
+  "notFound": {
+    "title": "Page not found",
+    "message": "The page you're looking for doesn't exist or has moved.",
+    "back": "Go to the dashboard"
+  }
+}
