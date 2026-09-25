@@ -2,6 +2,10 @@ import { defineConfig, devices } from '@playwright/test';
 
 const isCi = Boolean(process.env['CI']);
 
+// A dedicated port, so e2e never silently reuses another app already serving on the usual 4200.
+const PORT = 4210;
+const BASE_URL = `http://localhost:${PORT}`;
+
 /**
  * End-to-end tests run against the Angular dev server in mock mode (MSW), so they need no backend
  * until the API phases land; a later profile will point them at the real API.
@@ -14,7 +18,7 @@ export default defineConfig({
   workers: isCi ? 1 : undefined,
   reporter: isCi ? [['html', { open: 'never' }], ['github']] : 'list',
   use: {
-    baseURL: 'http://localhost:4200',
+    baseURL: BASE_URL,
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
   },
@@ -38,8 +42,8 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'npm run start -- --port 4200',
-    url: 'http://localhost:4200',
+    command: `npm run start -- --port ${PORT}`,
+    url: BASE_URL,
     reuseExistingServer: !isCi,
     timeout: 120_000,
   },
