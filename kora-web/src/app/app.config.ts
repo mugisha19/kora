@@ -6,6 +6,7 @@ import { routes } from './app.routes';
 import { provideApi } from './core/http/api.providers';
 import { provideI18n } from './core/i18n/i18n.providers';
 import { provideIcons } from './core/icons/icons.providers';
+import { provideSessionRestore } from './core/session/session.providers';
 
 /** Users who ask the OS for reduced motion get Material without animations (WCAG 2.3.3). */
 function prefersReducedMotion(): boolean {
@@ -23,6 +24,7 @@ export const appConfig: ApplicationConfig = {
     ),
     provideI18n(),
     provideIcons(),
+    provideSessionRestore(),
     {
       provide: MATERIAL_ANIMATIONS,
       useFactory: () => ({ animationsDisabled: prefersReducedMotion() }),

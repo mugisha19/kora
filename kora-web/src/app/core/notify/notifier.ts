@@ -21,6 +21,14 @@ export class Notifier {
     });
   }
 
+  /** Neutral information (e.g. why a page was not opened); polite, stays a little longer. */
+  info(message: string): void {
+    this.snackBar.open(message, this.transloco.translate('common.dismiss'), {
+      duration: 8000,
+      politeness: 'polite',
+    });
+  }
+
   success(message: string): void {
     this.snackBar.open(message, this.transloco.translate('common.dismiss'), {
       duration: 5000,
