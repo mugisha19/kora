@@ -312,6 +312,449 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/portfolios": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List portfolios
+         * @description Everyone in the organization can see portfolios. Sortable by `name`, `createdAt`. Default: `name,asc`.
+         */
+        get: operations["listPortfolios"];
+        put?: never;
+        /**
+         * Create a portfolio
+         * @description `PMO` or `ORG_ADMIN`.
+         */
+        post: operations["createPortfolio"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/portfolios/{portfolioId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a portfolio */
+        get: operations["getPortfolio"];
+        put?: never;
+        post?: never;
+        /**
+         * Delete an empty portfolio
+         * @description `PMO` or `ORG_ADMIN`.
+         */
+        delete: operations["deletePortfolio"];
+        options?: never;
+        head?: never;
+        /**
+         * Update or archive a portfolio
+         * @description `PMO` or `ORG_ADMIN`. An archived portfolio is read-only until it is reactivated (`status: ACTIVE`).
+         */
+        patch: operations["updatePortfolio"];
+        trace?: never;
+    };
+    "/portfolios/{portfolioId}/programs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List a portfolio''s programs
+         * @description Ordered by name.
+         */
+        get: operations["listPrograms"];
+        put?: never;
+        /**
+         * Create a program in a portfolio
+         * @description `PMO` or `ORG_ADMIN`.
+         */
+        post: operations["createProgram"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/programs/{programId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a program */
+        get: operations["getProgram"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update or close a program
+         * @description `PMO` or `ORG_ADMIN`.
+         */
+        patch: operations["updateProgram"];
+        trace?: never;
+    };
+    "/projects": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List the projects you can see
+         * @description `PMO` and `ORG_ADMIN` see every project; others see the projects they are members of. Sortable by `code`, `name`, `status`, `startDate`, `targetEndDate`. Default: `code,asc`.
+         */
+        get: operations["listProjects"];
+        put?: never;
+        /**
+         * Create a project
+         * @description `PROJECT_MANAGER`, `PMO` or `ORG_ADMIN`. Starts `PROPOSED` with an empty draft charter. The manager defaults to the caller and must hold one of those roles.
+         */
+        post: operations["createProject"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a project */
+        get: operations["getProject"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update a project
+         * @description The project manager, `PMO` or `ORG_ADMIN`. The methodology can only change while `PROPOSED`.
+         */
+        patch: operations["updateProject"];
+        trace?: never;
+    };
+    "/projects/{projectId}/transitions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Move a project to another lifecycle status
+         * @description The project manager, `PMO` or `ORG_ADMIN`. Only the statuses in `allowedTransitions` are legal; a reason is required for `ON_HOLD` and `CANCELLED`. `PROPOSED` becomes `APPROVED` only by approving the charter.
+         */
+        post: operations["transitionProject"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/health-override": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Override the computed health with a reason
+         * @description The project manager, `PMO` or `ORG_ADMIN`. The override is shown as such and replaces the computed value until removed.
+         */
+        put: operations["overrideProjectHealth"];
+        post?: never;
+        /** Return to the computed health */
+        delete: operations["clearProjectHealthOverride"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/members": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List the project team
+         * @description Manager first, then by name.
+         */
+        get: operations["listProjectMembers"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/members/{userId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Add a person to the project or change their project role
+         * @description The project manager, `PMO` or `ORG_ADMIN`. The person must be a member of the organization.
+         */
+        put: operations["putProjectMember"];
+        post?: never;
+        /**
+         * Remove a person from the project
+         * @description The project manager, `PMO` or `ORG_ADMIN`. The manager can't be removed; assign another manager first.
+         */
+        delete: operations["removeProjectMember"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/charter": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The current charter (the latest version that isn''t superseded) */
+        get: operations["getCharter"];
+        /**
+         * Replace the draft charter
+         * @description The project manager, `PMO` or `ORG_ADMIN`, only while the charter is a `DRAFT`. Lists replace the stored ones entirely.
+         */
+        put: operations["replaceCharter"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/charter/submit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Submit the draft for approval
+         * @description The project manager, `PMO` or `ORG_ADMIN`. Needs a purpose, at least one objective and a sponsor.
+         */
+        post: operations["submitCharter"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/charter/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Approve the submitted charter
+         * @description The sponsor, `PMO` or `ORG_ADMIN`. Authorizes the project: a `PROPOSED` project becomes `APPROVED`.
+         */
+        post: operations["approveCharter"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/charter/return": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Send the submitted charter back as a draft with a comment
+         * @description The sponsor, `PMO` or `ORG_ADMIN`.
+         */
+        post: operations["returnCharter"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/charter/versions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Every version of the charter, newest first */
+        get: operations["listCharterVersions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/wbs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The whole work breakdown structure with rolled-up values */
+        get: operations["getWbs"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/wbs/nodes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Add a deliverable or work package
+         * @description The project manager, `PMO` or `ORG_ADMIN`. The parent must be a deliverable; the tree is at most 8 levels deep.
+         */
+        post: operations["createWbsNode"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/wbs/nodes/{nodeId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete a WBS node
+         * @description The project manager, `PMO` or `ORG_ADMIN`. A node with children needs `cascade=true`.
+         */
+        delete: operations["deleteWbsNode"];
+        options?: never;
+        head?: never;
+        /**
+         * Update a WBS node
+         * @description The project manager, `PMO` or `ORG_ADMIN`. Effort, cost and percent complete belong to work packages; a deliverable's values are rolled up from its children.
+         */
+        patch: operations["updateWbsNode"];
+        trace?: never;
+    };
+    "/wbs/nodes/{nodeId}/move": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Move a node under another parent and/or position
+         * @description The project manager, `PMO` or `ORG_ADMIN`. Codes are renumbered; the whole tree is returned.
+         */
+        post: operations["moveWbsNode"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/dashboard/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Portfolio KPIs for the projects you can see
+         * @description Served from a read model refreshed on every project, charter and WBS change. Figures that need later features (SPI, CPI, risks, change requests) are absent until those features exist.
+         */
+        get: operations["getDashboardSummary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/dashboard/projects": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Projects that need attention
+         * @description Default order: severity (RED, AMBER, GREY, GREEN), then name. Sortable by `code`, `name`, `percentComplete`, `targetEndDate`.
+         */
+        get: operations["listDashboardProjects"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -373,7 +816,7 @@ export interface components {
          *     back to a generic message for unknown codes.
          * @enum {string}
          */
-        ErrorCode: "validation.failed" | "auth.unauthenticated" | "auth.invalid_credentials" | "auth.refresh_invalid" | "auth.email_taken" | "auth.reset_token_invalid" | "tenant.forbidden" | "tenant.header_invalid" | "access.denied" | "resource.not_found" | "method.not_allowed" | "media_type.unsupported" | "concurrency.stale_version" | "concurrency.if_match_required" | "members.last_admin" | "members.self_removal" | "invitations.already_member" | "invitations.already_pending" | "invitations.not_pending" | "invitations.not_found" | "invitations.expired" | "invitations.revoked" | "invitations.already_accepted" | "rate_limited" | "internal.error";
+        ErrorCode: "validation.failed" | "auth.unauthenticated" | "auth.invalid_credentials" | "auth.refresh_invalid" | "auth.email_taken" | "auth.reset_token_invalid" | "tenant.forbidden" | "tenant.header_invalid" | "access.denied" | "resource.not_found" | "method.not_allowed" | "media_type.unsupported" | "concurrency.stale_version" | "concurrency.if_match_required" | "members.last_admin" | "members.self_removal" | "invitations.already_member" | "invitations.already_pending" | "invitations.not_pending" | "invitations.not_found" | "invitations.expired" | "invitations.revoked" | "invitations.already_accepted" | "rate_limited" | "organization.currency_locked" | "portfolios.archived" | "portfolios.not_empty" | "projects.code_taken" | "projects.invalid_transition" | "projects.charter_approval_required" | "projects.methodology_locked" | "project_members.is_manager" | "charters.not_draft" | "charters.not_submitted" | "charters.incomplete" | "wbs.parent_not_deliverable" | "wbs.too_deep" | "wbs.cycle" | "wbs.has_children" | "wbs.type_change_not_allowed" | "internal.error";
         /** @enum {string} */
         Role: "ORG_ADMIN" | "PMO" | "PROJECT_MANAGER" | "MEMBER" | "VIEWER";
         /** @enum {string} */
@@ -562,6 +1005,420 @@ export interface components {
              */
             password: string;
         };
+        /** @description A decimal amount as a string (never a binary float) in the organization's currency */
+        Money: {
+            /** @example 12500000 */
+            amount: string;
+            /** @example RWF */
+            currency: string;
+        };
+        UserRef: {
+            /** Format: uuid */
+            userId: string;
+            /** @example Aline Uwase */
+            fullName: string;
+        };
+        /**
+         * @description RAG status: GREY = not started or finished; see the dashboard rule (ADR 0008)
+         * @enum {string}
+         */
+        Health: "GREEN" | "AMBER" | "RED" | "GREY";
+        TextList: string[];
+        /** @enum {string} */
+        PortfolioStatus: "ACTIVE" | "ARCHIVED";
+        Portfolio: {
+            /** Format: uuid */
+            id: string;
+            /** @example Digital Services 2026 */
+            name: string;
+            description?: string;
+            strategicObjectives: components["schemas"]["TextList"];
+            owner: components["schemas"]["UserRef"];
+            status: components["schemas"]["PortfolioStatus"];
+            /** Format: int32 */
+            programCount: number;
+            /** Format: int32 */
+            projectCount: number;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: int64 */
+            version: number;
+        };
+        PortfolioPage: components["schemas"]["PageMetadata"] & {
+            content: components["schemas"]["Portfolio"][];
+        };
+        CreatePortfolioRequest: {
+            name: string;
+            description?: string;
+            strategicObjectives?: components["schemas"]["TextList"];
+            /**
+             * Format: uuid
+             * @description Defaults to the caller; must be `PMO` or `ORG_ADMIN`
+             */
+            ownerId?: string;
+        };
+        UpdatePortfolioRequest: {
+            name?: string;
+            description?: string;
+            strategicObjectives?: components["schemas"]["TextList"];
+            /** Format: uuid */
+            ownerId?: string;
+            status?: components["schemas"]["PortfolioStatus"];
+        };
+        /** @enum {string} */
+        ProgramStatus: "ACTIVE" | "CLOSED";
+        Program: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            portfolioId: string;
+            /** @example Customer Channels */
+            name: string;
+            description?: string;
+            manager: components["schemas"]["UserRef"];
+            status: components["schemas"]["ProgramStatus"];
+            /** Format: int32 */
+            projectCount: number;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: int64 */
+            version: number;
+        };
+        CreateProgramRequest: {
+            name: string;
+            description?: string;
+            /**
+             * Format: uuid
+             * @description Must be `PROJECT_MANAGER`, `PMO` or `ORG_ADMIN`
+             */
+            managerId: string;
+        };
+        UpdateProgramRequest: {
+            name?: string;
+            description?: string;
+            /** Format: uuid */
+            managerId?: string;
+            status?: components["schemas"]["ProgramStatus"];
+        };
+        /**
+         * @description Decides which workspace tabs apply: AGILE (board, backlog), PREDICTIVE (schedule), HYBRID (both)
+         * @enum {string}
+         */
+        Methodology: "AGILE" | "PREDICTIVE" | "HYBRID";
+        /** @enum {string} */
+        ProjectStatus: "PROPOSED" | "APPROVED" | "IN_PROGRESS" | "ON_HOLD" | "CLOSING" | "CLOSED" | "CANCELLED";
+        Project: {
+            /** Format: uuid */
+            id: string;
+            /** @example AKG-012 */
+            code: string;
+            /** @example Mobile banking app */
+            name: string;
+            description?: string;
+            /** Format: uuid */
+            portfolioId: string;
+            /** Format: uuid */
+            programId?: string;
+            manager: components["schemas"]["UserRef"];
+            methodology: components["schemas"]["Methodology"];
+            status: components["schemas"]["ProjectStatus"];
+            /** @description Statuses the project may move to next through `POST /transitions` */
+            allowedTransitions: components["schemas"]["ProjectStatus"][];
+            /** Format: date */
+            startDate: string;
+            /** Format: date */
+            targetEndDate: string;
+            budget?: components["schemas"]["Money"];
+            health: components["schemas"]["Health"];
+            /** @description Why the project has this health (the override reason when overridden) */
+            healthReason?: string;
+            healthOverridden: boolean;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: int64 */
+            version: number;
+        };
+        ProjectPage: components["schemas"]["PageMetadata"] & {
+            content: components["schemas"]["Project"][];
+        };
+        /**
+         * @description Unique in the organization; upper-case letters, digits and dashes
+         * @example AKG-012
+         */
+        ProjectCode: string;
+        CreateProjectRequest: {
+            code: components["schemas"]["ProjectCode"];
+            name: string;
+            description?: string;
+            /** Format: uuid */
+            portfolioId: string;
+            /**
+             * Format: uuid
+             * @description Must belong to the same portfolio
+             */
+            programId?: string;
+            /**
+             * Format: uuid
+             * @description Defaults to the caller
+             */
+            managerId?: string;
+            methodology: components["schemas"]["Methodology"];
+            /** Format: date */
+            startDate: string;
+            /**
+             * Format: date
+             * @description After `startDate`
+             */
+            targetEndDate: string;
+            budget?: components["schemas"]["Money"];
+        };
+        UpdateProjectRequest: {
+            name?: string;
+            description?: string;
+            /** Format: uuid */
+            programId?: string;
+            /** Format: uuid */
+            managerId?: string;
+            methodology?: components["schemas"]["Methodology"];
+            /** Format: date */
+            startDate?: string;
+            /** Format: date */
+            targetEndDate?: string;
+            budget?: components["schemas"]["Money"];
+        };
+        TransitionRequest: {
+            to: components["schemas"]["ProjectStatus"];
+            /** @description Required when moving to `ON_HOLD` or `CANCELLED` */
+            reason?: string;
+        };
+        HealthOverrideRequest: {
+            /** @enum {string} */
+            health: "GREEN" | "AMBER" | "RED";
+            reason: string;
+        };
+        /**
+         * @description MANAGER is the project manager (set on the project); CONTRIBUTOR works on it; OBSERVER reads it
+         * @enum {string}
+         */
+        ProjectRole: "MANAGER" | "CONTRIBUTOR" | "OBSERVER";
+        ProjectMember: {
+            /** Format: uuid */
+            userId: string;
+            fullName: string;
+            email: components["schemas"]["Email"];
+            projectRole: components["schemas"]["ProjectRole"];
+            /** Format: date-time */
+            addedAt: string;
+        };
+        PutProjectMemberRequest: {
+            /** @enum {string} */
+            projectRole: "CONTRIBUTOR" | "OBSERVER";
+        };
+        /** @enum {string} */
+        CharterStatus: "DRAFT" | "SUBMITTED" | "APPROVED" | "SUPERSEDED";
+        CharterObjective: {
+            /** @description A SMART objective */
+            text: string;
+            successMetric: string;
+        };
+        CharterMilestone: {
+            name: string;
+            /** Format: date */
+            targetDate: string;
+        };
+        /** @description The editable part of a charter; a PUT replaces all of it */
+        CharterContent: {
+            purpose?: string;
+            businessCase?: string;
+            objectives?: components["schemas"]["CharterObjective"][];
+            inScope?: components["schemas"]["TextList"];
+            outOfScope?: components["schemas"]["TextList"];
+            assumptions?: components["schemas"]["TextList"];
+            constraints?: components["schemas"]["TextList"];
+            highLevelRisks?: components["schemas"]["TextList"];
+            milestones?: components["schemas"]["CharterMilestone"][];
+            summaryBudget?: components["schemas"]["Money"];
+            /** Format: uuid */
+            sponsorId?: string;
+        };
+        Charter: {
+            /** Format: uuid */
+            projectId: string;
+            /**
+             * Format: int32
+             * @description 1 for the first charter; a new number each time an approved charter is superseded
+             * @example 1
+             */
+            versionNumber: number;
+            status: components["schemas"]["CharterStatus"];
+            purpose?: string;
+            businessCase?: string;
+            objectives: components["schemas"]["CharterObjective"][];
+            inScope: components["schemas"]["TextList"];
+            outOfScope: components["schemas"]["TextList"];
+            assumptions: components["schemas"]["TextList"];
+            constraints: components["schemas"]["TextList"];
+            highLevelRisks: components["schemas"]["TextList"];
+            milestones: components["schemas"]["CharterMilestone"][];
+            summaryBudget?: components["schemas"]["Money"];
+            sponsor?: components["schemas"]["UserRef"];
+            /** Format: date-time */
+            submittedAt?: string;
+            approvedBy?: components["schemas"]["UserRef"];
+            /** Format: date-time */
+            approvedAt?: string;
+            /** @description Why the approver sent the last submission back */
+            returnComment?: string;
+            /** Format: int64 */
+            version: number;
+        };
+        ReturnCharterRequest: {
+            comment: string;
+        };
+        /**
+         * @description DELIVERABLE groups other nodes; WORK_PACKAGE is a leaf that carries effort, cost and progress
+         * @enum {string}
+         */
+        WbsNodeType: "DELIVERABLE" | "WORK_PACKAGE";
+        WbsNode: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            parentId?: string;
+            /**
+             * @description Outline number derived from the position in the tree, e.g. `1.2.3`
+             * @example 1.2.3
+             */
+            code: string;
+            name: string;
+            description?: string;
+            type: components["schemas"]["WbsNodeType"];
+            owner?: components["schemas"]["UserRef"];
+            /** @description A work package's own estimate, or the sum over a deliverable's subtree */
+            plannedEffortHours: number;
+            plannedCost: components["schemas"]["Money"];
+            /** @description A work package's reported progress, or the effort-weighted average over a subtree */
+            percentComplete: number;
+            earnedValue: components["schemas"]["Money"];
+            /** Format: int64 */
+            version: number;
+            children: components["schemas"]["WbsNode"][];
+        };
+        WbsTree: {
+            /** Format: uuid */
+            projectId: string;
+            plannedEffortHours: number;
+            plannedCost: components["schemas"]["Money"];
+            percentComplete: number;
+            earnedValue: components["schemas"]["Money"];
+            /** @description Top-level nodes (codes 1, 2, 3...) with their subtrees */
+            nodes: components["schemas"]["WbsNode"][];
+        };
+        CreateWbsNodeRequest: {
+            /**
+             * Format: uuid
+             * @description Omit for a top-level node; otherwise a deliverable
+             */
+            parentId?: string;
+            name: string;
+            description?: string;
+            type: components["schemas"]["WbsNodeType"];
+            /** Format: uuid */
+            ownerId?: string;
+            /** @description Work packages only */
+            plannedEffortHours?: number;
+            /** @description Work packages only; an amount in the organization's currency */
+            plannedCost?: string;
+            /** @description Work packages only (physical percent complete) */
+            percentComplete?: number;
+            /**
+             * Format: int32
+             * @description Place among its siblings (0-based); appended when omitted
+             */
+            position?: number;
+        };
+        UpdateWbsNodeRequest: {
+            name?: string;
+            description?: string;
+            type?: components["schemas"]["WbsNodeType"];
+            /** Format: uuid */
+            ownerId?: string;
+            plannedEffortHours?: number;
+            plannedCost?: string;
+            percentComplete?: number;
+        };
+        MoveWbsNodeRequest: {
+            /**
+             * Format: uuid
+             * @description The new parent deliverable; omit to make it a top-level node
+             */
+            newParentId?: string;
+            /** Format: int32 */
+            position: number;
+        };
+        DashboardSummary: {
+            /** Format: int32 */
+            projectCount: number;
+            /** @description Number of projects per `ProjectStatus` (statuses with no project are omitted) */
+            byStatus: {
+                [key: string]: number;
+            };
+            /** @description Number of projects per `Health` */
+            byHealth: {
+                [key: string]: number;
+            };
+            totalBudget: components["schemas"]["Money"];
+            totalPlannedCost: components["schemas"]["Money"];
+            totalEarnedValue: components["schemas"]["Money"];
+            /**
+             * Format: int32
+             * @description Projects in progress past their target end date
+             */
+            lateProjects: number;
+            /** @description Schedule performance index (from API Phase 7) */
+            portfolioSpi?: number;
+            /** @description Cost performance index (from API Phase 7) */
+            portfolioCpi?: number;
+            /**
+             * Format: int32
+             * @description From API Phase 6
+             */
+            openCriticalRisks?: number;
+            /**
+             * Format: int32
+             * @description From API Phase 6
+             */
+            pendingChangeRequests?: number;
+        };
+        NextMilestone: {
+            name: string;
+            /** Format: date */
+            targetDate: string;
+        };
+        DashboardProject: {
+            /** Format: uuid */
+            projectId: string;
+            code: string;
+            name: string;
+            /** Format: uuid */
+            portfolioId: string;
+            manager: components["schemas"]["UserRef"];
+            status: components["schemas"]["ProjectStatus"];
+            health: components["schemas"]["Health"];
+            healthReason?: string;
+            healthOverridden: boolean;
+            percentComplete: number;
+            /** Format: date */
+            targetEndDate?: string;
+            nextMilestone?: components["schemas"]["NextMilestone"];
+            /** @description From API Phase 7 */
+            spi?: number;
+            /** @description From API Phase 7 */
+            cpi?: number;
+        };
+        DashboardProjectPage: components["schemas"]["PageMetadata"] & {
+            content: components["schemas"]["DashboardProject"][];
+        };
     };
     responses: {
         /** @description Invalid input. Code: `validation.failed` with `errors[]`, or `tenant.header_invalid`. */
@@ -694,6 +1551,12 @@ export interface components {
         InvitationId: string;
         /** @description Opaque token from the invitation email */
         InvitationToken: string;
+        PortfolioId: string;
+        ProgramId: string;
+        ProjectId: string;
+        NodeId: string;
+        /** @description The person's user id (as in `Member.userId`) */
+        UserId: string;
     };
     requestBodies: never;
     headers: {
@@ -1037,6 +1900,16 @@ export interface operations {
             400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthenticated"];
             403: components["responses"]["Forbidden"];
+            /** @description Projects already have budgets in the current currency. Code: `organization.currency_locked`. */
+            409: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
             412: components["responses"]["PreconditionFailed"];
             428: components["responses"]["PreconditionRequired"];
             500: components["responses"]["InternalError"];
@@ -1369,6 +2242,1343 @@ export interface operations {
             404: components["responses"]["InvitationNotFound"];
             410: components["responses"]["InvitationGone"];
             429: components["responses"]["TooManyRequests"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listPortfolios: {
+        parameters: {
+            query?: {
+                status?: components["schemas"]["PortfolioStatus"];
+                /** @description Case-insensitive match on name (and code for projects) */
+                q?: string;
+                /** @description 0-based page index */
+                page?: components["parameters"]["Page"];
+                /** @description Page size (values above 100 are capped at 100) */
+                size?: components["parameters"]["Size"];
+                /** @description `field,asc` or `field,desc`; repeat for secondary sorts */
+                sort?: components["parameters"]["Sort"];
+            };
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description One page of portfolios */
+            200: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PortfolioPage"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    createPortfolio: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreatePortfolioRequest"];
+            };
+        };
+        responses: {
+            /** @description Portfolio created */
+            201: {
+                headers: {
+                    ETag: components["headers"]["ETag"];
+                    /** @description URL of the new resource */
+                    Location?: string;
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Portfolio"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getPortfolio: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                portfolioId: components["parameters"]["PortfolioId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The portfolio */
+            200: {
+                headers: {
+                    ETag: components["headers"]["ETag"];
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Portfolio"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    deletePortfolio: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                portfolioId: components["parameters"]["PortfolioId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Portfolio deleted */
+            204: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            /** @description The portfolio still has programs or projects. Code: `portfolios.not_empty`. */
+            409: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            500: components["responses"]["InternalError"];
+        };
+    };
+    updatePortfolio: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description The `ETag` of the version being updated, e.g. `"3"` */
+                "If-Match": components["parameters"]["IfMatch"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                portfolioId: components["parameters"]["PortfolioId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdatePortfolioRequest"];
+            };
+        };
+        responses: {
+            /** @description Updated portfolio */
+            200: {
+                headers: {
+                    ETag: components["headers"]["ETag"];
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Portfolio"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            /** @description Archived and the change is not a reactivation. Code: `portfolios.archived`. */
+            409: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listPrograms: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                portfolioId: components["parameters"]["PortfolioId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The programs */
+            200: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Program"][];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    createProgram: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                portfolioId: components["parameters"]["PortfolioId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateProgramRequest"];
+            };
+        };
+        responses: {
+            /** @description Program created */
+            201: {
+                headers: {
+                    ETag: components["headers"]["ETag"];
+                    /** @description URL of the new resource */
+                    Location?: string;
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Program"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            /** @description The portfolio is archived. Code: `portfolios.archived`. */
+            409: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getProgram: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                programId: components["parameters"]["ProgramId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The program */
+            200: {
+                headers: {
+                    ETag: components["headers"]["ETag"];
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Program"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    updateProgram: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description The `ETag` of the version being updated, e.g. `"3"` */
+                "If-Match": components["parameters"]["IfMatch"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                programId: components["parameters"]["ProgramId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateProgramRequest"];
+            };
+        };
+        responses: {
+            /** @description Updated program */
+            200: {
+                headers: {
+                    ETag: components["headers"]["ETag"];
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Program"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            /** @description The portfolio is archived. Code: `portfolios.archived`. */
+            409: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listProjects: {
+        parameters: {
+            query?: {
+                portfolioId?: string;
+                programId?: string;
+                status?: components["schemas"]["ProjectStatus"];
+                methodology?: components["schemas"]["Methodology"];
+                health?: components["schemas"]["Health"];
+                /** @description Case-insensitive match on name (and code for projects) */
+                q?: string;
+                /** @description 0-based page index */
+                page?: components["parameters"]["Page"];
+                /** @description Page size (values above 100 are capped at 100) */
+                size?: components["parameters"]["Size"];
+                /** @description `field,asc` or `field,desc`; repeat for secondary sorts */
+                sort?: components["parameters"]["Sort"];
+            };
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description One page of projects */
+            200: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProjectPage"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    createProject: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateProjectRequest"];
+            };
+        };
+        responses: {
+            /** @description Project created */
+            201: {
+                headers: {
+                    ETag: components["headers"]["ETag"];
+                    /** @description URL of the new resource */
+                    Location?: string;
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Project"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            /** @description `projects.code_taken` (with `errors[{field: "code"}]`) or `portfolios.archived`. */
+            409: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getProject: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                projectId: components["parameters"]["ProjectId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The project */
+            200: {
+                headers: {
+                    ETag: components["headers"]["ETag"];
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Project"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    updateProject: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description The `ETag` of the version being updated, e.g. `"3"` */
+                "If-Match": components["parameters"]["IfMatch"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                projectId: components["parameters"]["ProjectId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateProjectRequest"];
+            };
+        };
+        responses: {
+            /** @description Updated project */
+            200: {
+                headers: {
+                    ETag: components["headers"]["ETag"];
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Project"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            /** @description `projects.methodology_locked` or `portfolios.archived`. */
+            409: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    transitionProject: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                projectId: components["parameters"]["ProjectId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TransitionRequest"];
+            };
+        };
+        responses: {
+            /** @description The project in its new status */
+            200: {
+                headers: {
+                    ETag: components["headers"]["ETag"];
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Project"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            /** @description `projects.invalid_transition` or `projects.charter_approval_required`. */
+            409: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            500: components["responses"]["InternalError"];
+        };
+    };
+    overrideProjectHealth: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                projectId: components["parameters"]["ProjectId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["HealthOverrideRequest"];
+            };
+        };
+        responses: {
+            /** @description The project with its overridden health */
+            200: {
+                headers: {
+                    ETag: components["headers"]["ETag"];
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Project"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    clearProjectHealthOverride: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                projectId: components["parameters"]["ProjectId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The project with its computed health */
+            200: {
+                headers: {
+                    ETag: components["headers"]["ETag"];
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Project"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listProjectMembers: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                projectId: components["parameters"]["ProjectId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The project members */
+            200: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProjectMember"][];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    putProjectMember: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                projectId: components["parameters"]["ProjectId"];
+                /** @description The person's user id (as in `Member.userId`) */
+                userId: components["parameters"]["UserId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PutProjectMemberRequest"];
+            };
+        };
+        responses: {
+            /** @description The project member */
+            200: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProjectMember"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    removeProjectMember: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                projectId: components["parameters"]["ProjectId"];
+                /** @description The person's user id (as in `Member.userId`) */
+                userId: components["parameters"]["UserId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Removed */
+            204: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            /** @description The person is the project manager. Code: `project_members.is_manager`. */
+            409: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getCharter: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                projectId: components["parameters"]["ProjectId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The charter */
+            200: {
+                headers: {
+                    ETag: components["headers"]["ETag"];
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Charter"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    replaceCharter: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description The `ETag` of the version being updated, e.g. `"3"` */
+                "If-Match": components["parameters"]["IfMatch"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                projectId: components["parameters"]["ProjectId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CharterContent"];
+            };
+        };
+        responses: {
+            /** @description The updated draft */
+            200: {
+                headers: {
+                    ETag: components["headers"]["ETag"];
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Charter"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            /** @description The charter is not a draft. Code: `charters.not_draft`. */
+            409: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    submitCharter: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                projectId: components["parameters"]["ProjectId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The submitted charter */
+            200: {
+                headers: {
+                    ETag: components["headers"]["ETag"];
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Charter"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            /** @description `charters.not_draft`, or `charters.incomplete` with `errors[]` naming the missing fields. */
+            409: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            500: components["responses"]["InternalError"];
+        };
+    };
+    approveCharter: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                projectId: components["parameters"]["ProjectId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The approved charter */
+            200: {
+                headers: {
+                    ETag: components["headers"]["ETag"];
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Charter"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            /** @description The charter is not submitted. Code: `charters.not_submitted`. */
+            409: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            500: components["responses"]["InternalError"];
+        };
+    };
+    returnCharter: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                projectId: components["parameters"]["ProjectId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReturnCharterRequest"];
+            };
+        };
+        responses: {
+            /** @description The returned draft */
+            200: {
+                headers: {
+                    ETag: components["headers"]["ETag"];
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Charter"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            /** @description The charter is not submitted. Code: `charters.not_submitted`. */
+            409: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listCharterVersions: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                projectId: components["parameters"]["ProjectId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The versions */
+            200: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Charter"][];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getWbs: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                projectId: components["parameters"]["ProjectId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The WBS tree */
+            200: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WbsTree"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    createWbsNode: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                projectId: components["parameters"]["ProjectId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateWbsNodeRequest"];
+            };
+        };
+        responses: {
+            /** @description The new node */
+            201: {
+                headers: {
+                    ETag: components["headers"]["ETag"];
+                    /** @description URL of the new resource */
+                    Location?: string;
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WbsNode"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            /** @description `wbs.parent_not_deliverable` or `wbs.too_deep`. */
+            409: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            500: components["responses"]["InternalError"];
+        };
+    };
+    deleteWbsNode: {
+        parameters: {
+            query?: {
+                /** @description Also delete every descendant */
+                cascade?: boolean;
+            };
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                nodeId: components["parameters"]["NodeId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deleted */
+            204: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            /** @description The node has children and cascade is off. Code: `wbs.has_children`. */
+            409: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            500: components["responses"]["InternalError"];
+        };
+    };
+    updateWbsNode: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description The `ETag` of the version being updated, e.g. `"3"` */
+                "If-Match": components["parameters"]["IfMatch"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                nodeId: components["parameters"]["NodeId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateWbsNodeRequest"];
+            };
+        };
+        responses: {
+            /** @description The updated node */
+            200: {
+                headers: {
+                    ETag: components["headers"]["ETag"];
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WbsNode"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            /** @description Changing the type of a node that has children. Code: `wbs.type_change_not_allowed`. */
+            409: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    moveWbsNode: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                nodeId: components["parameters"]["NodeId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MoveWbsNodeRequest"];
+            };
+        };
+        responses: {
+            /** @description The renumbered tree */
+            200: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WbsTree"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            /** @description `wbs.cycle` (under its own descendant), `wbs.too_deep` or `wbs.parent_not_deliverable`. */
+            409: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getDashboardSummary: {
+        parameters: {
+            query?: {
+                portfolioId?: string;
+            };
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The summary */
+            200: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DashboardSummary"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listDashboardProjects: {
+        parameters: {
+            query?: {
+                portfolioId?: string;
+                health?: components["schemas"]["Health"];
+                /** @description 0-based page index */
+                page?: components["parameters"]["Page"];
+                /** @description Page size (values above 100 are capped at 100) */
+                size?: components["parameters"]["Size"];
+                /** @description `field,asc` or `field,desc`; repeat for secondary sorts */
+                sort?: components["parameters"]["Sort"];
+            };
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description One page of dashboard rows */
+            200: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DashboardProjectPage"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
             500: components["responses"]["InternalError"];
         };
     };
