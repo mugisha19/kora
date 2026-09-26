@@ -16,7 +16,12 @@ import java.util.UUID;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -24,6 +29,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,8 +48,24 @@ import org.springframework.web.bind.annotation.RestController;
  * resolvers, validation and the Problem Details handler. A probe controller that exists only in tests triggers
  * each kind of failure. No database or Docker needed.
  */
-@WebMvcTest(controllers = PlatformWebTest.ProbeController.class)
+@WebMvcTest(
+        controllers = PlatformWebTest.ProbeController.class,
+        // The tenant filter needs the organization module's services, which a web slice doesn't load.
+        excludeFilters = @ComponentScan.Filter(type = FilterType.REGEX, pattern = "com\\.kora\\.organization\\..*"))
+@Import(PlatformWebTest.OpenSecurity.class)
 class PlatformWebTest {
+
+    /** Authentication is not what this slice tests (see AuthIT); every probe endpoint is open. */
+    @TestConfiguration(proxyBeanMethods = false)
+    static class OpenSecurity {
+
+        @Bean
+        SecurityFilterChain openForProbes(HttpSecurity http) {
+            return http.csrf(AbstractHttpConfigurer::disable)
+                    .authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll())
+                    .build();
+        }
+    }
 
     @Autowired
     private MockMvcTester mvc;
