@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Kora API
-  version: 0.1.1
+  version: 0.2.0
   description: |
     Multi-tenant project and portfolio management built on PMI practices.
 
@@ -42,6 +42,16 @@ tags:
     description: People in the active organization and their roles (feature 03)
   - name: Invitations
     description: Expiring, single-use email invitations (feature 03)
+  - name: Portfolios
+    description: Portfolios and programs (feature 04)
+  - name: Projects
+    description: Projects, their lifecycle, team and health (feature 04)
+  - name: Charter
+    description: The project charter and its approval (feature 06)
+  - name: WBS
+    description: Work breakdown structure with rolled-up effort, cost and progress (feature 07)
+  - name: Dashboard
+    description: Portfolio dashboard read model (feature 05)
 
 security:
   - bearerAuth: []
@@ -364,6 +374,15 @@ paths:
           $ref: '#/components/responses/Unauthenticated'
         '403':
           $ref: '#/components/responses/Forbidden'
+        '409':
+          description: 'Projects already have budgets in the current currency. Code: `organization.currency_locked`.'
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
         '412':
           $ref: '#/components/responses/PreconditionFailed'
         '428':
@@ -693,6 +712,1301 @@ paths:
         '500':
           $ref: '#/components/responses/InternalError'
 
+  /portfolios:
+    get:
+      tags: [Portfolios]
+      operationId: listPortfolios
+      summary: List portfolios
+      description: 'Everyone in the organization can see portfolios. Sortable by `name`, `createdAt`. Default: `name,asc`.'
+      parameters:
+        - $ref: '#/components/parameters/OrganizationId'
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/PortfolioStatus'
+        - name: q
+          in: query
+          description: 'Case-insensitive match on name (and code for projects)'
+          schema:
+            type: string
+            maxLength: 100
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+        - $ref: '#/components/parameters/Sort'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: One page of portfolios
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PortfolioPage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      tags: [Portfolios]
+      operationId: createPortfolio
+      summary: Create a portfolio
+      description: '`PMO` or `ORG_ADMIN`.'
+      parameters:
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePortfolioRequest'
+      responses:
+        '201':
+          description: Portfolio created
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            Location:
+              description: URL of the new resource
+              schema:
+                type: string
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Portfolio'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /portfolios/{portfolioId}:
+    get:
+      tags: [Portfolios]
+      operationId: getPortfolio
+      summary: Get a portfolio
+      parameters:
+        - $ref: '#/components/parameters/PortfolioId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: The portfolio
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Portfolio'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    patch:
+      tags: [Portfolios]
+      operationId: updatePortfolio
+      summary: Update or archive a portfolio
+      description: '`PMO` or `ORG_ADMIN`. An archived portfolio is read-only until it is reactivated (`status: ACTIVE`).'
+      parameters:
+        - $ref: '#/components/parameters/PortfolioId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/IfMatch'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePortfolioRequest'
+      responses:
+        '200':
+          description: Updated portfolio
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Portfolio'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'Archived and the change is not a reactivation. Code: `portfolios.archived`.'
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '412':
+          $ref: '#/components/responses/PreconditionFailed'
+        '428':
+          $ref: '#/components/responses/PreconditionRequired'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    delete:
+      tags: [Portfolios]
+      operationId: deletePortfolio
+      summary: Delete an empty portfolio
+      description: '`PMO` or `ORG_ADMIN`.'
+      parameters:
+        - $ref: '#/components/parameters/PortfolioId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '204':
+          description: Portfolio deleted
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'The portfolio still has programs or projects. Code: `portfolios.not_empty`.'
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /portfolios/{portfolioId}/programs:
+    get:
+      tags: [Portfolios]
+      operationId: listPrograms
+      summary: List a portfolio''s programs
+      description: 'Ordered by name.'
+      parameters:
+        - $ref: '#/components/parameters/PortfolioId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: The programs
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Program'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      tags: [Portfolios]
+      operationId: createProgram
+      summary: Create a program in a portfolio
+      description: '`PMO` or `ORG_ADMIN`.'
+      parameters:
+        - $ref: '#/components/parameters/PortfolioId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateProgramRequest'
+      responses:
+        '201':
+          description: Program created
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            Location:
+              description: URL of the new resource
+              schema:
+                type: string
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Program'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'The portfolio is archived. Code: `portfolios.archived`.'
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /programs/{programId}:
+    get:
+      tags: [Portfolios]
+      operationId: getProgram
+      summary: Get a program
+      parameters:
+        - $ref: '#/components/parameters/ProgramId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: The program
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Program'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    patch:
+      tags: [Portfolios]
+      operationId: updateProgram
+      summary: Update or close a program
+      description: '`PMO` or `ORG_ADMIN`.'
+      parameters:
+        - $ref: '#/components/parameters/ProgramId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/IfMatch'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProgramRequest'
+      responses:
+        '200':
+          description: Updated program
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Program'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'The portfolio is archived. Code: `portfolios.archived`.'
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '412':
+          $ref: '#/components/responses/PreconditionFailed'
+        '428':
+          $ref: '#/components/responses/PreconditionRequired'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /projects:
+    get:
+      tags: [Projects]
+      operationId: listProjects
+      summary: List the projects you can see
+      description: '`PMO` and `ORG_ADMIN` see every project; others see the projects they are members of. Sortable by `code`, `name`, `status`, `startDate`, `targetEndDate`. Default: `code,asc`.'
+      parameters:
+        - $ref: '#/components/parameters/OrganizationId'
+        - name: portfolioId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: programId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/ProjectStatus'
+        - name: methodology
+          in: query
+          schema:
+            $ref: '#/components/schemas/Methodology'
+        - name: health
+          in: query
+          schema:
+            $ref: '#/components/schemas/Health'
+        - name: q
+          in: query
+          description: 'Case-insensitive match on name (and code for projects)'
+          schema:
+            type: string
+            maxLength: 100
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+        - $ref: '#/components/parameters/Sort'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: One page of projects
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectPage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      tags: [Projects]
+      operationId: createProject
+      summary: Create a project
+      description: '`PROJECT_MANAGER`, `PMO` or `ORG_ADMIN`. Starts `PROPOSED` with an empty draft charter. The manager defaults to the caller and must hold one of those roles.'
+      parameters:
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateProjectRequest'
+      responses:
+        '201':
+          description: Project created
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            Location:
+              description: URL of the new resource
+              schema:
+                type: string
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          description: '`projects.code_taken` (with `errors[{field: "code"}]`) or `portfolios.archived`.'
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /projects/{projectId}:
+    get:
+      tags: [Projects]
+      operationId: getProject
+      summary: Get a project
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: The project
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    patch:
+      tags: [Projects]
+      operationId: updateProject
+      summary: Update a project
+      description: 'The project manager, `PMO` or `ORG_ADMIN`. The methodology can only change while `PROPOSED`.'
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/IfMatch'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProjectRequest'
+      responses:
+        '200':
+          description: Updated project
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: '`projects.methodology_locked` or `portfolios.archived`.'
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '412':
+          $ref: '#/components/responses/PreconditionFailed'
+        '428':
+          $ref: '#/components/responses/PreconditionRequired'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /projects/{projectId}/transitions:
+    post:
+      tags: [Projects]
+      operationId: transitionProject
+      summary: Move a project to another lifecycle status
+      description: 'The project manager, `PMO` or `ORG_ADMIN`. Only the statuses in `allowedTransitions` are legal; a reason is required for `ON_HOLD` and `CANCELLED`. `PROPOSED` becomes `APPROVED` only by approving the charter.'
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransitionRequest'
+      responses:
+        '200':
+          description: The project in its new status
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: '`projects.invalid_transition` or `projects.charter_approval_required`.'
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /projects/{projectId}/health-override:
+    put:
+      tags: [Projects]
+      operationId: overrideProjectHealth
+      summary: Override the computed health with a reason
+      description: 'The project manager, `PMO` or `ORG_ADMIN`. The override is shown as such and replaces the computed value until removed.'
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HealthOverrideRequest'
+      responses:
+        '200':
+          description: The project with its overridden health
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    delete:
+      tags: [Projects]
+      operationId: clearProjectHealthOverride
+      summary: Return to the computed health
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: The project with its computed health
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /projects/{projectId}/members:
+    get:
+      tags: [Projects]
+      operationId: listProjectMembers
+      summary: List the project team
+      description: 'Manager first, then by name.'
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: The project members
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProjectMember'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /projects/{projectId}/members/{userId}:
+    put:
+      tags: [Projects]
+      operationId: putProjectMember
+      summary: Add a person to the project or change their project role
+      description: 'The project manager, `PMO` or `ORG_ADMIN`. The person must be a member of the organization.'
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/UserId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PutProjectMemberRequest'
+      responses:
+        '200':
+          description: The project member
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectMember'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    delete:
+      tags: [Projects]
+      operationId: removeProjectMember
+      summary: Remove a person from the project
+      description: 'The project manager, `PMO` or `ORG_ADMIN`. The manager can''t be removed; assign another manager first.'
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/UserId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '204':
+          description: Removed
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'The person is the project manager. Code: `project_members.is_manager`.'
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /projects/{projectId}/charter:
+    get:
+      tags: [Charter]
+      operationId: getCharter
+      summary: The current charter (the latest version that isn''t superseded)
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: The charter
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Charter'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    put:
+      tags: [Charter]
+      operationId: replaceCharter
+      summary: Replace the draft charter
+      description: 'The project manager, `PMO` or `ORG_ADMIN`, only while the charter is a `DRAFT`. Lists replace the stored ones entirely.'
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/IfMatch'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CharterContent'
+      responses:
+        '200':
+          description: The updated draft
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Charter'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'The charter is not a draft. Code: `charters.not_draft`.'
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '412':
+          $ref: '#/components/responses/PreconditionFailed'
+        '428':
+          $ref: '#/components/responses/PreconditionRequired'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /projects/{projectId}/charter/submit:
+    post:
+      tags: [Charter]
+      operationId: submitCharter
+      summary: Submit the draft for approval
+      description: 'The project manager, `PMO` or `ORG_ADMIN`. Needs a purpose, at least one objective and a sponsor.'
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: The submitted charter
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Charter'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: '`charters.not_draft`, or `charters.incomplete` with `errors[]` naming the missing fields.'
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /projects/{projectId}/charter/approve:
+    post:
+      tags: [Charter]
+      operationId: approveCharter
+      summary: Approve the submitted charter
+      description: 'The sponsor, `PMO` or `ORG_ADMIN`. Authorizes the project: a `PROPOSED` project becomes `APPROVED`.'
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: The approved charter
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Charter'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'The charter is not submitted. Code: `charters.not_submitted`.'
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /projects/{projectId}/charter/return:
+    post:
+      tags: [Charter]
+      operationId: returnCharter
+      summary: Send the submitted charter back as a draft with a comment
+      description: 'The sponsor, `PMO` or `ORG_ADMIN`.'
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReturnCharterRequest'
+      responses:
+        '200':
+          description: The returned draft
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Charter'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'The charter is not submitted. Code: `charters.not_submitted`.'
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /projects/{projectId}/charter/versions:
+    get:
+      tags: [Charter]
+      operationId: listCharterVersions
+      summary: Every version of the charter, newest first
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: The versions
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Charter'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /projects/{projectId}/wbs:
+    get:
+      tags: [WBS]
+      operationId: getWbs
+      summary: The whole work breakdown structure with rolled-up values
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: The WBS tree
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WbsTree'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /projects/{projectId}/wbs/nodes:
+    post:
+      tags: [WBS]
+      operationId: createWbsNode
+      summary: Add a deliverable or work package
+      description: 'The project manager, `PMO` or `ORG_ADMIN`. The parent must be a deliverable; the tree is at most 8 levels deep.'
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateWbsNodeRequest'
+      responses:
+        '201':
+          description: The new node
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            Location:
+              description: URL of the new resource
+              schema:
+                type: string
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WbsNode'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: '`wbs.parent_not_deliverable` or `wbs.too_deep`.'
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /wbs/nodes/{nodeId}:
+    patch:
+      tags: [WBS]
+      operationId: updateWbsNode
+      summary: Update a WBS node
+      description: 'The project manager, `PMO` or `ORG_ADMIN`. Effort, cost and percent complete belong to work packages; a deliverable''s values are rolled up from its children.'
+      parameters:
+        - $ref: '#/components/parameters/NodeId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/IfMatch'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateWbsNodeRequest'
+      responses:
+        '200':
+          description: The updated node
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WbsNode'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'Changing the type of a node that has children. Code: `wbs.type_change_not_allowed`.'
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '412':
+          $ref: '#/components/responses/PreconditionFailed'
+        '428':
+          $ref: '#/components/responses/PreconditionRequired'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    delete:
+      tags: [WBS]
+      operationId: deleteWbsNode
+      summary: Delete a WBS node
+      description: 'The project manager, `PMO` or `ORG_ADMIN`. A node with children needs `cascade=true`.'
+      parameters:
+        - $ref: '#/components/parameters/NodeId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - name: cascade
+          in: query
+          description: 'Also delete every descendant'
+          schema:
+            type: boolean
+            default: false
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '204':
+          description: Deleted
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'The node has children and cascade is off. Code: `wbs.has_children`.'
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /wbs/nodes/{nodeId}/move:
+    post:
+      tags: [WBS]
+      operationId: moveWbsNode
+      summary: Move a node under another parent and/or position
+      description: 'The project manager, `PMO` or `ORG_ADMIN`. Codes are renumbered; the whole tree is returned.'
+      parameters:
+        - $ref: '#/components/parameters/NodeId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MoveWbsNodeRequest'
+      responses:
+        '200':
+          description: The renumbered tree
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WbsTree'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: '`wbs.cycle` (under its own descendant), `wbs.too_deep` or `wbs.parent_not_deliverable`.'
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /dashboard/summary:
+    get:
+      tags: [Dashboard]
+      operationId: getDashboardSummary
+      summary: Portfolio KPIs for the projects you can see
+      description: 'Served from a read model refreshed on every project, charter and WBS change. Figures that need later features (SPI, CPI, risks, change requests) are absent until those features exist.'
+      parameters:
+        - $ref: '#/components/parameters/OrganizationId'
+        - name: portfolioId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: The summary
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardSummary'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /dashboard/projects:
+    get:
+      tags: [Dashboard]
+      operationId: listDashboardProjects
+      summary: Projects that need attention
+      description: 'Default order: severity (RED, AMBER, GREY, GREEN), then name. Sortable by `code`, `name`, `percentComplete`, `targetEndDate`.'
+      parameters:
+        - $ref: '#/components/parameters/OrganizationId'
+        - name: portfolioId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: health
+          in: query
+          schema:
+            $ref: '#/components/schemas/Health'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+        - $ref: '#/components/parameters/Sort'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: One page of dashboard rows
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardProjectPage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -785,6 +2099,43 @@ components:
         type: string
         minLength: 20
         maxLength: 200
+
+    PortfolioId:
+      name: portfolioId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    ProgramId:
+      name: programId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    ProjectId:
+      name: projectId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    NodeId:
+      name: nodeId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    UserId:
+      name: userId
+      in: path
+      required: true
+      description: The person's user id (as in `Member.userId`)
+      schema:
+        type: string
+        format: uuid
 
   headers:
     CorrelationId:
@@ -999,6 +2350,22 @@ components:
         - invitations.revoked
         - invitations.already_accepted
         - rate_limited
+        - organization.currency_locked
+        - portfolios.archived
+        - portfolios.not_empty
+        - projects.code_taken
+        - projects.invalid_transition
+        - projects.charter_approval_required
+        - projects.methodology_locked
+        - project_members.is_manager
+        - charters.not_draft
+        - charters.not_submitted
+        - charters.incomplete
+        - wbs.parent_not_deliverable
+        - wbs.too_deep
+        - wbs.cycle
+        - wbs.has_children
+        - wbs.type_change_not_allowed
         - internal.error
 
     # ---------- Shared ----------
@@ -1317,3 +2684,743 @@ components:
           minLength: 1
           maxLength: 128
           description: New account — a new password (12–128, not breached). Existing account — the current password.
+
+    # ---------- Shared (0.2.0) ----------
+    Money:
+      type: object
+      required: [amount, currency]
+      description: 'A decimal amount as a string (never a binary float) in the organization''s currency'
+      properties:
+        amount:
+          type: string
+          pattern: '^-?[0-9]{1,15}(\.[0-9]{1,4})?$'
+          example: '12500000'
+        currency:
+          type: string
+          pattern: '^[A-Z]{3}$'
+          example: RWF
+    UserRef:
+      type: object
+      required: [userId, fullName]
+      properties:
+        userId:
+          type: string
+          format: uuid
+        fullName:
+          type: string
+          example: Aline Uwase
+    Health:
+      type: string
+      description: 'RAG status: GREY = not started or finished; see the dashboard rule (ADR 0008)'
+      enum: [GREEN, AMBER, RED, GREY]
+    TextList:
+      type: array
+      maxItems: 50
+      items:
+        type: string
+        minLength: 1
+        maxLength: 500
+
+    # ---------- Portfolios and programs ----------
+    PortfolioStatus:
+      type: string
+      enum: [ACTIVE, ARCHIVED]
+    Portfolio:
+      type: object
+      required: [id, name, strategicObjectives, owner, status, programCount, projectCount, createdAt, version]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: Digital Services 2026
+        description:
+          type: string
+        strategicObjectives:
+          $ref: '#/components/schemas/TextList'
+        owner:
+          $ref: '#/components/schemas/UserRef'
+        status:
+          $ref: '#/components/schemas/PortfolioStatus'
+        programCount:
+          type: integer
+          format: int32
+        projectCount:
+          type: integer
+          format: int32
+        createdAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+          format: int64
+    PortfolioPage:
+      allOf:
+        - $ref: '#/components/schemas/PageMetadata'
+        - type: object
+          required: [content]
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/Portfolio'
+    CreatePortfolioRequest:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          minLength: 2
+          maxLength: 100
+        description:
+          type: string
+          maxLength: 2000
+        strategicObjectives:
+          $ref: '#/components/schemas/TextList'
+        ownerId:
+          type: string
+          format: uuid
+          description: Defaults to the caller; must be `PMO` or `ORG_ADMIN`
+    UpdatePortfolioRequest:
+      type: object
+      minProperties: 1
+      properties:
+        name:
+          type: string
+          minLength: 2
+          maxLength: 100
+        description:
+          type: string
+          maxLength: 2000
+        strategicObjectives:
+          $ref: '#/components/schemas/TextList'
+        ownerId:
+          type: string
+          format: uuid
+        status:
+          $ref: '#/components/schemas/PortfolioStatus'
+    ProgramStatus:
+      type: string
+      enum: [ACTIVE, CLOSED]
+    Program:
+      type: object
+      required: [id, portfolioId, name, manager, status, projectCount, createdAt, version]
+      properties:
+        id:
+          type: string
+          format: uuid
+        portfolioId:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: Customer Channels
+        description:
+          type: string
+        manager:
+          $ref: '#/components/schemas/UserRef'
+        status:
+          $ref: '#/components/schemas/ProgramStatus'
+        projectCount:
+          type: integer
+          format: int32
+        createdAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+          format: int64
+    CreateProgramRequest:
+      type: object
+      required: [name, managerId]
+      properties:
+        name:
+          type: string
+          minLength: 2
+          maxLength: 100
+        description:
+          type: string
+          maxLength: 2000
+        managerId:
+          type: string
+          format: uuid
+          description: Must be `PROJECT_MANAGER`, `PMO` or `ORG_ADMIN`
+    UpdateProgramRequest:
+      type: object
+      minProperties: 1
+      properties:
+        name:
+          type: string
+          minLength: 2
+          maxLength: 100
+        description:
+          type: string
+          maxLength: 2000
+        managerId:
+          type: string
+          format: uuid
+        status:
+          $ref: '#/components/schemas/ProgramStatus'
+
+    # ---------- Projects ----------
+    Methodology:
+      type: string
+      description: 'Decides which workspace tabs apply: AGILE (board, backlog), PREDICTIVE (schedule), HYBRID (both)'
+      enum: [AGILE, PREDICTIVE, HYBRID]
+    ProjectStatus:
+      type: string
+      enum: [PROPOSED, APPROVED, IN_PROGRESS, ON_HOLD, CLOSING, CLOSED, CANCELLED]
+    Project:
+      type: object
+      required: [id, code, name, portfolioId, manager, methodology, status, allowedTransitions, startDate,
+                 targetEndDate, health, healthOverridden, createdAt, version]
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+          example: AKG-012
+        name:
+          type: string
+          example: Mobile banking app
+        description:
+          type: string
+        portfolioId:
+          type: string
+          format: uuid
+        programId:
+          type: string
+          format: uuid
+        manager:
+          $ref: '#/components/schemas/UserRef'
+        methodology:
+          $ref: '#/components/schemas/Methodology'
+        status:
+          $ref: '#/components/schemas/ProjectStatus'
+        allowedTransitions:
+          type: array
+          description: Statuses the project may move to next through `POST /transitions`
+          items:
+            $ref: '#/components/schemas/ProjectStatus'
+        startDate:
+          type: string
+          format: date
+        targetEndDate:
+          type: string
+          format: date
+        budget:
+          $ref: '#/components/schemas/Money'
+        health:
+          $ref: '#/components/schemas/Health'
+        healthReason:
+          type: string
+          description: Why the project has this health (the override reason when overridden)
+        healthOverridden:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+          format: int64
+    ProjectPage:
+      allOf:
+        - $ref: '#/components/schemas/PageMetadata'
+        - type: object
+          required: [content]
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/Project'
+    ProjectCode:
+      type: string
+      description: Unique in the organization; upper-case letters, digits and dashes
+      pattern: '^[A-Z][A-Z0-9-]{1,14}$'
+      example: AKG-012
+    CreateProjectRequest:
+      type: object
+      required: [code, name, portfolioId, methodology, startDate, targetEndDate]
+      properties:
+        code:
+          $ref: '#/components/schemas/ProjectCode'
+        name:
+          type: string
+          minLength: 2
+          maxLength: 150
+        description:
+          type: string
+          maxLength: 4000
+        portfolioId:
+          type: string
+          format: uuid
+        programId:
+          type: string
+          format: uuid
+          description: Must belong to the same portfolio
+        managerId:
+          type: string
+          format: uuid
+          description: Defaults to the caller
+        methodology:
+          $ref: '#/components/schemas/Methodology'
+        startDate:
+          type: string
+          format: date
+        targetEndDate:
+          type: string
+          format: date
+          description: After `startDate`
+        budget:
+          $ref: '#/components/schemas/Money'
+    UpdateProjectRequest:
+      type: object
+      minProperties: 1
+      properties:
+        name:
+          type: string
+          minLength: 2
+          maxLength: 150
+        description:
+          type: string
+          maxLength: 4000
+        programId:
+          type: string
+          format: uuid
+        managerId:
+          type: string
+          format: uuid
+        methodology:
+          $ref: '#/components/schemas/Methodology'
+        startDate:
+          type: string
+          format: date
+        targetEndDate:
+          type: string
+          format: date
+        budget:
+          $ref: '#/components/schemas/Money'
+    TransitionRequest:
+      type: object
+      required: [to]
+      properties:
+        to:
+          $ref: '#/components/schemas/ProjectStatus'
+        reason:
+          type: string
+          maxLength: 500
+          description: Required when moving to `ON_HOLD` or `CANCELLED`
+    HealthOverrideRequest:
+      type: object
+      required: [health, reason]
+      properties:
+        health:
+          type: string
+          enum: [GREEN, AMBER, RED]
+        reason:
+          type: string
+          minLength: 1
+          maxLength: 500
+    ProjectRole:
+      type: string
+      description: 'MANAGER is the project manager (set on the project); CONTRIBUTOR works on it; OBSERVER reads it'
+      enum: [MANAGER, CONTRIBUTOR, OBSERVER]
+    ProjectMember:
+      type: object
+      required: [userId, fullName, email, projectRole, addedAt]
+      properties:
+        userId:
+          type: string
+          format: uuid
+        fullName:
+          type: string
+        email:
+          $ref: '#/components/schemas/Email'
+        projectRole:
+          $ref: '#/components/schemas/ProjectRole'
+        addedAt:
+          type: string
+          format: date-time
+    PutProjectMemberRequest:
+      type: object
+      required: [projectRole]
+      properties:
+        projectRole:
+          type: string
+          enum: [CONTRIBUTOR, OBSERVER]
+
+    # ---------- Charter ----------
+    CharterStatus:
+      type: string
+      enum: [DRAFT, SUBMITTED, APPROVED, SUPERSEDED]
+    CharterObjective:
+      type: object
+      required: [text, successMetric]
+      properties:
+        text:
+          type: string
+          minLength: 1
+          maxLength: 500
+          description: A SMART objective
+        successMetric:
+          type: string
+          minLength: 1
+          maxLength: 300
+    CharterMilestone:
+      type: object
+      required: [name, targetDate]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 200
+        targetDate:
+          type: string
+          format: date
+    CharterContent:
+      type: object
+      description: The editable part of a charter; a PUT replaces all of it
+      properties:
+        purpose:
+          type: string
+          maxLength: 4000
+        businessCase:
+          type: string
+          maxLength: 8000
+        objectives:
+          type: array
+          maxItems: 30
+          items:
+            $ref: '#/components/schemas/CharterObjective'
+        inScope:
+          $ref: '#/components/schemas/TextList'
+        outOfScope:
+          $ref: '#/components/schemas/TextList'
+        assumptions:
+          $ref: '#/components/schemas/TextList'
+        constraints:
+          $ref: '#/components/schemas/TextList'
+        highLevelRisks:
+          $ref: '#/components/schemas/TextList'
+        milestones:
+          type: array
+          maxItems: 50
+          items:
+            $ref: '#/components/schemas/CharterMilestone'
+        summaryBudget:
+          $ref: '#/components/schemas/Money'
+        sponsorId:
+          type: string
+          format: uuid
+    Charter:
+      type: object
+      required: [projectId, versionNumber, status, objectives, inScope, outOfScope, assumptions, constraints,
+                 highLevelRisks, milestones, version]
+      properties:
+        projectId:
+          type: string
+          format: uuid
+        versionNumber:
+          type: integer
+          format: int32
+          description: 1 for the first charter; a new number each time an approved charter is superseded
+          example: 1
+        status:
+          $ref: '#/components/schemas/CharterStatus'
+        purpose:
+          type: string
+        businessCase:
+          type: string
+        objectives:
+          type: array
+          items:
+            $ref: '#/components/schemas/CharterObjective'
+        inScope:
+          $ref: '#/components/schemas/TextList'
+        outOfScope:
+          $ref: '#/components/schemas/TextList'
+        assumptions:
+          $ref: '#/components/schemas/TextList'
+        constraints:
+          $ref: '#/components/schemas/TextList'
+        highLevelRisks:
+          $ref: '#/components/schemas/TextList'
+        milestones:
+          type: array
+          items:
+            $ref: '#/components/schemas/CharterMilestone'
+        summaryBudget:
+          $ref: '#/components/schemas/Money'
+        sponsor:
+          $ref: '#/components/schemas/UserRef'
+        submittedAt:
+          type: string
+          format: date-time
+        approvedBy:
+          $ref: '#/components/schemas/UserRef'
+        approvedAt:
+          type: string
+          format: date-time
+        returnComment:
+          type: string
+          description: Why the approver sent the last submission back
+        version:
+          type: integer
+          format: int64
+    ReturnCharterRequest:
+      type: object
+      required: [comment]
+      properties:
+        comment:
+          type: string
+          minLength: 1
+          maxLength: 2000
+
+    # ---------- WBS ----------
+    WbsNodeType:
+      type: string
+      description: 'DELIVERABLE groups other nodes; WORK_PACKAGE is a leaf that carries effort, cost and progress'
+      enum: [DELIVERABLE, WORK_PACKAGE]
+    WbsNode:
+      type: object
+      required: [id, code, name, type, plannedEffortHours, plannedCost, percentComplete, earnedValue, version,
+                 children]
+      properties:
+        id:
+          type: string
+          format: uuid
+        parentId:
+          type: string
+          format: uuid
+        code:
+          type: string
+          description: Outline number derived from the position in the tree, e.g. `1.2.3`
+          example: 1.2.3
+        name:
+          type: string
+        description:
+          type: string
+        type:
+          $ref: '#/components/schemas/WbsNodeType'
+        owner:
+          $ref: '#/components/schemas/UserRef'
+        plannedEffortHours:
+          type: number
+          description: A work package's own estimate, or the sum over a deliverable's subtree
+        plannedCost:
+          $ref: '#/components/schemas/Money'
+        percentComplete:
+          type: number
+          minimum: 0
+          maximum: 100
+          description: A work package's reported progress, or the effort-weighted average over a subtree
+        earnedValue:
+          $ref: '#/components/schemas/Money'
+        version:
+          type: integer
+          format: int64
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/WbsNode'
+    WbsTree:
+      type: object
+      required: [projectId, plannedEffortHours, plannedCost, percentComplete, earnedValue, nodes]
+      properties:
+        projectId:
+          type: string
+          format: uuid
+        plannedEffortHours:
+          type: number
+        plannedCost:
+          $ref: '#/components/schemas/Money'
+        percentComplete:
+          type: number
+        earnedValue:
+          $ref: '#/components/schemas/Money'
+        nodes:
+          type: array
+          description: Top-level nodes (codes 1, 2, 3...) with their subtrees
+          items:
+            $ref: '#/components/schemas/WbsNode'
+    CreateWbsNodeRequest:
+      type: object
+      required: [name, type]
+      properties:
+        parentId:
+          type: string
+          format: uuid
+          description: Omit for a top-level node; otherwise a deliverable
+        name:
+          type: string
+          minLength: 1
+          maxLength: 200
+        description:
+          type: string
+          maxLength: 4000
+        type:
+          $ref: '#/components/schemas/WbsNodeType'
+        ownerId:
+          type: string
+          format: uuid
+        plannedEffortHours:
+          type: number
+          minimum: 0
+          maximum: 1000000
+          description: Work packages only
+        plannedCost:
+          type: string
+          pattern: '^[0-9]{1,15}(\.[0-9]{1,4})?$'
+          description: Work packages only; an amount in the organization's currency
+        percentComplete:
+          type: number
+          minimum: 0
+          maximum: 100
+          description: Work packages only (physical percent complete)
+        position:
+          type: integer
+          format: int32
+          minimum: 0
+          description: Place among its siblings (0-based); appended when omitted
+    UpdateWbsNodeRequest:
+      type: object
+      minProperties: 1
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 200
+        description:
+          type: string
+          maxLength: 4000
+        type:
+          $ref: '#/components/schemas/WbsNodeType'
+        ownerId:
+          type: string
+          format: uuid
+        plannedEffortHours:
+          type: number
+          minimum: 0
+          maximum: 1000000
+        plannedCost:
+          type: string
+          pattern: '^[0-9]{1,15}(\.[0-9]{1,4})?$'
+        percentComplete:
+          type: number
+          minimum: 0
+          maximum: 100
+    MoveWbsNodeRequest:
+      type: object
+      required: [position]
+      properties:
+        newParentId:
+          type: string
+          format: uuid
+          description: The new parent deliverable; omit to make it a top-level node
+        position:
+          type: integer
+          format: int32
+          minimum: 0
+
+    # ---------- Dashboard ----------
+    DashboardSummary:
+      type: object
+      required: [projectCount, byStatus, byHealth, totalBudget, totalPlannedCost, totalEarnedValue, lateProjects]
+      properties:
+        projectCount:
+          type: integer
+          format: int32
+        byStatus:
+          type: object
+          description: Number of projects per `ProjectStatus` (statuses with no project are omitted)
+          additionalProperties:
+            type: integer
+            format: int32
+        byHealth:
+          type: object
+          description: Number of projects per `Health`
+          additionalProperties:
+            type: integer
+            format: int32
+        totalBudget:
+          $ref: '#/components/schemas/Money'
+        totalPlannedCost:
+          $ref: '#/components/schemas/Money'
+        totalEarnedValue:
+          $ref: '#/components/schemas/Money'
+        lateProjects:
+          type: integer
+          format: int32
+          description: Projects in progress past their target end date
+        portfolioSpi:
+          type: number
+          description: Schedule performance index (from API Phase 7)
+        portfolioCpi:
+          type: number
+          description: Cost performance index (from API Phase 7)
+        openCriticalRisks:
+          type: integer
+          format: int32
+          description: From API Phase 6
+        pendingChangeRequests:
+          type: integer
+          format: int32
+          description: From API Phase 6
+    NextMilestone:
+      type: object
+      required: [name, targetDate]
+      properties:
+        name:
+          type: string
+        targetDate:
+          type: string
+          format: date
+    DashboardProject:
+      type: object
+      required: [projectId, code, name, portfolioId, manager, status, health, healthOverridden, percentComplete]
+      properties:
+        projectId:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        portfolioId:
+          type: string
+          format: uuid
+        manager:
+          $ref: '#/components/schemas/UserRef'
+        status:
+          $ref: '#/components/schemas/ProjectStatus'
+        health:
+          $ref: '#/components/schemas/Health'
+        healthReason:
+          type: string
+        healthOverridden:
+          type: boolean
+        percentComplete:
+          type: number
+        targetEndDate:
+          type: string
+          format: date
+        nextMilestone:
+          $ref: '#/components/schemas/NextMilestone'
+        spi:
+          type: number
+          description: From API Phase 7
+        cpi:
+          type: number
+          description: From API Phase 7
+    DashboardProjectPage:
+      allOf:
+        - $ref: '#/components/schemas/PageMetadata'
+        - type: object
+          required: [content]
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/DashboardProject'
