@@ -1,6 +1,7 @@
 package com.kora;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.fields;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 import static com.tngtech.archunit.library.GeneralCodingRules.NO_CLASSES_SHOULD_ACCESS_STANDARD_STREAMS;
 import static com.tngtech.archunit.library.GeneralCodingRules.NO_CLASSES_SHOULD_THROW_GENERIC_EXCEPTIONS;
@@ -12,6 +13,8 @@ import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.junit.AnalyzeClasses;
 import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchRule;
+import jakarta.persistence.Entity;
+import org.hibernate.annotations.TenantId;
 import org.springframework.data.repository.Repository;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -63,6 +66,21 @@ class ArchitectureTest {
             .areAssignableTo(Repository.class)
             .should()
             .resideInAPackage("com.kora..adapter.persistence..")
+            .allowEmptyShould(true);
+
+    /**
+     * Tenant isolation, ORM layer (ADR 0007): an entity that belongs to an organization must let Hibernate filter it.
+     * Forgetting {@code @TenantId} would leave only row-level security between two customers' data.
+     */
+    @ArchTest
+    static final ArchRule tenantOwnedEntitiesAreTenantFiltered = fields().that()
+            .haveName("organizationId")
+            .and()
+            .areDeclaredInClassesThat()
+            .areAnnotatedWith(Entity.class)
+            .should()
+            .beAnnotatedWith(TenantId.class)
+            .because("every query on tenant-owned data must be filtered to the active organization")
             .allowEmptyShould(true);
 
     @ArchTest
