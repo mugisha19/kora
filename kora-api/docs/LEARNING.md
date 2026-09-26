@@ -146,3 +146,43 @@ by bursting at 12:00:59 and 12:01:00. Buckets live in Redis so every API instanc
 A `ThreadLocal` set for one request and not cleared leaks into the next request that reuses the thread, which
 across tenants is a data leak. A `ScopedValue` (final in Java 25) is bound for the duration of one call and
 disappears when the call returns, by construction. It also works with virtual threads.
+
+## Portfolio, program, project (Phase 3)
+
+PMI's three levels: a **project** is a temporary endeavour producing a unique result (the mobile banking app); a
+**program** groups related projects managed together because they deliver more jointly than separately (all
+customer channels); a **portfolio** is everything the organization invests in to meet its strategic objectives,
+and is where priorities and trade-offs are decided.
+
+## The charter authorizes the project (Phase 3)
+
+In PMBOK a project formally exists once its charter is approved by the sponsor: purpose, objectives, scope
+boundaries, milestones, budget. Kora enforces it: a project can only become `APPROVED` by approving its charter,
+and an approved charter can't be edited, only superseded through a change request.
+
+## Composite pattern: the WBS roll-up (Phase 3)
+
+A work package (leaf) and a deliverable (group) implement the same interface: planned effort, planned cost, percent
+complete, earned value. The deliverable just asks its children. So a node, a branch and the whole project use one
+piece of code. Progress is **weighted by effort**: finishing a 300-hour package moves the needle three times more
+than a 100-hour one; a plain average would lie.
+**Interview line:** "Composite lets you treat one item and a tree of items the same way, which is exactly what a
+roll-up is."
+
+## Read models: CQRS-lite (Phase 3)
+
+The dashboard needs data owned by several modules. Instead of joining across them on every request, a read model
+table (`project_snapshots`) is rebuilt from events whenever something changes, in the same transaction, so it is
+never stale. Writes go to the owning modules; reads come from a table shaped for the screen.
+
+## Money is not a double (Phase 3)
+
+`0.1 + 0.2` is `0.30000000000000004` in binary floating point. Money uses `BigDecimal`, is scaled to the currency's
+minor units (RWF has none, USD has two) and rounds half-even (banker's rounding, which doesn't bias sums upwards).
+Amounts travel as decimal *strings* in JSON so no JavaScript client turns them into floats.
+
+## "Today" depends on where you are (Phase 3)
+
+A test failed just after midnight in Kigali: the server compared dates in UTC, where it was still yesterday. Rules
+about days (late projects, deadlines, timesheet weeks) must use the organization's time zone. Store instants in
+UTC; decide "which day is it" in the user's or organization's zone.

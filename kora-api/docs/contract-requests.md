@@ -29,3 +29,9 @@ Template:
 - Reason: a missing or malformed `X-Organization-Id`, or a malformed id, answers `400`, which wasn't declared.
   The contract lint now requires `400` on every tenant-scoped operation.
 - Status: accepted in 0.1.1
+
+### 0.2.0: portfolios, projects, charter, WBS and dashboard
+- Requested by: api, 2026-09-27 (start of API Phase 3, for web Phase 4)
+- Endpoints: 32 new operations (tags Portfolios, Projects, Charter, WBS, Dashboard); `PATCH /organization` gains
+  `409 organization.currency_locked`
+- Status: accepted in 0.2.0; `GET /dashboard/trends` deferred to Phase 7 (EVM)
