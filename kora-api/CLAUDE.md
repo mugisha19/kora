@@ -32,7 +32,11 @@ into `domain` → `application` → `adapter.{web,persistence,...}`; dependencie
   crosses organizations. Tenant data only through JPA (plain JDBC bypasses RLS).
 - Authorization: the first line of a use case is `CurrentMember.requireRole(...)`, before any lookup. Add every new
   endpoint to `RoleMatrixIT`, and check every integration-test response with `Contract.conforms(...)`.
-- Money is `BigDecimal` with explicit rounding, never `double`. Time is `java.time` (`Instant` for moments).
+- Money is `platform.money.Money` (BigDecimal in minor units, half-even), JSON amounts are strings, and every amount
+  is in the organization's currency (modules holding amounts implement `CurrencyUsage`). Time is `java.time`:
+  `Instant` for moments, and "today" in the organization's time zone (`OrganizationTimeZone`), never UTC.
+- Project-scoped data goes through `ProjectAccess` (`readable`/`manageable`); changes that affect the dashboard
+  publish `ProjectChanged` or `WbsChanged` inside the transaction.
 - Integration tests use `@IntegrationTest` and are named `*IT`; never H2.
 - Comments explain WHY. Record decisions in `docs/adr/`, patterns in `docs/PATTERNS.md`, interview
   explanations in `docs/LEARNING.md`.
