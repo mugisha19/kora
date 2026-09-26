@@ -3,6 +3,7 @@ package com.kora.organization;
 /** Error codes the organization module returns; each is listed in the contract's {@code ErrorCode} enum. */
 public final class OrganizationErrorCodes {
 
+    public static final String CURRENCY_LOCKED = "organization.currency_locked";
     public static final String LAST_ADMIN = "members.last_admin";
     public static final String SELF_REMOVAL = "members.self_removal";
     public static final String ALREADY_MEMBER = "invitations.already_member";

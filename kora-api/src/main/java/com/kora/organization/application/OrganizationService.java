@@ -1,14 +1,18 @@
 package com.kora.organization.application;
 
 import com.kora.organization.ActiveMember;
+import com.kora.organization.CurrencyUsage;
 import com.kora.organization.CurrentMember;
+import com.kora.organization.OrganizationErrorCodes;
 import com.kora.organization.Role;
 import com.kora.organization.domain.Organization;
+import com.kora.platform.error.ConflictException;
 import com.kora.platform.error.FieldViolation;
 import com.kora.platform.error.InvalidInputException;
 import com.kora.platform.error.NotFoundException;
 import com.kora.platform.error.OptimisticLock;
 import com.kora.platform.error.PlatformErrorCodes;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,9 +21,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class OrganizationService {
 
     private final OrganizationRepository organizations;
+    private final ObjectProvider<CurrencyUsage> currencyUsages;
 
-    OrganizationService(OrganizationRepository organizations) {
+    OrganizationService(OrganizationRepository organizations, ObjectProvider<CurrencyUsage> currencyUsages) {
         this.organizations = organizations;
+        this.currencyUsages = currencyUsages;
     }
 
     @Transactional(readOnly = true)
@@ -45,7 +51,12 @@ public class OrganizationService {
         if (name != null) {
             organization.rename(name);
         }
-        if (currency != null) {
+        if (currency != null && !currency.equals(organization.getCurrency())) {
+            if (currencyUsages.stream().anyMatch(CurrencyUsage::currencyInUse)) {
+                throw new ConflictException(
+                        OrganizationErrorCodes.CURRENCY_LOCKED,
+                        "Budgets and costs already use " + organization.getCurrency() + "; the currency can't change");
+            }
             organization.changeCurrency(currency);
         }
         if (timeZone != null) {
