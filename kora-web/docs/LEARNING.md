@@ -149,6 +149,12 @@ treats as theft and revokes the session. So the first 401 starts the refresh and
 subscribes to the same in-flight call (`shareReplay`), then replays with the new token. A request
 that fails after someone else already refreshed simply retries with the newer token.
 
+Single-flight works inside one tab; two **tabs** share the cookie but not the JavaScript. If both
+refresh at the same instant, the API rotates the token for the winner and rejects the loser with
+`auth.refresh_invalid`. The API tolerates that reuse for 10 s, so the loser waits ~200 ms and retries
+once; by then the winner's new cookie is in the browser's shared cookie jar and the retry succeeds.
+A reuse after 10 s is treated as theft and revokes the whole session.
+
 ## Retry only what is safe to repeat (Phase 2)
 
 A GET can be repeated without side effects (idempotent); a POST that times out might already have

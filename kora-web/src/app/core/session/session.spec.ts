@@ -5,7 +5,7 @@ import { firstValueFrom } from 'rxjs';
 import { ORG_A, ORG_B, aSession as session, aUser as user } from '../../../testing/fixtures';
 import { PREFERENCE_KEYS } from '../storage/preferences';
 import { NOW } from './clock';
-import { SessionRefresher } from './session-refresher';
+import { REFRESH_RETRY_DELAY_MS, SessionRefresher } from './session-refresher';
 import { SessionStore } from './session.store';
 
 describe('session', () => {
@@ -130,6 +130,48 @@ describe('session', () => {
       await expect(second).rejects.toBeTruthy();
       expect(expired).toHaveBeenCalledOnce();
       expect(store.isAuthenticated()).toBe(false);
+    });
+
+    describe('two tabs refreshing at once', () => {
+      const refreshInvalid = [
+        { status: 401, code: 'auth.refresh_invalid' },
+        { status: 401, statusText: 'Unauthorized' },
+      ] as const;
+      const tick = () => new Promise((resolve) => setTimeout(resolve, 0));
+
+      beforeEach(() => TestBed.overrideProvider(REFRESH_RETRY_DELAY_MS, { useValue: 0 }));
+
+      it('retries once after losing the race, and keeps the session', async () => {
+        const refresher = TestBed.inject(SessionRefresher);
+        const http = TestBed.inject(HttpTestingController);
+        const expired = vi.fn();
+        refresher.expired$.subscribe(expired);
+        TestBed.inject(SessionStore).start(session('old'));
+
+        const result = firstValueFrom(refresher.refresh());
+        http.expectOne('/api/v1/auth/refresh').flush(...refreshInvalid);
+        await tick();
+        http.expectOne('/api/v1/auth/refresh').flush(session('from-other-tab'));
+
+        expect((await result).accessToken).toBe('from-other-tab');
+        expect(expired).not.toHaveBeenCalled();
+      });
+
+      it('gives up when the retry is rejected too', async () => {
+        const refresher = TestBed.inject(SessionRefresher);
+        const http = TestBed.inject(HttpTestingController);
+        TestBed.inject(SessionStore).start(session('old'));
+
+        const result = firstValueFrom(refresher.refresh());
+        result.catch(() => undefined);
+        http.expectOne('/api/v1/auth/refresh').flush(...refreshInvalid);
+        await tick();
+        http.expectOne('/api/v1/auth/refresh').flush(...refreshInvalid);
+
+        await expect(result).rejects.toBeTruthy();
+        expect(TestBed.inject(SessionStore).isAuthenticated()).toBe(false);
+        http.verify();
+      });
     });
   });
 });

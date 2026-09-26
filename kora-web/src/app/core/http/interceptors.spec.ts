@@ -8,7 +8,7 @@ import { ApiError } from '../api/api-error';
 import { SILENT_ERRORS, SKIP_LOADING, authFlow } from '../api/http-context';
 import { Notifier } from '../notify/notifier';
 import { NOW } from '../session/clock';
-import { SessionRefresher } from '../session/session-refresher';
+import { REFRESH_RETRY_DELAY_MS, SessionRefresher } from '../session/session-refresher';
 import { SessionStore } from '../session/session.store';
 import { API_INTERCEPTORS, RETRY_POLICY } from './interceptors';
 import { LoadingService } from './loading.service';
@@ -43,6 +43,7 @@ describe('API interceptor chain', () => {
         provideTestI18n(),
         { provide: Notifier, useValue: notifier },
         { provide: NOW, useValue: () => now },
+        { provide: REFRESH_RETRY_DELAY_MS, useValue: 0 },
         {
           provide: RETRY_POLICY,
           useValue: { maxRetries: 2, baseDelayMs: 0, maxRetryAfterSeconds: 5 },
@@ -300,6 +301,9 @@ describe('API interceptor chain', () => {
       const result = request(http.get('/api/v1/members'));
 
       backend.expectOne('/api/v1/members').flush(...problem(401, 'auth.unauthenticated'));
+      backend.expectOne('/api/v1/auth/refresh').flush(...problem(401, 'auth.refresh_invalid'));
+      // Retried once (another tab may have won the race), then given up.
+      await tick();
       backend.expectOne('/api/v1/auth/refresh').flush(...problem(401, 'auth.refresh_invalid'));
 
       await expect(result).rejects.toMatchObject({ code: 'auth.refresh_invalid' });
