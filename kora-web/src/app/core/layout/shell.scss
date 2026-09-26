@@ -94,3 +94,14 @@
     padding-inline: var(--kora-space-8);
   }
 }
+
+// Small screens: the logo alone identifies the app, leaving room for the organization switcher.
+@media (max-width: 600px) {
+  .brand-name {
+    display: none;
+  }
+
+  .toolbar {
+    padding-inline: var(--kora-space-1);
+  }
+}

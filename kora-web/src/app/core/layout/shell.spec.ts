@@ -5,6 +5,7 @@ import { Router, provideRouter } from '@angular/router';
 import { render, screen } from '@testing-library/angular';
 import userEvent from '@testing-library/user-event';
 import { BehaviorSubject } from 'rxjs';
+import { provideMockApi } from '../../../testing/mock-api';
 import { provideTestUi } from '../../../testing/test-providers';
 import { PageHeader } from '../../shared/ui/page-header';
 import { Shell } from './shell';
@@ -21,6 +22,7 @@ describe('Shell', () => {
     const view = await render(Shell, {
       providers: [
         ...provideTestUi(),
+        ...provideMockApi(),
         provideRouter([
           { path: 'dashboard', component: DashboardStub },
           { path: 'settings', component: SettingsStub },

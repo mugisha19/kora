@@ -20,8 +20,10 @@
     <span class="brand-name">Kora</span>
   </a>
   <span class="spacer"></span>
+  <kora-org-switcher />
   <kora-language-menu />
   <kora-theme-menu />
+  <kora-user-menu />
   @if (loading.active()) {
     <mat-progress-bar
       class="loading-bar"
@@ -41,7 +43,7 @@
   >
     <nav [attr.aria-label]="'nav.label' | transloco">
       <mat-nav-list>
-        @for (item of navItems; track item.path) {
+        @for (item of navItems(); track item.path) {
           <a
             mat-list-item
             [routerLink]="item.path"
