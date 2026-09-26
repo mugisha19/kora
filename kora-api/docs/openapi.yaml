@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Kora API
-  version: 0.1.0
+  version: 0.1.1
   description: |
     Multi-tenant project and portfolio management built on PMI practices.
 
@@ -479,6 +479,8 @@ paths:
           headers:
             X-Correlation-Id:
               $ref: '#/components/headers/CorrelationId'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthenticated'
         '403':
@@ -596,6 +598,8 @@ paths:
           headers:
             X-Correlation-Id:
               $ref: '#/components/headers/CorrelationId'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthenticated'
         '403':

@@ -106,6 +106,9 @@ class OpenApiContractTest {
             if (tenantScoped && !operation.getResponses().containsKey("403")) {
                 throw new AssertionError(name + " is tenant-scoped but doesn't declare 403 (tenant.forbidden)");
             }
+            if (tenantScoped && !operation.getResponses().containsKey("400")) {
+                throw new AssertionError(name + " is tenant-scoped but doesn't declare 400 (tenant.header_invalid)");
+            }
         });
         assertThat(problems).isEmpty();
     }
