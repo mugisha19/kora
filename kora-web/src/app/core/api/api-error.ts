@@ -1,24 +1,36 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { ProblemDetail, ProblemFieldError } from './api.models';
-
-/** Normalized error every feature works with, whatever went wrong on the wire. */
-export interface ApiError {
-  /** HTTP status; 0 when the request never reached the server. */
-  readonly status: number;
-  /** Stable machine code, e.g. `members.last_admin`; falls back to `http.<status>`. */
-  readonly code: string;
-  readonly title?: string;
-  readonly detail?: string;
-  readonly correlationId?: string;
-  readonly fieldErrors: readonly ProblemFieldError[];
-  /** Seconds, from the `Retry-After` header on 429/503. */
-  readonly retryAfter?: number;
-}
+import { ErrorCode, ProblemDetail, ProblemFieldError } from './api.models';
 
 export const NETWORK_ERROR_CODE = 'network.offline';
 export const UNKNOWN_ERROR_CODE = 'unknown';
 
-function isProblem(body: unknown): body is ProblemDetail {
+/**
+ * Contract codes plus the client-side ones. `(string & {})` keeps editor completion for the known
+ * codes while accepting codes a newer API adds (the contract says to fall back for unknown codes).
+ */
+export type ApiErrorCode =
+  ErrorCode | typeof NETWORK_ERROR_CODE | typeof UNKNOWN_ERROR_CODE | (string & {});
+
+/** Field problem as the UI uses it; `message` is the API's English developer text, never shown. */
+export type ApiFieldError = Pick<ProblemFieldError, 'field' | 'code' | 'params'> & {
+  message?: string;
+};
+
+/** Normalized error every feature works with, whatever went wrong on the wire. */
+export interface ApiError {
+  /** HTTP status; 0 when the request never reached the server, -1 for non-HTTP failures. */
+  readonly status: number;
+  /** Stable machine code, e.g. `members.last_admin`; falls back to `http.<status>`. */
+  readonly code: ApiErrorCode;
+  readonly title?: string;
+  readonly detail?: string;
+  readonly correlationId?: string;
+  readonly fieldErrors: readonly ApiFieldError[];
+  /** Seconds, from the `Retry-After` header on 429/503. */
+  readonly retryAfter?: number;
+}
+
+function isProblem(body: unknown): body is Partial<ProblemDetail> & { status: number } {
   return typeof body === 'object' && body !== null && 'status' in body;
 }
 
