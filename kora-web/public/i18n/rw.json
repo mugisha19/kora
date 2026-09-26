@@ -32,7 +32,9 @@
     "loading": "Birimo gufunguka…",
     "delete": "Siba",
     "errorTitle": "Habaye ikibazo",
-    "errorMessage": "Ntibyashobotse gufungura ibi. Genzura interineti yawe wongere ugerageze."
+    "errorMessage": "Ntibyashobotse gufungura ibi. Genzura interineti yawe wongere ugerageze.",
+    "dismiss": "Funga",
+    "loadingBar": "Birimo gufunguka"
   },
   "status": {
     "success": "Biragenda neza",
@@ -70,5 +72,94 @@
     "title": "Paji ntiyabonetse",
     "message": "Paji ushaka ntibaho cyangwa yimuriwe ahandi.",
     "back": "Jya ku kibaho"
+  },
+  "errors": {
+    "generic": "Habaye ikibazo. Ongera ugerageze.",
+    "unexpected": "Habaye ikibazo kitunguranye. Nibikomeza, ongera ufungure paji.",
+    "reference": "(Nimero: {{ id }})",
+    "sessionExpired": "Igihe cyawe cyarangiye. Ongera winjire.",
+    "status": {
+      "400": "Icyasabwe nticyari cyuzuye neza.",
+      "401": "Banza winjire kugira ngo ukomeze.",
+      "403": "Nta burenganzira ufite bwo gukora ibi.",
+      "404": "Ibyo ushaka ntibihari cyangwa byasibwe.",
+      "409": "Ibi binyuranye n’uko ibintu bihagaze ubu. Ongera ufungure maze wongere ugerageze.",
+      "410": "Iyi link ntikigikora.",
+      "412": "Undi muntu yabanje kubika impinduka. Ongera ufungure uzirebe, maze wongere ugerageze.",
+      "429": "Wagerageje inshuro nyinshi. Tegereza amasegonda {{ seconds }} wongere ugerageze.",
+      "500": "Seriveri yagize ikibazo. Uzongere ugerageze nyuma.",
+      "502": "Kora ntiboneka by’agateganyo. Ongera ugerageze mu kanya.",
+      "503": "Kora ntiboneka by’agateganyo. Ongera ugerageze mu kanya.",
+      "504": "Kora ntiboneka by’agateganyo. Ongera ugerageze mu kanya."
+    },
+    "codes": {
+      "validation": {
+        "failed": "Hari ibyuzuzwa bikeneye gukosorwa."
+      },
+      "auth": {
+        "unauthenticated": "Banza winjire kugira ngo ukomeze.",
+        "invalid_credentials": "Imeyili cyangwa ijambo ry’ibanga si byo.",
+        "refresh_invalid": "Igihe cyawe cyarangiye. Ongera winjire.",
+        "email_taken": "Hari konti isanzwe ikoresha iyi meyili.",
+        "reset_token_invalid": "Iyi link yo guhindura ijambo ry’ibanga ntikora cyangwa yararangiye. Saba indi."
+      },
+      "tenant": {
+        "forbidden": "Nturi umunyamuryango w’uyu muryango.",
+        "header_invalid": "Banza uhitemo umuryango."
+      },
+      "access": {
+        "denied": "Nta burenganzira ufite bwo gukora ibi."
+      },
+      "resource": {
+        "not_found": "Ibyo ushaka ntibihari cyangwa byasibwe."
+      },
+      "method": {
+        "not_allowed": "Iki gikorwa ntikiboneka."
+      },
+      "media_type": {
+        "unsupported": "Ubu buryo ntibwemewe."
+      },
+      "concurrency": {
+        "stale_version": "Undi muntu yabanje kubika impinduka. Ongera ufungure uzirebe, maze wongere ugerageze.",
+        "if_match_required": "Ongera ufungure paji maze wongere ugerageze."
+      },
+      "members": {
+        "last_admin": "Umuryango ugomba kugira nibura umuyobozi umwe.",
+        "self_removal": "Ntushobora kwikura mu muryango."
+      },
+      "invitations": {
+        "already_member": "Uyu muntu asanzwe ari umunyamuryango.",
+        "already_pending": "Uyu muntu asanzwe afite ubutumire butegereje.",
+        "not_pending": "Ubu butumire ntibukiri gutegereza.",
+        "not_found": "Iyi link y’ubutumire ntikora.",
+        "expired": "Ubu butumire bwararangiye. Saba ubundi.",
+        "revoked": "Ubu butumire bwahagaritswe.",
+        "already_accepted": "Ubu butumire bwamaze gukoreshwa."
+      },
+      "rate_limited": "Wagerageje inshuro nyinshi. Tegereza amasegonda {{ seconds }} wongere ugerageze.",
+      "internal": {
+        "error": "Seriveri yagize ikibazo. Uzongere ugerageze nyuma."
+      },
+      "network": {
+        "offline": "Ntibishoboka kugera kuri Kora. Genzura interineti yawe."
+      },
+      "unknown": "Habaye ikibazo. Ongera ugerageze."
+    },
+    "fields": {
+      "required": "Iki gice kigomba kuzuzwa.",
+      "length": "Hagomba kuba inyuguti hagati ya {{ min }} na {{ max }}.",
+      "length_min": "Hagomba kuba nibura inyuguti {{ min }}.",
+      "length_max": "Ntihagomba kurenga inyuguti {{ max }}.",
+      "format": "Imiterere yabyo si yo.",
+      "email": "Andika imeyili nyayo.",
+      "range": "Bigomba kuba hagati ya {{ min }} na {{ max }}.",
+      "range_min": "Bigomba kuba nibura {{ min }}.",
+      "range_max": "Ntibigomba kurenga {{ max }}.",
+      "invalid": "Iki gisubizo nticyemewe.",
+      "invalid_allowed": "Hagomba kuba kimwe muri ibi: {{ allowed }}.",
+      "password": {
+        "breached": "Iri jambo ry’ibanga ryagaragaye mu makuru yibwe. Hitamo irindi."
+      }
+    }
   }
 }

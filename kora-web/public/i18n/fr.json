@@ -32,7 +32,9 @@
     "loading": "Chargement…",
     "delete": "Supprimer",
     "errorTitle": "Une erreur s'est produite",
-    "errorMessage": "Impossible de charger ce contenu. Vérifiez votre connexion et réessayez."
+    "errorMessage": "Impossible de charger ce contenu. Vérifiez votre connexion et réessayez.",
+    "dismiss": "Fermer",
+    "loadingBar": "Chargement"
   },
   "status": {
     "success": "Dans les temps",
@@ -70,5 +72,94 @@
     "title": "Page introuvable",
     "message": "La page que vous cherchez n'existe pas ou a été déplacée.",
     "back": "Aller au tableau de bord"
+  },
+  "errors": {
+    "generic": "Une erreur s'est produite. Veuillez réessayer.",
+    "unexpected": "Un problème inattendu s'est produit. S'il se répète, rechargez la page.",
+    "reference": "(Réf. {{ id }})",
+    "sessionExpired": "Votre session a expiré. Veuillez vous reconnecter.",
+    "status": {
+      "400": "La requête n'était pas valide.",
+      "401": "Veuillez vous connecter pour continuer.",
+      "403": "Vous n'avez pas l'autorisation de faire cela.",
+      "404": "Cet élément n'existe pas ou a été supprimé.",
+      "409": "Cela entre en conflit avec l'état actuel. Rechargez et réessayez.",
+      "410": "Ce lien n'est plus valide.",
+      "412": "Quelqu'un d'autre a enregistré des modifications avant vous. Rechargez pour les voir, puis réessayez.",
+      "429": "Trop de tentatives. Attendez {{ seconds }} secondes et réessayez.",
+      "500": "Le serveur a rencontré un problème. Veuillez réessayer plus tard.",
+      "502": "Kora est temporairement indisponible. Réessayez dans un instant.",
+      "503": "Kora est temporairement indisponible. Réessayez dans un instant.",
+      "504": "Kora est temporairement indisponible. Réessayez dans un instant."
+    },
+    "codes": {
+      "validation": {
+        "failed": "Certains champs doivent être corrigés."
+      },
+      "auth": {
+        "unauthenticated": "Veuillez vous connecter pour continuer.",
+        "invalid_credentials": "Adresse e-mail ou mot de passe incorrect.",
+        "refresh_invalid": "Votre session a expiré. Veuillez vous reconnecter.",
+        "email_taken": "Un compte existe déjà avec cette adresse e-mail.",
+        "reset_token_invalid": "Ce lien de réinitialisation n'est pas valide ou a expiré. Demandez-en un nouveau."
+      },
+      "tenant": {
+        "forbidden": "Vous n'êtes pas membre de cette organisation.",
+        "header_invalid": "Choisissez d'abord une organisation."
+      },
+      "access": {
+        "denied": "Vous n'avez pas l'autorisation de faire cela."
+      },
+      "resource": {
+        "not_found": "Cet élément n'existe pas ou a été supprimé."
+      },
+      "method": {
+        "not_allowed": "Cette action n'est pas disponible."
+      },
+      "media_type": {
+        "unsupported": "Ce format n'est pas pris en charge."
+      },
+      "concurrency": {
+        "stale_version": "Quelqu'un d'autre a enregistré des modifications avant vous. Rechargez pour les voir, puis réessayez.",
+        "if_match_required": "Rechargez la page et réessayez."
+      },
+      "members": {
+        "last_admin": "L'organisation doit garder au moins un administrateur.",
+        "self_removal": "Vous ne pouvez pas vous retirer vous-même de l'organisation."
+      },
+      "invitations": {
+        "already_member": "Cette personne est déjà membre.",
+        "already_pending": "Cette personne a déjà une invitation en attente.",
+        "not_pending": "Cette invitation n'est plus en attente.",
+        "not_found": "Ce lien d'invitation n'est pas valide.",
+        "expired": "Cette invitation a expiré. Demandez-en une nouvelle.",
+        "revoked": "Cette invitation a été annulée.",
+        "already_accepted": "Cette invitation a déjà été utilisée."
+      },
+      "rate_limited": "Trop de tentatives. Attendez {{ seconds }} secondes et réessayez.",
+      "internal": {
+        "error": "Le serveur a rencontré un problème. Veuillez réessayer plus tard."
+      },
+      "network": {
+        "offline": "Impossible de joindre Kora. Vérifiez votre connexion."
+      },
+      "unknown": "Une erreur s'est produite. Veuillez réessayer."
+    },
+    "fields": {
+      "required": "Ce champ est obligatoire.",
+      "length": "Doit contenir entre {{ min }} et {{ max }} caractères.",
+      "length_min": "Doit contenir au moins {{ min }} caractères.",
+      "length_max": "Doit contenir au plus {{ max }} caractères.",
+      "format": "Le format n'est pas valide.",
+      "email": "Saisissez une adresse e-mail valide.",
+      "range": "Doit être compris entre {{ min }} et {{ max }}.",
+      "range_min": "Doit être au moins {{ min }}.",
+      "range_max": "Doit être au plus {{ max }}.",
+      "invalid": "Cette valeur n'est pas valide.",
+      "invalid_allowed": "Doit être l'une des valeurs suivantes : {{ allowed }}.",
+      "password": {
+        "breached": "Ce mot de passe figure dans une fuite de données. Choisissez-en un autre."
+      }
+    }
   }
 }

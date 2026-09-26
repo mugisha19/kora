@@ -32,7 +32,9 @@
     "loading": "Loading…",
     "delete": "Delete",
     "errorTitle": "Something went wrong",
-    "errorMessage": "We couldn't load this. Check your connection and try again."
+    "errorMessage": "We couldn't load this. Check your connection and try again.",
+    "dismiss": "Dismiss",
+    "loadingBar": "Loading"
   },
   "status": {
     "success": "On track",
@@ -70,5 +72,94 @@
     "title": "Page not found",
     "message": "The page you're looking for doesn't exist or has moved.",
     "back": "Go to the dashboard"
+  },
+  "errors": {
+    "generic": "Something went wrong. Please try again.",
+    "unexpected": "Something unexpected happened. If it keeps happening, reload the page.",
+    "reference": "(Ref. {{ id }})",
+    "sessionExpired": "Your session has expired. Please sign in again.",
+    "status": {
+      "400": "The request wasn't valid.",
+      "401": "Please sign in to continue.",
+      "403": "You don't have permission to do that.",
+      "404": "That item doesn't exist or was removed.",
+      "409": "That conflicts with the current state. Reload and try again.",
+      "410": "That link is no longer valid.",
+      "412": "Someone else saved changes first. Reload to see them, then try again.",
+      "429": "Too many attempts. Wait {{ seconds }} seconds and try again.",
+      "500": "The server had a problem. Please try again later.",
+      "502": "Kora is temporarily unavailable. Please try again in a moment.",
+      "503": "Kora is temporarily unavailable. Please try again in a moment.",
+      "504": "Kora is temporarily unavailable. Please try again in a moment."
+    },
+    "codes": {
+      "validation": {
+        "failed": "Some fields need attention."
+      },
+      "auth": {
+        "unauthenticated": "Please sign in to continue.",
+        "invalid_credentials": "Email or password is incorrect.",
+        "refresh_invalid": "Your session has expired. Please sign in again.",
+        "email_taken": "An account with this email already exists.",
+        "reset_token_invalid": "This reset link is invalid or has expired. Request a new one."
+      },
+      "tenant": {
+        "forbidden": "You're not a member of this organization.",
+        "header_invalid": "Choose an organization first."
+      },
+      "access": {
+        "denied": "You don't have permission to do that."
+      },
+      "resource": {
+        "not_found": "That item doesn't exist or was removed."
+      },
+      "method": {
+        "not_allowed": "That action isn't available."
+      },
+      "media_type": {
+        "unsupported": "That format isn't supported."
+      },
+      "concurrency": {
+        "stale_version": "Someone else saved changes first. Reload to see them, then try again.",
+        "if_match_required": "Reload the page and try again."
+      },
+      "members": {
+        "last_admin": "The organization needs at least one administrator.",
+        "self_removal": "You can't remove yourself from the organization."
+      },
+      "invitations": {
+        "already_member": "This person is already a member.",
+        "already_pending": "This person already has a pending invitation.",
+        "not_pending": "This invitation is no longer pending.",
+        "not_found": "This invitation link isn't valid.",
+        "expired": "This invitation has expired. Ask for a new one.",
+        "revoked": "This invitation was cancelled.",
+        "already_accepted": "This invitation has already been used."
+      },
+      "rate_limited": "Too many attempts. Wait {{ seconds }} seconds and try again.",
+      "internal": {
+        "error": "The server had a problem. Please try again later."
+      },
+      "network": {
+        "offline": "Can't reach Kora. Check your connection."
+      },
+      "unknown": "Something went wrong. Please try again."
+    },
+    "fields": {
+      "required": "This field is required.",
+      "length": "Must be between {{ min }} and {{ max }} characters.",
+      "length_min": "Must be at least {{ min }} characters.",
+      "length_max": "Must be at most {{ max }} characters.",
+      "format": "The format isn't valid.",
+      "email": "Enter a valid email address.",
+      "range": "Must be between {{ min }} and {{ max }}.",
+      "range_min": "Must be at least {{ min }}.",
+      "range_max": "Must be at most {{ max }}.",
+      "invalid": "This value isn't valid.",
+      "invalid_allowed": "Must be one of: {{ allowed }}.",
+      "password": {
+        "breached": "This password has appeared in a data breach. Choose a different one."
+      }
+    }
   }
 }
