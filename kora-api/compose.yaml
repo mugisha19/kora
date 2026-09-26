@@ -1,6 +1,6 @@
 # Local development services. `./mvnw spring-boot:run` starts them automatically (spring-boot-docker-compose)
 # and points the app at them; `docker compose up -d` starts them by hand.
-# Redis and Mailpit arrive in Phase 2 (sessions, rate limits, emails); S3-compatible storage in Phase 8.
+# S3-compatible storage arrives in Phase 8 (attachments).
 services:
   postgres:
     image: postgres:18-alpine
@@ -19,6 +19,24 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
+
+  redis:
+    # Refresh-token families and rate-limit buckets.
+    image: redis:8-alpine
+    ports:
+      - '127.0.0.1:6379:6379'
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  mailpit:
+    # Catches every outgoing email locally; read them at http://localhost:8025.
+    image: axllent/mailpit:v1.31
+    ports:
+      - '127.0.0.1:1025:1025'
+      - '127.0.0.1:8025:8025'
 
 volumes:
   postgres-data:
