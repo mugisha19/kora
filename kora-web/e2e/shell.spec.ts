@@ -1,6 +1,9 @@
 import { expect, test } from '@playwright/test';
+import { signInAs } from './support';
 
 test.describe('app shell', () => {
+  test.beforeEach(async ({ page }) => signInAs(page));
+
   test('theme and language persist across reloads (feature 23)', async ({ page }) => {
     await page.goto('/settings');
 
