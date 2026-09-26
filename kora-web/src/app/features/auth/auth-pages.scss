@@ -1,0 +1,41 @@
+.switch {
+  margin: var(--kora-space-6) 0 0;
+  text-align: center;
+}
+
+.demo {
+  margin-block-start: var(--kora-space-6);
+  padding-block-start: var(--kora-space-4);
+  border-block-start: 1px solid var(--mat-sys-outline-variant);
+
+  h2 {
+    font: var(--mat-sys-title-small);
+  }
+
+  p {
+    margin: var(--kora-space-1) 0 var(--kora-space-3);
+  }
+
+  ul {
+    display: grid;
+    gap: var(--kora-space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  button {
+    inline-size: 100%;
+    justify-content: space-between;
+  }
+}
+
+.demo-email {
+  margin-inline-start: var(--kora-space-2);
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-small);
+}
+
+.done p {
+  margin: 0 0 var(--kora-space-4);
+}

@@ -1,0 +1,69 @@
+<h1 class="kora-page-title" tabindex="-1">{{ 'auth.login.title' | transloco }}</h1>
+<p class="kora-page-subtitle">{{ 'auth.login.subtitle' | transloco }}</p>
+
+@if (reason() === 'expired') {
+  <div class="kora-notice info" role="status">
+    <mat-icon svgIcon="info" aria-hidden="true" />
+    <p>{{ 'errors.sessionExpired' | transloco }}</p>
+  </div>
+}
+@if (formError()) {
+  <div class="kora-notice error" role="alert">
+    <mat-icon svgIcon="error" aria-hidden="true" />
+    <p>{{ formError() }}</p>
+  </div>
+}
+
+<form class="kora-form" novalidate (submit)="signIn($event)">
+  <mat-form-field>
+    <mat-label>{{ 'auth.email' | transloco }}</mat-label>
+    <input matInput type="email" autocomplete="username" [formField]="form.email" />
+    <mat-error><kora-field-error [field]="form.email" /></mat-error>
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>{{ 'auth.password' | transloco }}</mat-label>
+    <input
+      matInput
+      autocomplete="current-password"
+      [type]="showPassword() ? 'text' : 'password'"
+      [formField]="form.password"
+    />
+    <kora-password-toggle matSuffix [(visible)]="showPassword" />
+    <mat-error><kora-field-error [field]="form.password" /></mat-error>
+  </mat-form-field>
+
+  <div class="kora-form-actions">
+    <a routerLink="/forgot-password">{{ 'auth.login.forgot' | transloco }}</a>
+    <button mat-flat-button type="submit" [disabled]="form().submitting()">
+      {{ 'auth.login.submit' | transloco }}
+    </button>
+  </div>
+</form>
+
+<p class="switch">
+  {{ 'auth.login.noAccount' | transloco }}
+  <a routerLink="/register">{{ 'auth.login.register' | transloco }}</a>
+</p>
+
+@if (demo) {
+  <section class="demo" aria-labelledby="demo-title">
+    <h2 id="demo-title">{{ 'auth.login.demoTitle' | transloco }}</h2>
+    <p class="kora-muted">{{ 'auth.login.demoHint' | transloco }}</p>
+    <ul>
+      @for (account of demo.accounts; track account.email) {
+        <li>
+          <button
+            mat-stroked-button
+            type="button"
+            [disabled]="form().submitting()"
+            (click)="signInAs(account.email)"
+          >
+            {{ 'roles.' + account.role | transloco }}
+            <span class="demo-email">{{ account.email }}</span>
+          </button>
+        </li>
+      }
+    </ul>
+  </section>
+}

@@ -1,0 +1,54 @@
+<h1 class="kora-page-title" tabindex="-1">{{ 'auth.register.title' | transloco }}</h1>
+<p class="kora-page-subtitle">{{ 'auth.register.subtitle' | transloco }}</p>
+
+@if (formError()) {
+  <div class="kora-notice error" role="alert">
+    <mat-icon svgIcon="error" aria-hidden="true" />
+    <p>{{ formError() }}</p>
+  </div>
+}
+
+<form class="kora-form" novalidate (submit)="register($event)">
+  <mat-form-field>
+    <mat-label>{{ 'auth.organizationName' | transloco }}</mat-label>
+    <input matInput autocomplete="organization" [formField]="form.organizationName" />
+    <mat-error><kora-field-error [field]="form.organizationName" /></mat-error>
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>{{ 'auth.fullName' | transloco }}</mat-label>
+    <input matInput autocomplete="name" [formField]="form.fullName" />
+    <mat-error><kora-field-error [field]="form.fullName" /></mat-error>
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>{{ 'auth.email' | transloco }}</mat-label>
+    <input matInput type="email" autocomplete="email" [formField]="form.email" />
+    <mat-error><kora-field-error [field]="form.email" /></mat-error>
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>{{ 'auth.password' | transloco }}</mat-label>
+    <input
+      matInput
+      autocomplete="new-password"
+      [type]="showPassword() ? 'text' : 'password'"
+      [formField]="form.password"
+    />
+    <kora-password-toggle matSuffix [(visible)]="showPassword" />
+    <mat-hint>{{ 'auth.passwordHint' | transloco }}</mat-hint>
+    <mat-error><kora-field-error [field]="form.password" /></mat-error>
+  </mat-form-field>
+
+  <div class="kora-form-actions">
+    <span></span>
+    <button mat-flat-button type="submit" [disabled]="form().submitting()">
+      {{ 'auth.register.submit' | transloco }}
+    </button>
+  </div>
+</form>
+
+<p class="switch">
+  {{ 'auth.register.haveAccount' | transloco }}
+  <a routerLink="/login">{{ 'auth.register.signIn' | transloco }}</a>
+</p>
