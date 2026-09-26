@@ -39,7 +39,10 @@ export const accountHandlers = [
       v.add('body', 'required', 'send at least one of fullName, locale');
     }
     if (body['fullName'] !== undefined) v.string('fullName', body['fullName'], 1, 120);
-    if (body['locale'] !== undefined) v.oneOf('locale', body['locale'], LOCALES);
+    // The API validates locale with a pattern, so a bad value is `format` (not `invalid`).
+    if (body['locale'] !== undefined) {
+      v.pattern('locale', body['locale'], new RegExp(`^(${LOCALES.join('|')})$`), true);
+    }
     if (!v.ok) return v.problem(r);
 
     const user = must(db.user(userId), 'user');

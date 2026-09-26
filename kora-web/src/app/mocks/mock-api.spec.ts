@@ -376,7 +376,14 @@ describe('mock API', () => {
       for (const path of ['/members/not-a-uuid', '/invitations/not-a-uuid']) {
         const res = await call('DELETE', path, { headers: viewer.headers() });
         expect(res.status).toBe(400);
-        expect(res.body!['errors'][0]).toMatchObject({ code: 'format' });
+        expect(res.body!['detail']).toBe('The request has invalid fields');
+        expect(res.body!['errors']).toEqual([
+          {
+            field: path.startsWith('/members') ? 'memberId' : 'invitationId',
+            code: 'invalid',
+            message: 'must be a valid UUID',
+          },
+        ]);
       }
       const wellFormed = await call('DELETE', '/members/00000000-0000-4000-8000-000000000000', {
         headers: viewer.headers(),
@@ -393,8 +400,7 @@ describe('mock API', () => {
         (await call('PATCH', '/me', { body: { locale: 'de' }, headers: auth })).body!['errors'][0],
       ).toMatchObject({
         field: 'locale',
-        code: 'invalid',
-        params: { allowed: ['en', 'fr', 'rw'] },
+        code: 'format',
       });
       const ok = await call('PATCH', '/me', {
         body: { fullName: 'Eric N.', locale: 'fr' },
