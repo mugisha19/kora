@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { render, screen, within } from '@testing-library/angular';
 import userEvent from '@testing-library/user-event';
+import { provideMockApi } from '../../testing/mock-api';
 import { provideTestUi } from '../../testing/test-providers';
 import { LanguageService } from '../core/i18n/language.service';
 import { ThemeService } from '../core/theme/theme.service';
@@ -10,7 +11,7 @@ import { NotFoundPage } from './not-found/not-found-page';
 import { SettingsPage } from './settings/settings-page';
 
 describe('pages', () => {
-  const providers = [...provideTestUi(), provideRouter([])];
+  const providers = [...provideTestUi(), ...provideMockApi(), provideRouter([])];
 
   afterEach(() => {
     localStorage.clear();
@@ -53,7 +54,8 @@ describe('pages', () => {
       await render(SettingsPage, { providers });
 
       expect(screen.getByText('Web app version')).toBeTruthy();
-      expect(screen.getAllByText('0.1.0')).toHaveLength(2);
+      expect(screen.getByText('0.1.0')).toBeTruthy();
+      expect(screen.getByText('0.1.1')).toBeTruthy();
       // Unit tests build with the production environment file (live API).
       expect(screen.getByText('Live API')).toBeTruthy();
     });

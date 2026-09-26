@@ -15,10 +15,11 @@ import { LANGUAGE_NAMES, LanguageService } from '../../core/i18n/language.servic
 import { THEME_ICONS, THEME_MODES, ThemeMode, ThemeService } from '../../core/theme/theme.service';
 import { PageHeader } from '../../shared/ui/page-header';
 import { StatusChip } from '../../shared/ui/status-chip';
+import { ProfileCard } from './profile-card';
 
 /**
- * Settings (feature 23). Phase 1 has Appearance and About; the Profile card (name and saved
- * language on the account) arrives with sign-in in Phase 3.
+ * Settings (feature 23): Profile (saved to the account), Appearance (remembered on this device)
+ * and About.
  */
 @Component({
   selector: 'kora-settings-page',
@@ -32,6 +33,7 @@ import { StatusChip } from '../../shared/ui/status-chip';
     MatCardTitle,
     MatIcon,
     PageHeader,
+    ProfileCard,
     StatusChip,
     TranslocoPipe,
   ],
