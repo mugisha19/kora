@@ -131,6 +131,12 @@ export class ProfileCard {
       this.form().reset();
       this.language.choose(me.locale);
     });
-    if (saved) this.notifier.success(this.transloco.translate('settings.profile.saved'));
+    if (saved) {
+      // The language may just have changed; wait for its file so the message is in that language.
+      const message = await firstValueFrom(
+        this.transloco.selectTranslate<string>('settings.profile.saved'),
+      );
+      this.notifier.success(message);
+    }
   }
 }
