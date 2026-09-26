@@ -51,8 +51,9 @@ admin area (members, invitations, organization settings), accept-invitation page
 
 ## Contract with kora-api
 
-Contract 0.1.0 (tag `api-v0.1.0`) at `kora-api/docs/openapi.yaml`. The real endpoints arrive in API
-Phase 2; until then the app runs against MSW. Change requests go in
+Contract 0.1.1 (tag `api-v0.2.0`) at `kora-api/docs/openapi.yaml`. All 18 operations are live on the real API
+(`npm run start:api`; needs Docker, starts empty: register an organization first, emails in Mailpit at
+http://localhost:8025). Mock mode stays the default. Change requests go in
 `kora-api/docs/contract-requests.md` or to the API session directly.
 
 ## Decisions so far

@@ -13,6 +13,7 @@ import {
   Reply,
   Validator,
   authenticate,
+  checkPathId,
   invalidBody,
   paging,
   readBody,
@@ -151,6 +152,8 @@ export const invitationsHandlers = [
     if (userId instanceof Response) return userId;
     const membership = tenant(request, r, userId);
     if (membership instanceof Response) return membership;
+    const badId = checkPathId(r, 'invitationId', params['invitationId']);
+    if (badId) return badId;
     const denied = requireRole(r, membership.role, ['ORG_ADMIN']);
     if (denied) return denied;
 

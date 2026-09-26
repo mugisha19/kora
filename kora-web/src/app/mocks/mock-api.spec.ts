@@ -47,8 +47,18 @@ describe('mock API', () => {
   beforeEach(() => db.reset());
 
   describe('conventions', () => {
+    it('answers unknown paths with 401 when signed out (security runs first)', async () => {
+      const res = await call('GET', '/nowhere');
+
+      expect(res.status).toBe(401);
+      expect(res.body!['code']).toBe('auth.unauthenticated');
+    });
+
     it('echoes a valid correlation id and answers unknown paths with a 404 problem', async () => {
-      const res = await call('GET', '/nowhere', { headers: { 'X-Correlation-Id': 'abc-123' } });
+      const { headers } = await signIn();
+      const res = await call('GET', '/nowhere', {
+        headers: { Authorization: headers().Authorization, 'X-Correlation-Id': 'abc-123' },
+      });
 
       expect(res.status).toBe(404);
       expect(res.headers.get('X-Correlation-Id')).toBe('abc-123');
@@ -358,6 +368,20 @@ describe('mock API', () => {
         });
       expect((await member(viewer.headers())).body!['code']).toBe('access.denied');
       expect((await member(admin.headers())).status).toBe(404);
+    });
+
+    it('rejects a malformed id on DELETE with 400, before the role check (contract 0.1.1)', async () => {
+      const viewer = await signIn('viewer@kora.demo');
+
+      for (const path of ['/members/not-a-uuid', '/invitations/not-a-uuid']) {
+        const res = await call('DELETE', path, { headers: viewer.headers() });
+        expect(res.status).toBe(400);
+        expect(res.body!['errors'][0]).toMatchObject({ code: 'format' });
+      }
+      const wellFormed = await call('DELETE', '/members/00000000-0000-4000-8000-000000000000', {
+        headers: viewer.headers(),
+      });
+      expect(wellFormed.body!['code']).toBe('access.denied');
     });
 
     it('updates the profile without If-Match and validates it', async () => {

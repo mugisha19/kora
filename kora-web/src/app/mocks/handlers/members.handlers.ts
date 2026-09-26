@@ -5,6 +5,7 @@ import {
   API,
   Validator,
   authenticate,
+  checkPathId,
   checkVersion,
   etag,
   ifMatchVersion,
@@ -101,6 +102,8 @@ export const membersHandlers = [
     if (userId instanceof Response) return userId;
     const membership = tenant(request, r, userId);
     if (membership instanceof Response) return membership;
+    const badId = checkPathId(r, 'memberId', params['memberId']);
+    if (badId) return badId;
     const denied = requireRole(r, membership.role, ['ORG_ADMIN']);
     if (denied) return denied;
 

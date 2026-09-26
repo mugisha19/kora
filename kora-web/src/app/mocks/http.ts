@@ -235,6 +235,15 @@ export function requireRole(r: Reply, role: Role, allowed: readonly Role[]): Res
   return allowed.includes(role) ? null : r.problem(403, 'access.denied');
 }
 
+/** 400 for a path id that isn't a UUID (Spring rejects it while binding, before the role check). */
+export function checkPathId(r: Reply, field: string, value: unknown): Response | null {
+  return typeof value === 'string' && UUID_PATTERN.test(value)
+    ? null
+    : r.problem(400, 'validation.failed', {
+        errors: [{ field, code: 'format', message: 'must be a UUID' }],
+      });
+}
+
 // ---------- Optimistic locking ----------
 
 /*
