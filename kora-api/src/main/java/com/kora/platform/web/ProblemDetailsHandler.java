@@ -1,17 +1,18 @@
 package com.kora.platform.web;
 
 import com.kora.platform.error.FieldViolation;
+import com.kora.platform.error.ForbiddenException;
 import com.kora.platform.error.OptimisticLock;
 import com.kora.platform.error.PlatformErrorCodes;
 import com.kora.platform.error.ProblemException;
+import com.kora.platform.error.RateLimitedException;
+import com.kora.platform.error.UnauthenticatedException;
 import jakarta.validation.ConstraintViolation;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.function.Supplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,8 @@ import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -55,21 +58,31 @@ class ProblemDetailsHandler extends ResponseEntityExceptionHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(ProblemDetailsHandler.class);
 
-    private static final String CODE = "code";
-    private static final String CORRELATION_ID = "correlationId";
-    private static final String ERRORS = "errors";
-    private static final String TYPE_PREFIX = "urn:kora:problem:";
     private static final String INVALID_FIELDS = "The request has invalid fields";
-    private static final String GENERIC_SERVER_ERROR = "An unexpected error occurred";
     private static final Set<String> MESSAGE_PARAMS = Set.of("min", "max", "value");
 
     // ---- Kora's own problems -------------------------------------------------------------------------------
 
     @ExceptionHandler(ProblemException.class)
     ResponseEntity<Object> handleProblem(ProblemException ex, WebRequest request) {
-        HttpStatus status = HttpStatus.valueOf(ex.kind().status());
-        ProblemDetail body = problem(status, ex.getMessage(), ex.code(), ex.violations());
-        return handleExceptionInternal(ex, body, new HttpHeaders(), status, request);
+        HttpHeaders headers = new HttpHeaders();
+        if (ex instanceof RateLimitedException rateLimited) {
+            headers.set(HttpHeaders.RETRY_AFTER, String.valueOf(rateLimited.retryAfterSeconds()));
+        }
+        HttpStatus status = ProblemDetailsFactory.statusOf(ex);
+        return handleExceptionInternal(ex, ProblemDetailsFactory.from(ex), headers, status, request);
+    }
+
+    /** Method security denied the call (the UI hides what a role can't do; the API enforces it). */
+    @ExceptionHandler(AccessDeniedException.class)
+    ResponseEntity<Object> handleAccessDenied(AccessDeniedException ex, WebRequest request) {
+        return handleProblem(new ForbiddenException("You don't have permission to do this"), request);
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    ResponseEntity<Object> handleAuthentication(AuthenticationException ex, WebRequest request) {
+        return handleProblem(
+                new UnauthenticatedException(PlatformErrorCodes.UNAUTHENTICATED, "Sign in to continue"), request);
     }
 
     /** JPA's {@code @Version} check caught a concurrent write that slipped past the {@code If-Match} check. */
@@ -82,7 +95,8 @@ class ProblemDetailsHandler extends ResponseEntityExceptionHandler {
     ResponseEntity<Object> handleUnexpected(Exception ex, WebRequest request) {
         LOG.error("Unhandled exception", ex);
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
-        ProblemDetail body = problem(status, GENERIC_SERVER_ERROR, PlatformErrorCodes.INTERNAL_ERROR, List.of());
+        ProblemDetail body = ProblemDetailsFactory.create(
+                status, ProblemDetailsFactory.GENERIC_SERVER_ERROR, PlatformErrorCodes.INTERNAL_ERROR, List.of());
         return handleExceptionInternal(ex, body, new HttpHeaders(), status, request);
     }
 
@@ -159,21 +173,10 @@ class ProblemDetailsHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> createResponseEntity(
             Object body, HttpHeaders headers, HttpStatusCode statusCode, WebRequest request) {
         ProblemDetail problem = body instanceof ProblemDetail detail ? detail : ProblemDetail.forStatus(statusCode);
-        Map<String, Object> properties = problem.getProperties();
-        String code = properties != null && properties.get(CODE) instanceof String existing
-                ? existing
-                : defaultCode(statusCode);
-        problem.setProperty(CODE, code);
-        problem.setType(URI.create(TYPE_PREFIX + code));
-        problem.setProperty(
-                CORRELATION_ID,
-                CorrelationId.current().orElseGet(() -> UUID.randomUUID().toString()));
-        if (problem.getInstance() == null && request instanceof ServletWebRequest servlet) {
-            problem.setInstance(URI.create(servlet.getRequest().getRequestURI()));
-        }
-        if (statusCode.is5xxServerError()) {
-            problem.setDetail(GENERIC_SERVER_ERROR);
-        }
+        String uri = request instanceof ServletWebRequest servlet
+                ? servlet.getRequest().getRequestURI()
+                : null;
+        ProblemDetailsFactory.complete(problem, statusCode, uri);
         return new ResponseEntity<>(problem, headers, statusCode);
     }
 
@@ -183,45 +186,9 @@ class ProblemDetailsHandler extends ResponseEntityExceptionHandler {
             HttpHeaders headers,
             HttpStatusCode status,
             WebRequest request) {
-        ProblemDetail body = problem(status, INVALID_FIELDS, PlatformErrorCodes.VALIDATION_FAILED, violations);
+        ProblemDetail body =
+                ProblemDetailsFactory.create(status, INVALID_FIELDS, PlatformErrorCodes.VALIDATION_FAILED, violations);
         return handleExceptionInternal(ex, body, headers, status, request);
-    }
-
-    private static ProblemDetail problem(
-            HttpStatusCode status, String detail, String code, List<FieldViolation> violations) {
-        ProblemDetail problem = ProblemDetail.forStatusAndDetail(status, detail);
-        problem.setProperty(CODE, code);
-        if (!violations.isEmpty()) {
-            problem.setProperty(
-                    ERRORS,
-                    violations.stream().map(ProblemDetailsHandler::toJson).toList());
-        }
-        return problem;
-    }
-
-    /** Explicit map so that an empty {@code params} is omitted rather than rendered as {@code {}}. */
-    private static Map<String, Object> toJson(FieldViolation violation) {
-        Map<String, Object> json = new LinkedHashMap<>();
-        json.put("field", violation.field());
-        json.put(CODE, violation.code());
-        json.put("message", violation.message());
-        if (!violation.params().isEmpty()) {
-            json.put("params", violation.params());
-        }
-        return json;
-    }
-
-    private static String defaultCode(HttpStatusCode status) {
-        return switch (status.value()) {
-            case 403 -> PlatformErrorCodes.ACCESS_DENIED;
-            case 404 -> PlatformErrorCodes.RESOURCE_NOT_FOUND;
-            case 405 -> PlatformErrorCodes.METHOD_NOT_ALLOWED;
-            case 406, 415 -> PlatformErrorCodes.MEDIA_TYPE_UNSUPPORTED;
-            case 412 -> PlatformErrorCodes.STALE_VERSION;
-            case 428 -> PlatformErrorCodes.IF_MATCH_REQUIRED;
-            default ->
-                status.is4xxClientError() ? PlatformErrorCodes.VALIDATION_FAILED : PlatformErrorCodes.INTERNAL_ERROR;
-        };
     }
 
     // ---- Translating validation details into the contract's field codes ------------------------------------
