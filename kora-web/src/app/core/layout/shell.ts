@@ -3,12 +3,14 @@ import { Component, ElementRef, Injector, afterNextRender, inject, viewChild } f
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
+import { MatProgressBar } from '@angular/material/progress-bar';
 import { MatListItem, MatListItemIcon, MatListItemTitle, MatNavList } from '@angular/material/list';
 import { MatSidenav, MatSidenavContainer, MatSidenavContent } from '@angular/material/sidenav';
 import { MatToolbar } from '@angular/material/toolbar';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { filter, map, skip } from 'rxjs';
+import { LoadingService } from '../http/loading.service';
 import { LanguageMenu } from './language-menu';
 import { NAV_ITEMS } from './nav-items';
 import { ThemeMenu } from './theme-menu';
@@ -31,6 +33,7 @@ export const HANDSET_QUERY = '(max-width: 959.98px)';
     MatListItemIcon,
     MatListItemTitle,
     MatNavList,
+    MatProgressBar,
     MatSidenav,
     MatSidenavContainer,
     MatSidenavContent,
@@ -49,6 +52,7 @@ export class Shell {
   private readonly sidenav = viewChild.required(MatSidenav);
   private readonly main = viewChild.required<ElementRef<HTMLElement>>('main');
 
+  protected readonly loading = inject(LoadingService);
   protected readonly navItems = NAV_ITEMS;
   protected readonly isHandset = toSignal(
     inject(BreakpointObserver)

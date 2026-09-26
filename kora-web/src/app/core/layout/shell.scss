@@ -30,6 +30,23 @@
   background: var(--mat-sys-surface-container);
 }
 
+// Pinned under the toolbar; fades in after a short delay so quick requests don't flash it.
+.loading-bar {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0;
+  animation: loading-bar-in 0s 200ms both;
+}
+
+@keyframes loading-bar-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 .brand {
   display: inline-flex;
   align-items: center;

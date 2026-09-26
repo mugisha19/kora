@@ -22,6 +22,13 @@
   <span class="spacer"></span>
   <kora-language-menu />
   <kora-theme-menu />
+  @if (loading.active()) {
+    <mat-progress-bar
+      class="loading-bar"
+      mode="indeterminate"
+      [attr.aria-label]="'common.loadingBar' | transloco"
+    />
+  }
 </mat-toolbar>
 
 <mat-sidenav-container class="container">
