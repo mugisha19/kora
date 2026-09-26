@@ -12,7 +12,8 @@ Testcontainers · ArchUnit · JaCoCo · Spotless + Checkstyle · GitHub Actions 
 
 ## Run locally
 
-Requires JDK 25 and Docker (for PostgreSQL and the integration tests). Maven comes with the wrapper.
+Requires JDK 25 and Docker (PostgreSQL, Redis and Mailpit run from `compose.yaml`; the integration tests use
+Testcontainers). Maven comes with the wrapper.
 
 ```bash
 cd kora-api
@@ -22,7 +23,24 @@ cd kora-api
 ./mvnw spotless:apply    # fix formatting
 ```
 
-Health: `GET /actuator/health` · build info: `GET /actuator/info` · metrics: `GET /actuator/prometheus`
+Health: `GET /actuator/health` · build info: `GET /actuator/info` · metrics: `GET /actuator/prometheus` ·
+emails sent locally: http://localhost:8025 (Mailpit)
+
+### Signing keys
+
+Locally the API generates a throw-away signing key at start-up (sessions end on restart). Anywhere else, create
+an EC P-256 key pair and pass it through environment variables (the `prod` profile refuses to start without):
+
+```bash
+openssl ecparam -name prime256v1 -genkey -noout | openssl pkcs8 -topk8 -nocrypt -out jwt-private.pem
+openssl ec -in jwt-private.pem -pubout -out jwt-public.pem
+export KORA_IDENTITY_JWT_KEY_ID=key-2026-09
+export KORA_IDENTITY_JWT_PRIVATE_KEY="$(cat jwt-private.pem)"
+export KORA_IDENTITY_JWT_PUBLIC_KEY="$(cat jwt-public.pem)"
+```
+
+To rotate, deploy a new pair and list the old public key under `kora.identity.jwt.previous-keys` until the last
+tokens it signed have expired (15 minutes); see ADR 0007.
 
 Without Docker, `./mvnw verify` still runs everything except the integration tests, which are reported as
 skipped (in CI they fail instead, so a broken runner can't pass).
