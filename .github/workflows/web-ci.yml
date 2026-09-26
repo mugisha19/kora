@@ -1,14 +1,14 @@
-# CI for the Angular web app. Runs only when kora-web (or this workflow) changes,
-# so API-only commits don't spend minutes on Node tooling.
+# CI for the Angular web app. Runs only when kora-web, this workflow or the API contract changes,
+# so API-only commits don't spend minutes on Node tooling, but a contract change re-checks the client.
 name: web-ci
 
 on:
   push:
     branches: ['**']
     tags: ['web-v*', 'v*']
-    paths: ['kora-web/**', '.github/workflows/web-ci.yml']
+    paths: ['kora-web/**', 'kora-api/docs/openapi.yaml', '.github/workflows/web-ci.yml']
   pull_request:
-    paths: ['kora-web/**', '.github/workflows/web-ci.yml']
+    paths: ['kora-web/**', 'kora-api/docs/openapi.yaml', '.github/workflows/web-ci.yml']
 
 # A newer push to the same branch cancels the run that is now out of date.
 concurrency:
@@ -24,7 +24,7 @@ defaults:
 
 jobs:
   quality:
-    name: Format, lint, unit tests, build
+    name: Format, lint, contract check, unit tests, build
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -37,6 +37,7 @@ jobs:
       - run: npm ci
       - run: npm run format:check
       - run: npm run lint
+      - run: npm run api:check
       - run: npm run test:ci
       - run: npm run build
       - uses: actions/upload-artifact@v7
