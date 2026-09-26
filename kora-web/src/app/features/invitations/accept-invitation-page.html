@@ -1,0 +1,78 @@
+@if (preview.isLoading()) {
+  <h1 class="kora-page-title" tabindex="-1">{{ 'invitation.loadingTitle' | transloco }}</h1>
+  <kora-loading-state />
+} @else if (unusable(); as reason) {
+  <h1 class="kora-page-title" tabindex="-1">{{ 'invitation.invalidTitle' | transloco }}</h1>
+  <div class="kora-notice error" role="alert">
+    <mat-icon svgIcon="error" aria-hidden="true" />
+    <p>{{ reason }}</p>
+  </div>
+  <a mat-stroked-button routerLink="/login">{{ 'invitation.goToSignIn' | transloco }}</a>
+} @else if (preview.value(); as invitation) {
+  <h1 class="kora-page-title" tabindex="-1">
+    {{ 'invitation.title' | transloco: { organization: invitation.organizationName } }}
+  </h1>
+  <p class="kora-page-subtitle">
+    {{
+      'invitation.subtitle'
+        | transloco
+          : {
+              inviter: invitation.invitedByName,
+              role: ('roles.' + invitation.role | transloco),
+            }
+    }}
+  </p>
+
+  <dl class="details">
+    <dt>{{ 'invitation.email' | transloco }}</dt>
+    <dd>{{ invitation.email }}</dd>
+    <dt>{{ 'invitation.expiresLabel' | transloco }}</dt>
+    <dd>{{ invitation.expiresAt | localizedDate: language.current() : 'long' }}</dd>
+  </dl>
+
+  <div class="kora-notice info">
+    <mat-icon svgIcon="info" aria-hidden="true" />
+    <p>
+      {{ (existingAccount() ? 'invitation.existingHint' : 'invitation.newHint') | transloco }}
+    </p>
+  </div>
+
+  @if (formError()) {
+    <div class="kora-notice error" role="alert">
+      <mat-icon svgIcon="error" aria-hidden="true" />
+      <p>{{ formError() }}</p>
+    </div>
+  }
+
+  <form class="kora-form" novalidate (submit)="accept($event)">
+    @if (!existingAccount()) {
+      <mat-form-field>
+        <mat-label>{{ 'auth.fullName' | transloco }}</mat-label>
+        <input matInput autocomplete="name" [formField]="form.fullName" />
+        <mat-error><kora-field-error [field]="form.fullName" /></mat-error>
+      </mat-form-field>
+    }
+
+    <mat-form-field>
+      <mat-label>{{ 'auth.password' | transloco }}</mat-label>
+      <input
+        matInput
+        [attr.autocomplete]="existingAccount() ? 'current-password' : 'new-password'"
+        [type]="showPassword() ? 'text' : 'password'"
+        [formField]="form.password"
+      />
+      <kora-password-toggle matSuffix [(visible)]="showPassword" />
+      @if (!existingAccount()) {
+        <mat-hint>{{ 'auth.passwordHint' | transloco }}</mat-hint>
+      }
+      <mat-error><kora-field-error [field]="form.password" /></mat-error>
+    </mat-form-field>
+
+    <div class="kora-form-actions">
+      <span></span>
+      <button mat-flat-button type="submit" [disabled]="form().submitting()">
+        {{ (existingAccount() ? 'invitation.accept' : 'invitation.acceptAndCreate') | transloco }}
+      </button>
+    </div>
+  </form>
+}

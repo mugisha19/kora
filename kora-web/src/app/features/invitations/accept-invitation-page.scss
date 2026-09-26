@@ -1,0 +1,15 @@
+.details {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: var(--kora-space-1) var(--kora-space-4);
+  margin: 0 0 var(--kora-space-4);
+
+  dt {
+    color: var(--mat-sys-on-surface-variant);
+  }
+
+  dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+  }
+}
