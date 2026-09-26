@@ -1,0 +1,70 @@
+<h2 class="visually-hidden">{{ 'admin.tabs.organization' | transloco }}</h2>
+
+@if (organization.isLoading() && !organization.hasValue()) {
+  <kora-loading-state />
+} @else if (organization.error()) {
+  <kora-error-state (retry)="organization.reload()" />
+} @else if (organization.value(); as current) {
+  <div class="settings">
+    <p class="slug kora-muted">
+      {{ 'admin.organization.slug' | transloco }}: <code>{{ current.slug }}</code>
+    </p>
+
+    @if (stale()) {
+      <div class="kora-notice error" role="alert">
+        <mat-icon svgIcon="warning" aria-hidden="true" />
+        <p>{{ 'admin.organization.stale' | transloco }}</p>
+      </div>
+      <button mat-stroked-button type="button" class="reload" (click)="reloadLatest()">
+        <mat-icon svgIcon="refresh" aria-hidden="true" />
+        {{ 'admin.organization.reload' | transloco }}
+      </button>
+    }
+    @if (formError()) {
+      <div class="kora-notice error" role="alert">
+        <mat-icon svgIcon="error" aria-hidden="true" />
+        <p>{{ formError() }}</p>
+      </div>
+    }
+
+    <form class="kora-form" novalidate (submit)="save($event)">
+      <mat-form-field>
+        <mat-label>{{ 'admin.organization.name' | transloco }}</mat-label>
+        <input matInput autocomplete="organization" [formField]="form.name" />
+        <mat-error><kora-field-error [field]="form.name" /></mat-error>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>{{ 'admin.organization.currency' | transloco }}</mat-label>
+        <mat-select [formField]="form.currency">
+          @for (currency of currencies(); track currency.code) {
+            <mat-option [value]="currency.code">{{ currency.label }}</mat-option>
+          }
+        </mat-select>
+        <mat-hint>{{ 'admin.organization.currencyHint' | transloco }}</mat-hint>
+        <mat-error><kora-field-error [field]="form.currency" /></mat-error>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>{{ 'admin.organization.timeZone' | transloco }}</mat-label>
+        <mat-select [formField]="form.timeZone">
+          @for (zone of timeZones(); track zone) {
+            <mat-option [value]="zone">{{ zone }}</mat-option>
+          }
+        </mat-select>
+        <mat-error><kora-field-error [field]="form.timeZone" /></mat-error>
+      </mat-form-field>
+
+      <div class="kora-form-actions">
+        <span></span>
+        <button
+          mat-flat-button
+          type="submit"
+          [disabled]="form().submitting() || !form().dirty() || stale()"
+        >
+          {{ 'admin.organization.save' | transloco }}
+        </button>
+      </div>
+    </form>
+  </div>
+}

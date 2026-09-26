@@ -1,0 +1,84 @@
+// Shared layout of the admin list pages (members, invitations).
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--kora-space-3);
+  margin-block-end: var(--kora-space-2);
+
+  .search {
+    flex: 1 1 260px;
+  }
+
+  .filter {
+    flex: 0 1 200px;
+  }
+
+  .spacer {
+    flex: 1;
+  }
+}
+
+.count {
+  min-block-size: 1.5em;
+  margin: 0 0 var(--kora-space-2);
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-small);
+}
+
+.table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: var(--kora-radius);
+}
+
+table {
+  inline-size: 100%;
+}
+
+.primary {
+  margin-inline-end: var(--kora-space-2);
+}
+
+.secondary {
+  display: block;
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-small);
+  overflow-wrap: anywhere;
+}
+
+.inline-select {
+  inline-size: 170px;
+  --mat-form-field-container-vertical-padding: 8px;
+  --mat-form-field-container-height: 40px;
+}
+
+.actions {
+  inline-size: 56px;
+  text-align: end;
+}
+
+.small-only {
+  display: none;
+}
+
+@media (max-width: 720px) {
+  .wide-only {
+    display: none;
+  }
+
+  .small-only {
+    display: block;
+  }
+
+  .inline-select {
+    inline-size: 136px;
+  }
+
+  // Cells keep enough padding to read, but give the table room on a phone.
+  .mat-mdc-cell,
+  .mat-mdc-header-cell {
+    padding-inline: var(--kora-space-2);
+  }
+}

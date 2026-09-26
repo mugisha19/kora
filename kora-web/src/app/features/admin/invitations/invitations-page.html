@@ -1,0 +1,149 @@
+<h2 class="visually-hidden">{{ 'admin.tabs.invitations' | transloco }}</h2>
+
+<div class="filters">
+  <mat-form-field class="filter" subscriptSizing="dynamic">
+    <mat-label>{{ 'admin.invitations.status' | transloco }}</mat-label>
+    <mat-select [value]="store.query().status" (selectionChange)="store.filterStatus($event.value)">
+      @for (status of statuses; track status) {
+        <mat-option [value]="status">{{ 'invitationStatus.' + status | transloco }}</mat-option>
+      }
+      <mat-option [value]="null">{{ 'admin.invitations.all' | transloco }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <span class="spacer"></span>
+  <button mat-flat-button type="button" (click)="openInvite()">
+    <mat-icon svgIcon="person_add" aria-hidden="true" />
+    {{ 'admin.invitations.invite' | transloco }}
+  </button>
+</div>
+
+<p class="count" role="status">
+  @if (store.status() === 'ready') {
+    {{ 'admin.invitations.count' | transloco: { count: store.total() } }}
+  }
+</p>
+
+@if (firstLoad()) {
+  <kora-loading-state />
+} @else if (store.status() === 'error') {
+  <kora-error-state [correlationId]="store.error()?.correlationId" (retry)="store.reload()" />
+} @else if (store.total() === 0) {
+  <kora-empty-state
+    icon="mail"
+    [heading]="'admin.invitations.emptyTitle' | transloco"
+    [message]="'admin.invitations.emptyMessage' | transloco"
+  />
+} @else {
+  <div class="table-wrap" [attr.aria-busy]="store.status() === 'loading'">
+    <table
+      mat-table
+      [dataSource]="store.invitations()"
+      matSort
+      matSortDisableClear
+      [matSortActive]="store.query().sortField"
+      [matSortDirection]="store.query().sortDirection"
+      (matSortChange)="onSort($event)"
+    >
+      <caption class="visually-hidden">
+        {{
+          'admin.tabs.invitations' | transloco
+        }}
+      </caption>
+
+      <ng-container matColumnDef="email">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+          {{ 'auth.email' | transloco }}
+        </th>
+        <td mat-cell *matCellDef="let invitation">
+          <span class="primary">{{ invitation.email }}</span>
+          <span class="secondary small-only">
+            {{
+              'admin.invitations.expiresOn'
+                | transloco: { date: (invitation.expiresAt | localizedDate: language.current()) }
+            }}
+          </span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="role">
+        <th mat-header-cell *matHeaderCellDef class="wide-only">
+          {{ 'admin.members.role' | transloco }}
+        </th>
+        <td mat-cell *matCellDef="let invitation" class="wide-only">
+          {{ 'roles.' + invitation.role | transloco }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef>{{ 'admin.invitations.status' | transloco }}</th>
+        <td mat-cell *matCellDef="let invitation">
+          <kora-status-chip
+            [tone]="lookOf(invitation.status).tone"
+            [icon]="lookOf(invitation.status).icon"
+            [label]="'invitationStatus.' + invitation.status | transloco"
+          />
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="invitedByName">
+        <th mat-header-cell *matHeaderCellDef class="wide-only">
+          {{ 'admin.invitations.invitedBy' | transloco }}
+        </th>
+        <td mat-cell *matCellDef="let invitation" class="wide-only">
+          {{ invitation.invitedByName }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="createdAt">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header class="wide-only">
+          {{ 'admin.invitations.sentOn' | transloco }}
+        </th>
+        <td mat-cell *matCellDef="let invitation" class="wide-only">
+          {{ invitation.createdAt | localizedDate: language.current() }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="expiresAt">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header class="wide-only">
+          {{ 'admin.invitations.expires' | transloco }}
+        </th>
+        <td mat-cell *matCellDef="let invitation" class="wide-only">
+          {{ invitation.expiresAt | localizedDate: language.current() }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>
+          <span class="visually-hidden">{{ 'admin.members.actions' | transloco }}</span>
+        </th>
+        <td mat-cell *matCellDef="let invitation" class="actions">
+          @if (invitation.status === 'PENDING') {
+            <button
+              mat-icon-button
+              type="button"
+              [disabled]="store.busyIds().includes(invitation.id)"
+              [attr.aria-label]="
+                'admin.invitations.revoke' | transloco: { email: invitation.email }
+              "
+              [matTooltip]="'admin.invitations.revoke' | transloco: { email: invitation.email }"
+              (click)="revoke(invitation)"
+            >
+              <mat-icon svgIcon="cancel" aria-hidden="true" />
+            </button>
+          }
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="columns"></tr>
+      <tr mat-row *matRowDef="let row; columns: columns"></tr>
+    </table>
+  </div>
+
+  <mat-paginator
+    [length]="store.total()"
+    [pageIndex]="store.query().page"
+    [pageSize]="store.query().size"
+    [pageSizeOptions]="[10, 20, 50]"
+    (page)="onPage($event)"
+  />
+}

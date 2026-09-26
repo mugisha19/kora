@@ -1,0 +1,138 @@
+<h2 class="visually-hidden">{{ 'admin.tabs.members' | transloco }}</h2>
+
+<div class="filters">
+  <mat-form-field class="search" subscriptSizing="dynamic">
+    <mat-label>{{ 'admin.members.search' | transloco }}</mat-label>
+    <mat-icon matPrefix svgIcon="search" aria-hidden="true" />
+    <input matInput type="search" [value]="store.query().q" (input)="onSearch($event)" />
+  </mat-form-field>
+  <mat-form-field class="filter" subscriptSizing="dynamic">
+    <mat-label>{{ 'admin.members.role' | transloco }}</mat-label>
+    <mat-select [value]="store.query().role" (selectionChange)="store.filterRole($event.value)">
+      <mat-option [value]="null">{{ 'admin.members.allRoles' | transloco }}</mat-option>
+      @for (role of roles; track role) {
+        <mat-option [value]="role">{{ 'roles.' + role | transloco }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+</div>
+
+<p class="count" role="status">
+  @if (store.status() === 'ready') {
+    {{ 'admin.members.count' | transloco: { count: store.total() } }}
+  }
+</p>
+
+@if (firstLoad()) {
+  <kora-loading-state />
+} @else if (store.status() === 'error') {
+  <kora-error-state [correlationId]="store.error()?.correlationId" (retry)="store.reload()" />
+} @else if (store.total() === 0) {
+  <kora-empty-state
+    icon="group"
+    [heading]="'admin.members.emptyTitle' | transloco"
+    [message]="'admin.members.emptyMessage' | transloco"
+  />
+} @else {
+  <div class="table-wrap" [attr.aria-busy]="store.status() === 'loading'">
+    <table
+      mat-table
+      [dataSource]="store.members()"
+      matSort
+      matSortDisableClear
+      [matSortActive]="store.query().sortField"
+      [matSortDirection]="store.query().sortDirection"
+      (matSortChange)="onSort($event)"
+    >
+      <caption class="visually-hidden">
+        {{
+          'admin.tabs.members' | transloco
+        }}
+      </caption>
+
+      <ng-container matColumnDef="fullName">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+          {{ 'admin.members.name' | transloco }}
+        </th>
+        <td mat-cell *matCellDef="let member">
+          <span class="primary">{{ member.fullName }}</span>
+          @if (isMe(member)) {
+            <kora-status-chip tone="info" icon="person" [label]="'admin.members.you' | transloco" />
+          }
+          <span class="secondary small-only">{{ member.email }}</span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="email">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header class="wide-only">
+          {{ 'admin.members.email' | transloco }}
+        </th>
+        <td mat-cell *matCellDef="let member" class="wide-only">{{ member.email }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="role">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+          {{ 'admin.members.role' | transloco }}
+        </th>
+        <td mat-cell *matCellDef="let member">
+          @if (isMe(member)) {
+            {{ 'roles.' + member.role | transloco }}
+          } @else {
+            <mat-form-field class="inline-select" subscriptSizing="dynamic">
+              <mat-select
+                [value]="member.role"
+                [disabled]="isBusy(member)"
+                [aria-label]="'admin.members.changeRole' | transloco: { name: member.fullName }"
+                (selectionChange)="changeRole(member, $event.value)"
+              >
+                @for (role of roles; track role) {
+                  <mat-option [value]="role">{{ 'roles.' + role | transloco }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          }
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="joinedAt">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header class="wide-only">
+          {{ 'admin.members.joined' | transloco }}
+        </th>
+        <td mat-cell *matCellDef="let member" class="wide-only">
+          {{ member.joinedAt | localizedDate: language.current() }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>
+          <span class="visually-hidden">{{ 'admin.members.actions' | transloco }}</span>
+        </th>
+        <td mat-cell *matCellDef="let member" class="actions">
+          @if (!isMe(member)) {
+            <button
+              mat-icon-button
+              type="button"
+              [disabled]="isBusy(member)"
+              [attr.aria-label]="'admin.members.remove' | transloco: { name: member.fullName }"
+              [matTooltip]="'admin.members.remove' | transloco: { name: member.fullName }"
+              (click)="remove(member)"
+            >
+              <mat-icon svgIcon="delete" aria-hidden="true" />
+            </button>
+          }
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="columns"></tr>
+      <tr mat-row *matRowDef="let row; columns: columns"></tr>
+    </table>
+  </div>
+
+  <mat-paginator
+    [length]="store.total()"
+    [pageIndex]="store.query().page"
+    [pageSize]="store.query().size"
+    [pageSizeOptions]="[10, 20, 50]"
+    (page)="onPage($event)"
+  />
+}
