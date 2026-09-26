@@ -16,7 +16,8 @@ declare global {
 export async function startMockApi(): Promise<void> {
   const worker = setupWorker(...handlers);
   await worker.start({
-    serviceWorker: { url: 'mockServiceWorker.js' },
+    // Absolute: a relative URL resolves against deep links (/admin/members) and the lookup fails.
+    serviceWorker: { url: '/mockServiceWorker.js' },
     quiet: true,
     onUnhandledRequest: 'bypass',
   });

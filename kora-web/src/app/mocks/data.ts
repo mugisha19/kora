@@ -57,15 +57,6 @@ export const USER = {
   viewer: '6f1e2d3c-4b5a-4c6d-8e7f-000000000005',
 } as const;
 
-/** One-click demo accounts shown on the sign-in page (`showDemoLogins`). */
-export const DEMO_ACCOUNTS: readonly { email: string; role: Role }[] = [
-  { email: 'admin@kora.demo', role: 'ORG_ADMIN' },
-  { email: 'pmo@kora.demo', role: 'PMO' },
-  { email: 'pm@kora.demo', role: 'PROJECT_MANAGER' },
-  { email: 'member@kora.demo', role: 'MEMBER' },
-  { email: 'viewer@kora.demo', role: 'VIEWER' },
-];
-
 /** Invitation links to try the accept flow in mock mode: /invitations/<token>. */
 export const DEMO_INVITATION_TOKENS = {
   newAccount: 'demo-invite-new-account-0001',

@@ -4,7 +4,6 @@ export const environment: Environment = {
   production: true,
   apiBaseUrl: '/api/v1',
   useMocks: false,
-  showDemoLogins: false,
-  contractVersion: '0.1.0',
+  contractVersion: '0.1.1',
   appVersion: '0.1.0',
 };
