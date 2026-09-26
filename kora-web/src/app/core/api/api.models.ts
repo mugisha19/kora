@@ -1,150 +1,69 @@
 /**
- * Hand-written types for API contract 0.1.0, agreed with the kora-api team until
- * `kora-api/docs/openapi.yaml` exists; they will be replaced by the generated client.
+ * Friendly names for the types generated from the API contract (`kora-api/docs/openapi.yaml`).
+ * Features import from here, never from `generated/`, so a regenerated schema breaks only this file.
+ * Regenerate with `npm run api:generate`; CI runs `npm run api:check`.
  */
+import type { components, operations } from './generated/schema';
 
-export const ROLES = ['ORG_ADMIN', 'PMO', 'PROJECT_MANAGER', 'MEMBER', 'VIEWER'] as const;
-export type Role = (typeof ROLES)[number];
+type Schemas = components['schemas'];
 
-export const LOCALES = ['en', 'fr', 'rw'] as const;
-export type Locale = (typeof LOCALES)[number];
+export type Role = Schemas['Role'];
+export type Locale = Schemas['Locale'];
+export type ErrorCode = Schemas['ErrorCode'];
+export type InvitationStatus = Schemas['InvitationStatus'];
 
-export interface MembershipSummary {
-  organizationId: string;
-  organizationName: string;
-  organizationSlug: string;
-  role: Role;
-}
+export type MembershipSummary = Schemas['Membership'];
+export type MeResponse = Schemas['MeResponse'];
+export type SessionResponse = Schemas['SessionResponse'];
+export type LoginRequest = Schemas['LoginRequest'];
+export type RegisterOrganizationRequest = Schemas['RegisterOrganizationRequest'];
+export type ForgotPasswordRequest = Schemas['ForgotPasswordRequest'];
+export type ResetPasswordRequest = Schemas['ResetPasswordRequest'];
+export type UpdateMeRequest = Schemas['UpdateMeRequest'];
 
-export interface MeResponse {
-  id: string;
-  email: string;
-  fullName: string;
-  locale: Locale;
-  memberships: MembershipSummary[];
-}
+export type Organization = Schemas['Organization'];
+export type UpdateOrganizationRequest = Schemas['UpdateOrganizationRequest'];
 
-export interface SessionResponse {
-  accessToken: string;
-  tokenType: 'Bearer';
-  /** Seconds until the access token expires. */
-  expiresIn: number;
-  user: MeResponse;
-}
+export type Member = Schemas['Member'];
+export type MemberPage = Schemas['MemberPage'];
+export type ChangeMemberRoleRequest = Schemas['ChangeMemberRoleRequest'];
 
-export interface LoginRequest {
-  email: string;
-  password: string;
-}
+export type Invitation = Schemas['Invitation'];
+export type InvitationPage = Schemas['InvitationPage'];
+export type CreateInvitationRequest = Schemas['CreateInvitationRequest'];
+export type InvitationPreview = Schemas['InvitationPreview'];
+export type AcceptInvitationRequest = Schemas['AcceptInvitationRequest'];
 
-export interface RegisterOrganizationRequest {
-  organizationName: string;
-  fullName: string;
-  email: string;
-  password: string;
-  currency?: string;
-  timeZone?: string;
-}
+export type ProblemDetail = Schemas['Problem'];
+export type ProblemFieldError = Schemas['FieldError'];
 
-export interface ResetPasswordRequest {
-  token: string;
-  newPassword: string;
-}
-
-export interface UpdateMeRequest {
-  fullName?: string;
-  locale?: Locale;
-}
-
-export interface Organization {
-  id: string;
-  name: string;
-  slug: string;
-  currency: string;
-  timeZone: string;
-  createdAt: string;
-  version: number;
-}
-
-export interface UpdateOrganizationRequest {
-  name?: string;
-  currency?: string;
-  timeZone?: string;
-}
-
-export interface Member {
-  /** Membership id. */
-  id: string;
-  userId: string;
-  email: string;
-  fullName: string;
-  role: Role;
-  joinedAt: string;
-  version: number;
-}
-
-export const INVITATION_STATUSES = ['PENDING', 'ACCEPTED', 'REVOKED', 'EXPIRED'] as const;
-export type InvitationStatus = (typeof INVITATION_STATUSES)[number];
-
-export interface Invitation {
-  id: string;
-  email: string;
-  role: Role;
-  status: InvitationStatus;
-  invitedByName: string;
-  createdAt: string;
-  expiresAt: string;
-}
-
-export interface CreateInvitationRequest {
-  email: string;
-  role: Role;
-}
-
-export interface InvitationPreview {
-  organizationName: string;
-  email: string;
-  role: Role;
-  invitedByName: string;
-  expiresAt: string;
-  existingAccount: boolean;
-}
-
-export interface AcceptInvitationRequest {
-  fullName?: string;
-  password: string;
-}
+/** Query parameters of list operations, straight from the contract. */
+export type ListMembersQuery = NonNullable<operations['listMembers']['parameters']['query']>;
+export type ListInvitationsQuery = NonNullable<
+  operations['listInvitations']['parameters']['query']
+>;
 
 /** Offset pagination (page is 0-based). */
-export interface Page<T> {
-  content: T[];
-  page: number;
-  size: number;
-  totalElements: number;
-  totalPages: number;
-}
+export type Page<T> = Schemas['PageMetadata'] & { content: T[] };
 
-export interface PageRequest {
-  page?: number;
-  size?: number;
-  /** `field,asc|desc`; repeatable. */
-  sort?: string | string[];
-}
+/** Runtime lists of enum values; `satisfies` keeps them in sync with the contract's unions. */
+export const ROLES = [
+  'ORG_ADMIN',
+  'PMO',
+  'PROJECT_MANAGER',
+  'MEMBER',
+  'VIEWER',
+] as const satisfies readonly Role[];
 
-export interface ProblemFieldError {
-  field: string;
-  code: string;
-  message?: string;
-}
+export const LOCALES = ['en', 'fr', 'rw'] as const satisfies readonly Locale[];
 
-/** RFC 9457 Problem Details with Kora extensions. */
-export interface ProblemDetail {
-  type?: string;
-  title?: string;
-  status: number;
-  detail?: string;
-  instance?: string;
-  code?: string;
-  correlationId?: string;
-  errors?: ProblemFieldError[];
-}
+export const INVITATION_STATUSES = [
+  'PENDING',
+  'ACCEPTED',
+  'REVOKED',
+  'EXPIRED',
+] as const satisfies readonly InvitationStatus[];
+
+/** Sort fields the API accepts (anything else is `400 validation.failed` on `sort`). */
+export const MEMBER_SORT_FIELDS = ['fullName', 'email', 'role', 'joinedAt'] as const;
+export const INVITATION_SORT_FIELDS = ['createdAt', 'expiresAt', 'email'] as const;

@@ -24,8 +24,10 @@
     "test:ci": "ng test --watch=false --coverage",
     "e2e": "playwright test",
     "e2e:ui": "playwright test --ui",
-    "verify": "npm run format:check && npm run lint && npm run test:ci && npm run build",
-    "prepare": "cd .. && husky kora-web/.husky"
+    "verify": "npm run format:check && npm run lint && npm run api:check && npm run test:ci && npm run build",
+    "prepare": "cd .. && husky kora-web/.husky",
+    "api:generate": "node scripts/api-client.mjs generate",
+    "api:check": "node scripts/api-client.mjs check"
   },
   "dependencies": {
     "@angular/cdk": "^22.2.0",
