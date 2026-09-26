@@ -110,6 +110,15 @@ class AuthIT {
         }
 
         @Test
+        void reportsANameThatIsTooShortOnceTrimmedOnTheRequestField() {
+            assertThat(conforms(register(uniqueEmail("trim"), PASSWORD, "  a  ")))
+                    .hasStatus(HttpStatus.BAD_REQUEST)
+                    .bodyJson()
+                    .extractingPath("$.errors[0].field")
+                    .isEqualTo("organizationName");
+        }
+
+        @Test
         void validatesCurrencyAndTimeZone() {
             MvcTestResult result = mvc.post()
                     .uri("/api/v1/auth/register-organization")

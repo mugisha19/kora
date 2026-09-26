@@ -9,6 +9,8 @@ import com.kora.organization.Role;
 import com.kora.organization.domain.Membership;
 import com.kora.organization.domain.Organization;
 import com.kora.organization.domain.Slugs;
+import com.kora.platform.error.FieldViolation;
+import com.kora.platform.error.InvalidInputException;
 import com.kora.platform.ratelimit.RateLimiter;
 import com.kora.platform.ratelimit.RateLimits;
 import com.kora.platform.tenancy.TenantTransactions;
@@ -68,19 +70,37 @@ public class RegistrationService {
 
     private UUID create(UUID organizationId, String slug, RegisterOrganization command) {
         Instant now = clock.instant();
-        Organization organization = Organization.create(
-                organizationId,
-                command.organizationName(),
-                slug,
-                command.currency() == null ? DEFAULT_CURRENCY : command.currency(),
-                command.timeZone() == null ? DEFAULT_TIME_ZONE : command.timeZone(),
-                now);
+        Organization organization = createOrganization(organizationId, slug, command, now);
         UUID userId = accounts.createAccount(command.email(), command.fullName(), command.password(), UserLocale.EN);
         AccountView account = accounts.get(userId);
         organizations.save(organization);
         memberships.save(
                 Membership.join(organizationId, userId, account.email(), account.fullName(), Role.ORG_ADMIN, now));
         return userId;
+    }
+
+    /**
+     * The domain names the organization's field {@code name}; in this request it is {@code organizationName}. Field
+     * errors must name request fields exactly, because the web app shows them next to its form inputs.
+     */
+    private static Organization createOrganization(
+            UUID organizationId, String slug, RegisterOrganization command, Instant now) {
+        try {
+            return Organization.create(
+                    organizationId,
+                    command.organizationName(),
+                    slug,
+                    command.currency() == null ? DEFAULT_CURRENCY : command.currency(),
+                    command.timeZone() == null ? DEFAULT_TIME_ZONE : command.timeZone(),
+                    now);
+        } catch (InvalidInputException invalid) {
+            throw new InvalidInputException(invalid.violations().stream()
+                    .map(violation -> violation.field().equals("name")
+                            ? new FieldViolation(
+                                    "organizationName", violation.code(), violation.message(), violation.params())
+                            : violation)
+                    .toList());
+        }
     }
 
     private String freeSlug(String organizationName) {
