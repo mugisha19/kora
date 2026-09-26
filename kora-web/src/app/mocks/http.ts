@@ -237,12 +237,24 @@ export function requireRole(r: Reply, role: Role, allowed: readonly Role[]): Res
 
 // ---------- Optimistic locking ----------
 
-/** `If-Match: "<version>"` (weak `W/` accepted): 428 when missing or malformed, 412 when stale. */
-export function checkIfMatch(request: Request, r: Reply, version: number): Response | null {
+/*
+ * Check order of versioned updates, as the API does it (Spring binds and validates the request
+ * before the use case runs):
+ *   401 → tenant 400/403 → 428 If-Match missing/malformed → 400 body shape → 403 role → 404
+ *   → 412 stale version → 400 domain validation → 409 domain conflict
+ * So the role check never depends on whether an id exists.
+ */
+
+/** The version in `If-Match: "<n>"` (weak `W/` accepted), or 428 when missing or malformed. */
+export function ifMatchVersion(request: Request, r: Reply): number | Response {
   const header = request.headers.get('If-Match')?.trim() ?? '';
   const match = /^(?:W\/)?"(\d+)"$/.exec(header);
-  if (!match) return r.problem(428, 'concurrency.if_match_required');
-  return Number(match[1]) === version ? null : r.problem(412, 'concurrency.stale_version');
+  return match ? Number(match[1]) : r.problem(428, 'concurrency.if_match_required');
+}
+
+/** 412 when the version the client edited is no longer the current one. */
+export function checkVersion(r: Reply, sent: number, current: number): Response | null {
+  return sent === current ? null : r.problem(412, 'concurrency.stale_version');
 }
 
 export function etag(version: number): Record<string, string> {

@@ -12,16 +12,44 @@ import {
   sessionResponse,
 } from '../http';
 
-const MAX_FAILURES = 5;
-const FAILURE_WINDOW_MS = 60_000;
+/** Like the API: a token bucket per email, 10 attempts per 15 minutes, refilled gradually. */
+const LOGIN_BUCKET_CAPACITY = 10;
+const LOGIN_REFILL_MS = (15 * 60_000) / LOGIN_BUCKET_CAPACITY;
+
+/** Rotated refresh token reused within this window: a two-tab race (401), not theft (revoke). */
+const REFRESH_REUSE_GRACE_MS = 10_000;
+
+/**
+ * Takes one sign-in attempt from the email's bucket. Every attempt counts, successful ones too, so
+ * a known-good login can't be interleaved to reset the limit. Returns 0 when allowed, otherwise
+ * the seconds until the next attempt is allowed (the `Retry-After`).
+ */
+function takeLoginAttempt(email: string, now: number): number {
+  const bucket = db.state.loginBuckets[email] ?? { tokens: LOGIN_BUCKET_CAPACITY, updatedAt: now };
+  const tokens = Math.min(
+    LOGIN_BUCKET_CAPACITY,
+    bucket.tokens + (now - bucket.updatedAt) / LOGIN_REFILL_MS,
+  );
+  if (tokens < 1) {
+    db.state.loginBuckets[email] = { tokens, updatedAt: now };
+    db.save();
+    return Math.max(1, Math.ceil(((1 - tokens) * LOGIN_REFILL_MS) / 1000));
+  }
+  db.state.loginBuckets[email] = { tokens: tokens - 1, updatedAt: now };
+  db.save();
+  return 0;
+}
 
 function slugify(name: string): string {
-  return name
-    .normalize('NFKD')
-    .replace(/[̀-ͯ]/g, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
+  return (
+    name
+      .normalize('NFKD')
+      // Drop the combining accents NFKD split off (é → e).
+      .replace(/\p{M}/gu, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+  );
 }
 
 export const authHandlers = [
@@ -37,23 +65,16 @@ export const authHandlers = [
     if (!v.ok) return v.problem(r);
 
     const email = String(body['email']).toLowerCase();
-    const now = Date.now();
-    const failures = (db.state.loginFailures[email] ?? []).filter(
-      (t) => now - t < FAILURE_WINDOW_MS,
-    );
-    if (failures.length >= MAX_FAILURES) {
-      const wait = Math.ceil((failures[0] + FAILURE_WINDOW_MS - now) / 1000);
+    const wait = takeLoginAttempt(email, Date.now());
+    if (wait > 0) {
       return r.problem(429, 'rate_limited', { headers: { 'Retry-After': String(wait) } });
     }
 
     const user = db.userByEmail(email);
     if (!user || user.password !== body['password']) {
-      db.state.loginFailures[email] = [...failures, now];
-      db.save();
       // Same response for an unknown email and a wrong password.
       return r.problem(401, 'auth.invalid_credentials');
     }
-    db.state.loginFailures[email] = [];
     return sessionResponse(r, user.id);
   }),
 
@@ -67,7 +88,12 @@ export const authHandlers = [
       });
     }
     if (presented.status === 'rotated') {
-      // A rotated token came back: it was copied. Revoke the whole family.
+      if (Date.now() - (presented.rotatedAt ?? 0) <= REFRESH_REUSE_GRACE_MS) {
+        // Another tab won the race; its new cookie is already in the shared jar. Plain 401: the
+        // client retries shortly and succeeds. Keep the cookie, it may already be the new one.
+        return r.problem(401, 'auth.refresh_invalid');
+      }
+      // A rotated token came back later: it was copied. Revoke the whole family.
       for (const token of db.state.refreshTokens) {
         if (token.familyId === presented.familyId) token.status = 'revoked';
       }
@@ -77,6 +103,7 @@ export const authHandlers = [
       });
     }
     presented.status = 'rotated';
+    presented.rotatedAt = Date.now();
     return sessionResponse(r, presented.userId, 200, presented.familyId);
   }),
 

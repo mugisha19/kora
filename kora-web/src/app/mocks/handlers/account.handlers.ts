@@ -5,8 +5,9 @@ import {
   API,
   Validator,
   authenticate,
-  checkIfMatch,
+  checkVersion,
   etag,
+  ifMatchVersion,
   invalidBody,
   isTimeZone,
   readBody,
@@ -66,26 +67,36 @@ export const accountHandlers = [
     if (userId instanceof Response) return userId;
     const membership = tenant(request, r, userId);
     if (membership instanceof Response) return membership;
-    const denied = requireRole(r, membership.role, ['ORG_ADMIN']);
-    if (denied) return denied;
+    const sentVersion = ifMatchVersion(request, r);
+    if (sentVersion instanceof Response) return sentVersion;
 
-    const organization = must(db.organization(membership.organizationId), 'organization');
-    const precondition = checkIfMatch(request, r, organization.version);
-    if (precondition) return precondition;
-
+    // Body shape (Bean Validation) comes before the role check.
     const body = await readBody(request);
     if (!body) return invalidBody(r);
-    const v = new Validator();
+    const shape = new Validator();
     if (['name', 'currency', 'timeZone'].every((key) => body[key] === undefined)) {
-      v.add('body', 'required', 'send at least one of name, currency, timeZone');
+      shape.add('body', 'required', 'send at least one of name, currency, timeZone');
     }
-    if (body['name'] !== undefined) v.string('name', body['name'], 2, 100);
-    v.pattern('currency', body['currency'], /^[A-Z]{3}$/);
+    if (body['name'] !== undefined) shape.string('name', body['name'], 2, 100);
+    shape.pattern('currency', body['currency'], /^[A-Z]{3}$/);
     const timeZone = body['timeZone'];
-    if (timeZone !== undefined && (typeof timeZone !== 'string' || !isTimeZone(timeZone))) {
-      v.add('timeZone', 'invalid', 'must be an IANA time zone id');
+    if (timeZone !== undefined && typeof timeZone !== 'string') {
+      shape.add('timeZone', 'invalid', 'must be a string');
     }
-    if (!v.ok) return v.problem(r);
+    if (!shape.ok) return shape.problem(r);
+
+    const denied = requireRole(r, membership.role, ['ORG_ADMIN']);
+    if (denied) return denied;
+    const organization = must(db.organization(membership.organizationId), 'organization');
+    const stale = checkVersion(r, sentVersion, organization.version);
+    if (stale) return stale;
+
+    // Domain validation needs reference data, so it runs last.
+    const domain = new Validator();
+    if (typeof timeZone === 'string' && !isTimeZone(timeZone)) {
+      domain.add('timeZone', 'invalid', 'must be an IANA time zone id');
+    }
+    if (!domain.ok) return domain.problem(r);
 
     if (body['name'] !== undefined) organization.name = String(body['name']).trim();
     if (body['currency'] !== undefined) organization.currency = String(body['currency']);

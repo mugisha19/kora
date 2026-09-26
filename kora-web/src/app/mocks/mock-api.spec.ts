@@ -94,17 +94,42 @@ describe('mock API', () => {
       });
       expect(unknown.body!['code']).toBe('auth.invalid_credentials');
 
-      for (let i = 0; i < 5; i++) {
+      // 10 attempts per 15 minutes; every attempt counts, a success doesn't reset the bucket.
+      for (let i = 0; i < 9; i++) {
         const wrong = await call('POST', '/auth/login', {
           body: { email: 'pm@kora.demo', password: 'nope' },
         });
         expect(wrong.status).toBe(401);
       }
+      const tenth = await call('POST', '/auth/login', {
+        body: { email: 'pm@kora.demo', password: DEMO_PASSWORD },
+      });
+      expect(tenth.status).toBe(200);
       const limited = await call('POST', '/auth/login', {
         body: { email: 'pm@kora.demo', password: DEMO_PASSWORD },
       });
       expect(limited.status).toBe(429);
-      expect(Number(limited.headers.get('Retry-After'))).toBeGreaterThan(0);
+      expect(limited.body!['code']).toBe('rate_limited');
+      expect(Number(limited.headers.get('Retry-After'))).toBeGreaterThanOrEqual(1);
+    });
+
+    it('refills the sign-in bucket gradually', async () => {
+      const now = vi.spyOn(Date, 'now');
+      now.mockReturnValue(1_000_000);
+      for (let i = 0; i < 10; i++) {
+        await call('POST', '/auth/login', { body: { email: 'pm@kora.demo', password: 'nope' } });
+      }
+      const limited = await call('POST', '/auth/login', {
+        body: { email: 'pm@kora.demo', password: 'nope' },
+      });
+      expect(limited.headers.get('Retry-After')).toBe('90');
+
+      now.mockReturnValue(1_000_000 + 90_000);
+      const allowed = await call('POST', '/auth/login', {
+        body: { email: 'pm@kora.demo', password: DEMO_PASSWORD },
+      });
+      expect(allowed.status).toBe(200);
+      now.mockRestore();
     });
 
     it('validates with field-agnostic codes', async () => {
@@ -117,17 +142,43 @@ describe('mock API', () => {
       ]);
     });
 
-    it('rotates refresh tokens and revokes the family when a rotated one is reused', async () => {
+    it('rotates refresh tokens and revokes the family when a rotated one is reused later', async () => {
+      const now = vi.spyOn(Date, 'now');
+      now.mockReturnValue(5_000_000);
       const { cookie } = await signIn();
 
       const first = await call('POST', '/auth/refresh', { headers: { Cookie: cookie } });
       expect(first.status).toBe(200);
       const next = String(first.headers.get('Set-Cookie')).split(';')[0];
 
+      // Past the 10 s race window, reuse of the old token means it was copied.
+      now.mockReturnValue(5_000_000 + 11_000);
       const reuse = await call('POST', '/auth/refresh', { headers: { Cookie: cookie } });
       expect(reuse.body!['code']).toBe('auth.refresh_invalid');
+      expect(reuse.headers.get('Set-Cookie')).toContain('Max-Age=0');
       const afterTheft = await call('POST', '/auth/refresh', { headers: { Cookie: next } });
       expect(afterTheft.status).toBe(401);
+      now.mockRestore();
+    });
+
+    it('treats a rotated token reused within 10 s as a two-tab race, not theft', async () => {
+      const now = vi.spyOn(Date, 'now');
+      now.mockReturnValue(5_000_000);
+      const { cookie } = await signIn();
+
+      const winner = await call('POST', '/auth/refresh', { headers: { Cookie: cookie } });
+      const winnerCookie = String(winner.headers.get('Set-Cookie')).split(';')[0];
+      now.mockReturnValue(5_000_000 + 2_000);
+      const loser = await call('POST', '/auth/refresh', { headers: { Cookie: cookie } });
+
+      expect(loser.status).toBe(401);
+      expect(loser.body!['code']).toBe('auth.refresh_invalid');
+      // No cookie cleared and no revocation: the loser retries with the winner's cookie.
+      expect(loser.headers.get('Set-Cookie')).toBeNull();
+      expect(
+        (await call('POST', '/auth/refresh', { headers: { Cookie: winnerCookie } })).status,
+      ).toBe(200);
+      now.mockRestore();
     });
 
     it('logs out by revoking the refresh family', async () => {
@@ -262,13 +313,51 @@ describe('mock API', () => {
       const patch = (headers: Record<string, string>) =>
         call('PATCH', '/organization', { body: { name: 'Akagera Digital' }, headers });
 
-      expect((await patch(pm.headers())).body!['code']).toBe('access.denied');
+      expect((await patch({ ...pm.headers(), 'If-Match': '"1"' })).body!['code']).toBe(
+        'access.denied',
+      );
       expect((await patch(admin.headers())).status).toBe(428);
       expect((await patch({ ...admin.headers(), 'If-Match': '*' })).status).toBe(428);
       expect((await patch({ ...admin.headers(), 'If-Match': '"9"' })).status).toBe(412);
       const ok = await patch({ ...admin.headers(), 'If-Match': 'W/"1"' });
       expect(ok.body).toMatchObject({ name: 'Akagera Digital', version: 2 });
       expect(ok.headers.get('ETag')).toBe('"2"');
+    });
+
+    it('checks in the API order: 428 → body shape → role → 404 → 412 → domain', async () => {
+      const viewer = await signIn('viewer@kora.demo');
+      const admin = await signIn();
+      const org = (headers: Record<string, string>, body: unknown) =>
+        call('PATCH', '/organization', { body, headers });
+
+      // Missing If-Match wins over the role check; a malformed body wins over the role check too.
+      expect((await org(viewer.headers(), { name: 'X Ltd' })).status).toBe(428);
+      expect((await org({ ...viewer.headers(), 'If-Match': '"1"' }, { name: 'X' })).status).toBe(
+        400,
+      );
+      // A stale version with an invalid body reports the body.
+      expect((await org({ ...admin.headers(), 'If-Match': '"9"' }, { name: 'X' })).status).toBe(
+        400,
+      );
+      // Unknown time zone is domain validation: only after the version check passes.
+      expect(
+        (await org({ ...admin.headers(), 'If-Match': '"9"' }, { timeZone: 'Mars/Base' })).status,
+      ).toBe(412);
+      expect(
+        (await org({ ...admin.headers(), 'If-Match': '"1"' }, { timeZone: 'Mars/Base' })).body![
+          'errors'
+        ][0],
+      ).toMatchObject({ field: 'timeZone', code: 'invalid' });
+
+      // Members: the role check never depends on whether the id exists.
+      const missing = '00000000-0000-4000-8000-000000000000';
+      const member = (headers: Record<string, string>) =>
+        call('PATCH', `/members/${missing}`, {
+          body: { role: 'MEMBER' },
+          headers: { ...headers, 'If-Match': '"1"' },
+        });
+      expect((await member(viewer.headers())).body!['code']).toBe('access.denied');
+      expect((await member(admin.headers())).status).toBe(404);
     });
 
     it('updates the profile without If-Match and validates it', async () => {

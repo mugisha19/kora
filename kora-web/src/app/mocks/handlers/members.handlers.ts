@@ -5,8 +5,9 @@ import {
   API,
   Validator,
   authenticate,
-  checkIfMatch,
+  checkVersion,
   etag,
+  ifMatchVersion,
   invalidBody,
   paging,
   readBody,
@@ -59,6 +60,16 @@ export const membersHandlers = [
     if (userId instanceof Response) return userId;
     const membership = tenant(request, r, userId);
     if (membership instanceof Response) return membership;
+    const sentVersion = ifMatchVersion(request, r);
+    if (sentVersion instanceof Response) return sentVersion;
+
+    // Body shape comes before the role check (see the check order in ../http.ts).
+    const body = await readBody(request);
+    if (!body) return invalidBody(r);
+    const v = new Validator();
+    v.oneOf('role', body['role'], ROLES);
+    if (!v.ok) return v.problem(r);
+
     const denied = requireRole(r, membership.role, ['ORG_ADMIN']);
     if (denied) return denied;
 
@@ -67,14 +78,8 @@ export const membersHandlers = [
       (m) => m.id === params['memberId'] && m.organizationId === membership.organizationId,
     );
     if (!target) return r.problem(404, 'resource.not_found');
-    const precondition = checkIfMatch(request, r, target.version);
-    if (precondition) return precondition;
-
-    const body = await readBody(request);
-    if (!body) return invalidBody(r);
-    const v = new Validator();
-    v.oneOf('role', body['role'], ROLES);
-    if (!v.ok) return v.problem(r);
+    const stale = checkVersion(r, sentVersion, target.version);
+    if (stale) return stale;
 
     const role = body['role'] as Role;
     const admins = db.state.memberships.filter(

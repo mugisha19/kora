@@ -93,15 +93,17 @@ export const invitationsHandlers = [
     if (userId instanceof Response) return userId;
     const membership = tenant(request, r, userId);
     if (membership instanceof Response) return membership;
-    const denied = requireRole(r, membership.role, ['ORG_ADMIN']);
-    if (denied) return denied;
 
+    // Body shape comes before the role check, as in the API.
     const body = await readBody(request);
     if (!body) return invalidBody(r);
     const v = new Validator();
     v.email('email', body['email']);
     v.oneOf('role', body['role'], ROLES);
     if (!v.ok) return v.problem(r);
+
+    const denied = requireRole(r, membership.role, ['ORG_ADMIN']);
+    if (denied) return denied;
 
     const email = String(body['email']).trim();
     const existing = db.userByEmail(email);

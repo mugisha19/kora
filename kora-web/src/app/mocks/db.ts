@@ -14,6 +14,8 @@ export interface RefreshTokenRecord {
   /** All tokens rotated from one sign-in share a family; reuse of a rotated one revokes it. */
   familyId: string;
   status: 'active' | 'rotated' | 'revoked';
+  /** When it was rotated; reuse within a short grace period is a two-tab race, not theft. */
+  rotatedAt?: number;
 }
 
 export interface ResetTokenRecord {
@@ -26,8 +28,8 @@ export interface ResetTokenRecord {
 export interface MockState extends SeedData {
   refreshTokens: RefreshTokenRecord[];
   resetTokens: ResetTokenRecord[];
-  /** Failed sign-in times per lower-cased email, for the rate limit. */
-  loginFailures: Record<string, number[]>;
+  /** Sign-in token buckets per lower-cased email, for the rate limit. */
+  loginBuckets: Record<string, { tokens: number; updatedAt: number }>;
 }
 
 /** Unwraps a lookup that the mock's own data guarantees; a miss is a bug in the mock. */
@@ -36,7 +38,7 @@ export function must<T>(value: T | undefined, what: string): T {
   return value;
 }
 
-const STORAGE_KEY = 'kora.mock.db.v1';
+const STORAGE_KEY = 'kora.mock.db.v2';
 
 function storage(): Storage | null {
   try {
@@ -148,7 +150,7 @@ export class MockDb {
   }
 
   private fresh(): MockState {
-    return { ...createSeed(), refreshTokens: [], resetTokens: [], loginFailures: {} };
+    return { ...createSeed(), refreshTokens: [], resetTokens: [], loginBuckets: {} };
   }
 }
 
