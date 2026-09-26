@@ -45,11 +45,14 @@ export class SessionRefresher {
   readonly expired$ = this.expiredSubject.asObservable();
 
   refresh(): Observable<SessionResponse> {
+    // Only a tab that had a session can lose the two-tab race; an anonymous start-up (no cookie)
+    // would just wait for nothing, delaying the sign-in page.
+    const hadSession = this.store.isAuthenticated();
     this.inFlight ??= this.api.refresh().pipe(
       retry({
         count: 1,
         delay: (error: unknown) =>
-          toApiError(error).code === 'auth.refresh_invalid'
+          hadSession && toApiError(error).code === 'auth.refresh_invalid'
             ? timer(this.retryDelayMs)
             : throwError(() => error),
       }),
