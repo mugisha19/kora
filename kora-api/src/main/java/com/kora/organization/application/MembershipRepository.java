@@ -2,6 +2,7 @@ package com.kora.organization.application;
 
 import com.kora.organization.Role;
 import com.kora.organization.domain.Membership;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -18,6 +19,8 @@ public interface MembershipRepository {
     Optional<Membership> findById(UUID id);
 
     Optional<Membership> findByUserId(UUID userId);
+
+    List<Membership> findByUserIdIn(Collection<UUID> userIds);
 
     boolean existsByUserId(UUID userId);
 
