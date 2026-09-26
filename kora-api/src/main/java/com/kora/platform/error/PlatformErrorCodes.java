@@ -14,6 +14,10 @@ public final class PlatformErrorCodes {
     public static final String STALE_VERSION = "concurrency.stale_version";
     public static final String IF_MATCH_REQUIRED = "concurrency.if_match_required";
     public static final String ACCESS_DENIED = "access.denied";
+    public static final String UNAUTHENTICATED = "auth.unauthenticated";
+    public static final String TENANT_HEADER_INVALID = "tenant.header_invalid";
+    public static final String TENANT_FORBIDDEN = "tenant.forbidden";
+    public static final String RATE_LIMITED = "rate_limited";
     public static final String INTERNAL_ERROR = "internal.error";
 
     /** Field-level reasons used inside {@code errors[]}. */
