@@ -49,6 +49,13 @@ module.exports = defineConfig([
     },
   },
   {
+    // console.info in the mock API stands in for the emails the real API sends (reset and invitation links).
+    files: ['src/app/mocks/**/*.ts'],
+    rules: {
+      'no-console': ['warn', { allow: ['info', 'warn', 'error'] }],
+    },
+  },
+  {
     files: ['**/*.html'],
     extends: [angular.configs.templateRecommended, angular.configs.templateAccessibility],
     rules: {

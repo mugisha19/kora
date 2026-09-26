@@ -80,6 +80,10 @@
                 {
                   "replace": "src/environments/environment.ts",
                   "with": "src/environments/environment.mock.ts"
+                },
+                {
+                  "replace": "src/app/mocks/enable-mocks.ts",
+                  "with": "src/app/mocks/enable-mocks.mock.ts"
                 }
               ]
             }
