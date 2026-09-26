@@ -1,18 +1,76 @@
 import { Routes } from '@angular/router';
-import { Shell } from './core/layout/shell';
+import { authGuard, guestGuard, roleGuard } from './core/auth/auth.guards';
 
-/** Route `title`s are translation keys (see TranslatedTitleStrategy). Pages are lazy-loaded. */
+/**
+ * Route `title`s are translation keys (see TranslatedTitleStrategy). Pages are lazy-loaded.
+ * Two lazy-loaded layouts (keeping the initial bundle small): public pages in the auth layout, the signed-in app in the shell. Both top-level
+ * routes have an empty path; the router picks the one whose children match the URL.
+ */
 export const routes: Routes = [
+  // Must come first: an empty-path layout route would otherwise match `/` with no child page.
+  { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
   {
     path: '',
-    component: Shell,
+    loadComponent: () => import('./core/layout/auth-layout').then((m) => m.AuthLayout),
+    // canActivateChild too: moving between sign-in pages keeps the layout, so its canActivate won't re-run.
+    canActivate: [guestGuard],
+    canActivateChild: [guestGuard],
     children: [
-      { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
+      {
+        path: 'login',
+        title: 'auth.login.title',
+        loadComponent: () => import('./features/auth/login-page').then((m) => m.LoginPage),
+      },
+      {
+        path: 'register',
+        title: 'auth.register.title',
+        loadComponent: () => import('./features/auth/register-page').then((m) => m.RegisterPage),
+      },
+      {
+        path: 'forgot-password',
+        title: 'auth.forgot.title',
+        loadComponent: () =>
+          import('./features/auth/forgot-password-page').then((m) => m.ForgotPasswordPage),
+      },
+      {
+        path: 'reset-password',
+        title: 'auth.reset.title',
+        loadComponent: () =>
+          import('./features/auth/reset-password-page').then((m) => m.ResetPasswordPage),
+      },
+    ],
+  },
+  {
+    // Invitation links work whether or not someone is signed in (feature 03).
+    path: 'invitations/:token',
+    loadComponent: () => import('./core/layout/auth-layout').then((m) => m.AuthLayout),
+    children: [
+      {
+        path: '',
+        title: 'invitation.pageTitle',
+        loadComponent: () =>
+          import('./features/invitations/accept-invitation-page').then(
+            (m) => m.AcceptInvitationPage,
+          ),
+      },
+    ],
+  },
+  {
+    path: '',
+    loadComponent: () => import('./core/layout/shell').then((m) => m.Shell),
+    canActivate: [authGuard],
+    canActivateChild: [authGuard],
+    children: [
       {
         path: 'dashboard',
         title: 'nav.dashboard',
         loadComponent: () =>
           import('./features/dashboard/dashboard-page').then((m) => m.DashboardPage),
+      },
+      {
+        path: 'admin',
+        canActivate: [roleGuard('ORG_ADMIN')],
+        loadChildren: () => import('./features/admin/admin.routes').then((m) => m.ADMIN_ROUTES),
       },
       {
         path: 'settings',
