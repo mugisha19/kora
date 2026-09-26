@@ -3,20 +3,22 @@
 Patterns are used only where they solve a real problem. Each row is filled in when the pattern
 actually lands in code, with file paths, and a pattern that doesn't earn its place is rejected in an ADR.
 
-| Pattern                                     | Problem it solves in Kora                                                                     | Status                  | Where                                                   |
-| ------------------------------------------- | --------------------------------------------------------------------------------------------- | ----------------------- | ------------------------------------------------------- |
-| Smart vs presentational components          | Keep data access out of reusable UI so it can be tested with plain inputs                     | Done — Phase 1          | `src/app/shared/ui/*` (presentational), feature pages   |
-| Strategy (framework hook)                   | Change how the router sets the document title without touching any route                      | Done — Phase 1          | `src/app/core/i18n/translated-title.strategy.ts`        |
-| Observer                                    | Language changes re-translate titles; later, real-time STOMP updates                          | Started — Phase 1       | `TranslatedTitleStrategy`; Phase 9 for STOMP            |
-| Facade per feature                          | Components talk to one API; store and HTTP details can change behind it                       | Planned — Phase 3       | —                                                       |
-| Chain of Responsibility (HTTP interceptors) | Correlation id, loading, error toast, retry, auth refresh, tenant header as independent links | Done — Phase 2          | `src/app/core/http/interceptors.ts`                     |
-| Adapter / Mapper                            | API errors of any shape → one `ApiError`; server field errors → Signal Forms errors           | Done — Phase 2          | `core/api/api-error.ts`, `core/errors/server-errors.ts` |
-| Composite                                   | WBS tree where a node and a subtree render and roll up the same way                           | Planned — Phase 4       | —                                                       |
-| State                                       | Only legal lifecycle transitions offered in the UI (project, charter, task, change request)   | Planned — Phases 4–7    | —                                                       |
-| Strategy (domain)                           | Methodology-specific tabs and rules (Agile, Predictive, Hybrid); export formats               | Planned — Phases 4–6, 9 | —                                                       |
-| Guards and resolvers                        | Role- and tenant-aware routing (the UI hides; the API enforces)                               | Planned — Phase 3       | —                                                       |
-| Single-flight (shared in-flight request)    | Parallel 401s trigger one token refresh, not ten competing rotations                          | Done — Phase 2          | `src/app/core/session/session-refresher.ts`             |
-| Store (NgRx SignalStore)                    | One reactive source of truth for the session: token, user, active organization                | Done — Phase 2          | `src/app/core/session/session.store.ts`                 |
+| Pattern                                     | Problem it solves in Kora                                                                     | Status                  | Where                                                            |
+| ------------------------------------------- | --------------------------------------------------------------------------------------------- | ----------------------- | ---------------------------------------------------------------- |
+| Smart vs presentational components          | Keep data access out of reusable UI so it can be tested with plain inputs                     | Done — Phase 1          | `src/app/shared/ui/*` (presentational), feature pages            |
+| Strategy (framework hook)                   | Change how the router sets the document title without touching any route                      | Done — Phase 1          | `src/app/core/i18n/translated-title.strategy.ts`                 |
+| Observer                                    | Language changes re-translate titles; later, real-time STOMP updates                          | Started — Phase 1       | `TranslatedTitleStrategy`; Phase 9 for STOMP                     |
+| Facade per feature                          | Components talk to one API; store and HTTP details can change behind it                       | Done — Phase 3          | `core/session/session.facade.ts`, `features/auth/auth.facade.ts` |
+| Chain of Responsibility (HTTP interceptors) | Correlation id, loading, error toast, retry, auth refresh, tenant header as independent links | Done — Phase 2          | `src/app/core/http/interceptors.ts`                              |
+| Adapter / Mapper                            | API errors of any shape → one `ApiError`; server field errors → Signal Forms errors           | Done — Phase 2          | `core/api/api-error.ts`, `core/errors/server-errors.ts`          |
+| Composite                                   | WBS tree where a node and a subtree render and roll up the same way                           | Planned — Phase 4       | —                                                                |
+| State                                       | Only legal lifecycle transitions offered in the UI (project, charter, task, change request)   | Planned — Phases 4–7    | —                                                                |
+| Strategy (domain)                           | Methodology-specific tabs and rules (Agile, Predictive, Hybrid); export formats               | Planned — Phases 4–6, 9 | —                                                                |
+| Guards                                      | Role- and session-aware routing (the UI hides; the API enforces)                              | Done — Phase 3          | `src/app/core/auth/auth.guards.ts`                               |
+| Route-scoped store                          | Admin list state lives only while its page is open; query drives server-side reloads          | Done — Phase 3          | `features/admin/*/*.store.ts`                                    |
+| Template helper (one submit path)           | Every form validates, calls the API and places errors the same way                            | Done — Phase 3          | `src/app/shared/forms/form-helpers.ts`                           |
+| Single-flight (shared in-flight request)    | Parallel 401s trigger one token refresh, not ten competing rotations                          | Done — Phase 2          | `src/app/core/session/session-refresher.ts`                      |
+| Store (NgRx SignalStore)                    | One reactive source of truth for the session: token, user, active organization                | Done — Phase 2          | `src/app/core/session/session.store.ts`                          |
 
 ## Phase 0
 
@@ -50,3 +52,16 @@ proxy, a network failure) into a single `ApiError` shape, so later layers never 
   membership and role; `withMethods` are the only way to change it.
 - **Dependency injection for time.** `NOW` is an injection token, so expiry logic is tested by
   moving a number instead of faking timers.
+
+## Phase 3
+
+- **Facade.** `SessionFacade` is the only way components start, restore, switch, expire or end a
+  session; `AuthFacade` wraps the public auth calls. Pages never touch `SessionStore` writes or
+  `AuthApi` directly, so the lifecycle rules (safe return URL, profile language, announcements)
+  live in one place.
+- **Guards.** `authGuard`, `guestGuard` and the factory `roleGuard(...roles)` return `UrlTree`s
+  (redirects) instead of `false`, so users always land somewhere meaningful.
+- **Route-scoped store.** `MembersStore` and `InvitationsStore` are in their page's `providers`,
+  with `withHooks.onInit` connecting the query signal to an `rxMethod` loader.
+- **One submit path.** `submitWithApi()` is the shared algorithm every form follows; pages only
+  supply the action and, optionally, a handler for a special error (412, expired link).

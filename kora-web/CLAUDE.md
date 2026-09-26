@@ -53,6 +53,11 @@ facade, store, pages, components) · `src/app/mocks` (MSW handlers and demo data
 
 - Unit tests render with `provideTestUi()` from `src/testing/test-providers.ts` (real translation
   files, fake icons, animations off). Query by role and accessible name.
+- Pages that call the API: `provideMockApi()` from `src/testing/mock-api.ts` (real interceptors,
+  MSW handlers in-process); `provideSession(await mockSession(email))` to render signed in;
+  `resetMockApi()` in `beforeEach`.
+- Forms: Signal Forms + `submitWithApi()` + `<kora-field-error>`; see ADR 0006.
+- e2e: `signInAs(page, role)` from `e2e/support.ts` (demo buttons, fresh mock data).
 - Every new string goes into `public/i18n/en.json`, `fr.json` and `rw.json` in the same commit
   (the parity test fails otherwise).
 - e2e runs its own dev server on port 4210 (never reuses another app on 4200) and scans pages

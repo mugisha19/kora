@@ -27,10 +27,9 @@ npm run api:generate  # regenerate API types after kora-api/docs/openapi.yaml ch
 
 ### Mock mode
 
-`npm start` serves the API from the browser (MSW) with fictional demo data. The demo accounts are
-`admin@kora.demo`, `pmo@kora.demo`, `pm@kora.demo`, `member@kora.demo` and `viewer@kora.demo`
-(password `KoraDemo!2026`); the sign-in screen arrives in Phase 3. Run `window.koraMock.reset()` in
-the console to restore the demo data. See [`docs/PROGRESS.md`](docs/PROGRESS.md) for demo
+`npm start` serves the API from the browser (MSW) with fictional demo data. The sign-in page has a
+one-click button per role (`admin@`, `pmo@`, `pm@`, `member@`, `viewer@kora.demo`, password
+`KoraDemo!2026`). Run `window.koraMock.reset()` in the console to restore the demo data. See [`docs/PROGRESS.md`](docs/PROGRESS.md) for demo
 invitation links.
 
 ## Documentation

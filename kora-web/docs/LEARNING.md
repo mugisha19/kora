@@ -177,3 +177,55 @@ code is unchanged: `HttpClient`, interceptors and cookies all run for real. The 
 contract's rules (validation, tenancy, locking, token rotation), and its behaviour is unit-tested by
 calling the handlers directly with `getResponse()`. The mock is only included in the `mock` build,
 so it never ships.
+
+## Open redirects and `returnUrl` (Phase 3)
+
+After sign-in the app returns to the page you wanted (`/login?returnUrl=/settings`). If it trusted
+that parameter blindly, a phishing link like `/login?returnUrl=https://evil.example` would send a
+freshly signed-in user to an attacker's page (OWASP A01). `safeReturnUrl()` accepts only same-app
+paths and rejects `//host`, `/\host` (browsers treat it like `//`), absolute URLs and control
+characters. Anything suspicious goes to the dashboard.
+
+## Guards hide, the API enforces (Phase 3)
+
+Route guards (`authGuard`, `guestGuard`, `roleGuard`) decide which screens the UI offers, so a
+viewer never sees an Administration link and gets a clear message if they type the URL. They are
+not security: anyone can call the API directly. The API checks the token, the organization
+membership and the role on every request, and the UI simply reflects that.
+
+## Why login errors are generic (Phase 3)
+
+"Wrong password" versus "no such account" tells an attacker which emails are registered. The API
+answers both with `auth.invalid_credentials` (and the same timing), and the page shows one sentence.
+"Forgot password" likewise always answers "if an account exists…".
+
+## One way to submit a form (Phase 3)
+
+Every form goes through `submitWithApi()`: client validation first (`submit()` marks fields
+touched and skips the call when invalid), then the API call; the contract's field errors are placed
+on their fields, anything else becomes one message at the top in an alert region, and focus moves
+to the first invalid field so keyboard and screen-reader users land on the problem. Material leaves
+`aria-invalid` off _empty_ required inputs, so the helper finds invalid fields by the form field's
+error class instead.
+
+## Optimistic locking in the UI (Phase 3)
+
+Updates carry `If-Match: "<version>"`. If someone else saved in between, the API answers 412 and
+nothing is overwritten. The UI then explains what happened: the members list simply reloads (a
+single field), while the organization form keeps your edits on screen and offers _Reload latest_,
+so you can see their version and redo your change deliberately.
+
+## Route-scoped stores (Phase 3)
+
+The members and invitations stores are provided by their pages, not the root injector: state
+exists while the page is open and is thrown away when you leave or switch organization, so one
+organization's data can never flash on another's screen. The query (search, filter, sort, page) is
+the store's single source of truth; `rxMethod` + `switchMap` reloads on every change and drops
+responses that arrive after a newer request.
+
+## Testing against the mock API in-process (Phase 3)
+
+Component tests provide `MockApiBackend`, an `HttpBackend` that hands each request to the MSW
+handlers (`getResponse`) after it has gone through the real interceptor chain. A test that types a
+taken email into the register form therefore gets the same 409 with `errors[{field:"email"}]` the
+API would send, and checks that the message appears on the email field.
