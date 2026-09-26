@@ -117,3 +117,57 @@ finish on fallback timers and tests become flaky under load. Unit tests therefor
 `MATERIAL_ANIMATIONS: { animationsDisabled: true }`. Tests also load the real translation files and
 query by **role and accessible name** (Testing Library), which checks accessibility and behaviour
 at the same time.
+
+## Contract-first with generated types (Phase 2)
+
+The API team owns `openapi.yaml`. `openapi-typescript` turns it into TypeScript types, and CI runs
+`api:check`, which regenerates the types and fails if they differ from the committed ones. When the
+contract changes, regenerating makes the TypeScript compiler list every place in the app that no
+longer matches. **Interview line:** "The contract is the single source of truth; drift is a build
+failure, not a production bug."
+
+## The interceptor chain (Phase 2)
+
+An Angular interceptor sees every request and response, and each one does a single job (Chain of
+Responsibility). Order matters: the outermost interceptor sees the final outcome of everything
+inside it. Ours is correlation id → loading → error toast → retry → auth → tenant. The toast sits
+outside retry and auth, so a request that was retried or re-authenticated successfully never shows
+an error. The correlation id is outermost, so every retry of one user action carries the same id.
+
+## Access token in memory, refresh token in an HttpOnly cookie (Phase 2)
+
+The short-lived access token (15 min) lives only in a JavaScript variable (the session store), so it
+disappears on reload and can't be read from storage by injected script. The long-lived refresh
+token is in an `HttpOnly; Secure; SameSite=Strict` cookie scoped to `/api/v1/auth`: JavaScript can't
+read it, other sites can't send it, and it only goes to the refresh endpoint.
+
+## Single-flight refresh (Phase 2)
+
+When the token expires, ten parallel requests all get 401. If each refreshed on its own, the first
+would rotate the refresh token and the other nine would present an already-used one, which the API
+treats as theft and revokes the session. So the first 401 starts the refresh and everyone else
+subscribes to the same in-flight call (`shareReplay`), then replays with the new token. A request
+that fails after someone else already refreshed simply retries with the newer token.
+
+## Retry only what is safe to repeat (Phase 2)
+
+A GET can be repeated without side effects (idempotent); a POST that times out might already have
+created an invitation. So only GET/HEAD/OPTIONS are retried, only for transient failures (network
+blip, 502/503/504, a 429 with a short `Retry-After`), with **exponential backoff** (400 ms, 800 ms) so
+a struggling server isn't hammered.
+
+## Errors users can act on (Phase 2)
+
+The API returns a stable `code` and field `params`; the app translates those, never the English
+`detail`. Reads that fail show an error state with "Try again" on the screen; failed writes show a
+toast with a reference number; validation errors appear next to the field (`serverErrors()` maps
+`objectives[2].metric` onto the Signal Forms tree). Unknown codes fall back to a generic message, so
+a newer API can't break an older client.
+
+## Mocking at the network layer with MSW (Phase 2)
+
+Mock Service Worker registers a service worker that answers `/api/v1/*` inside the browser. The app
+code is unchanged: `HttpClient`, interceptors and cookies all run for real. The mock implements the
+contract's rules (validation, tenancy, locking, token rotation), and its behaviour is unit-tested by
+calling the handlers directly with `getResponse()`. The mock is only included in the `mock` build,
+so it never ships.

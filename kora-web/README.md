@@ -20,9 +20,18 @@ cd kora-web
 npm ci
 npm start           # http://localhost:4200, API mocked in the browser (MSW)
 npm run start:api   # same, but /api is proxied to kora-api on http://localhost:8080
-npm run verify      # format check, lint, unit tests with coverage, production build
+npm run verify      # format check, lint, contract check, unit tests with coverage, build
 npm run e2e         # Playwright end-to-end tests with axe accessibility scans
+npm run api:generate  # regenerate API types after kora-api/docs/openapi.yaml changes
 ```
+
+### Mock mode
+
+`npm start` serves the API from the browser (MSW) with fictional demo data. The demo accounts are
+`admin@kora.demo`, `pmo@kora.demo`, `pm@kora.demo`, `member@kora.demo` and `viewer@kora.demo`
+(password `KoraDemo!2026`); the sign-in screen arrives in Phase 3. Run `window.koraMock.reset()` in
+the console to restore the demo data. See [`docs/PROGRESS.md`](docs/PROGRESS.md) for demo
+invitation links.
 
 ## Documentation
 

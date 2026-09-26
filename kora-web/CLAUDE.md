@@ -30,7 +30,10 @@ facade, store, pages, components) · `src/app/mocks` (MSW handlers and demo data
   text translated in en, fr and rw. Status and health are never shown by colour alone.
 - The UI hides what a role can't do; the API enforces it.
 - Versioned updates send `If-Match`; handle 412 with a clear "someone else saved first" message.
-- Errors go through `toApiError()`; show translated messages keyed by `code`.
+- Call the API only through `core/api/*.api.ts`; import types from `core/api/api.models.ts`, never
+  from `generated/`. Every new operation also gets an MSW handler and a mock-API test.
+- Errors go through `toApiError()`; show translated messages keyed by `code` (`ErrorMessages`),
+  field errors via `serverErrors()`. Reads show an error state; the interceptor toasts failed writes.
 - Comments explain WHY. Record decisions in `docs/adr/`, patterns in `docs/PATTERNS.md`,
   interview explanations in `docs/LEARNING.md`.
 - Check the latest stable version of a dependency before adding it.
@@ -58,7 +61,8 @@ facade, store, pages, components) · `src/app/mocks` (MSW handlers and demo data
 ## Commands (run in `kora-web/`)
 
 `npm start` (mock API) · `npm run start:api` (proxy to :8080) · `npm run lint` · `npm run test:ci` ·
-`npm run e2e` · `npm run verify` (everything CI runs) · `npm run icons` (after adding an icon name)
+`npm run e2e` · `npm run verify` (everything CI runs) · `npm run icons` (after adding an icon name) ·
+`npm run api:generate` (after a contract change) · `npm run api:check`
 
 ## Git (shared working tree with the API session — see ADR 0002)
 
