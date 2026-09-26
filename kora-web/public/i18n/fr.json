@@ -9,7 +9,8 @@
     "label": "Navigation principale",
     "openMenu": "Ouvrir le menu de navigation",
     "dashboard": "Tableau de bord",
-    "settings": "Paramètres"
+    "settings": "Paramètres",
+    "admin": "Administration"
   },
   "theme": {
     "label": "Thème",
@@ -66,6 +67,13 @@
       "mockApi": "API simulée",
       "mockApiHint": "Les données sont simulées dans votre navigateur ; rien n'est envoyé à un serveur.",
       "liveApi": "API réelle"
+    },
+    "profile": {
+      "title": "Profil",
+      "description": "Enregistré dans votre compte ; s’applique sur tous vos appareils.",
+      "language": "Langue préférée",
+      "save": "Enregistrer le profil",
+      "saved": "Profil enregistré."
     }
   },
   "notFound": {
@@ -143,7 +151,10 @@
       "network": {
         "offline": "Impossible de joindre Kora. Vérifiez votre connexion."
       },
-      "unknown": "Une erreur s'est produite. Veuillez réessayer."
+      "unknown": "Une erreur s'est produite. Veuillez réessayer.",
+      "organization": {
+        "currency_locked": "La devise ne peut pas changer : des projets ont déjà des budgets dans la devise actuelle."
+      }
     },
     "fields": {
       "required": "Ce champ est obligatoire.",
@@ -161,5 +172,165 @@
         "breached": "Ce mot de passe figure dans une fuite de données. Choisissez-en un autre."
       }
     }
+  },
+  "roles": {
+    "ORG_ADMIN": "Administrateur",
+    "PMO": "PMO",
+    "PROJECT_MANAGER": "Chef de projet",
+    "MEMBER": "Membre",
+    "VIEWER": "Lecteur"
+  },
+  "roleHints": {
+    "ORG_ADMIN": "Tout, y compris les membres, les rôles et les paramètres de l'organisation.",
+    "PMO": "Pilote les portefeuilles et programmes, approuve les changements, voit tous les projets.",
+    "PROJECT_MANAGER": "Crée et conduit des projets, planifie, gère les risques et les problèmes.",
+    "MEMBER": "Travaille sur les tâches assignées, saisit son temps, commente.",
+    "VIEWER": "Lecture seule."
+  },
+  "invitationStatus": {
+    "PENDING": "En attente",
+    "ACCEPTED": "Acceptée",
+    "REVOKED": "Révoquée",
+    "EXPIRED": "Expirée"
+  },
+  "guards": {
+    "forbidden": "Vous n'avez pas l'autorisation d'ouvrir cette page."
+  },
+  "orgSwitcher": {
+    "label": "Organisation",
+    "switched": "Organisation active : {{ name }}"
+  },
+  "userMenu": {
+    "label": "Menu du compte de {{ name }}",
+    "settings": "Paramètres",
+    "signOut": "Se déconnecter"
+  },
+  "auth": {
+    "email": "Adresse e-mail",
+    "password": "Mot de passe",
+    "showPassword": "Afficher le mot de passe",
+    "fullName": "Nom complet",
+    "organizationName": "Nom de l'organisation",
+    "newPassword": "Nouveau mot de passe",
+    "confirmPassword": "Confirmer le nouveau mot de passe",
+    "passwordHint": "De 12 à 128 caractères. Une longue phrase de passe est la plus facile à retenir.",
+    "login": {
+      "title": "Se connecter",
+      "subtitle": "Bon retour sur Kora.",
+      "submit": "Se connecter",
+      "forgot": "Mot de passe oublié ?",
+      "noAccount": "Nouveau sur Kora ?",
+      "register": "Créer une organisation",
+      "demoTitle": "Comptes de démonstration",
+      "demoHint": "Données fictives. Un clic vous connecte avec ce rôle :"
+    },
+    "register": {
+      "title": "Créez votre organisation",
+      "subtitle": "Vous en serez l’administrateur et pourrez inviter votre équipe.",
+      "submit": "Créer l'organisation",
+      "haveAccount": "Vous avez déjà un compte ?",
+      "signIn": "Se connecter"
+    },
+    "forgot": {
+      "title": "Réinitialiser votre mot de passe",
+      "subtitle": "Saisissez votre adresse e-mail et nous vous enverrons un lien pour choisir un nouveau mot de passe.",
+      "submit": "Envoyer le lien",
+      "sent": "Si un compte existe pour {{ email }}, nous avons envoyé un lien pour réinitialiser son mot de passe. Consultez votre boîte de réception.",
+      "back": "Retour à la connexion"
+    },
+    "reset": {
+      "title": "Choisissez un nouveau mot de passe",
+      "submit": "Enregistrer le mot de passe",
+      "mismatch": "Les mots de passe ne correspondent pas.",
+      "done": "Votre mot de passe a été modifié et vous avez été déconnecté partout. Connectez-vous avec le nouveau mot de passe.",
+      "invalidLink": "Ce lien de réinitialisation n'est pas valide, a expiré ou a déjà été utilisé.",
+      "requestNew": "Demander un nouveau lien",
+      "missingToken": "Ouvrez cette page depuis le lien de l'e-mail de réinitialisation."
+    }
+  },
+  "invitation": {
+    "pageTitle": "Invitation",
+    "loadingTitle": "Vérification de votre invitation",
+    "invalidTitle": "Cette invitation ne peut pas être utilisée",
+    "goToSignIn": "Aller à la connexion",
+    "title": "Rejoindre {{ organization }}",
+    "subtitle": "{{ inviter }} vous invite à rejoindre l’organisation en tant que {{ role }}.",
+    "email": "Invitation pour",
+    "expiresLabel": "Valable jusqu'au",
+    "existingHint": "Vous avez déjà un compte Kora. Saisissez son mot de passe pour accepter.",
+    "newHint": "Créez votre compte Kora pour accepter.",
+    "accept": "Accepter l'invitation",
+    "acceptAndCreate": "Créer le compte et rejoindre",
+    "joined": "Vous avez rejoint {{ organization }}."
+  },
+  "admin": {
+    "title": "Administration",
+    "subtitle": "Membres, invitations et paramètres de l'organisation.",
+    "tabs": {
+      "label": "Sections de l'administration",
+      "members": "Membres",
+      "invitations": "Invitations",
+      "organization": "Organisation"
+    },
+    "members": {
+      "search": "Rechercher par nom ou e-mail",
+      "role": "Rôle",
+      "allRoles": "Tous les rôles",
+      "count": "Membres : {{ count }}",
+      "name": "Nom",
+      "email": "E-mail",
+      "joined": "Arrivée",
+      "actions": "Actions",
+      "you": "Vous",
+      "changeRole": "Rôle de {{ name }}",
+      "remove": "Retirer {{ name }}",
+      "removeTitle": "Retirer {{ name }} ?",
+      "removeMessage": "{{ name }} perdra immédiatement l'accès à {{ organization }}. Vous pourrez l'inviter à nouveau plus tard.",
+      "removeConfirm": "Retirer",
+      "removed": "{{ name }} a été retiré.",
+      "roleChanged": "{{ name }} est maintenant {{ role }}.",
+      "emptyTitle": "Aucun membre ne correspond",
+      "emptyMessage": "Essayez une autre recherche ou un autre rôle."
+    },
+    "invitations": {
+      "status": "Statut",
+      "all": "Tous les statuts",
+      "invite": "Inviter quelqu’un",
+      "count": "Invitations : {{ count }}",
+      "emptyTitle": "Aucune invitation ici",
+      "emptyMessage": "Invitez des personnes par e-mail. Chaque lien est valable 14 jours.",
+      "invitedBy": "Invité par",
+      "sentOn": "Envoyée",
+      "expires": "Expiration",
+      "expiresOn": "Expire le {{ date }}",
+      "revoke": "Révoquer l'invitation de {{ email }}",
+      "revokeTitle": "Révoquer cette invitation ?",
+      "revokeMessage": "Le lien envoyé à {{ email }} ne fonctionnera plus.",
+      "revokeConfirm": "Révoquer",
+      "revoked": "L'invitation de {{ email }} a été révoquée.",
+      "dialogTitle": "Inviter quelqu’un",
+      "dialogSubmit": "Envoyer l'invitation",
+      "sent": "Invitation envoyée à {{ email }}."
+    },
+    "organization": {
+      "slug": "Identifiant",
+      "name": "Nom de l'organisation",
+      "currency": "Devise",
+      "currencyHint": "Utilisée pour tous les budgets et coûts. Verrouillée dès qu'un projet a un budget.",
+      "timeZone": "Fuseau horaire",
+      "save": "Enregistrer",
+      "saved": "Paramètres de l'organisation enregistrés.",
+      "stale": "Quelqu'un d'autre a enregistré ces paramètres pendant votre modification. Rechargez pour voir sa version, puis refaites votre modification.",
+      "reload": "Recharger la dernière version"
+    }
+  },
+  "paginator": {
+    "itemsPerPage": "Éléments par page",
+    "nextPage": "Page suivante",
+    "previousPage": "Page précédente",
+    "firstPage": "Première page",
+    "lastPage": "Dernière page",
+    "range": "{{ start }}–{{ end }} sur {{ total }}",
+    "rangeEmpty": "0 sur {{ total }}"
   }
 }

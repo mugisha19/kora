@@ -9,7 +9,8 @@
     "label": "Urutonde rw'ingenzi",
     "openMenu": "Fungura urutonde",
     "dashboard": "Ikibaho",
-    "settings": "Igenamiterere"
+    "settings": "Igenamiterere",
+    "admin": "Ubuyobozi"
   },
   "theme": {
     "label": "Isura",
@@ -66,6 +67,13 @@
       "mockApi": "API y'igerageza",
       "mockApiHint": "Amakuru ni ay'igerageza ari muri mushakisha yawe; nta na kimwe cyoherezwa kuri seriveri.",
       "liveApi": "API nyayo"
+    },
+    "profile": {
+      "title": "Umwirondoro",
+      "description": "Bibikwa kuri konti yawe; bikora ku bikoresho byawe byose.",
+      "language": "Ururimi ukunda",
+      "save": "Bika umwirondoro",
+      "saved": "Umwirondoro wabitswe."
     }
   },
   "notFound": {
@@ -143,7 +151,10 @@
       "network": {
         "offline": "Ntibishoboka kugera kuri Kora. Genzura interineti yawe."
       },
-      "unknown": "Habaye ikibazo. Ongera ugerageze."
+      "unknown": "Habaye ikibazo. Ongera ugerageze.",
+      "organization": {
+        "currency_locked": "Ifaranga ntirishobora guhinduka: hari imishinga isanzwe ifite ingengo y'imari mu ifaranga riri."
+      }
     },
     "fields": {
       "required": "Iki gice kigomba kuzuzwa.",
@@ -161,5 +172,165 @@
         "breached": "Iri jambo ry’ibanga ryagaragaye mu makuru yibwe. Hitamo irindi."
       }
     }
+  },
+  "roles": {
+    "ORG_ADMIN": "Umuyobozi",
+    "PMO": "PMO",
+    "PROJECT_MANAGER": "Umuyobozi w'umushinga",
+    "MEMBER": "Umunyamuryango",
+    "VIEWER": "Ureba gusa"
+  },
+  "roleHints": {
+    "ORG_ADMIN": "Byose, harimo abanyamuryango, inshingano n'igenamiterere ry'umuryango.",
+    "PMO": "Ayobora amatsinda y'imishinga, yemeza impinduka, abona imishinga yose.",
+    "PROJECT_MANAGER": "Atangiza kandi ayobora imishinga, ateganya igihe, acunga ibyago n'ibibazo.",
+    "MEMBER": "Akora imirimo yahawe, yandika igihe yakoze, atanga ibitekerezo.",
+    "VIEWER": "Areba gusa."
+  },
+  "invitationStatus": {
+    "PENDING": "Birategereje",
+    "ACCEPTED": "Byemewe",
+    "REVOKED": "Byahagaritswe",
+    "EXPIRED": "Byarangiye"
+  },
+  "guards": {
+    "forbidden": "Nta burenganzira ufite bwo gufungura iyo paji."
+  },
+  "orgSwitcher": {
+    "label": "Umuryango",
+    "switched": "Ubu uri muri {{ name }}"
+  },
+  "userMenu": {
+    "label": "Konti ya {{ name }}",
+    "settings": "Igenamiterere",
+    "signOut": "Sohoka"
+  },
+  "auth": {
+    "email": "Imeyili",
+    "password": "Ijambo ry'ibanga",
+    "showPassword": "Erekana ijambo ry'ibanga",
+    "fullName": "Amazina yombi",
+    "organizationName": "Izina ry'umuryango",
+    "newPassword": "Ijambo ry'ibanga rishya",
+    "confirmPassword": "Emeza ijambo ry'ibanga rishya",
+    "passwordHint": "Inyuguti kuva kuri 12 kugeza kuri 128. Interuro ndende iroroshye kwibuka.",
+    "login": {
+      "title": "Injira",
+      "subtitle": "Murakaza neza kuri Kora.",
+      "submit": "Injira",
+      "forgot": "Wibagiwe ijambo ry'ibanga?",
+      "noAccount": "Uri mushya kuri Kora?",
+      "register": "Fungura umuryango",
+      "demoTitle": "Konti z'igerageza",
+      "demoHint": "Amakuru y'igerageza. Kanda rimwe winjire ufite iyi nshingano:"
+    },
+    "register": {
+      "title": "Fungura umuryango wawe",
+      "subtitle": "Uzaba umuyobozi wawo kandi ushobora gutumira ikipe yawe.",
+      "submit": "Fungura umuryango",
+      "haveAccount": "Usanzwe ufite konti?",
+      "signIn": "Injira"
+    },
+    "forgot": {
+      "title": "Hindura ijambo ry'ibanga",
+      "subtitle": "Andika imeyili yawe tukoherereze link yo guhitamo ijambo ry'ibanga rishya.",
+      "submit": "Ohereza link",
+      "sent": "Niba hari konti ya {{ email }}, twayoherereje link yo guhindura ijambo ry'ibanga. Reba muri imeyili yawe.",
+      "back": "Subira aho binjirira"
+    },
+    "reset": {
+      "title": "Hitamo ijambo ry'ibanga rishya",
+      "submit": "Bika ijambo ry'ibanga",
+      "mismatch": "Amagambo y'ibanga ntabwo ahura.",
+      "done": "Ijambo ry'ibanga ryahinduwe kandi wasohowe ahantu hose. Injira ukoresheje ijambo ry'ibanga rishya.",
+      "invalidLink": "Iyi link ntikora, yararangiye cyangwa yamaze gukoreshwa.",
+      "requestNew": "Saba indi link",
+      "missingToken": "Fungura iyi paji ukoresheje link iri muri imeyili yo guhindura ijambo ry'ibanga."
+    }
+  },
+  "invitation": {
+    "pageTitle": "Ubutumire",
+    "loadingTitle": "Turimo kugenzura ubutumire bwawe",
+    "invalidTitle": "Ubu butumire ntibushobora gukoreshwa",
+    "goToSignIn": "Jya aho binjirira",
+    "title": "Injira muri {{ organization }}",
+    "subtitle": "{{ inviter }} yagutumiye kwinjira nka {{ role }}.",
+    "email": "Ubutumire bwa",
+    "expiresLabel": "Bufite agaciro kugeza",
+    "existingHint": "Usanzwe ufite konti ya Kora. Andika ijambo ry'ibanga ryayo kugira ngo wemere.",
+    "newHint": "Fungura konti yawe ya Kora kugira ngo wemere.",
+    "accept": "Emera ubutumire",
+    "acceptAndCreate": "Fungura konti winjire",
+    "joined": "Winjiye muri {{ organization }}."
+  },
+  "admin": {
+    "title": "Ubuyobozi",
+    "subtitle": "Abanyamuryango, ubutumire n'igenamiterere ry'umuryango.",
+    "tabs": {
+      "label": "Ibice by'ubuyobozi",
+      "members": "Abanyamuryango",
+      "invitations": "Ubutumire",
+      "organization": "Umuryango"
+    },
+    "members": {
+      "search": "Shakisha ukoresheje izina cyangwa imeyili",
+      "role": "Inshingano",
+      "allRoles": "Inshingano zose",
+      "count": "Abanyamuryango: {{ count }}",
+      "name": "Izina",
+      "email": "Imeyili",
+      "joined": "Yinjiye",
+      "actions": "Ibikorwa",
+      "you": "Ni wowe",
+      "changeRole": "Inshingano za {{ name }}",
+      "remove": "Kura {{ name }}",
+      "removeTitle": "Gukura {{ name }}?",
+      "removeMessage": "Ako kanya {{ name }} ntazongera kugera muri {{ organization }}. Ushobora kongera kumutumira nyuma.",
+      "removeConfirm": "Kura",
+      "removed": "{{ name }} yakuwemo.",
+      "roleChanged": "Ubu {{ name }} ni {{ role }}.",
+      "emptyTitle": "Nta munyamuryango uhuye n'ibyo ushaka",
+      "emptyMessage": "Gerageza gushakisha ukundi cyangwa uhitemo indi nshingano."
+    },
+    "invitations": {
+      "status": "Uko bihagaze",
+      "all": "Byose",
+      "invite": "Tumira umuntu",
+      "count": "Ubutumire: {{ count }}",
+      "emptyTitle": "Nta butumire buhari",
+      "emptyMessage": "Tumira abantu ukoresheje imeyili. Buri link imara iminsi 14.",
+      "invitedBy": "Yatumiwe na",
+      "sentOn": "Bwoherejwe",
+      "expires": "Birangira",
+      "expiresOn": "Birangira {{ date }}",
+      "revoke": "Hagarika ubutumire bwa {{ email }}",
+      "revokeTitle": "Guhagarika ubu butumire?",
+      "revokeMessage": "Link yoherejwe kuri {{ email }} ntizongera gukora.",
+      "revokeConfirm": "Hagarika",
+      "revoked": "Ubutumire bwa {{ email }} bwahagaritswe.",
+      "dialogTitle": "Tumira umuntu",
+      "dialogSubmit": "Ohereza ubutumire",
+      "sent": "Ubutumire bwoherejwe kuri {{ email }}."
+    },
+    "organization": {
+      "slug": "Ikiranga",
+      "name": "Izina ry'umuryango",
+      "currency": "Ifaranga",
+      "currencyHint": "Rikoreshwa ku ngengo y'imari yose. Ntirishobora guhinduka iyo umushinga ufite ingengo y'imari.",
+      "timeZone": "Isaha y’akarere",
+      "save": "Bika impinduka",
+      "saved": "Igenamiterere ry'umuryango ryabitswe.",
+      "stale": "Undi muntu yabitse iri genamiterere mu gihe warimo uhindura. Ongera ufungure urebe ibyo yakoze, maze wongere ukore impinduka yawe.",
+      "reload": "Fungura ibigezweho"
+    }
+  },
+  "paginator": {
+    "itemsPerPage": "Ibigaragara kuri buri paji",
+    "nextPage": "Paji ikurikira",
+    "previousPage": "Paji ibanza",
+    "firstPage": "Paji ya mbere",
+    "lastPage": "Paji ya nyuma",
+    "range": "{{ start }}–{{ end }} kuri {{ total }}",
+    "rangeEmpty": "0 kuri {{ total }}"
   }
 }

@@ -9,7 +9,8 @@
     "label": "Main navigation",
     "openMenu": "Open navigation menu",
     "dashboard": "Dashboard",
-    "settings": "Settings"
+    "settings": "Settings",
+    "admin": "Administration"
   },
   "theme": {
     "label": "Theme",
@@ -66,6 +67,13 @@
       "mockApi": "Mock API",
       "mockApiHint": "Data is simulated in your browser; nothing is sent to a server.",
       "liveApi": "Live API"
+    },
+    "profile": {
+      "title": "Profile",
+      "description": "Saved to your account; applies on every device.",
+      "language": "Preferred language",
+      "save": "Save profile",
+      "saved": "Profile saved."
     }
   },
   "notFound": {
@@ -143,7 +151,10 @@
       "network": {
         "offline": "Can't reach Kora. Check your connection."
       },
-      "unknown": "Something went wrong. Please try again."
+      "unknown": "Something went wrong. Please try again.",
+      "organization": {
+        "currency_locked": "The currency can't change: projects already have budgets in the current one."
+      }
     },
     "fields": {
       "required": "This field is required.",
@@ -161,5 +172,165 @@
         "breached": "This password has appeared in a data breach. Choose a different one."
       }
     }
+  },
+  "roles": {
+    "ORG_ADMIN": "Administrator",
+    "PMO": "PMO",
+    "PROJECT_MANAGER": "Project manager",
+    "MEMBER": "Member",
+    "VIEWER": "Viewer"
+  },
+  "roleHints": {
+    "ORG_ADMIN": "Everything, including members, roles and organization settings.",
+    "PMO": "Governs portfolios and programs, approves changes, sees all projects.",
+    "PROJECT_MANAGER": "Creates and runs projects, plans schedules, manages risks and issues.",
+    "MEMBER": "Works on assigned tasks, logs time and comments.",
+    "VIEWER": "Read-only access."
+  },
+  "invitationStatus": {
+    "PENDING": "Pending",
+    "ACCEPTED": "Accepted",
+    "REVOKED": "Revoked",
+    "EXPIRED": "Expired"
+  },
+  "guards": {
+    "forbidden": "You don't have permission to open that page."
+  },
+  "orgSwitcher": {
+    "label": "Organization",
+    "switched": "Switched to {{ name }}"
+  },
+  "userMenu": {
+    "label": "Account menu for {{ name }}",
+    "settings": "Settings",
+    "signOut": "Sign out"
+  },
+  "auth": {
+    "email": "Email",
+    "password": "Password",
+    "showPassword": "Show password",
+    "fullName": "Full name",
+    "organizationName": "Organization name",
+    "newPassword": "New password",
+    "confirmPassword": "Confirm new password",
+    "passwordHint": "12 to 128 characters. A long passphrase is easiest to remember.",
+    "login": {
+      "title": "Sign in",
+      "subtitle": "Welcome back to Kora.",
+      "submit": "Sign in",
+      "forgot": "Forgot your password?",
+      "noAccount": "New to Kora?",
+      "register": "Create an organization",
+      "demoTitle": "Demo accounts",
+      "demoHint": "Fictional data. One click signs you in with this role:"
+    },
+    "register": {
+      "title": "Create your organization",
+      "subtitle": "You'll be its administrator and can invite your team.",
+      "submit": "Create organization",
+      "haveAccount": "Already have an account?",
+      "signIn": "Sign in"
+    },
+    "forgot": {
+      "title": "Reset your password",
+      "subtitle": "Enter your email and we'll send you a link to choose a new password.",
+      "submit": "Send reset link",
+      "sent": "If an account exists for {{ email }}, we've sent a link to reset its password. Check your inbox.",
+      "back": "Back to sign in"
+    },
+    "reset": {
+      "title": "Choose a new password",
+      "submit": "Set new password",
+      "mismatch": "The passwords don't match.",
+      "done": "Your password has been changed, and you were signed out everywhere. Sign in with the new password.",
+      "invalidLink": "This reset link is invalid, expired or already used.",
+      "requestNew": "Request a new link",
+      "missingToken": "Open this page from the link in your password reset email."
+    }
+  },
+  "invitation": {
+    "pageTitle": "Invitation",
+    "loadingTitle": "Checking your invitation",
+    "invalidTitle": "This invitation can't be used",
+    "goToSignIn": "Go to sign in",
+    "title": "Join {{ organization }}",
+    "subtitle": "{{ inviter }} invited you to join as {{ role }}.",
+    "email": "Invitation for",
+    "expiresLabel": "Valid until",
+    "existingHint": "You already have a Kora account. Enter its password to accept.",
+    "newHint": "Create your Kora account to accept.",
+    "accept": "Accept invitation",
+    "acceptAndCreate": "Create account and join",
+    "joined": "You've joined {{ organization }}."
+  },
+  "admin": {
+    "title": "Administration",
+    "subtitle": "Members, invitations and organization settings.",
+    "tabs": {
+      "label": "Administration sections",
+      "members": "Members",
+      "invitations": "Invitations",
+      "organization": "Organization"
+    },
+    "members": {
+      "search": "Search by name or email",
+      "role": "Role",
+      "allRoles": "All roles",
+      "count": "Members: {{ count }}",
+      "name": "Name",
+      "email": "Email",
+      "joined": "Joined",
+      "actions": "Actions",
+      "you": "You",
+      "changeRole": "Role of {{ name }}",
+      "remove": "Remove {{ name }}",
+      "removeTitle": "Remove {{ name }}?",
+      "removeMessage": "{{ name }} will lose access to {{ organization }} immediately. You can invite them again later.",
+      "removeConfirm": "Remove",
+      "removed": "{{ name }} was removed.",
+      "roleChanged": "{{ name }} is now {{ role }}.",
+      "emptyTitle": "No members match",
+      "emptyMessage": "Try a different search or role."
+    },
+    "invitations": {
+      "status": "Status",
+      "all": "All statuses",
+      "invite": "Invite someone",
+      "count": "Invitations: {{ count }}",
+      "emptyTitle": "No invitations here",
+      "emptyMessage": "Invite people by email. Each link is valid for 14 days.",
+      "invitedBy": "Invited by",
+      "sentOn": "Sent",
+      "expires": "Expires",
+      "expiresOn": "Expires {{ date }}",
+      "revoke": "Revoke the invitation for {{ email }}",
+      "revokeTitle": "Revoke this invitation?",
+      "revokeMessage": "The link sent to {{ email }} will stop working.",
+      "revokeConfirm": "Revoke",
+      "revoked": "The invitation for {{ email }} was revoked.",
+      "dialogTitle": "Invite someone",
+      "dialogSubmit": "Send invitation",
+      "sent": "Invitation sent to {{ email }}."
+    },
+    "organization": {
+      "slug": "Identifier",
+      "name": "Organization name",
+      "currency": "Currency",
+      "currencyHint": "Used for all budgets and costs. Locked once a project has a budget.",
+      "timeZone": "Time zone",
+      "save": "Save changes",
+      "saved": "Organization settings saved.",
+      "stale": "Someone else saved these settings while you were editing. Reload to see their version, then make your change again.",
+      "reload": "Reload latest"
+    }
+  },
+  "paginator": {
+    "itemsPerPage": "Items per page",
+    "nextPage": "Next page",
+    "previousPage": "Previous page",
+    "firstPage": "First page",
+    "lastPage": "Last page",
+    "range": "{{ start }}–{{ end }} of {{ total }}",
+    "rangeEmpty": "0 of {{ total }}"
   }
 }
