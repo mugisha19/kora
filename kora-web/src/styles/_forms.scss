@@ -1,0 +1,67 @@
+// Shared form and message styles used by the auth pages, dialogs and admin forms.
+
+.kora-form {
+  display: grid;
+  gap: var(--kora-space-1);
+
+  mat-form-field {
+    inline-size: 100%;
+  }
+}
+
+.kora-form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--kora-space-3);
+  margin-block-start: var(--kora-space-2);
+}
+
+.kora-page-title {
+  margin-block-end: var(--kora-space-1);
+  font: var(--mat-sys-headline-small);
+}
+
+.kora-page-subtitle {
+  margin: 0 0 var(--kora-space-6);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+// Inline messages. Tone comes with an icon or a leading word, never colour alone.
+.kora-notice {
+  display: flex;
+  gap: var(--kora-space-2);
+  align-items: flex-start;
+  margin-block-end: var(--kora-space-4);
+  padding: var(--kora-space-3) var(--kora-space-4);
+  border-radius: var(--kora-radius);
+  font: var(--mat-sys-body-medium);
+
+  mat-icon {
+    flex: none;
+  }
+
+  p {
+    margin: 0;
+  }
+
+  &.error {
+    color: var(--kora-danger-fg);
+    background: var(--kora-danger-bg);
+  }
+
+  &.info {
+    color: var(--kora-info-fg);
+    background: var(--kora-info-bg);
+  }
+
+  &.success {
+    color: var(--kora-success-fg);
+    background: var(--kora-success-bg);
+  }
+}
+
+.kora-muted {
+  color: var(--mat-sys-on-surface-variant);
+}

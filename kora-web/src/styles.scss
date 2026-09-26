@@ -2,6 +2,7 @@
 @use '@angular/material' as mat;
 @use 'styles/tokens';
 @use 'styles/base';
+@use 'styles/forms';
 
 html {
   // `color-scheme` theme type makes Material emit `light-dark()` tokens: one theme serves both schemes,
