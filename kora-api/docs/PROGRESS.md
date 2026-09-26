@@ -2,23 +2,22 @@
 
 ## Current status
 
-Phase 1 complete (tag `api-v0.1.0`). Waiting for "continue".
+Phase 2 complete (tag `api-v0.2.0`). Waiting for "continue".
 
-Contract 0.1.0 is in `docs/openapi.yaml` and announced to the web session. The whole build, including the
-Testcontainers integration tests, passes locally with Docker Desktop.
+Contract 0.1.1 is implemented end to end: sign-in, refresh rotation, password reset, register-organization,
+`/me`, organization settings, members and invitations. Every integration-test response is validated against
+the contract.
 
 ## Next step
 
-Phase 2 — identity and tenancy (features 01–03, 23): users and Argon2id passwords, JWT access tokens with key
-rotation, refresh-token rotation with reuse detection in Redis, rate limiting, register-organization, tenant
-resolution with a repository filter and PostgreSQL row-level security, members, invitations, `/me`, email via
-Mailpit, and response validation against the contract.
+Phase 3 — portfolios, programs and projects with the project lifecycle (State), the project charter, the WBS
+(Composite roll-up) and the dashboard read model (features 04–07). Contract 0.2.0 first.
 
 ## Checklist
 
 - [x] 0. Scaffold, Maven wrapper, quality gates (Spotless, Checkstyle, ArchUnit, Modulith, JaCoCo), Testcontainers, CI (GitHub + GitLab), docs
 - [x] 1. Contract 0.1.0, Problem Details, correlation ids, pagination, optimistic locking, logging, contract lint
-- [ ] 2. Identity & tenancy: users, JWT + refresh rotation, rate limits, organizations, RLS, members, invitations, `/me` (features 01–03, 23)
+- [x] 2. Identity & tenancy: users, JWT + refresh rotation, rate limits, organizations, RLS, members, invitations, `/me` (features 01–03, 23)
 - [ ] 3. Portfolios, programs, projects, charter, WBS, dashboard read model (04–07)
 - [ ] 4. Tasks, board, lexorank, backlog, sprints, burndown, velocity (08–09)
 - [ ] 5. Dependencies, critical path, baselines, working calendar (10)
@@ -36,3 +35,4 @@ Mailpit, and response validation against the contract.
 - ADR 0004 — modular monolith with pragmatic hexagonal modules
 - ADR 0005 — REST API conventions (errors, tenancy header, paging, If-Match, correlation ids)
 - ADR 0006 — contract-first with a hand-written OpenAPI 3.0.3 document, linted and enforced by tests
+- ADR 0007 — sessions (JWT + rotating refresh families), credentials, three-layer tenant isolation, explicit role checks

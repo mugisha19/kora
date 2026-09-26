@@ -5,13 +5,13 @@ lands in code; a pattern that doesn't earn its place is rejected in an ADR.
 
 | Pattern                        | Problem it solves in Kora                                                                 | Status             | Where |
 | ------------------------------ | ----------------------------------------------------------------------------------------- | ------------------ | ----- |
-| Ports and adapters (Adapter)   | Email, token store, file storage, clock behind interfaces; in-memory fakes in tests        | Planned — Phase 2  | —     |
-| Strategy                       | Password hashing; CPM scheduling; EAC and percent-complete methods; methodology rules     | Planned — 2, 5, 7  | —     |
-| State                          | Lifecycles where illegal moves must be impossible: invitation, project, charter, task, issue, change request | Planned — 2–6 | — |
-| Specification                  | Composable, tenant-safe filters for list endpoints (members, projects, tasks, risks)      | Planned — Phase 2  | —     |
+| Ports and adapters (Adapter)   | Email, token store, file storage, clock behind interfaces; in-memory fakes in tests        | Done — Phase 2     | `platform/mail/EmailSender`, `identity/application/RefreshTokenStore` + `adapter/redis`, `*Repository` ports + `adapter/persistence` |
+| Strategy                       | Password hashing; CPM scheduling; EAC and percent-complete methods; methodology rules     | Hashing done — 2; 5, 7 planned | `identity/application/PasswordHasher`, `identity/adapter/security/Argon2PasswordHasher` |
+| State                          | Lifecycles where illegal moves must be impossible: invitation, project, charter, task, issue, change request | Invitation done — 2; 3–6 planned | `organization/domain/InvitationStatus` |
+| Specification                  | Composable, tenant-safe filters for list endpoints (members, projects, tasks, risks)      | Done — Phase 2     | `organization/adapter/persistence/MemberSpecifications` |
 | Builder                        | Readable test fixtures and the demo data seeder                                           | Planned — Phase 2  | —     |
 | Composite                      | WBS roll-up: a work package and a whole subtree compute effort, cost and progress the same way | Planned — Phase 3 | — |
-| Observer (domain events)       | Snapshot read models, WBS roll-up, notifications react to changes without coupling modules | Planned — 3, 8    | —     |
+| Observer (domain events)       | Snapshot read models, WBS roll-up, notifications react to changes without coupling modules | Started — Phase 2 | `UserProfileChanged` → `OrganizationEventListeners`; emails after commit |
 | Chain of Responsibility        | Change-request approval levels (PM → PMO → Sponsor) decided by configurable rules         | Planned — Phase 6  | —     |
 | Transactional outbox           | Events are never lost or sent for a rolled-back change (Modulith publication registry)    | Planned — Phase 8  | —     |
 | Template Method + Factory      | Report exporters share load → build → render → store; a new format is one new class       | Planned — Phase 9  | —     |
@@ -31,3 +31,13 @@ Still plumbing rather than domain patterns, but two structural ideas landed in t
   status codes and Problem Details (`platform/error`, `platform/web/ProblemDetailsHandler.java`).
 - **Servlet filter chain** (a Chain of Responsibility provided by the Servlet API): `CorrelationIdFilter` then
   `AccessLogFilter`, each doing one job and passing the request on (`platform/web`).
+
+## Phase 2
+
+- **Dependency inversion across modules.** `/me` needs memberships, which belong to the organization module, but
+  identity must not depend on it (that would be a cycle, and `ModularityTests` would fail). Identity declares the
+  port `MembershipDirectory`; organization implements it (`MembershipDirectoryService`).
+- **Scoped context objects** instead of passing the tenant through every method: `TenantScope` and
+  `CurrentMember` are `ScopedValue`s bound once per request by `TenantFilter`.
+- The **Builder** row moves to Phase 3: integration tests create data through the real endpoints
+  (`support/TestAccounts`), which proved simpler than fixture builders so far.

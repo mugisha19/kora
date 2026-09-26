@@ -95,3 +95,54 @@ The web app generates its client and mocks from it; the API is tested against it
 itself, so conventions (error format, headers, tenant scoping) can't be forgotten on a new endpoint.
 **Why not generate the spec from code?** Then the contract only exists after the code, and renaming a Java field
 would silently break the client. See ADR 0006.
+
+## Access token + refresh token (Phase 2)
+
+The access token (a signed JWT) proves who you are on every request and expires after 15 minutes. It lives in
+JavaScript memory, so a page reload loses it. The refresh token lives in an `HttpOnly` cookie that JavaScript
+can't read (so XSS can't steal it) and is only sent to `/api/v1/auth`. On reload, the app calls
+`/auth/refresh` and gets a new access token.
+**Why two tokens?** A stolen access token is useful for at most 15 minutes. The long-lived credential is never
+exposed to scripts.
+
+## Refresh-token rotation and reuse detection (Phase 2)
+
+Every refresh swaps the refresh token for a new one. If an old token ever comes back, someone copied it: the
+real browser and the attacker hold the same token and we can't tell who is who, so the whole sign-in (the
+token *family*) is revoked and both have to sign in again. A 10-second grace period covers the innocent case of
+two tabs refreshing at the same moment.
+**Interview line:** "Rotation turns a stolen refresh token into a detectable event instead of a silent,
+long-lived session."
+
+## Why login errors are generic, and equally slow (Phase 2)
+
+"No account with this email" versus "wrong password" tells an attacker which emails are registered. So both get
+the same message. Timing leaks too: checking an Argon2 hash takes tens of milliseconds, so an unknown email that
+skips the check would answer faster. We compare against a dummy hash in that case, so both paths do the same work.
+
+## Argon2id (Phase 2)
+
+Password hashing must be *slow and memory-hungry* on purpose: fast hashes (SHA-256) let attackers test billions
+of guesses per second on GPUs. Argon2id needs 19 MiB of memory per attempt, which GPUs are bad at. The salt and
+parameters are stored inside each hash, so settings can be raised later.
+
+## Row-level security (Phase 2)
+
+PostgreSQL can attach a filter to a table that it applies to every query by a given role: here
+`organization_id = current_setting('app.org')`. The app switches to that restricted role at the start of every
+transaction and sets `app.org` to the active organization. Even a hand-written SQL query that forgets
+`WHERE organization_id = ?` only sees one tenant's rows.
+**Interview line:** "Three layers — header check, ORM tenant filter, database RLS — and each one fails closed on
+its own."
+
+## Token bucket rate limiting (Phase 2)
+
+Each key (an IP, an email) has a bucket of N tokens that refills over time; each attempt takes one. When it's
+empty the answer is `429` with `Retry-After`. Unlike "N per fixed minute", a bucket has no window edge to exploit
+by bursting at 12:00:59 and 12:01:00. Buckets live in Redis so every API instance shares them.
+
+## ScopedValue vs ThreadLocal (Phase 2)
+
+A `ThreadLocal` set for one request and not cleared leaks into the next request that reuses the thread, which
+across tenants is a data leak. A `ScopedValue` (final in Java 25) is bound for the duration of one call and
+disappears when the call returns, by construction. It also works with virtual threads.
