@@ -26,7 +26,12 @@ into `domain` → `application` → `adapter.{web,persistence,...}`; dependencie
 - API conventions: base `/api/v1`, `X-Organization-Id` tenant header, RFC 9457 Problem Details with `code`,
   `correlationId`, `errors[]`; paged lists `{content,page,size,totalElements,totalPages}` (0-based);
   `version` + ETag, `If-Match` required on updates (412 stale, 428 missing).
-- Every tenant-owned table has `organization_id NOT NULL`; a cross-tenant id returns 404.
+- Tenancy (ADR 0007): every tenant-owned table has `organization_id NOT NULL`, an RLS policy (copy
+  `V3__organization.sql`) and `@TenantId` on the entity field; a cross-tenant id returns 404. Bind a scope and start
+  a transaction together with `TenantTransactions`, never the other way round; system scope only when a flow truly
+  crosses organizations. Tenant data only through JPA (plain JDBC bypasses RLS).
+- Authorization: the first line of a use case is `CurrentMember.requireRole(...)`, before any lookup. Add every new
+  endpoint to `RoleMatrixIT`, and check every integration-test response with `Contract.conforms(...)`.
 - Money is `BigDecimal` with explicit rounding, never `double`. Time is `java.time` (`Instant` for moments).
 - Integration tests use `@IntegrationTest` and are named `*IT`; never H2.
 - Comments explain WHY. Record decisions in `docs/adr/`, patterns in `docs/PATTERNS.md`, interview
