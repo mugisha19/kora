@@ -72,6 +72,13 @@ export function toApiError(error: unknown): ApiError {
     };
   }
 
+  // Angular's resource() wraps a non-Error rejection (our ApiError objects) in an Error whose
+  // `cause` is the original; unwrap it so the real code isn't lost.
+  if (error instanceof Error && error.cause !== undefined && error.cause !== error) {
+    const inner = toApiError(error.cause);
+    if (inner.code !== UNKNOWN_ERROR_CODE) return inner;
+  }
+
   return {
     status: -1,
     code: UNKNOWN_ERROR_CODE,

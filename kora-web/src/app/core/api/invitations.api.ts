@@ -10,7 +10,7 @@ import {
   ListInvitationsQuery,
   SessionResponse,
 } from './api.models';
-import { authFlow } from './http-context';
+import { authFlow, silent } from './http-context';
 import { API_BASE, toHttpParams, toVoid } from './http-params';
 
 /**
@@ -28,7 +28,8 @@ export class InvitationsApi {
   }
 
   create(body: CreateInvitationRequest): Observable<Invitation> {
-    return this.http.post<Invitation>(`${API_BASE}/invitations`, body);
+    // Silent: the invite dialog shows errors next to its fields.
+    return this.http.post<Invitation>(`${API_BASE}/invitations`, body, { context: silent() });
   }
 
   revoke(invitationId: string): Observable<void> {
@@ -38,12 +39,12 @@ export class InvitationsApi {
   }
 
   preview(token: string): Observable<InvitationPreview> {
-    return this.http.get<InvitationPreview>(this.tokenUrl(token), { context: authFlow() });
+    return this.http.get<InvitationPreview>(this.tokenUrl(token), { context: silent(authFlow()) });
   }
 
   accept(token: string, body: AcceptInvitationRequest): Observable<SessionResponse> {
     return this.http.post<SessionResponse>(`${this.tokenUrl(token)}/accept`, body, {
-      context: authFlow(),
+      context: silent(authFlow()),
     });
   }
 

@@ -74,6 +74,13 @@ describe('toApiError', () => {
     expect(isApiError(original)).toBe(true);
   });
 
+  it('unwraps an error carried as `cause` (how resource() reports a rejected loader)', () => {
+    const original = toApiError(httpError(410, { status: 410, code: 'invitations.expired' }));
+
+    expect(toApiError(new Error('wrapped', { cause: original }))).toBe(original);
+    expect(toApiError(new Error('wrapped', { cause: 'not an api error' })).detail).toBe('wrapped');
+  });
+
   it('wraps non-HTTP errors as unknown, keeping the message', () => {
     expect(toApiError(new Error('boom'))).toEqual({
       status: -1,

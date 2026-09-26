@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { MeResponse, UpdateMeRequest } from './api.models';
+import { silent } from './http-context';
 import { API_BASE } from './http-params';
 
 /** The signed-in user (contract tag "Me"). Not tenant-scoped; no `If-Match` on updates. */
@@ -14,6 +15,7 @@ export class MeApi {
   }
 
   update(body: UpdateMeRequest): Observable<MeResponse> {
-    return this.http.patch<MeResponse>(`${API_BASE}/me`, body);
+    // Silent: the profile form shows errors inline.
+    return this.http.patch<MeResponse>(`${API_BASE}/me`, body, { context: silent() });
   }
 }
