@@ -22,6 +22,9 @@
         <spring-modulith.version>2.1.1</spring-modulith.version>
         <archunit.version>1.5.1</archunit.version>
         <swagger-parser.version>2.1.48</swagger-parser.version>
+        <openapi-request-validator.version>3.0.0</openapi-request-validator.version>
+        <bouncycastle.version>1.86</bouncycastle.version>
+        <bucket4j.version>8.20.0</bucket4j.version>
         <spotless-maven-plugin.version>3.10.2</spotless-maven-plugin.version>
         <palantir-java-format.version>2.99.0</palantir-java-format.version>
         <maven-checkstyle-plugin.version>3.6.0</maven-checkstyle-plugin.version>
@@ -82,6 +85,39 @@
             <scope>runtime</scope>
         </dependency>
 
+        <!-- Security: JWT access tokens (resource server + Nimbus encoder), Argon2id password hashing -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security-oauth2-resource-server</artifactId>
+        </dependency>
+        <dependency>
+            <!-- Argon2 implementation used by Spring Security's Argon2PasswordEncoder -->
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk18on</artifactId>
+            <version>${bouncycastle.version}</version>
+        </dependency>
+
+        <!-- Redis: refresh-token families and rate-limit buckets (ADR 0007) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.bucket4j</groupId>
+            <artifactId>bucket4j_jdk17-lettuce</artifactId>
+            <version>${bucket4j.version}</version>
+        </dependency>
+
+        <!-- Email: password resets and invitations (Mailpit locally) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+
         <!-- Modular monolith: module boundaries are verified in tests (ADR 0004) -->
         <dependency>
             <groupId>org.springframework.modulith</groupId>
@@ -136,6 +172,23 @@
             <groupId>com.tngtech.archunit</groupId>
             <artifactId>archunit-junit5</artifactId>
             <version>${archunit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- Validates real requests and responses against docs/openapi.yaml in integration tests (ADR 0006) -->
+        <dependency>
+            <groupId>com.atlassian.oai</groupId>
+            <artifactId>openapi-request-validator-mockmvc</artifactId>
+            <version>${openapi-request-validator.version}</version>
             <scope>test</scope>
         </dependency>
         <!-- Parses docs/openapi.yaml in contract tests (ADR 0006) -->
