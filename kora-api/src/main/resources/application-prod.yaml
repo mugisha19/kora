@@ -5,3 +5,9 @@ logging:
       # One JSON object per line (Elastic Common Schema), including the correlation id and the access log's
       # key-value pairs, ready for Loki/Elasticsearch without parsing rules.
       console: ecs
+
+kora:
+  identity:
+    jwt:
+      # Production must use a configured, persistent signing key.
+      allow-ephemeral-key: false

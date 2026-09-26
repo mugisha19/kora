@@ -2,6 +2,7 @@ package com.kora;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 
 /**
  * Kora API entry point.
@@ -12,6 +13,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * {@code ModularityTests} and {@code ArchitectureTest} rather than by convention alone (ADR 0004).
  */
 @SpringBootApplication
+@ConfigurationPropertiesScan
 public class KoraApplication {
 
     public static void main(String[] args) {

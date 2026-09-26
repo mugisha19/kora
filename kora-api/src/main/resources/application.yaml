@@ -24,6 +24,14 @@ spring:
         # Contract paging: 0-based `page`, `size` 20 by default and capped at 100 (ADR 0005).
         default-page-size: 20
         max-page-size: 100
+  messages:
+    # Email texts per module, in English (default), French and Kinyarwanda.
+    basename: messages/identity,messages/organization
+    fallback-to-system-locale: false
+  mail:
+    # Mailpit from compose.yaml locally (web UI on http://localhost:8025); a real SMTP relay elsewhere.
+    host: localhost
+    port: 1025
   docker:
     compose:
       # `spring-boot:run` starts the services in compose.yaml and wires their connection details.
@@ -42,6 +50,10 @@ management:
     web:
       exposure:
         include: health, info, prometheus
+  health:
+    mail:
+      # Email is best-effort and sent asynchronously; an SMTP outage must not take the API out of the load balancer.
+      enabled: false
   endpoint:
     health:
       # /actuator/health/liveness and /readiness for container orchestrators.
@@ -50,3 +62,21 @@ management:
   info:
     java:
       enabled: true
+
+kora:
+  web:
+    # Links in emails (password reset, invitations) point at the web app.
+    base-url: http://localhost:4200
+  mail:
+    from: 'Kora <no-reply@kora.local>'
+  identity:
+    jwt:
+      issuer: kora
+      access-token-lifetime: 15m
+      # Set KORA_IDENTITY_JWT_KEY_ID, _PRIVATE_KEY and _PUBLIC_KEY outside development (see README).
+      allow-ephemeral-key: true
+    refresh-token:
+      lifetime: 14d
+      family-lifetime: 30d
+      reuse-grace-period: 10s
+      cookie-secure: true
