@@ -40,6 +40,8 @@ into `domain` → `application` → `adapter.{web,persistence,...}`; dependencie
 - Invalid input is `400 validation.failed` with `errors[].field` naming the request field (never 422).
 - Writes to another module's data go through a port that module owns (`ProjectChangeControl`,
   `SchedulePlanning`), never through its repositories; personal data is anonymized, not hard-deleted.
+- Money formulas work on the amounts and round half-even to minor units once, at the end; ratios that would divide
+  by zero are omitted with a reason, never returned as 0 or infinity.
 - Counts of days in plans (durations, lags, float, variance) are working days on the organization's calendar
   (`schedule` module); derived views such as the schedule are computed on read unless an ADR says otherwise.
 - Integration tests use `@IntegrationTest` and are named `*IT`; never H2.
