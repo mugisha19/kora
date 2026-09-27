@@ -176,6 +176,28 @@ public class Charter {
         this.submittedBy = null;
     }
 
+    /**
+     * An approved change request amended the charter (feature 14): this version is superseded and the returned one,
+     * with the amended content, takes its place, already approved by the change's final approver. Save this version
+     * first: the database allows one current version per project.
+     */
+    public Charter amend(CharterContent amended, UUID approver, Instant now) {
+        this.status = status.supersede();
+        Charter next = new Charter();
+        next.id = UUID.randomUUID();
+        next.organizationId = organizationId;
+        next.projectId = projectId;
+        next.versionNumber = versionNumber + 1;
+        next.status = CharterStatus.APPROVED;
+        next.createdAt = Objects.requireNonNull(now);
+        next.write(amended);
+        next.submittedAt = now;
+        next.submittedBy = Objects.requireNonNull(approver);
+        next.approvedBy = approver;
+        next.approvedAt = now;
+        return next;
+    }
+
     private void write(CharterContent content) {
         this.purpose = content.purpose();
         this.businessCase = content.businessCase();
