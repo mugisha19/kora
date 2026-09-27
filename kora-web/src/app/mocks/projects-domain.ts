@@ -466,6 +466,7 @@ export function dashboardSummary(
     values.reduce<Record<string, number>>((acc, v) => ({ ...acc, [v]: (acc[v] ?? 0) + 1 }), {});
   const trees = projects.map((p) => wbsTree(p));
   const money = (units: bigint) => ({ amount: fromUnits(units, digits), currency });
+  const ids = new Set(projects.map((p) => p.id));
   return {
     projectCount: projects.length,
     byStatus: count(projects.map((p) => p.status)),
@@ -476,5 +477,11 @@ export function dashboardSummary(
     totalPlannedCost: money(trees.reduce((t, tree) => t + toUnits(tree.plannedCost.amount), 0n)),
     totalEarnedValue: money(trees.reduce((t, tree) => t + toUnits(tree.earnedValue.amount), 0n)),
     lateProjects: projects.filter((p) => isLate(p)).length,
+    openCriticalRisks: (db.state.risks ?? []).filter(
+      (r) => ids.has(r.projectId) && r.status !== 'CLOSED' && r.probability * r.impact >= 15,
+    ).length,
+    pendingChangeRequests: (db.state.changeRequests ?? []).filter(
+      (c) => ids.has(c.projectId) && (c.status === 'SUBMITTED' || c.status === 'IN_REVIEW'),
+    ).length,
   };
 }
