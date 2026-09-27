@@ -61,8 +61,27 @@ public final class TestPortfolios {
         return read(result, "$.id");
     }
 
+    /** A project of the given methodology running from {@code start} for six months, without budget. */
+    public String project(Session creator, String portfolioId, String methodology, LocalDate start) {
+        MvcTestResult result =
+                createProject(creator, portfolioId, code(), start, start.plusMonths(6), null, methodology);
+        assertThat(result).hasStatus(HttpStatus.CREATED);
+        return read(result, "$.id");
+    }
+
     public MvcTestResult createProject(
             Session creator, String portfolioId, String code, LocalDate start, LocalDate end, String budget) {
+        return createProject(creator, portfolioId, code, start, end, budget, "AGILE");
+    }
+
+    public MvcTestResult createProject(
+            Session creator,
+            String portfolioId,
+            String code,
+            LocalDate start,
+            LocalDate end,
+            String budget,
+            String methodology) {
         String budgetJson =
                 budget == null ? "" : ",\"budget\":{\"amount\":\"%s\",\"currency\":\"RWF\"}".formatted(budget);
         return Contract.conforms(mvc.post()
@@ -70,9 +89,9 @@ public final class TestPortfolios {
                 .headers(creator.headers())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-                        {"code":"%s","name":"Project %s","portfolioId":"%s","methodology":"AGILE",
+                        {"code":"%s","name":"Project %s","portfolioId":"%s","methodology":"%s",
                          "startDate":"%s","targetEndDate":"%s"%s}
-                        """.formatted(code, code, portfolioId, start, end, budgetJson))
+                        """.formatted(code, code, portfolioId, methodology, start, end, budgetJson))
                 .exchange());
     }
 
