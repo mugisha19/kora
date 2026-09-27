@@ -215,8 +215,8 @@ describe('mock API — governance', () => {
       ]);
       expect(quadrants[0]['stakeholders'].map((s: Body) => s['name'])).toEqual([
         'Claudine Uwimana',
-        'Jean-Paul Habimana',
         'Odette Mukamurenzi',
+        'Thérèse Mukandayisenga',
       ]);
 
       const gaps = await get(`/projects/${MOBILE}/stakeholders?gap=true`);

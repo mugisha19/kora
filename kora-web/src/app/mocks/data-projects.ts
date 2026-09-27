@@ -10,7 +10,7 @@ import {
   ProjectStatus,
   WbsNodeType,
 } from '../core/api/api.models';
-import { ORG_AKAGERA, ORG_VIRUNGA, USER } from './data';
+import { ORG_AKAGERA, ORG_VIRUNGA, USER, kigaliDate } from './data';
 
 /**
  * Phase 4 demo data (feature 22's story): Akagera Digital's "Digital Services 2026" portfolio with
@@ -154,7 +154,7 @@ const rwf = (amount: string): Money => ({ amount, currency: 'RWF' });
 
 export function createProjectSeed(now = Date.now()): ProjectSeed {
   const at = (days: number) => new Date(now + days * DAY).toISOString();
-  const date = (days: number) => at(days).slice(0, 10);
+  const date = (days: number) => kigaliDate(now + days * DAY);
 
   const portfolios: PortfolioRecord[] = [
     {

@@ -15,7 +15,7 @@ import {
   RiskStatus,
   Role,
 } from '../core/api/api.models';
-import { USER } from './data';
+import { USER, kigaliDate } from './data';
 import { PEOPLE, PROJECT } from './data-projects';
 
 /**
@@ -170,7 +170,7 @@ const rwf = (amount: string) => ({ amount, currency: 'RWF' });
 
 export function createGovernanceSeed(now: number): GovernanceSeed {
   const at = (days: number) => new Date(now + days * DAY).toISOString();
-  const date = (days: number) => at(days).slice(0, 10);
+  const date = (days: number) => kigaliDate(now + days * DAY);
 
   let riskNo = 0;
   const risk = (
@@ -477,10 +477,10 @@ export function createGovernanceSeed(now: number): GovernanceSeed {
 
   const stakeholders: StakeholderRecord[] = [
     stakeholder('mobile', {
-      name: 'Jean-Paul Habimana',
+      name: 'Thérèse Mukandayisenga',
       organization: 'Akagera Bank',
       role: 'Chief executive officer',
-      email: 'jp.habimana@akagera-bank.example',
+      email: 't.mukandayisenga@akagera-bank.example',
       power: 5,
       interest: 3,
       influence: 5,
@@ -522,10 +522,10 @@ export function createGovernanceSeed(now: number): GovernanceSeed {
       communicationPreferences: 'Beta builds and a short survey every sprint',
     }),
     stakeholder('mobile', {
-      name: 'Eric Nshimiyimana',
+      name: 'Emmanuel Bizimana',
       organization: 'Akagera Bank',
       role: 'Call centre team lead',
-      email: 'e.nshimiyimana@akagera-bank.example',
+      email: 'e.bizimana@akagera-bank.example',
       power: 2,
       interest: 2,
       influence: 2,

@@ -5,7 +5,7 @@ import {
   TaskStatus,
   TaskType,
 } from '../core/api/api.models';
-import { USER } from './data';
+import { USER, kigaliDate } from './data';
 import { PEOPLE, PROJECT } from './data-projects';
 
 /**
@@ -113,7 +113,7 @@ export function rankAt(n: number): string {
 
 export function createWorkSeed(now = Date.now()): WorkSeed {
   const at = (days: number) => new Date(now + days * DAY).toISOString();
-  const date = (days: number) => at(days).slice(0, 10);
+  const date = (days: number) => kigaliDate(now + days * DAY);
 
   const sprint = (
     key: keyof typeof SPRINT,

@@ -75,6 +75,17 @@ export const BREACHED_PASSWORDS = new Set([
 
 const DAY = 86_400_000;
 
+const KIGALI = new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Kigali' });
+
+/**
+ * The calendar date in Kigali (both demo organizations' time zone) at `ms`. Seeds date things
+ * with it so they agree with the mock API's "today" (`orgToday`) at every hour — a UTC date is a
+ * day behind between midnight and 02:00 in Kigali.
+ */
+export function kigaliDate(ms: number): string {
+  return KIGALI.format(new Date(ms));
+}
+
 function uuid(n: number, prefix = '8a1b2c3d-0000-4000-8000'): string {
   return `${prefix}-${n.toString().padStart(12, '0')}`;
 }
