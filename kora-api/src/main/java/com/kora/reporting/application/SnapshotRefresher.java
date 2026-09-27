@@ -1,5 +1,7 @@
 package com.kora.reporting.application;
 
+import com.kora.governance.GovernanceQueries;
+import com.kora.governance.RiskChanged;
 import com.kora.organization.OrganizationCurrency;
 import com.kora.organization.OrganizationTimeZone;
 import com.kora.platform.tenancy.TenantScope;
@@ -39,6 +41,7 @@ class SnapshotRefresher {
 
     private final ProjectQueries projects;
     private final WbsQueries wbs;
+    private final GovernanceQueries governance;
     private final SnapshotRepository snapshots;
     private final OrganizationCurrency currency;
     private final OrganizationTimeZone timeZone;
@@ -48,6 +51,7 @@ class SnapshotRefresher {
     SnapshotRefresher(
             ProjectQueries projects,
             WbsQueries wbs,
+            GovernanceQueries governance,
             SnapshotRepository snapshots,
             OrganizationCurrency currency,
             OrganizationTimeZone timeZone,
@@ -55,6 +59,7 @@ class SnapshotRefresher {
             Clock clock) {
         this.projects = projects;
         this.wbs = wbs;
+        this.governance = governance;
         this.snapshots = snapshots;
         this.currency = currency;
         this.timeZone = timeZone;
@@ -69,6 +74,12 @@ class SnapshotRefresher {
 
     @EventListener
     void on(WbsChanged event) {
+        refresh(event.projectId());
+    }
+
+    /** A critical risk past its response date turns health red (feature 11). */
+    @EventListener
+    void on(RiskChanged event) {
         refresh(event.projectId());
     }
 
@@ -107,8 +118,13 @@ class SnapshotRefresher {
         WbsTotals totals = wbs.totals(projectId, organizationCurrency);
         // "Today" where the organization is: in Kigali the day starts two hours before it does in UTC.
         LocalDate today = LocalDate.now(clock.withZone(timeZone.zone()));
-        HealthRule.Result computed = HealthRule.evaluate(
-                new HealthRule.Inputs(source.status(), source.targetEndDate(), today, null, null, false));
+        HealthRule.Result computed = HealthRule.evaluate(new HealthRule.Inputs(
+                source.status(),
+                source.targetEndDate(),
+                today,
+                null,
+                null,
+                governance.criticalRiskOverdue(projectId, today)));
         projects.recordComputedHealth(projectId, computed.health(), computed.reason());
         boolean overridden = source.healthOverride() != null;
         Health health = overridden ? source.healthOverride() : computed.health();
