@@ -190,6 +190,37 @@ export type DecisionRequest = Schemas['DecisionRequest'];
 export type ChangeControlSettings = Schemas['ChangeControlSettings'];
 export type UpdateChangeControlSettingsRequest = Schemas['UpdateChangeControlSettingsRequest'];
 
+export type TimesheetStatus = Schemas['TimesheetStatus'];
+export type TimesheetEntry = Schemas['TimesheetEntry'];
+export type TimesheetEntryInput = Schemas['TimesheetEntryInput'];
+export type TimesheetSummary = Schemas['TimesheetSummary'];
+export type Timesheet = Schemas['Timesheet'];
+export type TimesheetPage = Schemas['TimesheetPage'];
+export type TimesheetWeek = Schemas['TimesheetWeek'];
+export type CostRate = Schemas['CostRate'];
+export type CreateCostRateRequest = Schemas['CreateCostRateRequest'];
+
+export type UtilizationBand = Schemas['UtilizationBand'];
+export type ResourceWeek = Schemas['ResourceWeek'];
+export type ResourceRow = Schemas['ResourceRow'];
+export type ResourceHeatmap = Schemas['ResourceHeatmap'];
+export type Allocation = Schemas['Allocation'];
+export type AllocationInput = Schemas['AllocationInput'];
+export type Capacity = Schemas['Capacity'];
+export type Leave = Schemas['Leave'];
+export type UpdateCapacityRequest = Schemas['UpdateCapacityRequest'];
+export type CreateLeaveRequest = Schemas['CreateLeaveRequest'];
+
+export type PercentCompleteMethod = Schemas['PercentCompleteMethod'];
+export type EacMethod = Schemas['EacMethod'];
+export type EvmSettings = Schemas['EvmSettings'];
+export type UpdateEvmSettingsRequest = Schemas['UpdateEvmSettingsRequest'];
+export type EvmReport = Schemas['EvmReport'];
+export type EvmPoint = Schemas['EvmPoint'];
+export type EvmSeries = Schemas['EvmSeries'];
+export type DashboardTrends = Schemas['DashboardTrends'];
+export type DashboardTrendMonth = Schemas['DashboardTrendMonth'];
+
 export type DashboardSummary = Schemas['DashboardSummary'];
 export type DashboardProject = Schemas['DashboardProject'];
 export type DashboardProjectPage = Schemas['DashboardProjectPage'];
@@ -208,6 +239,9 @@ export type ListStakeholdersQuery = NonNullable<
 >;
 export type ListChangeRequestsQuery = NonNullable<
   operations['listChangeRequests']['parameters']['query']
+>;
+export type ListProjectTimesheetsQuery = NonNullable<
+  operations['listProjectTimesheets']['parameters']['query']
 >;
 export type BacklogQuery = NonNullable<operations['getBacklog']['parameters']['query']>;
 export type ListDashboardProjectsQuery = NonNullable<
@@ -378,3 +412,23 @@ export const CHANGE_REQUEST_STATUSES = [
   'WITHDRAWN',
   'IMPLEMENTED',
 ] as const satisfies readonly ChangeRequestStatus[];
+
+export const TIMESHEET_STATUSES = [
+  'DRAFT',
+  'SUBMITTED',
+  'APPROVED',
+  'REJECTED',
+] as const satisfies readonly TimesheetStatus[];
+export const PERCENT_COMPLETE_METHODS = [
+  'PHYSICAL',
+  'ZERO_HUNDRED',
+  'FIFTY_FIFTY',
+  'STORY_POINTS',
+] as const satisfies readonly PercentCompleteMethod[];
+export const EAC_METHODS = [
+  'TYPICAL',
+  'ATYPICAL',
+  'COMPOSITE',
+] as const satisfies readonly EacMethod[];
+/** The heat map covers at most this many weeks. */
+export const HEATMAP_MAX_WEEKS = 26;
