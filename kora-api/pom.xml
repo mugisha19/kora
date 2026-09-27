@@ -12,7 +12,7 @@
 
     <groupId>com.kora</groupId>
     <artifactId>kora-api</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0</version>
     <name>kora-api</name>
     <description>Kora API: multi-tenant project and portfolio management built on PMI practices</description>
 
@@ -30,6 +30,9 @@
         <flying-saucer.version>10.5.0</flying-saucer.version>
         <commons-io.version>2.21.0</commons-io.version>
         <openpdf.version>3.0.5</openpdf.version>
+        <!-- Overrides Spring Boot 4.1.1's Tomcat 11.0.24: CVE-2026-65182 and CVE-2026-65905 (critical, fixed in 11.0.25),
+             found by the image scan. Remove when Spring Boot manages a fixed version. -->
+        <tomcat.version>11.0.26</tomcat.version>
         <spotless-maven-plugin.version>3.10.2</spotless-maven-plugin.version>
         <palantir-java-format.version>2.99.0</palantir-java-format.version>
         <maven-checkstyle-plugin.version>3.6.0</maven-checkstyle-plugin.version>
@@ -75,6 +78,11 @@
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-registry-prometheus</artifactId>
             <scope>runtime</scope>
+        </dependency>
+        <!-- Tracing (Phase 10): Micrometer Observation → OpenTelemetry, exported over OTLP when an endpoint is set -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-opentelemetry</artifactId>
         </dependency>
 
         <!-- Persistence: PostgreSQL, JPA, Flyway migrations -->
