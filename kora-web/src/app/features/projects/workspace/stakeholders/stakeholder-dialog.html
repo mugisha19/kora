@@ -1,0 +1,178 @@
+<h2 mat-dialog-title>
+  @if (data.stakeholder; as s) {
+    {{ s.name }}
+  } @else {
+    {{ 'stakeholders.addTitle' | transloco }}
+  }
+</h2>
+
+@if (editing) {
+  <form class="kora-form" novalidate (submit)="save($event)">
+    <mat-dialog-content>
+      @if (formError()) {
+        <div class="kora-notice error" role="alert">
+          <mat-icon svgIcon="error" aria-hidden="true" />
+          <p>{{ formError() }}</p>
+        </div>
+      }
+      <mat-form-field>
+        <mat-label>{{ 'stakeholders.fields.name' | transloco }}</mat-label>
+        <input matInput [formField]="form.name" />
+        <mat-error><kora-field-error [field]="form.name" /></mat-error>
+      </mat-form-field>
+      <div class="row">
+        <mat-form-field>
+          <mat-label>{{ 'stakeholders.fields.organization' | transloco }}</mat-label>
+          <input matInput [formField]="form.organization" />
+          <mat-error><kora-field-error [field]="form.organization" /></mat-error>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>{{ 'stakeholders.fields.role' | transloco }}</mat-label>
+          <input matInput [formField]="form.role" />
+          <mat-error><kora-field-error [field]="form.role" /></mat-error>
+        </mat-form-field>
+      </div>
+      <div class="row">
+        <mat-form-field>
+          <mat-label>{{ 'stakeholders.fields.email' | transloco }}</mat-label>
+          <input matInput type="email" autocomplete="off" [formField]="form.email" />
+          <mat-error><kora-field-error [field]="form.email" /></mat-error>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>{{ 'stakeholders.fields.phone' | transloco }}</mat-label>
+          <input matInput type="tel" autocomplete="off" [formField]="form.phone" />
+          <mat-error><kora-field-error [field]="form.phone" /></mat-error>
+        </mat-form-field>
+      </div>
+      <p class="kora-muted">{{ 'stakeholders.privacy' | transloco }}</p>
+
+      <div class="row">
+        <mat-form-field>
+          <mat-label>{{ 'stakeholders.fields.power' | transloco }}</mat-label>
+          <mat-select [formField]="form.power">
+            @for (value of levels; track value) {
+              <mat-option [value]="value">{{
+                'stakeholders.level.' + value | transloco
+              }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>{{ 'stakeholders.fields.interest' | transloco }}</mat-label>
+          <mat-select [formField]="form.interest">
+            @for (value of levels; track value) {
+              <mat-option [value]="value">{{
+                'stakeholders.level.' + value | transloco
+              }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>{{ 'stakeholders.fields.influence' | transloco }}</mat-label>
+          <mat-select [formField]="form.influence">
+            @for (value of levels; track value) {
+              <mat-option [value]="value">{{
+                'stakeholders.level.' + value | transloco
+              }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <p class="quadrant" aria-live="polite">
+        {{ 'stakeholders.quadrantPreview' | transloco }}:
+        <strong>{{ 'stakeholderQuadrant.' + quadrant() | transloco }}</strong>
+      </p>
+
+      <div class="row">
+        <mat-form-field>
+          <mat-label>{{ 'stakeholders.fields.current' | transloco }}</mat-label>
+          <mat-select [formField]="form.currentEngagement">
+            <mat-select-trigger>{{
+              'engagement.' + model().currentEngagement | transloco
+            }}</mat-select-trigger>
+            @for (value of engagements; track value) {
+              <mat-option [value]="value">{{ 'engagement.' + value | transloco }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>{{ 'stakeholders.fields.desired' | transloco }}</mat-label>
+          <mat-select [formField]="form.desiredEngagement">
+            <mat-select-trigger>{{
+              'engagement.' + model().desiredEngagement | transloco
+            }}</mat-select-trigger>
+            @for (value of engagements; track value) {
+              <mat-option [value]="value">{{ 'engagement.' + value | transloco }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <mat-form-field>
+        <mat-label>{{ 'stakeholders.fields.communication' | transloco }}</mat-label>
+        <input matInput [formField]="form.communicationPreferences" />
+        <mat-hint>{{ 'stakeholders.hints.communication' | transloco }}</mat-hint>
+        <mat-error><kora-field-error [field]="form.communicationPreferences" /></mat-error>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>{{ 'stakeholders.fields.notes' | transloco }}</mat-label>
+        <textarea matInput rows="3" [formField]="form.notes"></textarea>
+        <mat-error><kora-field-error [field]="form.notes" /></mat-error>
+      </mat-form-field>
+    </mat-dialog-content>
+    <mat-dialog-actions align="end">
+      @if (data.stakeholder && data.remove) {
+        <button mat-button type="button" class="danger" (click)="remove()">
+          <mat-icon svgIcon="delete" aria-hidden="true" />
+          {{ 'stakeholders.remove' | transloco }}
+        </button>
+      }
+      <button mat-button type="button" mat-dialog-close>{{ 'common.cancel' | transloco }}</button>
+      <button mat-flat-button type="submit" [disabled]="form().submitting()">
+        {{ (data.stakeholder ? 'common.save' : 'stakeholders.add') | transloco }}
+      </button>
+    </mat-dialog-actions>
+  </form>
+} @else if (data.stakeholder; as s) {
+  <mat-dialog-content>
+    <dl class="facts">
+      <div>
+        <dt>{{ 'stakeholders.fields.organization' | transloco }}</dt>
+        <dd>{{ s.organization || '—' }}</dd>
+      </div>
+      <div>
+        <dt>{{ 'stakeholders.fields.role' | transloco }}</dt>
+        <dd>{{ s.role || '—' }}</dd>
+      </div>
+      <div>
+        <dt>{{ 'stakeholders.fields.email' | transloco }}</dt>
+        <dd>{{ s.email || '—' }}</dd>
+      </div>
+      <div>
+        <dt>{{ 'stakeholders.fields.phone' | transloco }}</dt>
+        <dd>{{ s.phone || '—' }}</dd>
+      </div>
+      <div>
+        <dt>{{ 'stakeholders.fields.quadrant' | transloco }}</dt>
+        <dd>{{ 'stakeholderQuadrant.' + s.quadrant | transloco }}</dd>
+      </div>
+      <div>
+        <dt>{{ 'stakeholders.fields.engagement' | transloco }}</dt>
+        <dd>
+          {{ 'engagement.' + s.currentEngagement | transloco }} →
+          {{ 'engagement.' + s.desiredEngagement | transloco }}
+        </dd>
+      </div>
+      <div class="wide">
+        <dt>{{ 'stakeholders.fields.communication' | transloco }}</dt>
+        <dd>{{ s.communicationPreferences || '—' }}</dd>
+      </div>
+      <div class="wide">
+        <dt>{{ 'stakeholders.fields.notes' | transloco }}</dt>
+        <dd>{{ s.notes || '—' }}</dd>
+      </div>
+    </dl>
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button mat-flat-button type="button" mat-dialog-close>{{ 'common.close' | transloco }}</button>
+  </mat-dialog-actions>
+}

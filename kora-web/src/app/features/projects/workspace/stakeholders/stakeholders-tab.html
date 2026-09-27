@@ -1,0 +1,188 @@
+<div class="toolbar">
+  <button
+    mat-stroked-button
+    type="button"
+    [attr.aria-pressed]="gapOnly()"
+    (click)="setGap(!gapOnly())"
+  >
+    @if (gapOnly()) {
+      <mat-icon svgIcon="check" aria-hidden="true" />
+    }
+    {{ 'stakeholders.gapFilter' | transloco }}
+  </button>
+  @if (chosenQuadrant(); as q) {
+    <button mat-button type="button" (click)="setQuadrant(null)">
+      <mat-icon svgIcon="close" aria-hidden="true" />
+      {{
+        'stakeholders.clearQuadrant'
+          | transloco: { quadrant: ('stakeholderQuadrant.' + q | transloco) }
+      }}
+    </button>
+  }
+  <span class="spacer"></span>
+  @if (facade.canEdit()) {
+    <button mat-flat-button type="button" (click)="facade.add()">
+      <mat-icon svgIcon="person_add" aria-hidden="true" />
+      {{ 'stakeholders.add' | transloco }}
+    </button>
+  }
+</div>
+
+<section aria-labelledby="grid-title">
+  <h2 id="grid-title">{{ 'stakeholders.grid' | transloco }}</h2>
+  @if (grid.hasValue()) {
+    <kora-stakeholder-grid
+      [grid]="grid.value()"
+      [selected]="chosenQuadrant()"
+      (opened)="facade.show($event)"
+      (filtered)="setQuadrant($event)"
+    />
+  } @else if (grid.error()) {
+    <kora-error-state (retry)="grid.reload()" />
+  } @else {
+    <kora-loading-state />
+  }
+</section>
+
+<section aria-labelledby="register-title">
+  <h2 id="register-title">{{ 'stakeholders.register' | transloco }}</h2>
+  <p class="count" role="status">
+    @if (register.hasValue()) {
+      {{ 'stakeholders.count' | transloco: { count: stakeholders().length } }}
+    }
+  </p>
+  @if (register.isLoading() && !register.hasValue()) {
+    <kora-loading-state />
+  } @else if (register.error()) {
+    <kora-error-state (retry)="register.reload()" />
+  } @else if (!stakeholders().length) {
+    <kora-empty-state
+      icon="group"
+      [heading]="
+        (gapOnly() || chosenQuadrant() ? 'stakeholders.noMatchTitle' : 'stakeholders.emptyTitle')
+          | transloco
+      "
+      [message]="
+        (gapOnly() || chosenQuadrant()
+          ? 'stakeholders.noMatchMessage'
+          : 'stakeholders.emptyMessage'
+        ) | transloco
+      "
+    />
+  } @else {
+    <h3 class="sub">{{ 'stakeholders.matrix' | transloco }}</h3>
+    <p class="kora-muted legend">{{ 'stakeholders.matrixLegend' | transloco }}</p>
+    <div
+      class="table-wrap"
+      role="region"
+      tabindex="0"
+      [attr.aria-label]="'stakeholders.matrix' | transloco"
+    >
+      <table class="matrix">
+        <caption class="visually-hidden">
+          {{
+            'stakeholders.matrixCaption' | transloco
+          }}
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col">{{ 'stakeholders.fields.name' | transloco }}</th>
+            @for (level of engagements; track level) {
+              <th scope="col">{{ 'engagement.' + level | transloco }}</th>
+            }
+            <th scope="col">{{ 'stakeholders.fields.gap' | transloco }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (s of stakeholders(); track s.id) {
+            <tr>
+              <th scope="row">{{ s.name }}</th>
+              @for (level of engagements; track level) {
+                <td class="cell">
+                  @if (s.currentEngagement === level) {
+                    <span class="mark current">
+                      <span aria-hidden="true">{{ 'stakeholders.currentShort' | transloco }}</span>
+                      <span class="visually-hidden">{{ 'stakeholders.current' | transloco }}</span>
+                    </span>
+                  }
+                  @if (s.desiredEngagement === level) {
+                    <span class="mark desired">
+                      <span aria-hidden="true">{{ 'stakeholders.desiredShort' | transloco }}</span>
+                      <span class="visually-hidden">{{ 'stakeholders.desired' | transloco }}</span>
+                    </span>
+                  }
+                </td>
+              }
+              <td class="num">
+                @if (s.engagementGap > 0) {
+                  <strong>{{
+                    'stakeholders.gapLabel' | transloco: { count: s.engagementGap }
+                  }}</strong>
+                } @else if (s.engagementGap < 0) {
+                  {{ 'stakeholders.aboveDesired' | transloco }}
+                } @else {
+                  {{ 'stakeholders.onTarget' | transloco }}
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <h3 class="sub">{{ 'stakeholders.people' | transloco }}</h3>
+    <div
+      class="table-wrap"
+      role="region"
+      tabindex="0"
+      [attr.aria-label]="'stakeholders.people' | transloco"
+    >
+      <table>
+        <caption class="visually-hidden">
+          {{
+            'stakeholders.register' | transloco
+          }}
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col">{{ 'stakeholders.fields.name' | transloco }}</th>
+            <th scope="col">{{ 'stakeholders.fields.quadrant' | transloco }}</th>
+            <th scope="col" class="num">{{ 'stakeholders.fields.power' | transloco }}</th>
+            <th scope="col" class="num">{{ 'stakeholders.fields.interest' | transloco }}</th>
+            <th scope="col">{{ 'stakeholders.fields.contact' | transloco }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (s of stakeholders(); track s.id) {
+            <tr>
+              <th scope="row">
+                <button type="button" class="open" (click)="facade.show(s.id)">
+                  <span class="title">{{ s.name }}</span>
+                </button>
+                @if (s.role || s.organization) {
+                  <span class="secondary">
+                    {{ s.role }}{{ s.role && s.organization ? ', ' : '' }}{{ s.organization }}
+                  </span>
+                }
+              </th>
+              <td>{{ 'stakeholderQuadrant.' + s.quadrant | transloco }}</td>
+              <td class="num">{{ s.power }}</td>
+              <td class="num">{{ s.interest }}</td>
+              <td>
+                @if (s.email) {
+                  <a [href]="'mailto:' + s.email">{{ s.email }}</a>
+                }
+                @if (s.phone) {
+                  <span class="secondary">{{ s.phone }}</span>
+                }
+                @if (!s.email && !s.phone) {
+                  —
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>
