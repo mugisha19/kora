@@ -53,6 +53,7 @@ export class TaskFacade {
       canChange: task ? this.canChange(task) : this.project.canContribute(),
       canComment: this.project.canContribute(),
       canDelete: this.project.canEdit(),
+      scheduling: this.project.project()?.methodology !== 'AGILE',
       save: async (request, existing) => {
         const saved = existing
           ? await firstValueFrom(

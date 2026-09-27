@@ -17,6 +17,7 @@ import { firstValueFrom } from 'rxjs';
 import {
   CreateTaskRequest,
   ProjectMember,
+  ScheduleConstraint,
   TASK_PRIORITIES,
   TASK_TYPES,
   Task,
@@ -44,6 +45,8 @@ export interface TaskDialogData {
   canChange: boolean;
   canComment: boolean;
   canDelete: boolean;
+  /** Predictive and Hybrid projects: the task has a duration and a date constraint (feature 10). */
+  scheduling?: boolean;
   /** Creates or updates; rejects with an ApiError the form shows. */
   save: (request: CreateTaskRequest | UpdateTaskRequest, task?: Task) => Promise<Task>;
   remove?: (task: Task) => Promise<boolean>;
@@ -59,6 +62,9 @@ interface TaskForm {
   remainingHours: string;
   startDate: string;
   dueDate: string;
+  durationDays: string;
+  scheduleConstraint: ScheduleConstraint;
+  constraintDate: string;
   labels: string;
   description: string;
 }
@@ -123,7 +129,7 @@ export class TaskDialog {
     required(path.title);
     maxLength(path.title, 200);
     maxLength(path.description, 10_000);
-    validate(path.storyPoints, ({ value }) => this.whole(value(), 100));
+    validate(path.storyPoints, ({ value }) => this.whole(value(), 100, 'tasks.errors.points'));
     validate(path.estimateHours, ({ value }) => this.hours(value()));
     validate(path.remainingHours, ({ value }) => this.hours(value()));
     validate(path.dueDate, ({ value, valueOf }) => {
@@ -132,6 +138,12 @@ export class TaskDialog {
         ? { kind: I18N_ERROR, message: 'tasks.errors.dueBeforeStart' }
         : undefined;
     });
+    validate(path.durationDays, ({ value }) => this.whole(value(), 1000, 'tasks.errors.duration'));
+    validate(path.constraintDate, ({ value, valueOf }) =>
+      valueOf(path.scheduleConstraint) === 'START_NO_EARLIER_THAN' && !value()
+        ? { kind: 'required' }
+        : undefined,
+    );
     validate(path.labels, ({ value }) => {
       const labels = this.labelList(value());
       if (labels.length > 10) return { kind: I18N_ERROR, message: 'tasks.errors.tooManyLabels' };
@@ -233,6 +245,7 @@ export class TaskDialog {
       ...(numbers.remainingHours !== null ? { remainingHours: numbers.remainingHours } : {}),
       ...(m.startDate ? { startDate: m.startDate } : {}),
       ...(m.dueDate ? { dueDate: m.dueDate } : {}),
+      ...(this.data.scheduling ? this.scheduleFields(m) : {}),
     };
     if (!this.data.task) {
       const defaults = this.data.defaults ?? {};
@@ -258,6 +271,9 @@ export class TaskDialog {
       remainingHours: text(task?.remainingHours),
       startDate: task?.startDate ?? '',
       dueDate: task?.dueDate ?? '',
+      durationDays: text(task?.durationDays),
+      scheduleConstraint: task?.scheduleConstraint ?? 'ASAP',
+      constraintDate: task?.constraintDate ?? '',
       labels: task?.labels.join(', ') ?? '',
       description: task?.description ?? '',
     };
@@ -274,12 +290,24 @@ export class TaskDialog {
     ];
   }
 
-  private whole(text: string, max: number) {
+  /** ASAP clears a constraint the task had; a blank duration leaves it as it was. */
+  private scheduleFields(m: TaskForm): UpdateTaskRequest {
+    const duration = numberOrNull(m.durationDays);
+    return {
+      ...(duration !== null ? { durationDays: duration } : {}),
+      scheduleConstraint: m.scheduleConstraint,
+      ...(m.scheduleConstraint === 'START_NO_EARLIER_THAN'
+        ? { constraintDate: m.constraintDate }
+        : {}),
+    };
+  }
+
+  private whole(text: string, max: number, message: string) {
     if (!text.trim()) return undefined;
     const value = Number(text);
     return Number.isInteger(value) && value >= 0 && value <= max
       ? undefined
-      : { kind: I18N_ERROR, message: 'tasks.errors.points' };
+      : { kind: I18N_ERROR, message };
   }
 
   private hours(text: string) {

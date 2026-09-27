@@ -84,6 +84,36 @@
           <mat-error><kora-field-error [field]="form.dueDate" /></mat-error>
         </mat-form-field>
       </div>
+      @if (data.scheduling) {
+        <fieldset class="schedule">
+          <legend>{{ 'tasks.scheduleLegend' | transloco }}</legend>
+          <div class="row">
+            <mat-form-field>
+              <mat-label>{{ 'schedule.fields.duration' | transloco }}</mat-label>
+              <input matInput inputmode="numeric" [formField]="form.durationDays" />
+              <span matTextSuffix>{{ 'schedule.daysSuffix' | transloco }}</span>
+              <mat-hint>{{ 'schedule.hints.duration' | transloco }}</mat-hint>
+              <mat-error><kora-field-error [field]="form.durationDays" /></mat-error>
+            </mat-form-field>
+            <mat-form-field>
+              <mat-label>{{ 'schedule.fields.constraint' | transloco }}</mat-label>
+              <mat-select [formField]="form.scheduleConstraint">
+                <mat-option value="ASAP">{{ 'scheduleConstraint.ASAP' | transloco }}</mat-option>
+                <mat-option value="START_NO_EARLIER_THAN">
+                  {{ 'scheduleConstraint.START_NO_EARLIER_THAN' | transloco }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            @if (model().scheduleConstraint === 'START_NO_EARLIER_THAN') {
+              <mat-form-field>
+                <mat-label>{{ 'schedule.fields.constraintDate' | transloco }}</mat-label>
+                <input matInput type="date" [formField]="form.constraintDate" />
+                <mat-error><kora-field-error [field]="form.constraintDate" /></mat-error>
+              </mat-form-field>
+            }
+          </div>
+        </fieldset>
+      }
       <mat-form-field>
         <mat-label>{{ 'tasks.fields.labels' | transloco }}</mat-label>
         <input matInput [formField]="form.labels" />
@@ -143,6 +173,33 @@
         <dt>{{ 'tasks.fields.dueDate' | transloco }}</dt>
         <dd>{{ (t.dueDate | localizedDate: language.current()) || '—' }}</dd>
       </div>
+      @if (data.scheduling) {
+        <div>
+          <dt>{{ 'schedule.fields.duration' | transloco }}</dt>
+          <dd>
+            @if (t.durationDays === 0) {
+              {{ 'schedule.milestone' | transloco }}
+            } @else if (t.durationDays !== undefined) {
+              {{ 'schedule.days' | transloco: { count: t.durationDays } }}
+            } @else {
+              —
+            }
+          </dd>
+        </div>
+        <div>
+          <dt>{{ 'schedule.fields.constraint' | transloco }}</dt>
+          <dd>
+            @if (t.scheduleConstraint === 'START_NO_EARLIER_THAN') {
+              {{
+                'schedule.startsNoEarlier'
+                  | transloco: { date: (t.constraintDate | localizedDate: language.current()) }
+              }}
+            } @else {
+              {{ 'scheduleConstraint.ASAP' | transloco }}
+            }
+          </dd>
+        </div>
+      }
       @if (t.labels.length) {
         <div>
           <dt>{{ 'tasks.fields.labels' | transloco }}</dt>

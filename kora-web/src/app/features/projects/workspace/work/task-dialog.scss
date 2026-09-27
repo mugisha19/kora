@@ -74,3 +74,15 @@ h3 {
   --mat-button-text-label-text-color: var(--mat-sys-error);
   margin-inline-end: auto;
 }
+
+.schedule {
+  margin: 0 0 var(--kora-space-2);
+  padding: var(--kora-space-2) var(--kora-space-3) 0;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: var(--kora-radius, 8px);
+
+  legend {
+    padding-inline: var(--kora-space-1);
+    font: var(--mat-sys-label-large);
+  }
+}
