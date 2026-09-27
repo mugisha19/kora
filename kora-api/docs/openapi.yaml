@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Kora API
-  version: 0.4.0
+  version: 0.5.0
   description: |
     Multi-tenant project and portfolio management built on PMI practices.
 
@@ -58,6 +58,14 @@ tags:
     description: Backlog, sprints, burndown and velocity (feature 09)
   - name: Schedule
     description: Dependencies, the critical path schedule, baselines and the working calendar (feature 10)
+  - name: Risks
+    description: Risk register, assessments and the heat map (feature 11)
+  - name: Issues
+    description: Issue log (feature 12)
+  - name: Stakeholders
+    description: Stakeholder register and the power/interest grid (feature 13)
+  - name: ChangeRequests
+    description: Change requests and their approval chain (feature 14)
 
 security:
   - bearerAuth: []
@@ -3089,6 +3097,1448 @@ paths:
         '500':
           $ref: '#/components/responses/InternalError'
 
+  /projects/{projectId}/risks:
+    get:
+      tags: [Risks]
+      operationId: listRisks
+      summary: 'The project''s risk register'
+      description: 'Sortable by `score`, `key`, `reviewDate`, `createdAt`; by default highest score first.'
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/RiskStatus'
+        - name: kind
+          in: query
+          schema:
+            $ref: '#/components/schemas/RiskKind'
+        - name: category
+          in: query
+          schema:
+            $ref: '#/components/schemas/RiskCategory'
+        - name: ownerId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: minScore
+          in: query
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 25
+        - name: q
+          in: query
+          description: 'Case-insensitive match on name (and code for projects)'
+          schema:
+            type: string
+            maxLength: 100
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+        - $ref: '#/components/parameters/Sort'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: One page of risks
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RiskPage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      tags: [Risks]
+      operationId: createRisk
+      summary: 'Raise a risk'
+      description: 'The project''s managers and contributors. The first assessment is recorded with it.'
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRiskRequest'
+      responses:
+        '201':
+          description: Risk raised
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            Location:
+              description: URL of the new resource
+              schema:
+                type: string
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Risk'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /projects/{projectId}/risks/heatmap:
+    get:
+      tags: [Risks]
+      operationId: getRiskHeatmap
+      summary: 'Probability × impact counts of the open risks'
+      description: '25 cells, probability and impact 1–5; the same filters as the register, so the counts match it.'
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - name: kind
+          in: query
+          schema:
+            $ref: '#/components/schemas/RiskKind'
+        - name: category
+          in: query
+          schema:
+            $ref: '#/components/schemas/RiskCategory'
+        - name: ownerId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: The heat map
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RiskHeatmap'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /risks:
+    get:
+      tags: [Risks]
+      operationId: listPortfolioRisks
+      summary: 'Open risks across the projects the caller can see'
+      description: 'The portfolio view (PMO): by default every open risk scoring 15 or more (critical).'
+      parameters:
+        - $ref: '#/components/parameters/OrganizationId'
+        - name: portfolioId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: minScore
+          in: query
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 25
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+        - $ref: '#/components/parameters/Sort'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: One page of risks
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RiskPage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /risks/{riskId}:
+    get:
+      tags: [Risks]
+      operationId: getRisk
+      summary: 'Get a risk'
+      parameters:
+        - $ref: '#/components/parameters/RiskId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: The risk
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Risk'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    patch:
+      tags: [Risks]
+      operationId: updateRisk
+      summary: 'Update a risk''s description, owner and response'
+      description: 'The project''s managers or the risk owner. Probability and impact change through assessments, so the history is complete. `RESPONSE_PLANNED` and later need a response strategy and plan.'
+      parameters:
+        - $ref: '#/components/parameters/RiskId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/IfMatch'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRiskRequest'
+      responses:
+        '200':
+          description: The updated risk
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Risk'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'The risk is closed. Code: `risks.closed`.'
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '412':
+          $ref: '#/components/responses/PreconditionFailed'
+        '428':
+          $ref: '#/components/responses/PreconditionRequired'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /risks/{riskId}/assessments:
+    get:
+      tags: [Risks]
+      operationId: listRiskAssessments
+      summary: 'The risk''s scoring history, oldest first'
+      parameters:
+        - $ref: '#/components/parameters/RiskId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: The assessments
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RiskAssessment'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      tags: [Risks]
+      operationId: assessRisk
+      summary: 'Re-score a risk'
+      description: 'The project''s managers or the risk owner.'
+      parameters:
+        - $ref: '#/components/parameters/RiskId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssessRiskRequest'
+      responses:
+        '201':
+          description: The new assessment; the risk now carries its scores
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RiskAssessment'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'The risk is closed. Code: `risks.closed`.'
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /risks/{riskId}/close:
+    post:
+      tags: [Risks]
+      operationId: closeRisk
+      summary: 'Close a risk that can no longer happen'
+      description: 'The project''s managers or the risk owner.'
+      parameters:
+        - $ref: '#/components/parameters/RiskId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CloseRiskRequest'
+      responses:
+        '200':
+          description: The closed risk
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Risk'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'The risk is already closed. Code: `risks.closed`.'
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /risks/{riskId}/materialize:
+    post:
+      tags: [Risks]
+      operationId: materializeRisk
+      summary: 'The risk happened: open a linked issue and close the risk'
+      description: 'The project''s managers or the risk owner. One step: the issue is created and the risk closed as materialized in the same transaction.'
+      parameters:
+        - $ref: '#/components/parameters/RiskId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MaterializeRiskRequest'
+      responses:
+        '201':
+          description: The new issue
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            Location:
+              description: URL of the new resource
+              schema:
+                type: string
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Issue'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'The risk is already closed. Code: `risks.closed`.'
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /projects/{projectId}/issues:
+    get:
+      tags: [Issues]
+      operationId: listIssues
+      summary: 'The project''s issue log'
+      description: 'Sortable by `priority`, `dueDate`, `key`, `createdAt`; by default most urgent first.'
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/IssueStatus'
+        - name: priority
+          in: query
+          schema:
+            $ref: '#/components/schemas/IssuePriority'
+        - name: ownerId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: overdue
+          in: query
+          description: 'Only unresolved issues past their due date'
+          schema:
+            type: boolean
+        - name: q
+          in: query
+          description: 'Case-insensitive match on name (and code for projects)'
+          schema:
+            type: string
+            maxLength: 100
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+        - $ref: '#/components/parameters/Sort'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: One page of issues
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IssuePage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      tags: [Issues]
+      operationId: createIssue
+      summary: 'Raise an issue'
+      description: 'The project''s managers and contributors.'
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateIssueRequest'
+      responses:
+        '201':
+          description: Issue raised
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            Location:
+              description: URL of the new resource
+              schema:
+                type: string
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Issue'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /issues/{issueId}:
+    get:
+      tags: [Issues]
+      operationId: getIssue
+      summary: 'Get an issue'
+      parameters:
+        - $ref: '#/components/parameters/IssueId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: The issue
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Issue'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    patch:
+      tags: [Issues]
+      operationId: updateIssue
+      summary: 'Update an issue'
+      description: 'The project''s managers or the issue owner. `status` moves between OPEN and IN_PROGRESS only; resolving, closing and reopening have their own operations.'
+      parameters:
+        - $ref: '#/components/parameters/IssueId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/IfMatch'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateIssueRequest'
+      responses:
+        '200':
+          description: The updated issue
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Issue'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: '`issues.invalid_transition`, e.g. editing a closed issue.'
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '412':
+          $ref: '#/components/responses/PreconditionFailed'
+        '428':
+          $ref: '#/components/responses/PreconditionRequired'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /issues/{issueId}/resolve:
+    post:
+      tags: [Issues]
+      operationId: resolveIssue
+      summary: 'Resolve an issue, saying how'
+      description: 'The project''s managers or the issue owner.'
+      parameters:
+        - $ref: '#/components/parameters/IssueId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResolveIssueRequest'
+      responses:
+        '200':
+          description: The resolved issue
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Issue'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'The issue is resolved or closed already. Code: `issues.invalid_transition`.'
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /issues/{issueId}/close:
+    post:
+      tags: [Issues]
+      operationId: closeIssue
+      summary: 'Close a resolved issue'
+      description: 'The project''s managers.'
+      parameters:
+        - $ref: '#/components/parameters/IssueId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: The closed issue
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Issue'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'Only a resolved issue closes. Code: `issues.invalid_transition`.'
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /issues/{issueId}/reopen:
+    post:
+      tags: [Issues]
+      operationId: reopenIssue
+      summary: 'Reopen a resolved or closed issue'
+      description: 'The project''s managers.'
+      parameters:
+        - $ref: '#/components/parameters/IssueId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReopenIssueRequest'
+      responses:
+        '200':
+          description: The reopened issue
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Issue'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'The issue is not resolved or closed. Code: `issues.invalid_transition`.'
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /projects/{projectId}/stakeholders:
+    get:
+      tags: [Stakeholders]
+      operationId: listStakeholders
+      summary: 'The project''s stakeholder register'
+      description: 'Sorted by name. Removed stakeholders are not listed.'
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - name: quadrant
+          in: query
+          schema:
+            $ref: '#/components/schemas/StakeholderQuadrant'
+        - name: gap
+          in: query
+          description: 'Only stakeholders whose current engagement is below the desired one'
+          schema:
+            type: boolean
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+        - $ref: '#/components/parameters/Sort'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: One page of stakeholders
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StakeholderPage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      tags: [Stakeholders]
+      operationId: createStakeholder
+      summary: 'Add a stakeholder'
+      description: 'The project manager, `PMO` or `ORG_ADMIN`.'
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateStakeholderRequest'
+      responses:
+        '201':
+          description: Stakeholder added
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            Location:
+              description: URL of the new resource
+              schema:
+                type: string
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Stakeholder'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /projects/{projectId}/stakeholders/grid:
+    get:
+      tags: [Stakeholders]
+      operationId: getStakeholderGrid
+      summary: 'The power/interest grid'
+      description: 'Four quadrants, always in the order MANAGE_CLOSELY, KEEP_SATISFIED, KEEP_INFORMED, MONITOR. High means 3 or more on the 1–5 scale.'
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: The grid
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StakeholderGrid'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /stakeholders/{stakeholderId}:
+    get:
+      tags: [Stakeholders]
+      operationId: getStakeholder
+      summary: 'Get a stakeholder'
+      parameters:
+        - $ref: '#/components/parameters/StakeholderId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: The stakeholder
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Stakeholder'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    patch:
+      tags: [Stakeholders]
+      operationId: updateStakeholder
+      summary: 'Update a stakeholder'
+      description: 'The project manager, `PMO` or `ORG_ADMIN`.'
+      parameters:
+        - $ref: '#/components/parameters/StakeholderId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/IfMatch'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateStakeholderRequest'
+      responses:
+        '200':
+          description: The updated stakeholder
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Stakeholder'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '412':
+          $ref: '#/components/responses/PreconditionFailed'
+        '428':
+          $ref: '#/components/responses/PreconditionRequired'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    delete:
+      tags: [Stakeholders]
+      operationId: deleteStakeholder
+      summary: 'Remove a stakeholder and erase their personal data'
+      description: 'The project manager, `PMO` or `ORG_ADMIN`. The record is anonymized (name replaced, contact details, notes and user link erased) rather than deleted, so nothing that refers to it breaks.'
+      parameters:
+        - $ref: '#/components/parameters/StakeholderId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '204':
+          description: Removed
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /projects/{projectId}/change-requests:
+    get:
+      tags: [ChangeRequests]
+      operationId: listChangeRequests
+      summary: 'The project''s change requests, newest first'
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/ChangeRequestStatus'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+        - $ref: '#/components/parameters/Sort'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: One page of change requests
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChangeRequestPage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      tags: [ChangeRequests]
+      operationId: createChangeRequest
+      summary: 'Draft a change request'
+      description: 'The project''s managers and contributors. With `issueId`, the issue and the request are linked.'
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateChangeRequestRequest'
+      responses:
+        '201':
+          description: Draft created
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            Location:
+              description: URL of the new resource
+              schema:
+                type: string
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChangeRequest'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /change-requests/{changeRequestId}:
+    get:
+      tags: [ChangeRequests]
+      operationId: getChangeRequest
+      summary: 'Get a change request with its approval steps'
+      parameters:
+        - $ref: '#/components/parameters/ChangeRequestId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: The change request
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChangeRequest'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    patch:
+      tags: [ChangeRequests]
+      operationId: updateChangeRequest
+      summary: 'Edit a draft'
+      description: 'The requester or the project''s managers.'
+      parameters:
+        - $ref: '#/components/parameters/ChangeRequestId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/IfMatch'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateChangeRequestRequest'
+      responses:
+        '200':
+          description: The updated draft
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChangeRequest'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'Only a draft can be edited. Code: `change_requests.not_draft`.'
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '412':
+          $ref: '#/components/responses/PreconditionFailed'
+        '428':
+          $ref: '#/components/responses/PreconditionRequired'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /change-requests/{changeRequestId}/submit:
+    post:
+      tags: [ChangeRequests]
+      operationId: submitChangeRequest
+      summary: 'Submit a draft for approval'
+      description: 'The requester or the project''s managers. The approval chain is built now from the impact and the organization''s change-control thresholds.'
+      parameters:
+        - $ref: '#/components/parameters/ChangeRequestId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: The submitted request
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChangeRequest'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'Only a draft can be submitted. Code: `change_requests.not_draft`.'
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /change-requests/{changeRequestId}/decisions:
+    post:
+      tags: [ChangeRequests]
+      operationId: decideChangeRequest
+      summary: 'Approve or reject the current approval step'
+      description: 'Only the current step''s approver, never the requester. A rejection needs a comment and ends the chain; the last approval applies the change to the budget, target end date, charter and schedule baseline in one transaction.'
+      parameters:
+        - $ref: '#/components/parameters/ChangeRequestId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DecisionRequest'
+      responses:
+        '200':
+          description: The request after the decision
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChangeRequest'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: '`change_requests.not_in_review` or `change_requests.self_approval`.'
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /change-requests/{changeRequestId}/withdraw:
+    post:
+      tags: [ChangeRequests]
+      operationId: withdrawChangeRequest
+      summary: 'Withdraw a request that is not decided yet'
+      description: 'The requester or the project''s managers.'
+      parameters:
+        - $ref: '#/components/parameters/ChangeRequestId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: The withdrawn request
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChangeRequest'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'It is decided already. Code: `change_requests.invalid_transition`.'
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /change-requests/{changeRequestId}/implement:
+    post:
+      tags: [ChangeRequests]
+      operationId: implementChangeRequest
+      summary: 'Mark an approved change as implemented'
+      description: 'The project''s managers.'
+      parameters:
+        - $ref: '#/components/parameters/ChangeRequestId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: The implemented request
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChangeRequest'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'Only an approved request. Code: `change_requests.invalid_transition`.'
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /change-requests/{changeRequestId}/revise:
+    post:
+      tags: [ChangeRequests]
+      operationId: reviseChangeRequest
+      summary: 'Start a new revision of a rejected request'
+      description: 'The requester or the project''s managers. A new draft with the same key and the next revision number is created from it; the rejected one stays as it was.'
+      parameters:
+        - $ref: '#/components/parameters/ChangeRequestId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '201':
+          description: The new draft revision
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            Location:
+              description: URL of the new resource
+              schema:
+                type: string
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChangeRequest'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'Only a rejected request. Code: `change_requests.invalid_transition`.'
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /approvals/pending:
+    get:
+      tags: [ChangeRequests]
+      operationId: listPendingApprovals
+      summary: 'My approval inbox: requests waiting for my decision'
+      description: 'Across every project of the organization, oldest submission first.'
+      parameters:
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: The requests
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ChangeRequest'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /organization/change-control:
+    get:
+      tags: [ChangeRequests]
+      operationId: getChangeControlSettings
+      summary: 'The thresholds that decide who approves a change'
+      description: '5% / 10 working days / 15% until an administrator changes them.'
+      parameters:
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: The settings
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChangeControlSettings'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    put:
+      tags: [ChangeRequests]
+      operationId: updateChangeControlSettings
+      summary: 'Change the approval thresholds'
+      description: '`ORG_ADMIN` only. Requests submitted later use them; submitted ones keep their chain.'
+      parameters:
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/IfMatch'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateChangeControlSettingsRequest'
+      responses:
+        '200':
+          description: The settings
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChangeControlSettings'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '412':
+          $ref: '#/components/responses/PreconditionFailed'
+        '428':
+          $ref: '#/components/responses/PreconditionRequired'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -3244,6 +4694,35 @@ components:
 
     DependencyId:
       name: dependencyId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+    RiskId:
+      name: riskId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    IssueId:
+      name: issueId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    StakeholderId:
+      name: stakeholderId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    ChangeRequestId:
+      name: changeRequestId
       in: path
       required: true
       schema:
@@ -3490,6 +4969,12 @@ components:
         - schedule.cycle
         - schedule.dependency_exists
         - schedule.not_predictive
+        - risks.closed
+        - issues.invalid_transition
+        - change_requests.not_draft
+        - change_requests.not_in_review
+        - change_requests.self_approval
+        - change_requests.invalid_transition
         - internal.error
 
     # ---------- Shared ----------
@@ -5236,3 +6721,925 @@ components:
           maxItems: 200
           items:
             $ref: '#/components/schemas/Holiday'
+
+    # ---------- Risks (0.5.0) ----------
+    RiskKind:
+      type: string
+      description: A threat harms the objectives if it happens; an opportunity helps them
+      enum: [THREAT, OPPORTUNITY]
+    RiskCategory:
+      type: string
+      enum: [TECHNICAL, EXTERNAL, ORGANIZATIONAL, PROJECT_MANAGEMENT, FINANCIAL, OTHER]
+    RiskProximity:
+      type: string
+      description: 'When it could happen: within days, weeks, months, or later'
+      enum: [IMMEDIATE, WEEKS, MONTHS, LATER]
+    RiskStatus:
+      type: string
+      description: 'IDENTIFIED → ANALYZED → RESPONSE_PLANNED → MONITORING, then CLOSED'
+      enum: [IDENTIFIED, ANALYZED, RESPONSE_PLANNED, MONITORING, CLOSED]
+    ResponseStrategy:
+      type: string
+      description: |
+        Threats: AVOID, MITIGATE, TRANSFER, ACCEPT, ESCALATE. Opportunities: EXPLOIT, ENHANCE, SHARE, ACCEPT,
+        ESCALATE. A strategy of the other kind is refused (400 on responseStrategy).
+      enum: [AVOID, MITIGATE, TRANSFER, EXPLOIT, ENHANCE, SHARE, ACCEPT, ESCALATE]
+    Severity:
+      type: string
+      description: 'Score bands: 1–4 LOW, 5–9 MEDIUM, 10–14 HIGH, 15–25 CRITICAL'
+      enum: [LOW, MEDIUM, HIGH, CRITICAL]
+    RiskClosure:
+      type: string
+      description: 'EXPIRED: can no longer happen; MATERIALIZED: it happened (see the linked issue)'
+      enum: [EXPIRED, MATERIALIZED]
+    Risk:
+      type: object
+      required: [id, key, projectId, title, kind, category, status, probability, impact, score, severity,
+                 identifiedBy, createdAt, version]
+      properties:
+        id:
+          type: string
+          format: uuid
+        key:
+          type: string
+          example: AKG-12-R3
+        projectId:
+          type: string
+          format: uuid
+        title:
+          type: string
+        description:
+          type: string
+          maxLength: 4000
+        category:
+          $ref: '#/components/schemas/RiskCategory'
+        proximity:
+          $ref: '#/components/schemas/RiskProximity'
+        ownerId:
+          type: string
+          format: uuid
+        responseStrategy:
+          $ref: '#/components/schemas/ResponseStrategy'
+        responsePlan:
+          type: string
+          maxLength: 4000
+        triggerConditions:
+          type: string
+          maxLength: 2000
+        reviewDate:
+          type: string
+          format: date
+        kind:
+          $ref: '#/components/schemas/RiskKind'
+        status:
+          $ref: '#/components/schemas/RiskStatus'
+        probability:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 5
+        impact:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 5
+        score:
+          type: integer
+          format: int32
+          description: probability × impact, 1–25 (inherent risk)
+        severity:
+          $ref: '#/components/schemas/Severity'
+        residualProbability:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 5
+        residualImpact:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 5
+        residualScore:
+          type: integer
+          format: int32
+          description: The score expected once the response works
+        owner:
+          $ref: '#/components/schemas/UserRef'
+        identifiedBy:
+          $ref: '#/components/schemas/UserRef'
+        reviewOverdue:
+          type: boolean
+          description: Open with a review date in the past (organization time zone)
+        closure:
+          $ref: '#/components/schemas/RiskClosure'
+        closureNote:
+          type: string
+        issueId:
+          type: string
+          format: uuid
+          description: The issue opened when the risk materialized
+        createdAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+          format: int64
+    RiskPage:
+      allOf:
+        - $ref: '#/components/schemas/PageMetadata'
+        - type: object
+          required: [content]
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/Risk'
+    CreateRiskRequest:
+      type: object
+      required: [title, kind, category, probability, impact]
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+        description:
+          type: string
+          maxLength: 4000
+        category:
+          $ref: '#/components/schemas/RiskCategory'
+        proximity:
+          $ref: '#/components/schemas/RiskProximity'
+        ownerId:
+          type: string
+          format: uuid
+        responseStrategy:
+          $ref: '#/components/schemas/ResponseStrategy'
+        responsePlan:
+          type: string
+          maxLength: 4000
+        triggerConditions:
+          type: string
+          maxLength: 2000
+        reviewDate:
+          type: string
+          format: date
+        kind:
+          $ref: '#/components/schemas/RiskKind'
+        probability:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 5
+        impact:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 5
+    UpdateRiskRequest:
+      type: object
+      minProperties: 1
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+        description:
+          type: string
+          maxLength: 4000
+        category:
+          $ref: '#/components/schemas/RiskCategory'
+        proximity:
+          $ref: '#/components/schemas/RiskProximity'
+        ownerId:
+          type: string
+          format: uuid
+        responseStrategy:
+          $ref: '#/components/schemas/ResponseStrategy'
+        responsePlan:
+          type: string
+          maxLength: 4000
+        triggerConditions:
+          type: string
+          maxLength: 2000
+        reviewDate:
+          type: string
+          format: date
+        status:
+          type: string
+          enum: [IDENTIFIED, ANALYZED, RESPONSE_PLANNED, MONITORING]
+    RiskAssessment:
+      type: object
+      required: [id, probability, impact, score, assessedBy, assessedAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        probability:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 5
+        impact:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 5
+        score:
+          type: integer
+          format: int32
+        residualProbability:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 5
+        residualImpact:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 5
+        note:
+          type: string
+        assessedBy:
+          $ref: '#/components/schemas/UserRef'
+        assessedAt:
+          type: string
+          format: date-time
+    AssessRiskRequest:
+      type: object
+      required: [probability, impact]
+      properties:
+        probability:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 5
+        impact:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 5
+        residualProbability:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 5
+        residualImpact:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 5
+        note:
+          type: string
+          maxLength: 1000
+    CloseRiskRequest:
+      type: object
+      required: [note]
+      properties:
+        note:
+          type: string
+          minLength: 1
+          maxLength: 1000
+    MaterializeRiskRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+          description: Defaults to the risk's title
+        priority:
+          $ref: '#/components/schemas/IssuePriority'
+        ownerId:
+          type: string
+          format: uuid
+          description: Defaults to the risk owner
+        dueDate:
+          type: string
+          format: date
+    RiskHeatmapCell:
+      type: object
+      required: [probability, impact, score, severity, count, riskIds]
+      properties:
+        probability:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 5
+        impact:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 5
+        score:
+          type: integer
+          format: int32
+        severity:
+          $ref: '#/components/schemas/Severity'
+        count:
+          type: integer
+          format: int32
+        riskIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+    RiskHeatmap:
+      type: object
+      required: [projectId, cells]
+      properties:
+        projectId:
+          type: string
+          format: uuid
+        cells:
+          type: array
+          description: All 25 cells, probability 5 to 1 (rows, top to bottom), impact 1 to 5 within a row
+          items:
+            $ref: '#/components/schemas/RiskHeatmapCell'
+
+    # ---------- Issues ----------
+    IssueType:
+      type: string
+      enum: [TECHNICAL, RESOURCE, SCOPE, VENDOR, OTHER]
+    IssuePriority:
+      type: string
+      enum: [LOW, MEDIUM, HIGH, CRITICAL]
+    IssueStatus:
+      type: string
+      description: 'OPEN ⇄ IN_PROGRESS → RESOLVED → CLOSED; RESOLVED or CLOSED can be reopened'
+      enum: [OPEN, IN_PROGRESS, RESOLVED, CLOSED]
+    Issue:
+      type: object
+      required: [id, key, projectId, title, type, priority, status, raisedBy, overdue, escalated, createdAt,
+                 version]
+      properties:
+        id:
+          type: string
+          format: uuid
+        key:
+          type: string
+          example: AKG-12-I7
+        projectId:
+          type: string
+          format: uuid
+        title:
+          type: string
+        description:
+          type: string
+        type:
+          $ref: '#/components/schemas/IssueType'
+        priority:
+          $ref: '#/components/schemas/IssuePriority'
+        status:
+          $ref: '#/components/schemas/IssueStatus'
+        owner:
+          $ref: '#/components/schemas/UserRef'
+        raisedBy:
+          $ref: '#/components/schemas/UserRef'
+        dueDate:
+          type: string
+          format: date
+        resolution:
+          type: string
+        resolvedAt:
+          type: string
+          format: date-time
+        riskId:
+          type: string
+          format: uuid
+          description: The risk this issue materialized from
+        changeRequestId:
+          type: string
+          format: uuid
+          description: The change request raised to deal with it
+        overdue:
+          type: boolean
+          description: Unresolved and past its due date (organization time zone)
+        escalated:
+          type: boolean
+          description: CRITICAL and unresolved for more than 3 days; the PMO should step in
+        createdAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+          format: int64
+    IssuePage:
+      allOf:
+        - $ref: '#/components/schemas/PageMetadata'
+        - type: object
+          required: [content]
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/Issue'
+    CreateIssueRequest:
+      type: object
+      required: [title, type, priority]
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+        description:
+          type: string
+          maxLength: 4000
+        type:
+          $ref: '#/components/schemas/IssueType'
+        priority:
+          $ref: '#/components/schemas/IssuePriority'
+        ownerId:
+          type: string
+          format: uuid
+        dueDate:
+          type: string
+          format: date
+    UpdateIssueRequest:
+      type: object
+      minProperties: 1
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+        description:
+          type: string
+          maxLength: 4000
+        type:
+          $ref: '#/components/schemas/IssueType'
+        priority:
+          $ref: '#/components/schemas/IssuePriority'
+        ownerId:
+          type: string
+          format: uuid
+        dueDate:
+          type: string
+          format: date
+        status:
+          type: string
+          enum: [OPEN, IN_PROGRESS]
+    ResolveIssueRequest:
+      type: object
+      required: [resolution]
+      properties:
+        resolution:
+          type: string
+          minLength: 1
+          maxLength: 4000
+    ReopenIssueRequest:
+      type: object
+      required: [reason]
+      properties:
+        reason:
+          type: string
+          minLength: 1
+          maxLength: 1000
+
+    # ---------- Stakeholders ----------
+    Engagement:
+      type: string
+      description: 'From least to most engaged: UNAWARE, RESISTANT, NEUTRAL, SUPPORTIVE, LEADING'
+      enum: [UNAWARE, RESISTANT, NEUTRAL, SUPPORTIVE, LEADING]
+    StakeholderQuadrant:
+      type: string
+      description: |
+        MANAGE_CLOSELY: high power, high interest; KEEP_SATISFIED: high power, low interest; KEEP_INFORMED: low
+        power, high interest; MONITOR: low power, low interest. High is 3 or more.
+      enum: [MANAGE_CLOSELY, KEEP_SATISFIED, KEEP_INFORMED, MONITOR]
+    Stakeholder:
+      type: object
+      required: [id, projectId, name, power, interest, currentEngagement, desiredEngagement, engagementGap,
+                 quadrant, removed, version]
+      properties:
+        id:
+          type: string
+          format: uuid
+        projectId:
+          type: string
+          format: uuid
+        name:
+          type: string
+        organization:
+          type: string
+        role:
+          type: string
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        userId:
+          type: string
+          format: uuid
+          description: When the stakeholder is a member of the organization
+        power:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 5
+        interest:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 5
+        influence:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 5
+        currentEngagement:
+          $ref: '#/components/schemas/Engagement'
+        desiredEngagement:
+          $ref: '#/components/schemas/Engagement'
+        engagementGap:
+          type: integer
+          format: int32
+          description: Desired minus current, in levels; positive means more engagement is needed
+        quadrant:
+          $ref: '#/components/schemas/StakeholderQuadrant'
+        communicationPreferences:
+          type: string
+        notes:
+          type: string
+        removed:
+          type: boolean
+          description: The stakeholder was removed and their personal data erased
+        version:
+          type: integer
+          format: int64
+    StakeholderPage:
+      allOf:
+        - $ref: '#/components/schemas/PageMetadata'
+        - type: object
+          required: [content]
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/Stakeholder'
+    CreateStakeholderRequest:
+      type: object
+      required: [name, power, interest, currentEngagement, desiredEngagement]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 200
+        organization:
+          type: string
+          maxLength: 200
+        role:
+          type: string
+          maxLength: 200
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        phone:
+          type: string
+          maxLength: 40
+          pattern: '^[+0-9 ()-]{3,40}$'
+        userId:
+          type: string
+          format: uuid
+        power:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 5
+        interest:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 5
+        influence:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 5
+        currentEngagement:
+          $ref: '#/components/schemas/Engagement'
+        desiredEngagement:
+          $ref: '#/components/schemas/Engagement'
+        communicationPreferences:
+          type: string
+          maxLength: 1000
+        notes:
+          type: string
+          maxLength: 4000
+    UpdateStakeholderRequest:
+      type: object
+      minProperties: 1
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 200
+        organization:
+          type: string
+          maxLength: 200
+        role:
+          type: string
+          maxLength: 200
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        phone:
+          type: string
+          maxLength: 40
+          pattern: '^[+0-9 ()-]{3,40}$'
+        userId:
+          type: string
+          format: uuid
+        power:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 5
+        interest:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 5
+        influence:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 5
+        currentEngagement:
+          $ref: '#/components/schemas/Engagement'
+        desiredEngagement:
+          $ref: '#/components/schemas/Engagement'
+        communicationPreferences:
+          type: string
+          maxLength: 1000
+        notes:
+          type: string
+          maxLength: 4000
+    StakeholderGridEntry:
+      type: object
+      required: [id, name, power, interest, engagementGap]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        power:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 5
+        interest:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 5
+        engagementGap:
+          type: integer
+          format: int32
+    StakeholderGridQuadrant:
+      type: object
+      required: [quadrant, stakeholders]
+      properties:
+        quadrant:
+          $ref: '#/components/schemas/StakeholderQuadrant'
+        stakeholders:
+          type: array
+          items:
+            $ref: '#/components/schemas/StakeholderGridEntry'
+    StakeholderGrid:
+      type: object
+      required: [projectId, quadrants]
+      properties:
+        projectId:
+          type: string
+          format: uuid
+        quadrants:
+          type: array
+          items:
+            $ref: '#/components/schemas/StakeholderGridQuadrant'
+
+    # ---------- Change requests ----------
+    ChangeRequestType:
+      type: string
+      enum: [SCOPE, SCHEDULE, COST, QUALITY, OTHER]
+    ChangeRequestStatus:
+      type: string
+      description: |
+        DRAFT → SUBMITTED → IN_REVIEW (after the first approval) → APPROVED → IMPLEMENTED; a rejection makes it
+        REJECTED (revise to try again); DRAFT, SUBMITTED and IN_REVIEW can be WITHDRAWN.
+      enum: [DRAFT, SUBMITTED, IN_REVIEW, APPROVED, REJECTED, WITHDRAWN, IMPLEMENTED]
+    ChangeImpact:
+      type: object
+      properties:
+        costDelta:
+          allOf:
+            - $ref: '#/components/schemas/Money'
+          description: Added cost (negative for a saving), in the organization's currency
+        scheduleDeltaDays:
+          type: integer
+          format: int32
+          minimum: -1000
+          maximum: 1000
+          description: Working days added to the target end date (negative to pull it in)
+        scopeSummary:
+          type: string
+          maxLength: 2000
+        riskSummary:
+          type: string
+          maxLength: 2000
+        changesCharterScope:
+          type: boolean
+          default: false
+          description: Approving it adds the scope summary to a new charter version (the sponsor must approve)
+    ApprovalLevel:
+      type: string
+      enum: [PROJECT_MANAGER, PMO, SPONSOR]
+    Decision:
+      type: string
+      enum: [APPROVE, REJECT]
+    ApprovalStep:
+      type: object
+      required: [position, level, reason, state]
+      properties:
+        position:
+          type: integer
+          format: int32
+          description: 1 for the first step
+        level:
+          $ref: '#/components/schemas/ApprovalLevel'
+        reason:
+          type: string
+          description: Why this step is in the chain, e.g. "Cost change of 8% exceeds 5%"
+        approver:
+          allOf:
+            - $ref: '#/components/schemas/UserRef'
+          description: The one person who decides, when the step names someone
+        approverRole:
+          allOf:
+            - $ref: '#/components/schemas/Role'
+          description: Any member with this role (except the requester) decides, when the step names a role
+        state:
+          type: string
+          enum: [WAITING, PENDING, APPROVED, REJECTED, SKIPPED]
+          description: 'PENDING: its turn now; WAITING: a later step; SKIPPED: not reached (after a rejection)'
+        decidedBy:
+          $ref: '#/components/schemas/UserRef'
+        comment:
+          type: string
+        decidedAt:
+          type: string
+          format: date-time
+    ChangeRequest:
+      type: object
+      required: [id, key, revision, projectId, title, type, status, impact, requestedBy, steps, createdAt,
+                 version]
+      properties:
+        id:
+          type: string
+          format: uuid
+        key:
+          type: string
+          example: AKG-12-CR2
+        revision:
+          type: integer
+          format: int32
+          description: 1, then 2, 3... for each revision after a rejection; the key stays the same
+        projectId:
+          type: string
+          format: uuid
+        title:
+          type: string
+        description:
+          type: string
+        reason:
+          type: string
+        type:
+          $ref: '#/components/schemas/ChangeRequestType'
+        status:
+          $ref: '#/components/schemas/ChangeRequestStatus'
+        impact:
+          $ref: '#/components/schemas/ChangeImpact'
+        requestedBy:
+          $ref: '#/components/schemas/UserRef'
+        issueId:
+          type: string
+          format: uuid
+        previousRevisionId:
+          type: string
+          format: uuid
+        steps:
+          type: array
+          description: The approval chain, empty until submission
+          items:
+            $ref: '#/components/schemas/ApprovalStep'
+        submittedAt:
+          type: string
+          format: date-time
+        decidedAt:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+          format: int64
+    ChangeRequestPage:
+      allOf:
+        - $ref: '#/components/schemas/PageMetadata'
+        - type: object
+          required: [content]
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/ChangeRequest'
+    CreateChangeRequestRequest:
+      type: object
+      required: [title, type, reason]
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+        description:
+          type: string
+          maxLength: 4000
+        reason:
+          type: string
+          minLength: 1
+          maxLength: 2000
+        type:
+          $ref: '#/components/schemas/ChangeRequestType'
+        impact:
+          $ref: '#/components/schemas/ChangeImpact'
+        issueId:
+          type: string
+          format: uuid
+    UpdateChangeRequestRequest:
+      type: object
+      minProperties: 1
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+        description:
+          type: string
+          maxLength: 4000
+        reason:
+          type: string
+          minLength: 1
+          maxLength: 2000
+        type:
+          $ref: '#/components/schemas/ChangeRequestType'
+        impact:
+          $ref: '#/components/schemas/ChangeImpact'
+    DecisionRequest:
+      type: object
+      required: [decision]
+      properties:
+        decision:
+          $ref: '#/components/schemas/Decision'
+        comment:
+          type: string
+          maxLength: 2000
+          description: Required to reject
+    ChangeControlSettings:
+      type: object
+      required: [pmoCostPercent, pmoScheduleDays, sponsorCostPercent, version]
+      properties:
+        pmoCostPercent:
+          type: number
+          description: PMO approval when the cost change exceeds this share of the budget
+        pmoScheduleDays:
+          type: integer
+          format: int32
+          description: PMO approval when the schedule change exceeds this many working days
+        sponsorCostPercent:
+          type: number
+          description: Sponsor approval when the cost change exceeds this share of the budget
+        version:
+          type: integer
+          format: int64
+          description: 0 until the settings are first changed
+    UpdateChangeControlSettingsRequest:
+      type: object
+      required: [pmoCostPercent, pmoScheduleDays, sponsorCostPercent]
+      properties:
+        pmoCostPercent:
+          type: number
+          minimum: 0
+          maximum: 100
+        pmoScheduleDays:
+          type: integer
+          format: int32
+          minimum: 0
+          maximum: 1000
+        sponsorCostPercent:
+          type: number
+          minimum: 0
+          maximum: 100
