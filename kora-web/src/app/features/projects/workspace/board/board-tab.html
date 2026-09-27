@@ -1,0 +1,220 @@
+<div class="toolbar">
+  <mat-form-field subscriptSizing="dynamic" class="sprint">
+    <mat-label>{{ 'board.sprint' | transloco }}</mat-label>
+    <mat-select
+      [value]="store.shownSprintId() ?? 'all'"
+      (selectionChange)="
+        query.set({ sprint: $event.value === store.activeSprint()?.id ? null : $event.value })
+      "
+    >
+      <mat-select-trigger>
+        {{ store.shownSprint()?.name ?? ('board.allTasks' | transloco) }}
+      </mat-select-trigger>
+      @for (s of store.sprints(); track s.id) {
+        <mat-option [value]="s.id">
+          {{ s.name }} · {{ 'sprintStatus.' + s.status | transloco }}
+        </mat-option>
+      }
+      <mat-option value="all">{{ 'board.allTasks' | transloco }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field subscriptSizing="dynamic">
+    <mat-label>{{ 'tasks.fields.assignee' | transloco }}</mat-label>
+    <mat-select
+      [value]="assignee() ?? null"
+      (selectionChange)="query.set({ assignee: $event.value })"
+    >
+      <mat-option [value]="null">{{ 'board.anyone' | transloco }}</mat-option>
+      @for (person of project.assignable(); track person.userId) {
+        <mat-option [value]="person.userId">{{ person.fullName }}</mat-option>
+      }
+      <mat-option value="none">{{ 'tasks.unassigned' | transloco }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field subscriptSizing="dynamic">
+    <mat-label>{{ 'tasks.fields.type' | transloco }}</mat-label>
+    <mat-select [value]="type() ?? null" (selectionChange)="query.set({ type: $event.value })">
+      <mat-select-trigger>{{ 'taskType.' + type() | transloco }}</mat-select-trigger>
+      <mat-option [value]="null">{{ 'board.anyType' | transloco }}</mat-option>
+      @for (value of types; track value) {
+        <mat-option [value]="value">{{ 'taskType.' + value | transloco }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+  @if (store.labels().length) {
+    <mat-form-field subscriptSizing="dynamic">
+      <mat-label>{{ 'tasks.fields.labels' | transloco }}</mat-label>
+      <mat-select [value]="label() ?? null" (selectionChange)="query.set({ label: $event.value })">
+        <mat-option [value]="null">{{ 'board.anyLabel' | transloco }}</mat-option>
+        @for (value of store.labels(); track value) {
+          <mat-option [value]="value">{{ value }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  }
+  <mat-slide-toggle
+    [checked]="swimlanes()"
+    (change)="query.set({ lanes: $event.checked ? 'assignee' : null })"
+  >
+    {{ 'board.swimlanes' | transloco }}
+  </mat-slide-toggle>
+  @if (project.canContribute()) {
+    <button mat-flat-button type="button" class="create" (click)="create()">
+      <mat-icon svgIcon="add" aria-hidden="true" />
+      {{ 'tasks.create' | transloco }}
+    </button>
+  }
+</div>
+
+@if (store.shownSprint(); as s) {
+  <p class="sprint-line">
+    <strong>{{ s.name }}</strong>
+    @if (s.goal) {
+      — {{ s.goal }}
+    }
+  </p>
+}
+
+<p class="help kora-muted">{{ 'board.keyboardHelp' | transloco }}</p>
+
+@if (store.status() === 'loading' && store.columns().length === 0) {
+  <kora-loading-state />
+} @else if (store.status() === 'error') {
+  <kora-error-state [correlationId]="store.error()?.correlationId" (retry)="store.reload()" />
+} @else {
+  <ng-template #columnHead let-column>
+    <div class="column-head">
+      <h3 [id]="'col-' + column.status">{{ columnName(column) }}</h3>
+      <span class="count">
+        @if (column.wipLimit !== undefined) {
+          {{
+            'board.countOfLimit' | transloco: { count: column.taskCount, limit: column.wipLimit }
+          }}
+        } @else {
+          {{ column.taskCount }}
+        }
+      </span>
+      @if (column.wipLimit !== undefined && column.taskCount > column.wipLimit) {
+        <kora-status-chip tone="danger" icon="error" [label]="'board.overLimit' | transloco" />
+      } @else if (column.atLimit) {
+        <kora-status-chip tone="warning" icon="warning" [label]="'board.atLimit' | transloco" />
+      }
+      @if (project.canEdit()) {
+        <button
+          mat-icon-button
+          type="button"
+          class="configure"
+          [attr.aria-label]="'board.configure' | transloco: { column: columnName(column) }"
+          [matTooltip]="'board.configure' | transloco: { column: columnName(column) }"
+          (click)="configure(column)"
+        >
+          <mat-icon svgIcon="settings" aria-hidden="true" />
+        </button>
+      }
+    </div>
+  </ng-template>
+
+  @if (!swimlanes()) {
+    <div class="board" cdkDropListGroup>
+      @for (column of store.board(); track column.status) {
+        <section
+          class="column"
+          [class.at-limit]="column.atLimit"
+          [attr.aria-labelledby]="'col-' + column.status"
+        >
+          <ng-container *ngTemplateOutlet="columnHead; context: { $implicit: column }" />
+          <ul
+            class="cards"
+            cdkDropList
+            [cdkDropListData]="column.status"
+            [cdkDropListEnterPredicate]="canEnter"
+            (cdkDropListDropped)="drop($event)"
+          >
+            @for (task of column.tasks; track task.id; let first = $first, last = $last) {
+              <li
+                cdkDrag
+                [cdkDragData]="task"
+                [cdkDragDisabled]="!tasks.canChange(task)"
+                [attr.data-task]="task.id"
+              >
+                <kora-board-card
+                  [task]="task"
+                  [columns]="columnNames()"
+                  [movable]="tasks.canChange(task)"
+                  [first]="first"
+                  [last]="last"
+                  [pending]="store.pending().includes(task.id)"
+                  (moved)="keyboardMove($event)"
+                  (opened)="open($event)"
+                />
+                <div class="placeholder" *cdkDragPlaceholder></div>
+              </li>
+            } @empty {
+              <li class="empty kora-muted">{{ 'board.emptyColumn' | transloco }}</li>
+            }
+          </ul>
+        </section>
+      }
+    </div>
+  } @else {
+    <div class="lanes">
+      <div class="board heads" aria-hidden="true">
+        @for (column of store.board(); track column.status) {
+          <div class="column head-only">
+            <ng-container *ngTemplateOutlet="columnHead; context: { $implicit: column }" />
+          </div>
+        }
+      </div>
+      @for (lane of store.lanes(); track lane.id) {
+        <section class="lane" [attr.aria-labelledby]="'lane-' + lane.id">
+          <h3 class="lane-title" [id]="'lane-' + lane.id">
+            {{ lane.name ?? ('tasks.unassigned' | transloco) }}
+          </h3>
+          <div class="board" cdkDropListGroup>
+            @for (column of store.board(); track column.status) {
+              <ul
+                class="cards column"
+                cdkDropList
+                [cdkDropListData]="column.status"
+                [cdkDropListEnterPredicate]="canEnter"
+                [attr.aria-label]="columnName(column)"
+                (cdkDropListDropped)="drop($event, lane.id)"
+              >
+                @for (
+                  task of tasksIn(column.status, lane.id);
+                  track task.id;
+                  let first = $first, last = $last
+                ) {
+                  <li
+                    cdkDrag
+                    [cdkDragData]="task"
+                    [cdkDragDisabled]="!tasks.canChange(task)"
+                    [attr.data-task]="task.id"
+                  >
+                    <kora-board-card
+                      [task]="task"
+                      [columns]="columnNames()"
+                      [movable]="tasks.canChange(task)"
+                      [first]="first"
+                      [last]="last"
+                      [pending]="store.pending().includes(task.id)"
+                      (moved)="keyboardMove($event, lane.id)"
+                      (opened)="open($event)"
+                    />
+                    <div class="placeholder" *cdkDragPlaceholder></div>
+                  </li>
+                }
+              </ul>
+            }
+          </div>
+        </section>
+      } @empty {
+        <kora-empty-state
+          icon="view_kanban"
+          [heading]="'board.emptyTitle' | transloco"
+          [message]="'board.emptyMessage' | transloco"
+        />
+      }
+    </div>
+  }
+}

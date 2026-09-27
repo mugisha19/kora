@@ -1,0 +1,132 @@
+:host {
+  display: block;
+  min-inline-size: 0;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--kora-space-3);
+  margin-block-end: var(--kora-space-2);
+
+  mat-form-field {
+    flex: 0 1 180px;
+  }
+
+  .sprint {
+    flex-basis: 220px;
+  }
+
+  .create {
+    margin-inline-start: auto;
+  }
+}
+
+.sprint-line {
+  margin: 0 0 var(--kora-space-1);
+}
+
+.help {
+  margin: 0 0 var(--kora-space-3);
+  font: var(--mat-sys-body-small);
+}
+
+// Columns scroll sideways on narrow screens; each keeps a readable width.
+.board {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(240px, 1fr);
+  gap: var(--kora-space-3);
+  overflow-x: auto;
+  padding-block-end: var(--kora-space-2);
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+  padding: var(--kora-space-2);
+  border-radius: var(--kora-radius);
+  background: var(--mat-sys-surface-container-low);
+
+  &.at-limit {
+    outline: 2px solid var(--kora-warning-fg);
+    outline-offset: -2px;
+  }
+}
+
+.column-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--kora-space-2);
+  min-block-size: 40px;
+  margin-block-end: var(--kora-space-2);
+
+  h3 {
+    font: var(--mat-sys-title-small);
+  }
+
+  .count {
+    color: var(--mat-sys-on-surface-variant);
+    font: var(--mat-sys-label-medium);
+  }
+
+  .configure {
+    margin-inline-start: auto;
+  }
+}
+
+.cards {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--kora-space-2);
+  min-block-size: 80px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.empty {
+  padding: var(--kora-space-3);
+  border: 1px dashed var(--mat-sys-outline-variant);
+  border-radius: var(--kora-radius);
+  font: var(--mat-sys-body-small);
+  text-align: center;
+}
+
+.placeholder {
+  min-block-size: 72px;
+  border: 2px dashed var(--mat-sys-primary);
+  border-radius: var(--kora-radius);
+}
+
+.cdk-drag-preview {
+  box-shadow: var(--mat-sys-level3);
+}
+
+.cdk-drag-animating,
+.cards.cdk-drop-list-dragging li:not(.cdk-drag-placeholder) {
+  transition: transform 200ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.lanes .heads {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 1;
+}
+
+.head-only {
+  padding-block: var(--kora-space-1);
+}
+
+.lane {
+  margin-block-end: var(--kora-space-3);
+}
+
+.lane-title {
+  margin-block: var(--kora-space-2);
+  font: var(--mat-sys-title-small);
+}

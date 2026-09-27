@@ -2,7 +2,7 @@ import { Component, input } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { EmptyState } from '../../../shared/ui/empty-state';
 
-/** Board, backlog and schedule arrive in later phases (features 08–10); the tab says so. */
+/** The schedule arrives in a later phase (feature 10); the tab says so. */
 @Component({
   selector: 'kora-coming-soon-tab',
   imports: [EmptyState, TranslocoPipe],
@@ -16,5 +16,5 @@ import { EmptyState } from '../../../shared/ui/empty-state';
 })
 export class ComingSoonTab {
   /** Route data. */
-  readonly tab = input.required<'board' | 'backlog' | 'schedule'>();
+  readonly tab = input.required<'schedule'>();
 }
