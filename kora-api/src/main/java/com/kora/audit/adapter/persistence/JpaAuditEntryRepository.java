@@ -6,7 +6,6 @@ import com.kora.audit.domain.AuditEntry;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -15,10 +14,14 @@ import org.springframework.data.repository.Repository;
 interface JpaAuditEntryRepository
         extends Repository<AuditEntry, UUID>, JpaSpecificationExecutor<AuditEntry>, AuditEntryRepository {
 
+    /** The first rows only: no page count, which on the audit table would be the most expensive query. */
     @Override
     default List<AuditEntry> search(AuditSearch search, int limit) {
-        return findAll(specification(search), PageRequest.of(0, limit, Sort.by(Sort.Order.desc("chainPosition"))))
-                .getContent();
+        return findBy(
+                specification(search),
+                query -> query.sortBy(Sort.by(Sort.Order.desc("chainPosition")))
+                        .limit(limit)
+                        .all());
     }
 
     @Override

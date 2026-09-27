@@ -5,7 +5,6 @@ import com.kora.notifications.domain.Notification;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -31,8 +30,12 @@ interface JpaNotificationRepository
                             cb.equal(notification.get("createdAt"), beforeCreatedAt),
                             cb.lessThan(notification.get("id"), beforeId))));
         }
-        return findAll(mine, PageRequest.of(0, limit, Sort.by(Sort.Order.desc("createdAt"), Sort.Order.desc("id"))))
-                .getContent();
+        // Cursor pages need the rows, never a total count.
+        return findBy(
+                mine,
+                query -> query.sortBy(Sort.by(Sort.Order.desc("createdAt"), Sort.Order.desc("id")))
+                        .limit(limit)
+                        .all());
     }
 
     @Override

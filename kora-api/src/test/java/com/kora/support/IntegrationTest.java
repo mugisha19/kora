@@ -39,7 +39,10 @@ import org.springframework.context.annotation.Import;
             "kora.rate-limits.invitation-preview-ip=10000/1m",
             "kora.rate-limits.invitation-accept-ip=10000/1m",
             "kora.identity.refresh-token.reuse-grace-period=0s",
-            "kora.organization.invitation-expiry.initial-delay=PT1H"
+            "kora.organization.invitation-expiry.initial-delay=PT1H",
+            // Statement counts for the N+1 checks (QueryCountIT), without Hibernate's per-session log lines.
+            "spring.jpa.properties.hibernate.generate_statistics=true",
+            "logging.level.org.hibernate.engine.internal.StatisticalLoggingSessionEventListener=WARN"
         })
 @AutoConfigureMockMvc
 @AutoConfigureMetrics
