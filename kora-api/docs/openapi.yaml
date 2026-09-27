@@ -5524,7 +5524,7 @@ paths:
       tags: [Activity]
       operationId: listProjectActivity
       summary: 'What happened on the project, newest first'
-      description: 'Everyone who sees the project. Cursor-paginated; live entries arrive on the project''''s WebSocket topic.'
+      description: 'Everyone who sees the project. Cursor-paginated; live entries arrive on the project''s WebSocket topic.'
       parameters:
         - $ref: '#/components/parameters/ProjectId'
         - $ref: '#/components/parameters/OrganizationId'
@@ -5638,8 +5638,8 @@ paths:
     get:
       tags: [Audit]
       operationId: verifyAuditChain
-      summary: 'Check that the audit log hasn''''t been tampered with'
-      description: '`ORG_ADMIN` only. Recomputes the hash chain of the organization''''s entries in the period.'
+      summary: 'Check that the audit log hasn''t been tampered with'
+      description: '`ORG_ADMIN` only. Recomputes the hash chain of the organization''s entries in the period.'
       parameters:
         - $ref: '#/components/parameters/OrganizationId'
         - name: from
@@ -5709,7 +5709,7 @@ paths:
       tags: [Attachments]
       operationId: startAttachmentUpload
       summary: 'Start an upload: get a presigned URL to PUT the file to'
-      description: 'The project''''s managers and contributors. Allowed types: PDF, PNG, JPEG, GIF, WebP, plain text, CSV, Word, Excel and PowerPoint (OOXML); at most 25 MB. PUT the bytes to `uploadUrl` with the headers given, within 15 minutes, then call complete.'
+      description: 'The project''s managers and contributors. Allowed types: PDF, PNG, JPEG, GIF, WebP, plain text, CSV, Word, Excel and PowerPoint (OOXML); at most 25 MB. PUT the bytes to `uploadUrl` with the headers given, within 15 minutes, then call complete.'
       parameters:
         - $ref: '#/components/parameters/OrganizationId'
         - $ref: '#/components/parameters/CorrelationId'
@@ -5822,7 +5822,7 @@ paths:
       tags: [Attachments]
       operationId: deleteAttachment
       summary: 'Delete an attachment'
-      description: 'Its uploader or the project''''s managers. Kept 30 days before the file is purged.'
+      description: 'Its uploader or the project''s managers. Kept 30 days before the file is purged.'
       parameters:
         - $ref: '#/components/parameters/AttachmentId'
         - $ref: '#/components/parameters/OrganizationId'
@@ -5872,7 +5872,7 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
         '409':
-          description: 'The file isn''''t available yet. Code: `attachments.not_uploaded`.'
+          description: 'The file isn''t available yet. Code: `attachments.not_uploaded`.'
           headers:
             X-Correlation-Id:
               $ref: '#/components/headers/CorrelationId'
