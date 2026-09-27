@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Kora API
-  version: 0.3.0
+  version: 0.4.0
   description: |
     Multi-tenant project and portfolio management built on PMI practices.
 
@@ -56,6 +56,8 @@ tags:
     description: Tasks and the Kanban board (feature 08)
   - name: Sprints
     description: Backlog, sprints, burndown and velocity (feature 09)
+  - name: Schedule
+    description: Dependencies, the critical path schedule, baselines and the working calendar (feature 10)
 
 security:
   - bearerAuth: []
@@ -914,7 +916,7 @@ paths:
     get:
       tags: [Portfolios]
       operationId: listPrograms
-      summary: List a portfolio''s programs
+      summary: 'List a portfolio''s programs'
       description: 'Ordered by name.'
       parameters:
         - $ref: '#/components/parameters/PortfolioId'
@@ -1484,7 +1486,7 @@ paths:
     get:
       tags: [Charter]
       operationId: getCharter
-      summary: The current charter (the latest version that isn''t superseded)
+      summary: 'The current charter (the latest version that isn''t superseded)'
       parameters:
         - $ref: '#/components/parameters/ProjectId'
         - $ref: '#/components/parameters/OrganizationId'
@@ -2157,7 +2159,7 @@ paths:
     patch:
       tags: [Tasks]
       operationId: updateTask
-      summary: Update a task''s details
+      summary: 'Update a task''s details'
       description: 'Managers edit any task; contributors edit tasks assigned to them or unassigned. The status changes through `POST /tasks/{taskId}/move`.'
       parameters:
         - $ref: '#/components/parameters/TaskId'
@@ -2225,7 +2227,7 @@ paths:
     post:
       tags: [Tasks]
       operationId: moveTask
-      summary: Change a task''s status and/or position in one call
+      summary: 'Change a task''s status and/or position in one call'
       description: 'Places the task between `afterTaskId` (above it) and `beforeTaskId` (below it) in the target status, or last when both are omitted. Moving into a column at its WIP limit needs `override: true`. `BLOCKED` needs a reason; reopening a `DONE` task is for managers only.'
       parameters:
         - $ref: '#/components/parameters/TaskId'
@@ -2272,7 +2274,7 @@ paths:
     get:
       tags: [Tasks]
       operationId: listTaskComments
-      summary: The task''s comments, oldest first
+      summary: 'The task''s comments, oldest first'
       parameters:
         - $ref: '#/components/parameters/TaskId'
         - $ref: '#/components/parameters/OrganizationId'
@@ -2442,7 +2444,7 @@ paths:
     get:
       tags: [Sprints]
       operationId: listSprints
-      summary: The project''s sprints, newest first
+      summary: 'The project''s sprints, newest first'
       parameters:
         - $ref: '#/components/parameters/ProjectId'
         - $ref: '#/components/parameters/OrganizationId'
@@ -2553,7 +2555,7 @@ paths:
     patch:
       tags: [Sprints]
       operationId: updateSprint
-      summary: Change a sprint''s name, goal or dates
+      summary: 'Change a sprint''s name, goal or dates'
       parameters:
         - $ref: '#/components/parameters/SprintId'
         - $ref: '#/components/parameters/OrganizationId'
@@ -2836,6 +2838,257 @@ paths:
         '500':
           $ref: '#/components/responses/InternalError'
 
+  /projects/{projectId}/dependencies:
+    get:
+      tags: [Schedule]
+      operationId: listDependencies
+      summary: 'The dependencies between the project''s tasks'
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: The dependencies
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Dependency'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      tags: [Schedule]
+      operationId: createDependency
+      summary: 'Link two tasks of the project'
+      description: 'The project manager, PMO or ORG_ADMIN; Predictive and Hybrid projects only. A link that would close a loop is refused before anything is saved.'
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDependencyRequest'
+      responses:
+        '201':
+          description: Dependency created
+          headers:
+            Location:
+              description: URL of the new resource
+              schema:
+                type: string
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dependency'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: '`schedule.cycle` (the error names the loop in `errors[0].params.cycle`), `schedule.dependency_exists` or `schedule.not_predictive`.'
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /dependencies/{dependencyId}:
+    delete:
+      tags: [Schedule]
+      operationId: deleteDependency
+      summary: 'Remove a dependency'
+      parameters:
+        - $ref: '#/components/parameters/DependencyId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '204':
+          description: Removed
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /projects/{projectId}/schedule:
+    get:
+      tags: [Schedule]
+      operationId: getSchedule
+      summary: 'The critical path schedule of the project''s tasks'
+      description: 'Computed on request with the critical path method on the organization''s working calendar, from the project start date. Floats and variances are in working days; a positive variance is late.'
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: The schedule
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Schedule'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'The dependencies form a loop. Code: `schedule.cycle`.'
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /projects/{projectId}/schedule/baseline:
+    post:
+      tags: [Schedule]
+      operationId: saveBaseline
+      summary: 'Save the current schedule as the new baseline'
+      description: 'The project manager, PMO or ORG_ADMIN. Every task''s early start and finish are recorded; the schedule then reports variances against this baseline.'
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '201':
+          description: Baseline saved
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Baseline'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: '`schedule.not_predictive` or `schedule.cycle`.'
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /organization/calendar:
+    get:
+      tags: [Schedule]
+      operationId: getWorkingCalendar
+      summary: 'The organization''s working days and holidays'
+      description: 'Monday to Friday and no holidays until an administrator changes it.'
+      parameters:
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: The working calendar
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkingCalendar'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    put:
+      tags: [Schedule]
+      operationId: updateWorkingCalendar
+      summary: 'Replace the working days and holidays'
+      description: '`ORG_ADMIN` only. Every project schedule is computed with it from then on.'
+      parameters:
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/IfMatch'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateWorkingCalendarRequest'
+      responses:
+        '200':
+          description: The working calendar
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkingCalendar'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '412':
+          $ref: '#/components/responses/PreconditionFailed'
+        '428':
+          $ref: '#/components/responses/PreconditionRequired'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -2988,6 +3241,14 @@ components:
       schema:
         type: string
         enum: [TODO, IN_PROGRESS, BLOCKED, IN_REVIEW, DONE]
+
+    DependencyId:
+      name: dependencyId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
 
   headers:
     CorrelationId:
@@ -3226,6 +3487,9 @@ components:
         - sprints.not_planned
         - sprints.not_active
         - sprints.closed
+        - schedule.cycle
+        - schedule.dependency_exists
+        - schedule.not_predictive
         - internal.error
 
     # ---------- Shared ----------
@@ -4358,6 +4622,16 @@ components:
           format: date
         labels:
           $ref: '#/components/schemas/Labels'
+        durationDays:
+          type: integer
+          format: int32
+          description: Planned duration in working days; 0 is a milestone. The schedule assumes 1 when absent.
+        scheduleConstraint:
+          $ref: '#/components/schemas/ScheduleConstraint'
+        constraintDate:
+          type: string
+          format: date
+          description: Present with START_NO_EARLIER_THAN
         rank:
           type: string
           description: Opaque sort key (lexorank); order tasks by it, never parse it
@@ -4429,6 +4703,17 @@ components:
           format: date
         labels:
           $ref: '#/components/schemas/Labels'
+        durationDays:
+          type: integer
+          format: int32
+          minimum: 0
+          maximum: 1000
+        scheduleConstraint:
+          $ref: '#/components/schemas/ScheduleConstraint'
+        constraintDate:
+          type: string
+          format: date
+          description: Required with START_NO_EARLIER_THAN; ignored with ASAP
     UpdateTaskRequest:
       type: object
       minProperties: 1
@@ -4471,6 +4756,17 @@ components:
           format: date
         labels:
           $ref: '#/components/schemas/Labels'
+        durationDays:
+          type: integer
+          format: int32
+          minimum: 0
+          maximum: 1000
+        scheduleConstraint:
+          $ref: '#/components/schemas/ScheduleConstraint'
+        constraintDate:
+          type: string
+          format: date
+          description: Required with START_NO_EARLIER_THAN; ignored with ASAP
     MoveTaskRequest:
       type: object
       required: [status]
@@ -4737,3 +5033,206 @@ components:
           type: integer
           format: int32
           description: Highest completed points in the window (forecast range)
+
+    # ---------- Schedule (0.4.0) ----------
+    ScheduleConstraint:
+      type: string
+      description: 'ASAP: as soon as its predecessors allow; START_NO_EARLIER_THAN: not before `constraintDate`'
+      enum: [ASAP, START_NO_EARLIER_THAN]
+    DependencyType:
+      type: string
+      description: |
+        FS: the successor starts after the predecessor finishes (the usual one); SS: starts after it starts;
+        FF: finishes after it finishes; SF: finishes after it starts.
+      enum: [FS, SS, FF, SF]
+    Dependency:
+      type: object
+      required: [id, projectId, predecessorId, successorId, type, lagDays, createdAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        projectId:
+          type: string
+          format: uuid
+        predecessorId:
+          type: string
+          format: uuid
+        successorId:
+          type: string
+          format: uuid
+        type:
+          $ref: '#/components/schemas/DependencyType'
+        lagDays:
+          type: integer
+          format: int32
+          description: Working days of waiting after the link is satisfied; negative is a lead (overlap)
+        createdAt:
+          type: string
+          format: date-time
+    CreateDependencyRequest:
+      type: object
+      required: [predecessorId, successorId]
+      properties:
+        predecessorId:
+          type: string
+          format: uuid
+        successorId:
+          type: string
+          format: uuid
+        type:
+          allOf:
+            - $ref: '#/components/schemas/DependencyType'
+          default: FS
+        lagDays:
+          type: integer
+          format: int32
+          minimum: -365
+          maximum: 365
+          default: 0
+    ScheduledTask:
+      type: object
+      required: [taskId, key, title, status, durationDays, earlyStart, earlyFinish, lateStart, lateFinish,
+                 totalFloat, freeFloat, critical]
+      properties:
+        taskId:
+          type: string
+          format: uuid
+        key:
+          type: string
+        title:
+          type: string
+        status:
+          $ref: '#/components/schemas/TaskStatus'
+        durationDays:
+          type: integer
+          format: int32
+          description: The duration used, 1 when the task has none
+        earlyStart:
+          type: string
+          format: date
+        earlyFinish:
+          type: string
+          format: date
+          description: The last working day of the task (its start for a milestone)
+        lateStart:
+          type: string
+          format: date
+        lateFinish:
+          type: string
+          format: date
+        totalFloat:
+          type: integer
+          format: int32
+          description: Working days the task can slip without delaying the project
+        freeFloat:
+          type: integer
+          format: int32
+          description: Working days the task can slip without delaying any successor
+        critical:
+          type: boolean
+          description: No total float; show it distinctly without relying on colour alone
+        baselineStart:
+          type: string
+          format: date
+        baselineFinish:
+          type: string
+          format: date
+        startVariance:
+          type: integer
+          format: int32
+          description: Working days between the baseline start and the early start; positive is late
+        finishVariance:
+          type: integer
+          format: int32
+          description: Working days between the baseline finish and the early finish; positive is late
+    Baseline:
+      type: object
+      required: [number, savedAt, savedBy, taskCount]
+      properties:
+        number:
+          type: integer
+          format: int32
+          description: 1 for the first baseline of the project, then 2, 3...
+        savedAt:
+          type: string
+          format: date-time
+        savedBy:
+          $ref: '#/components/schemas/UserRef'
+        taskCount:
+          type: integer
+          format: int32
+    Schedule:
+      type: object
+      required: [projectId, projectStart, criticalPath, tasks]
+      properties:
+        projectId:
+          type: string
+          format: uuid
+        projectStart:
+          type: string
+          format: date
+          description: The first working day on or after the project start date
+        projectFinish:
+          type: string
+          format: date
+          description: The latest early finish; absent without tasks
+        baseline:
+          $ref: '#/components/schemas/Baseline'
+        criticalPath:
+          type: array
+          description: Critical task ids in schedule order
+          items:
+            type: string
+            format: uuid
+        tasks:
+          type: array
+          description: In schedule order (early start, then rank)
+          items:
+            $ref: '#/components/schemas/ScheduledTask'
+    DayOfWeek:
+      type: string
+      enum: [MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY]
+    Holiday:
+      type: object
+      required: [date, name]
+      properties:
+        date:
+          type: string
+          format: date
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+    WorkingCalendar:
+      type: object
+      required: [workingDays, holidays, version]
+      properties:
+        workingDays:
+          type: array
+          items:
+            $ref: '#/components/schemas/DayOfWeek'
+        holidays:
+          type: array
+          description: In date order
+          items:
+            $ref: '#/components/schemas/Holiday'
+        version:
+          type: integer
+          format: int64
+          description: 0 until the calendar is first changed
+    UpdateWorkingCalendarRequest:
+      type: object
+      required: [workingDays, holidays]
+      properties:
+        workingDays:
+          type: array
+          minItems: 1
+          maxItems: 7
+          items:
+            $ref: '#/components/schemas/DayOfWeek'
+        holidays:
+          type: array
+          maxItems: 200
+          items:
+            $ref: '#/components/schemas/Holiday'
