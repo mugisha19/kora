@@ -41,3 +41,34 @@ api:verify:
         - kora-api/target/failsafe-reports/TEST-*.xml
     paths:
       - kora-api/target/site/jacoco/
+
+# The container image (Phase 10): built after the tests pass, then scanned like on GitHub.
+api:image:
+  stage: image
+  extends: [.api-rules]
+  needs: [api:verify]
+  image: docker:cli
+  services:
+    - name: docker:dind
+      alias: docker
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ''
+  script:
+    - docker build -t kora-api:$CI_COMMIT_SHORT_SHA kora-api
+    - docker save kora-api:$CI_COMMIT_SHORT_SHA -o kora-api-image.tar
+  artifacts:
+    expire_in: 1 day
+    paths:
+      - kora-api-image.tar
+
+api:image-scan:
+  stage: image
+  extends: [.api-rules]
+  needs: [api:image]
+  image:
+    name: aquasec/trivy:0.74.0
+    entrypoint: ['']
+  script:
+    - trivy image --input kora-api-image.tar --scanners vuln --timeout 20m --severity CRITICAL --ignore-unfixed
+      --exit-code 1 --no-progress

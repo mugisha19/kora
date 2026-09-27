@@ -49,4 +49,25 @@ jobs:
             kora-api/target/spring-modulith-docs
           if-no-files-found: ignore
 
-  # The container image job is added in Phase 10 together with the Dockerfile (see kora-api/docs/adr/0003).
+  image:
+    name: Container image and vulnerability scan
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: docker/setup-buildx-action@v4
+      - uses: docker/build-push-action@v7
+        with:
+          context: kora-api
+          load: true
+          tags: kora-api:${{ github.sha }}
+          cache-from: type=gha,scope=kora-api
+          cache-to: type=gha,mode=max,scope=kora-api
+      # Trivy from its pinned image rather than a third-party action. It fails the build on critical vulnerabilities
+      # that have a fix, in the JRE, the OS packages or any library in the image.
+      - name: Scan the image
+        run: >
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:0.74.0
+          image --scanners vuln --timeout 20m --severity CRITICAL --ignore-unfixed --exit-code 1 --no-progress
+          kora-api:${{ github.sha }}
