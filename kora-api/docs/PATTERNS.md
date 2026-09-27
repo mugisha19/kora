@@ -107,3 +107,19 @@ Still plumbing rather than domain patterns, but two structural ideas landed in t
   **Adapter** for live delivery too: `LivePush`, with `StompLivePush`.
 - **Interceptor** for authorization: `StompAuthorization` checks every inbound STOMP frame (CONNECT, SUBSCRIBE, SEND)
   before the broker sees it, with the same rules as REST.
+
+## Phase 9
+
+- **Template Method**: `reports/application/ReportExporter.export` fixes the steps of every export (load the data,
+  build the document, render, store); `PdfReportExporter` and `ExcelReportExporter` supply only `render` and their file
+  type.
+- **Factory**: `ReportExporterFactory` picks the data source by report type and the exporter by format, both
+  discovered as beans; a new format is one new class.
+- **Plug-in interface across modules**: `reports.ReportSource` is implemented by the modules that own the data
+  (reporting, governance, performance, resourcing). The dependency points toward `reports`, which knows none of them.
+- **Intermediate representation**: `ReportContent` of typed `Cell`s (a sealed interface) separates what a report says
+  from how a format shows it, so PDF formats amounts in the reader's language while Excel keeps them as numbers.
+- **Background job with a claim check**: the request stores a job and an event; the worker generates the file, puts it
+  in object storage, and the job keeps only the key and a short-lived link.
+- **Seeding through the public API**: `demo/DemoStory` drives Kora's own REST API as its users, so demo data obeys
+  every rule; the owning modules backfill history the API can't create (`platform.demo.DemoHistory`).

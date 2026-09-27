@@ -353,3 +353,67 @@ as your site (stored XSS).
 A browser can't put an `Authorization` header on the WebSocket handshake, so authenticate the first STOMP frame
 instead, and authorize every subscription exactly like the equivalent REST read. Pushes are best effort. The REST
 endpoints stay the source of truth, and a reconnecting client refetches.
+
+## Template Method vs Strategy (Phase 9)
+
+Both vary behaviour.
+- **Template Method** fixes an algorithm's skeleton in a base class and lets subclasses fill in steps. `ReportExporter`
+  always loads, builds, renders and stores, in that order; formats differ only in how they render.
+- **Strategy** swaps a whole algorithm behind an interface chosen at run time, as with the EVM methods.
+
+Rule of thumb: when the steps and their order are the invariant, use Template Method; when the algorithm itself is
+the choice, use Strategy.
+
+## CSV and Excel formula injection (Phase 9)
+
+A cell that starts with `=`, `+`, `-` or `@` can be run as a formula when opened. `=HYPERLINK(...)` leaks data;
+old DDE payloads ran commands. Exports of user-entered text (risk titles, task names) are the attack surface.
+
+The defence is to mark such text as text. In a CSV, prefix it with an apostrophe. In XLSX, set the cell's quote-prefix
+flag: Excel's own "typed with a leading apostrophe", invisible, and it survives editing the cell.
+
+## Streaming large spreadsheets (Phase 9)
+
+A normal POI workbook keeps every cell object in memory: a 100,000-row sheet takes hundreds of megabytes.
+`SXSSFWorkbook` keeps a sliding window (here 100 rows) and writes the rest to a compressed temporary file, so memory
+is flat whatever the row count.
+
+The trade-off: rows that left the window can't be read or auto-sized again, so column widths come from the first rows.
+
+## Asynchronous jobs for heavy work (Phase 9)
+
+A report can take seconds, and an HTTP request shouldn't. The API validates and authorizes at once (errors come back
+synchronously), queues the job through the outbox, and answers 202 with the job's URL.
+
+- A worker does the work under a concurrency limit, as the requester.
+- The client polls or waits for a notification.
+- Idempotency comes from the job's status: a redelivered event finds it done and does nothing.
+
+## Demo data that can't lie (Phase 9)
+
+Inserting demo rows directly is fast, but it bypasses the rules. A project could be "in progress" without an approved
+charter, or show a health its numbers don't support.
+
+Driving the public API instead makes the demo a long end-to-end test: if it runs, the story is consistent. Only true
+history, which an API that records "now" can't produce, is backfilled by the module that owns it.
+
+## A javac gotcha: `TypeNotPresentException: Type E not present` (Phase 9)
+
+Once, after new source files were added, an incremental build compiled a record component declared as
+`List<@NotNull @Pattern(regexp = LABEL) String>` with the generic signature `List<E>`, and Bean Validation failed on
+every request using it. A clean build (`./mvnw clean verify`, what CI runs) produced the right signature.
+
+If reflection reports a type variable that the class doesn't declare, look at the bytecode
+(`javap -v ... | grep Signature`) before suspecting libraries, and rebuild clean.
+
+## Paused test contexts and cached clients (Phase 9)
+
+Spring's test framework caches application contexts. Since Spring Framework 7, it also *pauses* the ones not in use:
+their lifecycle beans stop, then start again when a test needs the context back.
+
+A bean that captured a client once breaks across that cycle. Our rate limiter kept the Redis client of a connection
+factory that shut it down on stop and created a new one on start, so every request after the demo profile's context
+ran failed with "Connection is closed".
+
+Ask the factory for its current client instead of keeping one. Restarts are real in production too.
+

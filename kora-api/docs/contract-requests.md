@@ -66,3 +66,9 @@ Template:
   (described in the Notifications tag); 3 new error codes
 - Follow-up: six descriptions with doubled apostrophes fixed (text only)
 - Status: accepted in 0.7.0
+
+### 0.8.0: report exports
+- Requested by: api, 2026-09-27 (start of API Phase 9, for web Phase 9)
+- Endpoints: 3 new operations (tag Reports); NotificationType gains REPORT_READY and REPORT_FAILED; 1 new error code
+- Demo data (feature 22) needs no contract change
+- Status: accepted in 0.8.0

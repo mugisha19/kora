@@ -48,8 +48,13 @@ into `domain` → `application` → `adapter.{web,persistence,...}`; dependencie
 - Every entity change is audited automatically (ADR 0013); mark snapshots, counters and tokens `@NotAudited` with a
   reason. Events that notify people carry an `eventKey` and their `organizationId` and go through the outbox;
   asynchronous listeners bind their organization before starting a transaction (not `@ApplicationModuleListener`).
-- Files go through `attachments.application.FileStorage` (presigned URLs); the API never streams uploads or
-  downloads itself.
+- Files go through `platform.storage.FileStorage` (presigned URLs); the API never streams uploads or downloads
+  itself.
+- A new report type is a `reports.ReportSource` in the module that owns the data, built with that module's own access
+  checks; a new format is a `ReportExporter` subclass (ADR 0014). Excel text cells that look like formulas get the
+  quote prefix.
+- Demo data (`demo` profile) goes through the public API in `demo/DemoStory`; history the API can't create is a
+  `platform.demo.DemoHistory` in the owning module. Keep the story in line with the web app's mock data.
 - Comments explain WHY. Record decisions in `docs/adr/`, patterns in `docs/PATTERNS.md`, interview
   explanations in `docs/LEARNING.md`.
 - Check the latest stable version of a dependency before adding it.

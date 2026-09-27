@@ -2,22 +2,24 @@
 
 ## Current status
 
-Phase 8 complete (tag `api-v0.8.0`). Waiting for "continue".
+Phase 9 complete (tag `api-v0.9.0`). Waiting for "continue".
 
-Contract 0.7.0 is implemented:
-- a transactional outbox (Spring Modulith) for domain events;
-- notifications in the app and by email, with per-kind preferences, idempotent on redelivery;
-- live notifications and project activity over STOMP WebSocket, authenticated per frame;
-- an audit trail captured from every entity change, hash-chained per organization and not rewritable by the
-  application, with verification, item history and the activity feed;
-- attachments through presigned URLs to S3-compatible storage (SeaweedFS locally), with content-type sniffing and a
-  purge.
+Contract 0.8.0 is implemented:
+- **Report exports:** project status, portfolio summary, risk register, EVM and timesheets, as PDF and Excel.
+  - Generated in the background as the requester, in their language, and stored for 7 days.
+  - Announced by a notification.
+  - Excel text that looks like a formula is kept as text.
+  - Sheets are streamed, so size doesn't matter.
+- **Demo profile:** seeds two fictional organizations through the public API, with history in every module and demo
+  logins for every role.
+- **Outbox:** events are now redelivered after a restart and retried when a listener fails.
 
-256 unit and 780 integration tests, 94.1% line coverage.
+263 unit and 835 integration tests, 94.1% line coverage.
 
 ## Next step
 
-Phase 9 — report exports (PDF/Excel) and demo data (features 21–22). Contract 0.8.0 first.
+Phase 10: tracing, performance, the Docker image, full-stack compose (with `--profile demo`) and the final README.
+Tag v1.0.0.
 
 ## Checklist
 
@@ -30,7 +32,7 @@ Phase 9 — report exports (PDF/Excel) and demo data (features 21–22). Contrac
 - [x] 6. Risks, issues, stakeholders, change requests with approval chain (11–14)
 - [x] 7. Timesheets, capacity, EVM (15–17)
 - [x] 8. Outbox, notifications, WebSocket, audit trail, attachments (18–20)
-- [ ] 9. Report exports, demo data (21–22)
+- [x] 9. Report exports, demo data (21–22)
 - [ ] 10. Tracing, performance, Docker image, full-stack compose, final README; tag v1.0.0
 
 ## Decisions so far
@@ -50,3 +52,5 @@ Phase 9 — report exports (PDF/Excel) and demo data (features 21–22). Contrac
 - ADR 0012 — per-project timesheets, dated cost rates, capacity, EVM strategies and snapshots, SPI/CPI in health
 - ADR 0013 — transactional outbox, persistence-level hash-chained audit trail, notifications and STOMP, presigned
   attachments with content sniffing, SeaweedFS for local S3
+- ADR 0014: report exports (a reports module with data-owning ReportSources, Template Method exporters,
+  background jobs), demo data seeded through the public API, outbox redelivery

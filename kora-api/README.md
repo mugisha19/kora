@@ -27,6 +27,19 @@ Health: `GET /actuator/health` · build info: `GET /actuator/info` · metrics: `
 emails sent locally: http://localhost:8025 (Mailpit); attachments are stored in SeaweedFS (S3 API on
 http://localhost:8333)
 
+### Demo data
+
+Start with the `demo` profile to get two fictional organizations with a story across every feature (feature 22):
+
+```bash
+./mvnw spring-boot:run -Dspring-boot.run.profiles=demo
+```
+
+About a minute after start-up (see the log line `Demo data ready`), sign in with password `KoraDemo!2026` as
+`admin@kora.demo` (ORG_ADMIN; also PMO in the second organization), `pmo@kora.demo`, `pm@kora.demo`,
+`member@kora.demo` or `viewer@kora.demo`. Seeding runs once: it does nothing when the demo administrator exists. The
+demo profile refuses to start next to `prod`. All names, companies and figures are fictional.
+
 ### Signing keys
 
 Locally the API generates a throw-away signing key at start-up (sessions end on restart). Anywhere else, create
