@@ -84,3 +84,16 @@ proxy, a network failure) into a single `ApiError` shape, so later layers never 
   through `QueryParams`; the store just reacts to the resulting query signal.
 - **Progressive enhancement for charts.** Data first (a table), chart second (lazy, decorative,
   patterned).
+
+## Phase 5
+
+- **State (server-side), mirrored for affordances.** `TASK_NEXT` decides which columns accept a
+  dropped card and which "Move to…" items appear; the API enforces the same state machine.
+- **Entity adapter.** `BoardStore` keeps tasks with `withEntities` and derives the columns,
+  swimlanes and filters with `withComputed`.
+- **Optimistic update with rollback.** Place the card, call `/move`, reload: success shows the
+  server's rank and counts, refusal shows the card where it was.
+- **Facade shared by two tabs.** `TaskFacade` (side sheet, rights, moves with their dialogs) is
+  provided by both the board and the backlog.
+- **Interpreter.** The Markdown renderer parses text into blocks and inline pieces and renders them
+  with templates — the data never becomes markup.

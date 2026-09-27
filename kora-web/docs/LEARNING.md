@@ -271,3 +271,35 @@ runs again — an endless reload. Pass the signal itself (`store.load(this.proje
 A chart is an image: assistive technology gets a table with the same numbers, the canvas is
 `aria-hidden`, segments carry patterns (ECharts decals) and text labels, and the chart library is
 loaded only when the chart scrolls into view.
+
+## Accessible drag and drop (Phase 5)
+
+Dragging needs a pointer and good aim, so every drag has a keyboard path: a "Move" menu on each
+card (up, down, each column the task may go to) and Move up/down buttons in the backlog. After a
+move, a live region says where the card went ("position 2 of 5"), and focus goes back to the
+card — moving a DOM node drops focus, which would leave keyboard users at the top of the page.
+
+## Optimistic UI and rollback (Phase 5)
+
+Waiting for the server before a dropped card moves feels broken; moving it first and never
+checking is wrong when the server refuses (WIP limit, illegal transition, remaining work). The
+board does both: the card moves at once, the API decides, and a reload shows the truth — either
+the saved order or the card back where it was, with the reason.
+
+## Why ranks are strings (Phase 5)
+
+Lexorank-style ranks let one task move by rewriting one row: the new rank sits between its
+neighbours' ranks. The client only sends "after this task, before that one" and sorts by the
+strings it gets back; it never does arithmetic on them.
+
+## Velocity is a range, not a promise (Phase 5)
+
+Committed points are frozen when a sprint starts; completed points are recorded when it closes.
+Showing the recent low–high range ("18 to 23 points, 20.75 on average") plans honestly; a single
+number invites treating velocity as a performance target.
+
+## Rendering user Markdown safely (Phase 5)
+
+`innerHTML` plus a sanitizer is one bug away from script injection. Parsing a small Markdown
+subset into data and rendering it with templates means the text can only ever become text, bold,
+lists and vetted links.

@@ -2,14 +2,13 @@
 
 ## Current status
 
-Phase 4 complete (tag `web-v0.4.0`). Waiting for "continue".
+Phase 5 complete (tag `web-v0.5.0`). Waiting for "continue".
 
 ## Next step
 
-Phase 5 — tasks, Kanban board (WIP limits, drag and drop via `/move`), backlog, sprints, burndown
-and velocity. Contract 0.3.0 (21 operations) is live on the real API since `api-v0.4.0`; see the
-backend notes in memory (all invalid input there is 400 `validation.failed`, not 422). The WBS
-`percentCompleteSource: TASKS` case (read-only percent) arrives with tasks.
+Phase 6 — dependencies, the critical-path schedule (Gantt) with baselines and the working calendar
+(feature 10). Contract 0.4.0 is live since `api-v0.5.0`; see the backend notes in memory
+(working days, critical = total float 0 shown with colour and pattern, `schedule.cycle` chain).
 
 ## Checklist
 
@@ -18,12 +17,43 @@ backend notes in memory (all invalid input there is 400 `validation.failed`, not
 - [x] 2. API client, mock layer (MSW), interceptors, error handling, dev proxy
 - [x] 3. Auth, org switcher, guards, admin users/roles/invitations, settings profile
 - [x] 4. Portfolio dashboard, projects, charter, WBS tree
-- [ ] 5. Kanban, backlog, sprints
+- [x] 5. Kanban, backlog, sprints
 - [ ] 6. Gantt with dependencies and critical path
 - [ ] 7. Risks + heat map, issues, stakeholders, change requests
 - [ ] 8. Timesheets, resource heat map, EVM dashboard
 - [ ] 9. Real-time notifications, activity feed, attachments, report exports
 - [ ] 10. E2E flows, performance, Nginx Docker image, final README; tag v1.0.0
+
+## Phase 5 — what exists
+
+- Mock API for the 21 contract 0.3.0 operations (task lifecycle, contributor rights, project-wide
+  ranks, WIP limits with override, remaining work before done, one active sprint, frozen
+  commitment, carry-over, burndown days, velocity range); work packages with tasks take their
+  progress from them (`percentCompleteSource: TASKS`) — `src/app/mocks/work-domain.ts`,
+  `src/app/mocks/handlers/{task,sprint}.handlers.ts`, demo data in `src/app/mocks/data-work.ts`
+- API clients: `src/app/core/api/{tasks,sprints}.api.ts`
+- Board tab: columns with WIP counts (at/over limit in words), CDK drag and drop limited to legal
+  moves, a "Move" menu on every card, announcements, optimistic moves with snap-back, "move
+  anyway" at a WIP limit, reason for Blocked, filters and swimlanes in the URL, column settings —
+  `src/app/features/projects/workspace/board/`
+- Task side sheet: edit (by whoever may change the task), Markdown description and comments,
+  delete (managers) — `src/app/features/projects/workspace/work/`
+- Backlog tab: active sprint (burndown with data table, close with carry-over), planned sprints
+  (start, planned points against recent velocity), ranked backlog (drag or Move up/down,
+  multi-select into a sprint), velocity chart with forecast range —
+  `src/app/features/projects/workspace/backlog/`
+- Shared: safe Markdown renderer (`shared/markdown/`), theme colours for charts
+  (`shared/charts/`)
+- Tests: 375 unit tests (≈ 92% statements), 92 e2e tests (desktop and 375 px, axe)
+
+## Feature acceptance criteria covered (Phase 5)
+
+- 08: dragging a card persists its status and order (e2e, drag then reload); a refused move
+  snaps back with a message (unit); every drag action has a keyboard equivalent (unit + e2e);
+  "two browsers see each other's moves within 1 s" needs live updates — Phase 9 (feature 18)
+- 09: closing a sprint moves unfinished tasks as chosen and records completed points (unit +
+  e2e); the burndown is recorded after every task change and daily (mock + API); backlog order
+  persists and is keyboard-reorderable (unit + e2e)
 
 ## Phase 4 — what exists
 
@@ -109,12 +139,15 @@ backend notes in memory (all invalid input there is 400 `validation.failed`, not
 - Phase 4 demo: PMO (`pmo@kora.demo`, French profile) is the sponsor of the "Data warehouse"
   charter awaiting approval; "Customer self-service portal" is late (amber); "ERP rollout" has an
   overridden red health; the portal and mobile app have WBS trees with progress.
+- Phase 5 demo: the mobile app (`AKG-001`) runs Sprint 5 with "In progress" at its WIP limit, a
+  blocked task and a task still in review with 2 h left; Sprint 6 is planned; Sprints 1–4 give
+  velocity. The ERP's "Payables and receivables" work package takes its progress from its tasks.
 
 ## Contract with kora-api
 
-Web types are generated from contract 0.5.0 (`kora-api/docs/openapi.yaml`); this build uses the
-0.1.1 and 0.2.0 operations, all live on the real API (0.3.0 since `api-v0.4.0`, 0.4.0 since
-`api-v0.5.0`). `npm run start:api` runs the app against the real API (needs Docker; it starts empty:
+Web types are generated from contract 0.6.0 (`kora-api/docs/openapi.yaml`); this build uses the
+0.1.1 to 0.3.0 operations. All of 0.1.1–0.6.0 is live on the real API (0.3.0 since `api-v0.4.0`,
+0.4.0 since `api-v0.5.0`, 0.5.0 since `api-v0.6.0`, 0.6.0 since `api-v0.7.0`). `npm run start:api` runs the app against the real API (needs Docker; it starts empty:
 register an organization first; emails in Mailpit at http://localhost:8025). Mock mode stays the
 default. Change requests go in `kora-api/docs/contract-requests.md` or to the API session directly.
 
@@ -128,3 +161,4 @@ default. Change requests go in `kora-api/docs/contract-requests.md` or to the AP
 - ADR 0005 — API layer: generated types, thin services, interceptor chain, MSW mock API
 - ADR 0006 — sign-in, session lifecycle and administration screens
 - ADR 0007 — portfolios, projects, dashboard, charter and WBS screens
+- ADR 0008 — Kanban board, backlog and sprints
