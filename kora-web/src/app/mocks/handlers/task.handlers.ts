@@ -89,6 +89,14 @@ function taskShape(v: Validator, body: Record<string, unknown>, creating: boolea
   v.number('remainingHours', body['remainingHours'], 0, 10_000);
   v.date('startDate', body['startDate']);
   v.date('dueDate', body['dueDate']);
+  integer(v, 'durationDays', body['durationDays'], 1000);
+  if (body['scheduleConstraint'] !== undefined) {
+    v.oneOf('scheduleConstraint', body['scheduleConstraint'], [
+      'ASAP',
+      'START_NO_EARLIER_THAN',
+    ] as const);
+  }
+  v.date('constraintDate', body['constraintDate']);
   const labels = body['labels'];
   if (labels !== undefined && labels !== null) {
     if (!Array.isArray(labels)) v.add('labels', 'invalid', 'must be a list');
@@ -132,6 +140,13 @@ function taskDomain(
   ) {
     v.add('sprintId', 'invalid', 'must be an open sprint of this project');
   }
+  // A start-no-earlier-than constraint needs its date (sent now, or kept from before).
+  const constraint =
+    (body['scheduleConstraint'] as string | undefined) ?? current?.scheduleConstraint;
+  const constraintDate = (body['constraintDate'] as string | undefined) ?? current?.constraintDate;
+  if (constraint === 'START_NO_EARLIER_THAN' && !constraintDate) {
+    v.add('constraintDate', 'required', 'required with START_NO_EARLIER_THAN');
+  }
   const start = (body['startDate'] as string | undefined) ?? current?.startDate;
   const due = (body['dueDate'] as string | undefined) ?? current?.dueDate;
   if (start && due && due < start) v.add('dueDate', 'invalid', 'must not be before the start date');
@@ -155,6 +170,17 @@ function apply(task: TaskRecord, body: Record<string, unknown>): void {
   if (body['startDate'] !== undefined) task.startDate = String(body['startDate']);
   if (body['dueDate'] !== undefined) task.dueDate = String(body['dueDate']);
   if (body['labels'] !== undefined) task.labels = cleanLabels(body['labels']);
+  if (body['durationDays'] !== undefined) task.durationDays = Number(body['durationDays']);
+  if (body['scheduleConstraint'] === 'ASAP') {
+    // ASAP clears the constraint.
+    task.scheduleConstraint = 'ASAP';
+    delete task.constraintDate;
+  } else if (body['scheduleConstraint'] === 'START_NO_EARLIER_THAN') {
+    task.scheduleConstraint = 'START_NO_EARLIER_THAN';
+  }
+  if (body['constraintDate'] !== undefined && task.scheduleConstraint === 'START_NO_EARLIER_THAN') {
+    task.constraintDate = String(body['constraintDate']);
+  }
 }
 
 export const taskHandlers = [

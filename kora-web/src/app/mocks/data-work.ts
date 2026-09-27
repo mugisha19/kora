@@ -34,6 +34,10 @@ export interface TaskRecord {
   startDate?: string;
   dueDate?: string;
   labels: string[];
+  /** Working days; 0 = milestone; the schedule assumes 1 when absent. */
+  durationDays?: number;
+  scheduleConstraint?: 'ASAP' | 'START_NO_EARLIER_THAN';
+  constraintDate?: string;
   /** Opaque, lexicographically ordered across the whole project. */
   rank: string;
   createdAt: string;
