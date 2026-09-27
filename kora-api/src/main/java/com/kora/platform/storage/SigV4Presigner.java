@@ -1,4 +1,4 @@
-package com.kora.attachments.adapter.storage;
+package com.kora.platform.storage;
 
 import java.net.URI;
 import java.nio.charset.StandardCharsets;

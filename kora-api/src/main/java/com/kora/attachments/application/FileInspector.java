@@ -2,6 +2,7 @@ package com.kora.attachments.application;
 
 import com.kora.attachments.domain.ContentSniffer;
 import com.kora.attachments.domain.FileType;
+import com.kora.platform.storage.FileStorage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;

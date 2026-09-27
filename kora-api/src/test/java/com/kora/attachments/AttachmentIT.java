@@ -5,8 +5,8 @@ import static com.kora.support.TestPortfolios.read;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.kora.attachments.application.AttachmentPurge;
-import com.kora.attachments.application.FileStorage;
 import com.kora.organization.Role;
+import com.kora.platform.storage.FileStorage;
 import com.kora.support.IntegrationTest;
 import com.kora.support.RecordingEmailSender;
 import com.kora.support.TestAccounts;

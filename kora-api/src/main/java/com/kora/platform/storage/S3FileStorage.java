@@ -1,6 +1,6 @@
-package com.kora.attachments.adapter.storage;
+package com.kora.platform.storage;
 
-import com.kora.attachments.application.FileStorage;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
@@ -9,6 +9,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Clock;
@@ -101,6 +102,28 @@ class S3FileStorage implements FileStorage {
             }
         }
         return response.body();
+    }
+
+    @Override
+    public void put(String key, Path file, String contentType) {
+        URI url = presigner.presign(
+                "PUT",
+                object(properties.endpoint(), key),
+                Map.of(),
+                Map.of("content-type", contentType),
+                clock.instant(),
+                OWN_REQUEST_VALIDITY);
+        try {
+            HttpResponse<Void> response = send(
+                    HttpRequest.newBuilder(url)
+                            .timeout(Duration.ofMinutes(2))
+                            .header("Content-Type", contentType)
+                            .PUT(HttpRequest.BodyPublishers.ofFile(file)),
+                    HttpResponse.BodyHandlers.discarding());
+            requireSuccess(response, "PUT");
+        } catch (FileNotFoundException missing) {
+            throw new UncheckedIOException(missing);
+        }
     }
 
     @Override

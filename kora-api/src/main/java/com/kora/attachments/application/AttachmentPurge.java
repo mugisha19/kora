@@ -1,6 +1,7 @@
 package com.kora.attachments.application;
 
 import com.kora.attachments.domain.Attachment;
+import com.kora.platform.storage.FileStorage;
 import com.kora.platform.tenancy.TenantTransactions;
 import java.time.Clock;
 import java.time.Duration;

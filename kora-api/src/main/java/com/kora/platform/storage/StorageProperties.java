@@ -1,4 +1,4 @@
-package com.kora.attachments.adapter.storage;
+package com.kora.platform.storage;
 
 import jakarta.validation.constraints.NotBlank;
 import java.net.URI;
