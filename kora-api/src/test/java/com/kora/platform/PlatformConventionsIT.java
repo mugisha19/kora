@@ -62,4 +62,27 @@ class PlatformConventionsIT {
                 .bodyText()
                 .contains("jvm_memory_used_bytes");
     }
+
+    /** W3C trace context in, the same trace id out: one id joins the logs, the audit trail and the traces. */
+    @Test
+    void withoutACorrelationIdTheTraceIdIsUsed() {
+        assertThat(mvc.get()
+                        .uri("/actuator/health")
+                        .header("traceparent", "00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01"))
+                .hasStatusOk()
+                .hasHeader(CorrelationId.HEADER, "4bf92f3577b34da6a3ce929d0e0e4736");
+    }
+
+    @Test
+    void businessEventsAreCounted() {
+        assertThat(mvc.post()
+                        .uri("/api/v1/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\":\"nobody@example.com\",\"password\":\"not-the-password-1\"}"))
+                .hasStatus(HttpStatus.UNAUTHORIZED);
+
+        assertThat(mvc.get().uri("/actuator/prometheus"))
+                .bodyText()
+                .contains("kora_sign_ins_total{outcome=\"failure\"");
+    }
 }

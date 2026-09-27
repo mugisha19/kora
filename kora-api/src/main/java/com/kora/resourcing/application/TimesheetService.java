@@ -7,6 +7,7 @@ import com.kora.platform.error.FieldViolation;
 import com.kora.platform.error.InvalidInputException;
 import com.kora.platform.error.NotFoundException;
 import com.kora.platform.error.PlatformErrorCodes;
+import com.kora.platform.metrics.BusinessMetrics;
 import com.kora.portfolio.ProjectAccess;
 import com.kora.resourcing.ActualCostRecorded;
 import com.kora.resourcing.ResourcingErrorCodes;
@@ -48,6 +49,7 @@ public class TimesheetService {
     private final ProjectAccess projects;
     private final WorkQueries work;
     private final OrganizationTimeZone timeZone;
+    private final BusinessMetrics metrics;
     private final ApplicationEventPublisher events;
     private final Clock clock;
 
@@ -57,7 +59,9 @@ public class TimesheetService {
             WorkQueries work,
             OrganizationTimeZone timeZone,
             ApplicationEventPublisher events,
+            BusinessMetrics metrics,
             Clock clock) {
+        this.metrics = metrics;
         this.timesheets = timesheets;
         this.projects = projects;
         this.work = work;
@@ -210,6 +214,7 @@ public class TimesheetService {
     }
 
     private void announceDecision(Timesheet sheet) {
+        metrics.decision("timesheet", sheet.getStatus() == TimesheetStatus.APPROVED);
         events.publishEvent(new TimesheetDecided(
                 sheet.getId() + ":" + sheet.getDecidedAt(),
                 CurrentMember.get().organizationId(),

@@ -20,6 +20,7 @@ import com.kora.platform.error.InvalidInputException;
 import com.kora.platform.error.NotFoundException;
 import com.kora.platform.error.OptimisticLock;
 import com.kora.platform.error.PlatformErrorCodes;
+import com.kora.platform.metrics.BusinessMetrics;
 import com.kora.platform.money.Money;
 import com.kora.portfolio.ProjectAccess;
 import com.kora.portfolio.ProjectChangeControl;
@@ -55,6 +56,7 @@ public class ChangeRequestService {
     private final SchedulePlanning schedule;
     private final ChangeControlService settings;
     private final GovernanceSupport support;
+    private final BusinessMetrics metrics;
     private final ApplicationEventPublisher events;
     private final Clock clock;
     private final ApprovalHandler chain = ApprovalHandler.standardChain();
@@ -68,7 +70,9 @@ public class ChangeRequestService {
             ChangeControlService settings,
             GovernanceSupport support,
             ApplicationEventPublisher events,
+            BusinessMetrics metrics,
             Clock clock) {
+        this.metrics = metrics;
         this.requests = requests;
         this.issueRepository = issueRepository;
         this.projects = projects;
@@ -189,6 +193,7 @@ public class ChangeRequestService {
                 || saved.getStatus() == ChangeRequestStatus.IMPLEMENTED
                 || saved.getStatus() == ChangeRequestStatus.REJECTED;
         if (decided) {
+            metrics.decision("change_request", saved.getStatus() != ChangeRequestStatus.REJECTED);
             events.publishEvent(new ChangeRequestDecided(
                     UUID.randomUUID().toString(),
                     me.organizationId(),

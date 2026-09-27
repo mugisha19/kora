@@ -6,6 +6,7 @@ import com.kora.identity.domain.EmailAddresses;
 import com.kora.platform.audit.AuditRecord;
 import com.kora.platform.audit.AuditTrail;
 import com.kora.platform.error.ProblemException;
+import com.kora.platform.metrics.BusinessMetrics;
 import com.kora.platform.ratelimit.RateLimiter;
 import com.kora.platform.ratelimit.RateLimits;
 import java.util.UUID;
@@ -23,13 +24,16 @@ public class LoginService {
     private final RateLimiter rateLimiter;
     private final RateLimits limits;
     private final AuditTrail audit;
+    private final BusinessMetrics metrics;
 
     LoginService(
             UserAccounts accounts,
             SessionService sessions,
             RateLimiter rateLimiter,
             RateLimits limits,
-            AuditTrail audit) {
+            AuditTrail audit,
+            BusinessMetrics metrics) {
+        this.metrics = metrics;
         this.accounts = accounts;
         this.sessions = sessions;
         this.rateLimiter = rateLimiter;
@@ -45,9 +49,11 @@ public class LoginService {
             userId = accounts.authenticate(email, password);
         } catch (ProblemException refused) {
             audit.security("auth.sign_in_failed", null, AuditRecord.Outcome.DENIED);
+            metrics.signIn(false);
             throw refused;
         }
         audit.security("auth.signed_in", userId, AuditRecord.Outcome.SUCCESS);
+        metrics.signIn(true);
         return sessions.start(userId);
     }
 }
