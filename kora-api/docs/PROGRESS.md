@@ -2,24 +2,25 @@
 
 ## Current status
 
-Phase 9 complete (tag `api-v0.9.0`). Waiting for "continue".
+Phase 10 complete (tag `api-v1.0.0`): the API is feature-complete for features 01–24.
 
-Contract 0.8.0 is implemented:
-- **Report exports:** project status, portfolio summary, risk register, EVM and timesheets, as PDF and Excel.
-  - Generated in the background as the requester, in their language, and stored for 7 days.
-  - Announced by a notification.
-  - Excel text that looks like a formula is kept as text.
-  - Sheets are streamed, so size doesn't matter.
-- **Demo profile:** seeds two fictional organizations through the public API, with history in every module and demo
-  logins for every role.
-- **Outbox:** events are now redelivered after a restart and retried when a listener fails.
+Phase 10 added:
+- **Tracing:** OpenTelemetry, with the trace id as the default correlation id.
+- **Logs and metrics:** organization and user ids in every log line; business metrics.
+- **Performance:** a test that keeps 17 list endpoints free of N+1 queries (and removed count queries from cursor
+  pages).
+- **Delivery:**
+  - a layered, non-root container image with the actuator off the public port;
+  - `docker compose --profile demo up --build` for a populated stack;
+  - image scans in CI, whose first run found and fixed critical Tomcat vulnerabilities.
 
-263 unit and 835 integration tests, 94.1% line coverage.
+263 unit and 854 integration tests, 94.4% line coverage.
 
 ## Next step
 
-Phase 10: tracing, performance, the Docker image, full-stack compose (with `--profile demo`) and the final README.
-Tag v1.0.0.
+The product release `v1.0.0` follows the web app's Phase 10. That phase adds the Nginx image and `kora-web/compose.yaml`;
+a root `compose.yaml` will then include both apps' compose files (agreed with the web session). Who tags `v1.0.0` is
+the user's decision.
 
 ## Checklist
 
@@ -33,7 +34,7 @@ Tag v1.0.0.
 - [x] 7. Timesheets, capacity, EVM (15–17)
 - [x] 8. Outbox, notifications, WebSocket, audit trail, attachments (18–20)
 - [x] 9. Report exports, demo data (21–22)
-- [ ] 10. Tracing, performance, Docker image, full-stack compose, final README; tag v1.0.0
+- [x] 10. Tracing, performance, Docker image, full-stack compose, final README; tag api-v1.0.0 (product v1.0.0 after web Phase 10)
 
 ## Decisions so far
 
@@ -54,3 +55,5 @@ Tag v1.0.0.
   attachments with content sniffing, SeaweedFS for local S3
 - ADR 0014: report exports (a reports module with data-owning ReportSources, Template Method exporters,
   background jobs), demo data seeded through the public API, outbox redelivery
+- ADR 0015: OpenTelemetry tracing and trace-id correlation, business metrics, query-count tests, the container
+  image, the compose demo stack and image scanning

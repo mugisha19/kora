@@ -397,14 +397,18 @@ charter, or show a health its numbers don't support.
 Driving the public API instead makes the demo a long end-to-end test: if it runs, the story is consistent. Only true
 history, which an API that records "now" can't produce, is backfilled by the module that owns it.
 
-## A javac gotcha: `TypeNotPresentException: Type E not present` (Phase 9)
+## A javac gotcha: `TypeNotPresentException: Type E not present` (Phases 9–10)
 
-Once, after new source files were added, an incremental build compiled a record component declared as
-`List<@NotNull @Pattern(regexp = LABEL) String>` with the generic signature `List<E>`, and Bean Validation failed on
-every request using it. A clean build (`./mvnw clean verify`, what CI runs) produced the right signature.
+After new source files were added, incremental builds sometimes compiled a record component declared as
+`List<@NotNull @Pattern(regexp = LABEL) String>` with the generic signature `List<E>`. Every request using it then
+failed in Bean Validation. A clean build compiled it correctly, so CI never saw it, but local builds kept hitting it.
 
-If reflection reports a type variable that the class doesn't declare, look at the bytecode
-(`javap -v ... | grep Signature`) before suspecting libraries, and rebuild clean.
+The trigger was a type annotation on a type argument whose attribute referenced a constant. A composed constraint
+(`@TaskLabel`, which carries its own `@Pattern`) removes the constant from the type argument, and the signature is
+stable.
+
+If reflection reports a type variable that the class doesn't declare, read the bytecode
+(`javap -v ... | grep Signature`) before suspecting libraries.
 
 ## Paused test contexts and cached clients (Phase 9)
 
@@ -416,4 +420,21 @@ factory that shut it down on stop and created a new one on start, so every reque
 ran failed with "Connection is closed".
 
 Ask the factory for its current client instead of keeping one. Restarts are real in production too.
+
+## Scanning what ships (Phase 10)
+
+Dependency pins in the POM say what we asked for. The image is what runs: the JRE, the OS packages and every
+transitive jar.
+
+Scanning the built image (Trivy, CRITICAL, only issues with a fix) found three critical vulnerabilities in the
+embedded Tomcat version the framework managed. The fix was one property (`tomcat.version`), with a comment saying
+when to remove it.
+
+Fail the build only on what you can act on: "critical and fixed" keeps the gate meaningful instead of noisy.
+
+## One id per request (Phase 10)
+
+A correlation id in the logs, an audit trail, error responses and distributed traces is only useful if it is the
+same id everywhere. Reusing the W3C trace id as the default correlation id means a support ticket quoting the id from
+an error message leads straight to the logs, the audit entries and the trace of that request.
 

@@ -55,6 +55,9 @@ into `domain` → `application` → `adapter.{web,persistence,...}`; dependencie
   quote prefix.
 - Demo data (`demo` profile) goes through the public API in `demo/DemoStory`; history the API can't create is a
   `platform.demo.DemoHistory` in the owning module. Keep the story in line with the web app's mock data.
+- New list endpoints go into `QueryCountIT` (no N+1). Cursor pages fetch rows with `findBy(...limit(n))`, never a
+  `Page` (whose count query is wasted). Business events worth counting go through `BusinessMetrics`.
+- The compose service is named `api` on port 8080: the web app's Nginx depends on that name.
 - Comments explain WHY. Record decisions in `docs/adr/`, patterns in `docs/PATTERNS.md`, interview
   explanations in `docs/LEARNING.md`.
 - Check the latest stable version of a dependency before adding it.
@@ -63,6 +66,7 @@ into `domain` → `application` → `adapter.{web,persistence,...}`; dependencie
 
 `./mvnw spring-boot:run` (needs Docker; starts `compose.yaml`) · `./mvnw test` (fast) ·
 `./mvnw spotless:apply` · `./mvnw verify` (everything CI runs; must be green before every commit)
+· `docker compose --profile demo up --build` (the API image with demo data) · `docker build -t kora-api .`
 
 ## Git (ADR 0002)
 

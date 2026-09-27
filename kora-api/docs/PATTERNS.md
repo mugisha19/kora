@@ -123,3 +123,15 @@ Still plumbing rather than domain patterns, but two structural ideas landed in t
   in object storage, and the job keeps only the key and a short-lived link.
 - **Seeding through the public API**: `demo/DemoStory` drives Kora's own REST API as its users, so demo data obeys
   every rule; the owning modules backfill history the API can't create (`platform.demo.DemoHistory`).
+
+## Phase 10
+
+- **Observer for observability**: Micrometer Observations are emitted once and turned into traces (OpenTelemetry) and
+  metrics (Prometheus) by handlers; business code only counts domain events (`platform.metrics.BusinessMetrics`).
+- **Correlation id as trace id**: `CorrelationIdFilter` runs right after the observation filter and reuses the trace id,
+  so logs, audit entries, errors and spans join on one key.
+- **Characterization test for performance**: `QueryCountIT` measures statement counts at two data sizes; a growing
+  count is an N+1, whatever its cause.
+- **Layered container image**: dependencies, loader and application in separate layers, least-changed first, so a code
+  change ships only the last layer.
+
