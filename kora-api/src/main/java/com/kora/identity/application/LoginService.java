@@ -3,8 +3,12 @@ package com.kora.identity.application;
 import com.kora.identity.IssuedSession;
 import com.kora.identity.UserAccounts;
 import com.kora.identity.domain.EmailAddresses;
+import com.kora.platform.audit.AuditRecord;
+import com.kora.platform.audit.AuditTrail;
+import com.kora.platform.error.ProblemException;
 import com.kora.platform.ratelimit.RateLimiter;
 import com.kora.platform.ratelimit.RateLimits;
+import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 /**
@@ -18,17 +22,32 @@ public class LoginService {
     private final SessionService sessions;
     private final RateLimiter rateLimiter;
     private final RateLimits limits;
+    private final AuditTrail audit;
 
-    LoginService(UserAccounts accounts, SessionService sessions, RateLimiter rateLimiter, RateLimits limits) {
+    LoginService(
+            UserAccounts accounts,
+            SessionService sessions,
+            RateLimiter rateLimiter,
+            RateLimits limits,
+            AuditTrail audit) {
         this.accounts = accounts;
         this.sessions = sessions;
         this.rateLimiter = rateLimiter;
         this.limits = limits;
+        this.audit = audit;
     }
 
     public IssuedSession login(String email, String password, String clientAddress) {
         rateLimiter.acquire(limits.named("login-ip", "20/1m"), clientAddress);
         rateLimiter.acquire(limits.named("login-email", "10/15m"), EmailAddresses.normalize(email));
-        return sessions.start(accounts.authenticate(email, password));
+        UUID userId;
+        try {
+            userId = accounts.authenticate(email, password);
+        } catch (ProblemException refused) {
+            audit.security("auth.sign_in_failed", null, AuditRecord.Outcome.DENIED);
+            throw refused;
+        }
+        audit.security("auth.signed_in", userId, AuditRecord.Outcome.SUCCESS);
+        return sessions.start(userId);
     }
 }
