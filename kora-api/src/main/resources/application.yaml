@@ -26,12 +26,17 @@ spring:
         max-page-size: 100
   messages:
     # Email texts per module, in English (default), French and Kinyarwanda.
-    basename: messages/identity,messages/organization,messages/notifications
+    basename: messages/identity,messages/organization,messages/notifications,messages/reports
     fallback-to-system-locale: false
   mail:
     # Mailpit from compose.yaml locally (web UI on http://localhost:8025); a real SMTP relay elsewhere.
     host: localhost
     port: 1025
+  modulith:
+    events:
+      # The outbox (ADR 0013): events whose listeners didn't finish before a shutdown or crash are delivered again at
+      # startup; OutboxMaintenance also retries failed ones while running and prunes completed ones.
+      republish-outstanding-events-on-restart: true
   docker:
     compose:
       # `spring-boot:run` starts the services in compose.yaml and wires their connection details.
