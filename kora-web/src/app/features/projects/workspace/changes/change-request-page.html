@@ -1,0 +1,158 @@
+<a mat-button routerLink=".." class="back">
+  <mat-icon svgIcon="arrow_back" aria-hidden="true" />
+  {{ 'changes.backToList' | transloco }}
+</a>
+
+@if (notFound()) {
+  <kora-empty-state
+    icon="search"
+    [heading]="'changes.notFoundTitle' | transloco"
+    [message]="'changes.notFoundMessage' | transloco"
+  />
+} @else if (request.error()) {
+  <kora-error-state (retry)="request.reload()" />
+} @else if (request.value(); as cr) {
+  <header class="request-head">
+    <div>
+      <p class="key">
+        {{ cr.key }}
+        @if (cr.revision > 1) {
+          · {{ 'changes.revision' | transloco: { number: cr.revision } }}
+        }
+      </p>
+      <h2 tabindex="-1">{{ cr.title }}</h2>
+      <p class="meta kora-muted">
+        {{ 'changeType.' + cr.type | transloco }} ·
+        {{
+          'changes.requestedOn'
+            | transloco
+              : {
+                  name: cr.requestedBy.fullName,
+                  date: (cr.createdAt | localizedDate: language.current()),
+                }
+        }}
+      </p>
+    </div>
+    <kora-change-status [status]="cr.status" />
+  </header>
+
+  <div class="actions">
+    @if (facade.awaitsMe(cr)) {
+      <button mat-flat-button type="button" (click)="facade.decide(cr, 'APPROVE')">
+        <mat-icon svgIcon="thumb_up" aria-hidden="true" />
+        {{ 'changes.approve' | transloco }}
+      </button>
+      <button mat-stroked-button type="button" (click)="facade.decide(cr, 'REJECT')">
+        <mat-icon svgIcon="thumb_down" aria-hidden="true" />
+        {{ 'changes.reject' | transloco }}
+      </button>
+    }
+    @if (facade.canEdit(cr)) {
+      @if (cr.status === 'DRAFT') {
+        <button mat-flat-button type="button" (click)="facade.submit(cr)">
+          <mat-icon svgIcon="send" aria-hidden="true" />
+          {{ 'changes.submit' | transloco }}
+        </button>
+        <button mat-stroked-button type="button" (click)="facade.edit(cr)">
+          <mat-icon svgIcon="edit" aria-hidden="true" />
+          {{ 'common.edit' | transloco }}
+        </button>
+      }
+      @if (cr.status === 'DRAFT' || cr.status === 'SUBMITTED' || cr.status === 'IN_REVIEW') {
+        <button mat-button type="button" (click)="facade.withdraw(cr)">
+          <mat-icon svgIcon="undo" aria-hidden="true" />
+          {{ 'changes.withdraw' | transloco }}
+        </button>
+      }
+      @if (cr.status === 'REJECTED') {
+        <button mat-flat-button type="button" (click)="facade.revise(cr)">
+          <mat-icon svgIcon="edit" aria-hidden="true" />
+          {{ 'changes.revise' | transloco }}
+        </button>
+      }
+    }
+    @if (facade.canImplement(cr)) {
+      <button mat-flat-button type="button" (click)="facade.implement(cr)">
+        <mat-icon svgIcon="check" aria-hidden="true" />
+        {{ 'changes.implement' | transloco }}
+      </button>
+    }
+  </div>
+
+  <div class="detail">
+    <section aria-labelledby="impact-title">
+      <h3>{{ 'changes.fields.reason' | transloco }}</h3>
+      <p class="text">{{ cr.reason }}</p>
+      @if (cr.description) {
+        <h3>{{ 'changes.fields.description' | transloco }}</h3>
+        <p class="text">{{ cr.description }}</p>
+      }
+
+      <h3 id="impact-title">{{ 'changes.impact' | transloco }}</h3>
+      <dl class="impact">
+        <div>
+          <dt>{{ 'changes.fields.cost' | transloco }}</dt>
+          <dd>{{ (cr.impact.costDelta | signedMoney: language.current()) || '—' }}</dd>
+        </div>
+        <div>
+          <dt>{{ 'changes.fields.schedule' | transloco }}</dt>
+          <dd>
+            @if (cr.impact.scheduleDeltaDays) {
+              {{ 'changes.days' | transloco: { count: cr.impact.scheduleDeltaDays } }}
+            } @else {
+              —
+            }
+          </dd>
+        </div>
+        <div>
+          <dt>{{ 'changes.fields.charterScope' | transloco }}</dt>
+          <dd>{{ (cr.impact.changesCharterScope ? 'common.yes' : 'common.no') | transloco }}</dd>
+        </div>
+        <div class="wide">
+          <dt>{{ 'changes.fields.scope' | transloco }}</dt>
+          <dd>{{ cr.impact.scopeSummary || '—' }}</dd>
+        </div>
+        <div class="wide">
+          <dt>{{ 'changes.fields.risk' | transloco }}</dt>
+          <dd>{{ cr.impact.riskSummary || '—' }}</dd>
+        </div>
+      </dl>
+
+      @if (cr.issueId || cr.previousRevisionId) {
+        <h3>{{ 'changes.links' | transloco }}</h3>
+        <ul class="links">
+          @if (cr.issueId) {
+            <li>
+              <a [routerLink]="['/projects', cr.projectId, 'issues', cr.issueId]">
+                {{ 'changes.openIssue' | transloco }}
+              </a>
+            </li>
+          }
+          @if (cr.previousRevisionId) {
+            <li>
+              <a [routerLink]="['..', cr.previousRevisionId]">
+                {{ 'changes.previousRevision' | transloco }}
+              </a>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+
+    <section aria-labelledby="chain-title" class="chain">
+      <h3 id="chain-title">{{ 'changes.chain' | transloco }}</h3>
+      @if (cr.steps.length) {
+        @if (cr.status === 'SUBMITTED' || cr.status === 'IN_REVIEW') {
+          <p class="waiting">
+            {{ 'changes.waitingFor' | transloco }}: <kora-waiting-for [request]="cr" />
+          </p>
+        }
+        <kora-approval-timeline [steps]="cr.steps" />
+      } @else {
+        <p class="kora-muted">{{ 'changes.chainLater' | transloco }}</p>
+      }
+    </section>
+  </div>
+} @else {
+  <kora-loading-state />
+}

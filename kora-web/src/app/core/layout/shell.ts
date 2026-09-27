@@ -21,6 +21,7 @@ import { map } from 'rxjs';
 import { LoadingService } from '../http/loading.service';
 import { SessionStore } from '../session/session.store';
 import { focusHeadingOnNavigation, focusMainHeading } from './focus';
+import { ApprovalsButton } from './approvals-button';
 import { LanguageMenu } from './language-menu';
 import { visibleNavItems } from './nav-items';
 import { OrgSwitcher } from './org-switcher';
@@ -38,6 +39,7 @@ export const HANDSET_QUERY = '(max-width: 959.98px)';
 @Component({
   selector: 'kora-shell',
   imports: [
+    ApprovalsButton,
     LanguageMenu,
     MatIcon,
     MatIconButton,

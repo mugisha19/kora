@@ -77,6 +77,12 @@ export const routes: Routes = [
           import('./features/projects/projects.routes').then((m) => m.PROJECT_ROUTES),
       },
       {
+        path: 'approvals',
+        title: 'approvals.title',
+        loadComponent: () =>
+          import('./features/approvals/approvals-page').then((m) => m.ApprovalsPage),
+      },
+      {
         path: 'admin',
         canActivate: [roleGuard('ORG_ADMIN')],
         loadChildren: () => import('./features/admin/admin.routes').then((m) => m.ADMIN_ROUTES),
