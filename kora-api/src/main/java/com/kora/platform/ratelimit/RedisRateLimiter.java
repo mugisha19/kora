@@ -23,14 +23,34 @@ class RedisRateLimiter implements RateLimiter {
 
     private static final String KEY_PREFIX = "kora:rate-limit:";
 
-    private final ProxyManager<byte[]> buckets;
+    private final LettuceConnectionFactory connectionFactory;
+    private volatile Buckets current;
 
     RedisRateLimiter(LettuceConnectionFactory connectionFactory) {
+        this.connectionFactory = connectionFactory;
+    }
+
+    /** The buckets over one Redis client. */
+    private record Buckets(RedisClient client, ProxyManager<byte[]> proxy) {}
+
+    /**
+     * The buckets over the factory's current client. The factory shuts its client down when it stops and creates a
+     * new one when it starts again (a context restart; the test framework pausing a cached context), so a client
+     * captured once would stay closed.
+     */
+    private ProxyManager<byte[]> buckets() {
         RedisClient client = (RedisClient) connectionFactory.getRequiredNativeClient();
-        this.buckets = Bucket4jLettuce.casBasedBuilder(client)
-                .expirationAfterWrite(
-                        ExpirationAfterWriteStrategy.basedOnTimeForRefillingBucketUpToMax(Duration.ofMinutes(1)))
-                .build();
+        Buckets known = current;
+        if (known == null || known.client() != client) {
+            known = new Buckets(
+                    client,
+                    Bucket4jLettuce.casBasedBuilder(client)
+                            .expirationAfterWrite(ExpirationAfterWriteStrategy.basedOnTimeForRefillingBucketUpToMax(
+                                    Duration.ofMinutes(1)))
+                            .build());
+            current = known;
+        }
+        return known.proxy();
     }
 
     @Override
@@ -41,7 +61,7 @@ class RedisRateLimiter implements RateLimiter {
                         bandwidth.capacity(limit.capacity()).refillGreedy(limit.capacity(), limit.period()))
                 .build();
         ConsumptionProbe probe =
-                buckets.builder().build(bucketKey, () -> configuration).tryConsumeAndReturnRemaining(1);
+                buckets().builder().build(bucketKey, () -> configuration).tryConsumeAndReturnRemaining(1);
         if (!probe.isConsumed()) {
             throw new RateLimitedException(Duration.ofNanos(probe.getNanosToWaitForRefill()));
         }
