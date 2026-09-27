@@ -35,8 +35,9 @@ into `domain` → `application` → `adapter.{web,persistence,...}`; dependencie
 - Money is `platform.money.Money` (BigDecimal in minor units, half-even), JSON amounts are strings, and every amount
   is in the organization's currency (modules holding amounts implement `CurrencyUsage`). Time is `java.time`:
   `Instant` for moments, and "today" in the organization's time zone (`OrganizationTimeZone`), never UTC.
-- Project-scoped data goes through `ProjectAccess` (`readable`/`manageable`); changes that affect the dashboard
-  publish `ProjectChanged` or `WbsChanged` inside the transaction.
+- Project-scoped data goes through `ProjectAccess` (`readable`/`participating`/`manageable`); changes that affect
+  the dashboard publish `ProjectChanged`, `WbsChanged` or `TaskChanged` inside the transaction.
+- Invalid input is `400 validation.failed` with `errors[].field` naming the request field (never 422).
 - Integration tests use `@IntegrationTest` and are named `*IT`; never H2.
 - Comments explain WHY. Record decisions in `docs/adr/`, patterns in `docs/PATTERNS.md`, interview
   explanations in `docs/LEARNING.md`.
