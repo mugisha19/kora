@@ -1,6 +1,7 @@
 package com.kora.governance.application;
 
 import com.kora.governance.ChangeRequestApproved;
+import com.kora.governance.ChangeRequestChanged;
 import com.kora.governance.domain.ApprovalHandler;
 import com.kora.governance.domain.ApprovalHandler.ChangeContext;
 import com.kora.governance.domain.ChangeRequest;
@@ -159,7 +160,9 @@ public class ChangeRequestService {
                 impact.changesCharterScope(),
                 settings.current().thresholds());
         request.submit(chain.chainFor(context), clock.instant());
-        return requests.saveAndFlush(request);
+        ChangeRequest saved = requests.saveAndFlush(request);
+        events.publishEvent(new ChangeRequestChanged(saved.getProjectId()));
+        return saved;
     }
 
     /**
@@ -177,6 +180,7 @@ public class ChangeRequestService {
         if (approved) {
             apply(saved, me.userId());
         }
+        events.publishEvent(new ChangeRequestChanged(saved.getProjectId()));
         return saved;
     }
 
@@ -185,7 +189,9 @@ public class ChangeRequestService {
         ChangeRequest request = find(requestId);
         requireRequesterOrManager(request);
         request.withdraw();
-        return requests.saveAndFlush(request);
+        ChangeRequest saved = requests.saveAndFlush(request);
+        events.publishEvent(new ChangeRequestChanged(saved.getProjectId()));
+        return saved;
     }
 
     @Transactional

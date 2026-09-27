@@ -11,4 +11,10 @@ public interface GovernanceQueries {
      * after it was raised, as of {@code today}.
      */
     boolean criticalRiskOverdue(UUID projectId, LocalDate today);
+
+    /** Open risks scoring 15 or more. */
+    int openCriticalRisks(UUID projectId);
+
+    /** Change requests submitted or in review. */
+    int pendingChangeRequests(UUID projectId);
 }

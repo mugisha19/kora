@@ -22,6 +22,8 @@ public interface ChangeRequestRepository {
 
     boolean existsByCostDeltaAmountIsNotNull();
 
+    long countByProjectIdAndStatusIn(UUID projectId, Collection<ChangeRequestStatus> statuses);
+
     ChangeRequest save(ChangeRequest request);
 
     ChangeRequest saveAndFlush(ChangeRequest request);
