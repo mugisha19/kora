@@ -1,0 +1,15 @@
+.quick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--kora-space-2);
+  margin-block-end: var(--kora-space-3);
+
+  button[aria-pressed='true'] {
+    background: var(--mat-sys-secondary-container);
+    color: var(--mat-sys-on-secondary-container);
+  }
+}
+
+tbody th kora-status-chip {
+  margin-block-start: var(--kora-space-1);
+}

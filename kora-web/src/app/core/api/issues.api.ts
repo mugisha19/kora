@@ -13,7 +13,8 @@ import { API_BASE, ifMatch, toHttpParams } from './http-params';
 
 /**
  * The issue log (contract tag "Issues"). PATCH moves between OPEN and IN_PROGRESS only;
- * resolving, closing and reopening have their own operations. Form writes are silent.
+ * resolving, closing and reopening have their own operations. Every write is silent: the issue
+ * facade says what went wrong.
  */
 @Injectable({ providedIn: 'root' })
 export class IssuesApi {
@@ -52,7 +53,7 @@ export class IssuesApi {
 
   /** Managers; only a resolved issue closes. */
   close(issueId: string): Observable<Issue> {
-    return this.http.post<Issue>(`${this.url(issueId)}/close`, null);
+    return this.http.post<Issue>(`${this.url(issueId)}/close`, null, { context: silent() });
   }
 
   reopen(issueId: string, reason: string): Observable<Issue> {

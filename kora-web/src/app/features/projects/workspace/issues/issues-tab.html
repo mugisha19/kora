@@ -1,0 +1,168 @@
+<div class="quick" role="group" [attr.aria-label]="'issues.quickFilters' | transloco">
+  <button
+    mat-stroked-button
+    type="button"
+    [attr.aria-pressed]="mine() === 'true'"
+    (click)="toggle('mine', mine() !== 'true')"
+  >
+    @if (mine() === 'true') {
+      <mat-icon svgIcon="check" aria-hidden="true" />
+    }
+    {{ 'issues.quick.mine' | transloco }}
+  </button>
+  <button
+    mat-stroked-button
+    type="button"
+    [attr.aria-pressed]="overdue() === 'true'"
+    (click)="toggle('overdue', overdue() !== 'true')"
+  >
+    @if (overdue() === 'true') {
+      <mat-icon svgIcon="check" aria-hidden="true" />
+    }
+    {{ 'issues.quick.overdue' | transloco }}
+  </button>
+  <button
+    mat-stroked-button
+    type="button"
+    [attr.aria-pressed]="query().priority === 'CRITICAL'"
+    (click)="toggleCritical()"
+  >
+    @if (query().priority === 'CRITICAL') {
+      <mat-icon svgIcon="check" aria-hidden="true" />
+    }
+    {{ 'issues.quick.critical' | transloco }}
+  </button>
+</div>
+
+<div class="filters">
+  <mat-form-field class="search" subscriptSizing="dynamic">
+    <mat-label>{{ 'issues.search' | transloco }}</mat-label>
+    <mat-icon matPrefix svgIcon="search" aria-hidden="true" />
+    <input matInput type="search" [value]="q() ?? ''" (input)="onSearch($event)" />
+  </mat-form-field>
+  <mat-form-field class="filter" subscriptSizing="dynamic">
+    <mat-label>{{ 'issues.fields.status' | transloco }}</mat-label>
+    <mat-select [value]="query().status ?? null" (selectionChange)="filter('status', $event.value)">
+      <mat-select-trigger>{{ 'issueStatus.' + query().status | transloco }}</mat-select-trigger>
+      <mat-option [value]="null">{{ 'issues.anyStatus' | transloco }}</mat-option>
+      @for (value of statuses; track value) {
+        <mat-option [value]="value">{{ 'issueStatus.' + value | transloco }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field class="filter" subscriptSizing="dynamic">
+    <mat-label>{{ 'issues.fields.priority' | transloco }}</mat-label>
+    <mat-select
+      [value]="query().priority ?? null"
+      (selectionChange)="filter('priority', $event.value)"
+    >
+      <mat-select-trigger>{{ 'taskPriority.' + query().priority | transloco }}</mat-select-trigger>
+      <mat-option [value]="null">{{ 'issues.anyPriority' | transloco }}</mat-option>
+      @for (value of priorities; track value) {
+        <mat-option [value]="value">{{ 'taskPriority.' + value | transloco }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+  @if (filtered()) {
+    <button mat-button type="button" (click)="clearFilters()">
+      <mat-icon svgIcon="close" aria-hidden="true" />
+      {{ 'projects.filters.clear' | transloco }}
+    </button>
+  }
+  <span class="spacer"></span>
+  @if (facade.canRaise()) {
+    <button mat-flat-button type="button" (click)="raise()">
+      <mat-icon svgIcon="add" aria-hidden="true" />
+      {{ 'issues.raise' | transloco }}
+    </button>
+  }
+</div>
+
+<p class="count" role="status">
+  @if (issues.hasValue()) {
+    {{ 'issues.count' | transloco: { count: issues.value().totalElements } }}
+  }
+</p>
+
+@if (issues.isLoading() && !issues.hasValue()) {
+  <kora-loading-state />
+} @else if (issues.error()) {
+  <kora-error-state (retry)="issues.reload()" />
+} @else if (!issues.value()?.content?.length) {
+  <kora-empty-state
+    icon="check_circle"
+    [heading]="(filtered() ? 'issues.noMatchTitle' : 'issues.emptyTitle') | transloco"
+    [message]="(filtered() ? 'issues.noMatchMessage' : 'issues.emptyMessage') | transloco"
+  />
+} @else {
+  <div class="table-wrap">
+    <table [attr.aria-busy]="issues.isLoading()">
+      <caption class="visually-hidden">
+        {{
+          'issues.log' | transloco
+        }}
+      </caption>
+      <thead>
+        <tr>
+          <th scope="col">{{ 'issues.fields.issue' | transloco }}</th>
+          <th scope="col">{{ 'issues.fields.priority' | transloco }}</th>
+          <th scope="col">{{ 'issues.fields.status' | transloco }}</th>
+          <th scope="col">{{ 'issues.fields.owner' | transloco }}</th>
+          <th scope="col">{{ 'issues.fields.dueDate' | transloco }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (issue of issues.value()?.content ?? []; track issue.id) {
+          <tr [class.done]="issue.status === 'RESOLVED' || issue.status === 'CLOSED'">
+            <th scope="row">
+              <button type="button" class="open" (click)="open(issue)">
+                <span class="key">{{ issue.key }}</span
+                >&ngsp;<span class="title">{{ issue.title }}</span>
+              </button>
+              <span class="secondary">{{ 'issueType.' + issue.type | transloco }}</span>
+              @if (issue.escalated) {
+                <kora-status-chip
+                  tone="danger"
+                  icon="keyboard_double_arrow_up"
+                  [label]="'issues.escalated' | transloco"
+                />
+              }
+            </th>
+            <td><kora-priority-chip [priority]="issue.priority" /></td>
+            <td>
+              <kora-status-chip
+                [tone]="statusLook[issue.status].tone"
+                [icon]="statusLook[issue.status].icon"
+                [label]="'issueStatus.' + issue.status | transloco"
+              />
+            </td>
+            <td>{{ issue.owner?.fullName ?? '—' }}</td>
+            <td>
+              @if (issue.dueDate) {
+                {{ issue.dueDate | localizedDate: language.current() }}
+                @if (issue.overdue) {
+                  <kora-status-chip
+                    tone="warning"
+                    icon="warning"
+                    [label]="'issues.overdue' | transloco"
+                  />
+                }
+              } @else {
+                —
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  <mat-paginator
+    [length]="issues.value()?.totalElements ?? 0"
+    [pageIndex]="query().page ?? 0"
+    [pageSize]="query().size ?? 20"
+    [pageSizeOptions]="pageSizes"
+    (page)="onPage($event)"
+  />
+}
+
+<router-outlet />
