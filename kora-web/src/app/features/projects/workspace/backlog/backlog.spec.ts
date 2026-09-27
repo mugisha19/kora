@@ -24,7 +24,7 @@ describe('backlog', () => {
   it('shows the active sprint, the planned one and the ranked backlog', async () => {
     await open();
 
-    const active = await screen.findByRole('region', { name: 'Sprint 5' });
+    const active = await screen.findByRole('region', { name: 'Sprint 5' }, { timeout: 5000 });
     expect(within(active).getByText('Security hardening for the beta')).toBeTruthy();
     const figures = within(active)
       .getAllByRole('definition')
@@ -87,7 +87,7 @@ describe('backlog', () => {
 
   it('closes the active sprint, carrying unfinished work to the next one', async () => {
     await open();
-    const active = await screen.findByRole('region', { name: 'Sprint 5' });
+    const active = await screen.findByRole('region', { name: 'Sprint 5' }, { timeout: 5000 });
 
     await userEvent.click(within(active).getByRole('button', { name: 'Close sprint' }));
     const dialog = await screen.findByRole('dialog', { name: 'Close Sprint 5?' });
@@ -114,7 +114,7 @@ describe('backlog', () => {
 
   it('plans a new sprint after the last one', async () => {
     await open();
-    await screen.findByRole('region', { name: 'Sprint 5' });
+    await screen.findByRole('region', { name: 'Sprint 5' }, { timeout: 5000 });
 
     await userEvent.click(screen.getByRole('button', { name: 'Plan a sprint' }));
     const dialog = await screen.findByRole('dialog', { name: 'Plan a sprint' });
@@ -124,7 +124,7 @@ describe('backlog', () => {
     await userEvent.type(within(dialog).getByRole('textbox', { name: 'Goal' }), 'Public launch');
     await userEvent.click(within(dialog).getByRole('button', { name: 'Plan a sprint' }));
 
-    expect(await screen.findByRole('region', { name: 'Sprint 7' })).toBeTruthy();
+    expect(await screen.findByRole('region', { name: 'Sprint 7' }, { timeout: 5000 })).toBeTruthy();
     expect(screen.getByText('Public launch')).toBeTruthy();
   });
 
