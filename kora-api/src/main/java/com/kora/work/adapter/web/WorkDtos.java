@@ -13,7 +13,6 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -23,9 +22,6 @@ import java.util.UUID;
 
 /** Request and response bodies of the contract tags {@code Tasks} and {@code Sprints}. */
 final class WorkDtos {
-
-    /** A letter or digit, then up to 29 letters, digits, spaces, underscores or hyphens. */
-    static final String LABEL = "[\\p{L}\\p{N}][\\p{L}\\p{N} _-]{0,29}";
 
     private WorkDtos() {}
 
@@ -72,7 +68,7 @@ final class WorkDtos {
             @DecimalMin("0") @DecimalMax("10000") BigDecimal remainingHours,
             LocalDate startDate,
             LocalDate dueDate,
-            @Size(max = 10) List<@NotNull @Pattern(regexp = LABEL) String> labels,
+            @Size(max = 10) List<@NotNull @TaskLabel String> labels,
             @Min(0) @Max(1000) Integer durationDays,
             ScheduleConstraint scheduleConstraint,
             LocalDate constraintDate) {}
@@ -89,7 +85,7 @@ final class WorkDtos {
             @DecimalMin("0") @DecimalMax("10000") BigDecimal remainingHours,
             LocalDate startDate,
             LocalDate dueDate,
-            @Size(max = 10) List<@NotNull @Pattern(regexp = LABEL) String> labels,
+            @Size(max = 10) List<@NotNull @TaskLabel String> labels,
             @Min(0) @Max(1000) Integer durationDays,
             ScheduleConstraint scheduleConstraint,
             LocalDate constraintDate) {}
