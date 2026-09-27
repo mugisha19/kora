@@ -101,6 +101,27 @@ public class WorkingCalendar {
                 Objects.requireNonNull(origin));
     }
 
+    /**
+     * The date {@code workingDays} working days after {@code date} (before it when negative), e.g. a target end date
+     * moved by an approved change. Zero returns the date itself.
+     */
+    public LocalDate shift(LocalDate date, int workingDays) {
+        Set<LocalDate> closed = holidays.stream().map(Holiday::date).collect(Collectors.toSet());
+        int step = workingDays < 0 ? -1 : 1;
+        LocalDate day = date;
+        for (int remaining = Math.abs(workingDays); remaining > 0; ) {
+            day = day.plusDays(step);
+            if (workingDays().contains(day.getDayOfWeek()) && !closed.contains(day)) {
+                remaining--;
+            }
+        }
+        return day;
+    }
+
+    private Set<DayOfWeek> workingDays() {
+        return EnumSet.copyOf(workingDays);
+    }
+
     public List<DayOfWeek> getWorkingDays() {
         return workingDays;
     }

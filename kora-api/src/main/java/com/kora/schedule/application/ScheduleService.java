@@ -3,6 +3,7 @@ package com.kora.schedule.application;
 import com.kora.organization.CurrentMember;
 import com.kora.portfolio.ProjectAccess;
 import com.kora.portfolio.ProjectRef;
+import com.kora.schedule.SchedulePlanning;
 import com.kora.schedule.application.ProjectSchedule.Row;
 import com.kora.schedule.domain.Baseline;
 import com.kora.schedule.domain.BaselineTask;
@@ -31,7 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
  * calculation linear, so a stored copy would only add a way to be stale. Baselines are the one thing stored.
  */
 @Service
-public class ScheduleService {
+public class ScheduleService implements SchedulePlanning {
 
     /** A task nobody gave a duration still takes a day, so it shows on the chart and its links mean something. */
     static final int DEFAULT_DURATION = 1;
@@ -74,17 +75,36 @@ public class ScheduleService {
     public Baseline saveBaseline(UUID projectId) {
         ProjectRef project = projects.manageable(projectId);
         ScheduleRules.requirePredictive(project);
+        return record(project, CurrentMember.get().userId());
+    }
+
+    @Override
+    public LocalDate shiftByWorkingDays(LocalDate date, int workingDays) {
+        return calendar.current().shift(date, workingDays);
+    }
+
+    @Override
+    @Transactional
+    public boolean rebaseline(ProjectRef project, UUID savedBy) {
+        if (!ScheduleRules.isPredictive(project)) {
+            return false;
+        }
+        record(project, savedBy);
+        return true;
+    }
+
+    private Baseline record(ProjectRef project, UUID savedBy) {
         ProjectSchedule schedule = compute(project);
         int number = baselines
-                        .findFirstByProjectIdOrderByNumberDesc(projectId)
+                        .findFirstByProjectIdOrderByNumberDesc(project.id())
                         .map(Baseline::getNumber)
                         .orElse(0)
                 + 1;
         Baseline baseline = baselines.save(Baseline.save(
                 CurrentMember.get().organizationId(),
-                projectId,
+                project.id(),
                 number,
-                CurrentMember.get().userId(),
+                savedBy,
                 schedule.tasks().size(),
                 clock.instant()));
         baselineTasks.saveAll(schedule.tasks().stream()

@@ -20,8 +20,12 @@ final class ScheduleRules {
 
     private ScheduleRules() {}
 
+    static boolean isPredictive(ProjectRef project) {
+        return SCHEDULED.contains(project.methodology());
+    }
+
     static void requirePredictive(ProjectRef project) {
-        if (!SCHEDULED.contains(project.methodology())) {
+        if (!isPredictive(project)) {
             throw new ConflictException(
                     ScheduleErrorCodes.NOT_PREDICTIVE,
                     "Dependencies and baselines are for Predictive and Hybrid projects; this one is Agile");
