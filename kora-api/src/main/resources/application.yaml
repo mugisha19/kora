@@ -26,7 +26,7 @@ spring:
         max-page-size: 100
   messages:
     # Email texts per module, in English (default), French and Kinyarwanda.
-    basename: messages/identity,messages/organization
+    basename: messages/identity,messages/organization,messages/notifications
     fallback-to-system-locale: false
   mail:
     # Mailpit from compose.yaml locally (web UI on http://localhost:8025); a real SMTP relay elsewhere.
@@ -69,6 +69,16 @@ kora:
     base-url: http://localhost:4200
   mail:
     from: 'Kora <no-reply@kora.local>'
+  storage:
+    # Attachments (feature 20): SeaweedFS from compose.yaml locally; S3 or any S3-compatible store elsewhere, set
+    # through KORA_STORAGE_ENDPOINT, _REGION, _BUCKET, _ACCESS_KEY and _SECRET_KEY.
+    endpoint: http://localhost:8333
+    region: us-east-1
+    bucket: kora-attachments
+    # Local-only credentials of the throwaway compose container (config/seaweedfs-s3.json).
+    access-key: kora
+    secret-key: kora-local-secret
+    create-bucket: true
   identity:
     jwt:
       issuer: kora
