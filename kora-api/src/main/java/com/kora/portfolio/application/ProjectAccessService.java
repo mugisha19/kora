@@ -131,6 +131,8 @@ public class ProjectAccessService implements ProjectAccess {
                 project.getName(),
                 project.getManagerId(),
                 project.getMethodology().name(),
-                project.getStatus().name());
+                project.getStatus().name(),
+                project.getStartDate(),
+                project.getTargetEndDate());
     }
 }
