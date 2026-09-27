@@ -6,6 +6,7 @@ import com.kora.portfolio.Health;
 import com.kora.reporting.domain.HealthRule.Inputs;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
@@ -33,9 +34,22 @@ class HealthRuleTest {
             })
     void appliesTheRule(
             String status, LocalDate end, BigDecimal spi, BigDecimal cpi, boolean criticalRisk, Health expected) {
-        HealthRule.Result result = HealthRule.evaluate(new Inputs(status, end, TODAY, spi, cpi, criticalRisk));
+        HealthRule.Result result = HealthRule.evaluate(new Inputs(status, end, TODAY, spi, cpi, criticalRisk, null));
 
         assertThat(result.health()).isEqualTo(expected);
         assertThat(result.reason()).isNotBlank();
+    }
+
+    @Test
+    void aForecastFinishAfterTheTargetEndDateIsAmber() {
+        LocalDate end = LocalDate.of(2026, 12, 31);
+
+        HealthRule.Result late = HealthRule.evaluate(
+                new Inputs("IN_PROGRESS", end, TODAY, null, null, false, LocalDate.of(2027, 1, 15)));
+        HealthRule.Result onTime = HealthRule.evaluate(new Inputs("IN_PROGRESS", end, TODAY, null, null, false, end));
+
+        assertThat(late.health()).isEqualTo(Health.AMBER);
+        assertThat(late.reason()).isEqualTo("Forecast to finish on 2027-01-15, after its target end date (2026-12-31)");
+        assertThat(onTime.health()).isEqualTo(Health.GREEN);
     }
 }

@@ -11,13 +11,14 @@ import java.util.Set;
  * <ol>
  *   <li>GREY: not started ({@code PROPOSED}, {@code APPROVED}) or finished ({@code CLOSED}, {@code CANCELLED});
  *   <li>RED: SPI or CPI below 0.80, or a critical risk open past its response date;
- *   <li>AMBER: SPI or CPI below 0.95, or the project is past its target end date;
+ *   <li>AMBER: SPI or CPI below 0.95, the project is past its target end date, or its schedule forecasts a finish
+ *       after it;
  *   <li>GREEN otherwise.
  * </ol>
  *
- * SPI, CPI and risks come from later features (EVM in Phase 7, risks in Phase 6); until then they are absent and those
- * checks are skipped rather than guessed. The past-end-date check stands in for a late milestone until the schedule
- * (Phase 5) tracks milestones. A manager's override (with a reason) always wins over the computed value.
+ * SPI and CPI come from earned value (feature 17) and are skipped while they would divide by zero, rather than
+ * guessed. The forecast finish is the critical path's (feature 10), for plan-driven projects. A manager's override
+ * (with a reason) always wins over the computed value.
  */
 public final class HealthRule {
 
@@ -39,7 +40,8 @@ public final class HealthRule {
             LocalDate today,
             BigDecimal spi,
             BigDecimal cpi,
-            boolean criticalRiskOverdue) {}
+            boolean criticalRiskOverdue,
+            LocalDate forecastFinish) {}
 
     public record Result(Health health, String reason) {}
 
@@ -67,6 +69,12 @@ public final class HealthRule {
         }
         if (isLate(in.status(), in.targetEndDate(), in.today())) {
             return new Result(Health.AMBER, "Past its target end date (" + in.targetEndDate() + ")");
+        }
+        if (in.forecastFinish() != null && in.forecastFinish().isAfter(in.targetEndDate())) {
+            return new Result(
+                    Health.AMBER,
+                    "Forecast to finish on " + in.forecastFinish() + ", after its target end date ("
+                            + in.targetEndDate() + ")");
         }
         return new Result(Health.GREEN, "On track");
     }
