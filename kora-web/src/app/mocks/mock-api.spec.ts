@@ -1,48 +1,11 @@
-import { getResponse } from 'msw';
 import { DEMO_INVITATION_TOKENS, DEMO_PASSWORD, ORG_AKAGERA, ORG_VIRUNGA } from './data';
 import { db } from './db';
-import { handlers } from './handlers';
+import { call, signIn } from '../../testing/mock-requests';
 
 /**
  * The mock API must behave like the contract says, or screens built against it will break on the
  * real API. These tests run requests through the MSW handlers directly (no service worker).
  */
-const BASE = 'http://localhost/api/v1';
-
-async function call(
-  method: string,
-  path: string,
-  { body, headers = {} }: { body?: unknown; headers?: Record<string, string> } = {},
-) {
-  const response = await getResponse(
-    handlers,
-    new Request(`${BASE}${path}`, {
-      method,
-      headers: { 'Content-Type': 'application/json', ...headers },
-      body: body === undefined ? undefined : JSON.stringify(body),
-    }),
-  );
-  if (!response) throw new Error(`No handler for ${method} ${path}`);
-  const text = await response.text();
-  return {
-    status: response.status,
-    headers: response.headers,
-    body: text ? (JSON.parse(text) as Record<string, any>) : null, // eslint-disable-line @typescript-eslint/no-explicit-any -- test-only: bodies are asserted structurally
-  };
-}
-
-async function signIn(email = 'admin@kora.demo') {
-  const res = await call('POST', '/auth/login', { body: { email, password: DEMO_PASSWORD } });
-  return {
-    token: res.body!['accessToken'] as string,
-    cookie: String(res.headers.get('Set-Cookie')).split(';')[0],
-    headers: (org = ORG_AKAGERA) => ({
-      Authorization: `Bearer ${res.body!['accessToken']}`,
-      'X-Organization-Id': org,
-    }),
-  };
-}
-
 describe('mock API', () => {
   beforeEach(() => db.reset());
 

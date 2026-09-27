@@ -23,6 +23,7 @@ const TITLES: Record<number, string> = {
   409: 'Conflict',
   410: 'Gone',
   412: 'Precondition Failed',
+  422: 'Unprocessable Content',
   428: 'Precondition Required',
   429: 'Too Many Requests',
   500: 'Internal Server Error',
@@ -159,8 +160,81 @@ export class Validator {
     return false;
   }
 
-  problem(r: Reply): Response {
-    return r.problem(400, 'validation.failed', { errors: this.errors });
+  /** Optional date `YYYY-MM-DD`. */
+  date(field: string, value: unknown, required = false): boolean {
+    if (value === undefined || value === null) {
+      if (required) this.add(field, 'required', `${field} is required`);
+      return !required;
+    }
+    if (
+      typeof value !== 'string' ||
+      !/^\d{4}-\d{2}-\d{2}$/.test(value) ||
+      Number.isNaN(Date.parse(value))
+    ) {
+      return this.add(field, 'invalid', 'must be a date (YYYY-MM-DD)');
+    }
+    return true;
+  }
+
+  /** Optional UUID reference (an unparseable one is `invalid`, as Spring reports it). */
+  uuid(field: string, value: unknown, required = false): boolean {
+    if (value === undefined || value === null) {
+      if (required) this.add(field, 'required', `${field} is required`);
+      return !required;
+    }
+    if (typeof value !== 'string' || !/^[0-9a-f-]{36}$/i.test(value)) {
+      return this.add(field, 'invalid', 'must be a valid UUID');
+    }
+    return true;
+  }
+
+  /** Optional number within [min, max]. */
+  number(field: string, value: unknown, min: number, max: number): boolean {
+    if (value === undefined || value === null) return true;
+    if (typeof value !== 'number' || !Number.isFinite(value)) {
+      return this.add(field, 'invalid', 'must be a number');
+    }
+    if (value < min || value > max) {
+      return this.add(field, 'range', `must be between ${min} and ${max}`, { min, max });
+    }
+    return true;
+  }
+
+  /** Optional list of 1–500-character strings, at most 50 items (the contract's TextList). */
+  textList(field: string, value: unknown): boolean {
+    if (value === undefined || value === null) return true;
+    if (!Array.isArray(value)) return this.add(field, 'invalid', 'must be a list');
+    if (value.length > 50) return this.add(field, 'length', 'at most 50 items', { max: 50 });
+    let ok = true;
+    value.forEach((item, index) => {
+      ok = this.string(`${field}[${index}]`, item, 1, 500) && ok;
+    });
+    return ok;
+  }
+
+  /**
+   * Optional Money in the organization's currency, scaled like the API: a different currency is
+   * `invalid` on `<field>.currency`, more decimals than the currency has is `format` on `.amount`.
+   */
+  money(field: string, value: unknown, currency: string, digits: number): boolean {
+    if (value === undefined || value === null) return true;
+    if (typeof value !== 'object') return this.add(field, 'invalid', 'must be a money object');
+    const money = value as Record<string, unknown>;
+    if (typeof money['amount'] !== 'string' || !/^-?\d{1,15}(\.\d{1,4})?$/.test(money['amount'])) {
+      return this.add(`${field}.amount`, 'format', 'must be a decimal string');
+    }
+    if (money['currency'] !== currency) {
+      return this.add(`${field}.currency`, 'invalid', `must be ${currency}`);
+    }
+    const decimals = money['amount'].split('.')[1]?.replace(/0+$/, '').length ?? 0;
+    if (decimals > digits) {
+      return this.add(`${field}.amount`, 'format', `at most ${digits} decimals for ${currency}`);
+    }
+    return true;
+  }
+
+  problem(r: Reply, status = 400): Response {
+    return r.problem(status, 'validation.failed', { errors: this.errors });
   }
 }
 
