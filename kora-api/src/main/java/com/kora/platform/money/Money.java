@@ -36,6 +36,15 @@ public record Money(BigDecimal amount, String currency) {
         return new Money(amount.add(other.amount), currency);
     }
 
+    public Money minus(Money other) {
+        requireSameCurrency(other);
+        return new Money(amount.subtract(other.amount), currency);
+    }
+
+    public boolean isZero() {
+        return amount.signum() == 0;
+    }
+
     /** Multiplies by a factor (e.g. a percentage as a fraction), rounding half-even to minor units. */
     public Money times(BigDecimal factor) {
         return new Money(amount.multiply(factor).setScale(fractionDigits(currency), RoundingMode.HALF_EVEN), currency);
