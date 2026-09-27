@@ -1151,6 +1151,512 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/projects/{projectId}/risks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The project's risk register
+         * @description Sortable by `score`, `key`, `reviewDate`, `createdAt`; by default highest score first.
+         */
+        get: operations["listRisks"];
+        put?: never;
+        /**
+         * Raise a risk
+         * @description The project's managers and contributors. The first assessment is recorded with it.
+         */
+        post: operations["createRisk"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/risks/heatmap": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Probability × impact counts of the open risks
+         * @description 25 cells, probability and impact 1–5; the same filters as the register, so the counts match it.
+         */
+        get: operations["getRiskHeatmap"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/risks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Open risks across the projects the caller can see
+         * @description The portfolio view (PMO): by default every open risk scoring 15 or more (critical).
+         */
+        get: operations["listPortfolioRisks"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/risks/{riskId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a risk */
+        get: operations["getRisk"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update a risk's description, owner and response
+         * @description The project's managers or the risk owner. Probability and impact change through assessments, so the history is complete. `RESPONSE_PLANNED` and later need a response strategy and plan.
+         */
+        patch: operations["updateRisk"];
+        trace?: never;
+    };
+    "/risks/{riskId}/assessments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The risk's scoring history, oldest first */
+        get: operations["listRiskAssessments"];
+        put?: never;
+        /**
+         * Re-score a risk
+         * @description The project's managers or the risk owner.
+         */
+        post: operations["assessRisk"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/risks/{riskId}/close": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Close a risk that can no longer happen
+         * @description The project's managers or the risk owner.
+         */
+        post: operations["closeRisk"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/risks/{riskId}/materialize": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * The risk happened: open a linked issue and close the risk
+         * @description The project's managers or the risk owner. One step: the issue is created and the risk closed as materialized in the same transaction.
+         */
+        post: operations["materializeRisk"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/issues": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The project's issue log
+         * @description Sortable by `priority`, `dueDate`, `key`, `createdAt`; by default most urgent first.
+         */
+        get: operations["listIssues"];
+        put?: never;
+        /**
+         * Raise an issue
+         * @description The project's managers and contributors.
+         */
+        post: operations["createIssue"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/issues/{issueId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get an issue */
+        get: operations["getIssue"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update an issue
+         * @description The project's managers or the issue owner. `status` moves between OPEN and IN_PROGRESS only; resolving, closing and reopening have their own operations.
+         */
+        patch: operations["updateIssue"];
+        trace?: never;
+    };
+    "/issues/{issueId}/resolve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Resolve an issue, saying how
+         * @description The project's managers or the issue owner.
+         */
+        post: operations["resolveIssue"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/issues/{issueId}/close": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Close a resolved issue
+         * @description The project's managers.
+         */
+        post: operations["closeIssue"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/issues/{issueId}/reopen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Reopen a resolved or closed issue
+         * @description The project's managers.
+         */
+        post: operations["reopenIssue"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/stakeholders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The project's stakeholder register
+         * @description Sorted by name. Removed stakeholders are not listed.
+         */
+        get: operations["listStakeholders"];
+        put?: never;
+        /**
+         * Add a stakeholder
+         * @description The project manager, `PMO` or `ORG_ADMIN`.
+         */
+        post: operations["createStakeholder"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/stakeholders/grid": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The power/interest grid
+         * @description Four quadrants, always in the order MANAGE_CLOSELY, KEEP_SATISFIED, KEEP_INFORMED, MONITOR. High means 3 or more on the 1–5 scale.
+         */
+        get: operations["getStakeholderGrid"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stakeholders/{stakeholderId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a stakeholder */
+        get: operations["getStakeholder"];
+        put?: never;
+        post?: never;
+        /**
+         * Remove a stakeholder and erase their personal data
+         * @description The project manager, `PMO` or `ORG_ADMIN`. The record is anonymized (name replaced, contact details, notes and user link erased) rather than deleted, so nothing that refers to it breaks.
+         */
+        delete: operations["deleteStakeholder"];
+        options?: never;
+        head?: never;
+        /**
+         * Update a stakeholder
+         * @description The project manager, `PMO` or `ORG_ADMIN`.
+         */
+        patch: operations["updateStakeholder"];
+        trace?: never;
+    };
+    "/projects/{projectId}/change-requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The project's change requests, newest first */
+        get: operations["listChangeRequests"];
+        put?: never;
+        /**
+         * Draft a change request
+         * @description The project's managers and contributors. With `issueId`, the issue and the request are linked.
+         */
+        post: operations["createChangeRequest"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/change-requests/{changeRequestId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a change request with its approval steps */
+        get: operations["getChangeRequest"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Edit a draft
+         * @description The requester or the project's managers.
+         */
+        patch: operations["updateChangeRequest"];
+        trace?: never;
+    };
+    "/change-requests/{changeRequestId}/submit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Submit a draft for approval
+         * @description The requester or the project's managers. The approval chain is built now from the impact and the organization's change-control thresholds.
+         */
+        post: operations["submitChangeRequest"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/change-requests/{changeRequestId}/decisions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Approve or reject the current approval step
+         * @description Only the current step's approver, never the requester. A rejection needs a comment and ends the chain; the last approval applies the change to the budget, target end date, charter and schedule baseline in one transaction.
+         */
+        post: operations["decideChangeRequest"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/change-requests/{changeRequestId}/withdraw": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Withdraw a request that is not decided yet
+         * @description The requester or the project's managers.
+         */
+        post: operations["withdrawChangeRequest"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/change-requests/{changeRequestId}/implement": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Mark an approved change as implemented
+         * @description The project's managers.
+         */
+        post: operations["implementChangeRequest"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/change-requests/{changeRequestId}/revise": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Start a new revision of a rejected request
+         * @description The requester or the project's managers. A new draft with the same key and the next revision number is created from it; the rejected one stays as it was.
+         */
+        post: operations["reviseChangeRequest"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/approvals/pending": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My approval inbox: requests waiting for my decision
+         * @description Across every project of the organization, oldest submission first.
+         */
+        get: operations["listPendingApprovals"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organization/change-control": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The thresholds that decide who approves a change
+         * @description 5% / 10 working days / 15% until an administrator changes them.
+         */
+        get: operations["getChangeControlSettings"];
+        /**
+         * Change the approval thresholds
+         * @description `ORG_ADMIN` only. Requests submitted later use them; submitted ones keep their chain.
+         */
+        put: operations["updateChangeControlSettings"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1212,7 +1718,7 @@ export interface components {
          *     back to a generic message for unknown codes.
          * @enum {string}
          */
-        ErrorCode: "validation.failed" | "auth.unauthenticated" | "auth.invalid_credentials" | "auth.refresh_invalid" | "auth.email_taken" | "auth.reset_token_invalid" | "tenant.forbidden" | "tenant.header_invalid" | "access.denied" | "resource.not_found" | "method.not_allowed" | "media_type.unsupported" | "concurrency.stale_version" | "concurrency.if_match_required" | "members.last_admin" | "members.self_removal" | "invitations.already_member" | "invitations.already_pending" | "invitations.not_pending" | "invitations.not_found" | "invitations.expired" | "invitations.revoked" | "invitations.already_accepted" | "rate_limited" | "organization.currency_locked" | "portfolios.archived" | "portfolios.not_empty" | "projects.code_taken" | "projects.invalid_transition" | "projects.charter_approval_required" | "projects.methodology_locked" | "project_members.is_manager" | "charters.not_draft" | "charters.not_submitted" | "charters.incomplete" | "wbs.parent_not_deliverable" | "wbs.too_deep" | "wbs.cycle" | "wbs.has_children" | "wbs.type_change_not_allowed" | "tasks.invalid_transition" | "tasks.wip_limit_reached" | "tasks.remaining_work" | "sprints.not_agile" | "sprints.already_active" | "sprints.not_planned" | "sprints.not_active" | "sprints.closed" | "schedule.cycle" | "schedule.dependency_exists" | "schedule.not_predictive" | "internal.error";
+        ErrorCode: "validation.failed" | "auth.unauthenticated" | "auth.invalid_credentials" | "auth.refresh_invalid" | "auth.email_taken" | "auth.reset_token_invalid" | "tenant.forbidden" | "tenant.header_invalid" | "access.denied" | "resource.not_found" | "method.not_allowed" | "media_type.unsupported" | "concurrency.stale_version" | "concurrency.if_match_required" | "members.last_admin" | "members.self_removal" | "invitations.already_member" | "invitations.already_pending" | "invitations.not_pending" | "invitations.not_found" | "invitations.expired" | "invitations.revoked" | "invitations.already_accepted" | "rate_limited" | "organization.currency_locked" | "portfolios.archived" | "portfolios.not_empty" | "projects.code_taken" | "projects.invalid_transition" | "projects.charter_approval_required" | "projects.methodology_locked" | "project_members.is_manager" | "charters.not_draft" | "charters.not_submitted" | "charters.incomplete" | "wbs.parent_not_deliverable" | "wbs.too_deep" | "wbs.cycle" | "wbs.has_children" | "wbs.type_change_not_allowed" | "tasks.invalid_transition" | "tasks.wip_limit_reached" | "tasks.remaining_work" | "sprints.not_agile" | "sprints.already_active" | "sprints.not_planned" | "sprints.not_active" | "sprints.closed" | "schedule.cycle" | "schedule.dependency_exists" | "schedule.not_predictive" | "risks.closed" | "issues.invalid_transition" | "change_requests.not_draft" | "change_requests.not_in_review" | "change_requests.self_approval" | "change_requests.invalid_transition" | "internal.error";
         /** @enum {string} */
         Role: "ORG_ADMIN" | "PMO" | "PROJECT_MANAGER" | "MEMBER" | "VIEWER";
         /** @enum {string} */
@@ -2257,6 +2763,512 @@ export interface components {
             workingDays: components["schemas"]["DayOfWeek"][];
             holidays: components["schemas"]["Holiday"][];
         };
+        /**
+         * @description A threat harms the objectives if it happens; an opportunity helps them
+         * @enum {string}
+         */
+        RiskKind: "THREAT" | "OPPORTUNITY";
+        /** @enum {string} */
+        RiskCategory: "TECHNICAL" | "EXTERNAL" | "ORGANIZATIONAL" | "PROJECT_MANAGEMENT" | "FINANCIAL" | "OTHER";
+        /**
+         * @description When it could happen: within days, weeks, months, or later
+         * @enum {string}
+         */
+        RiskProximity: "IMMEDIATE" | "WEEKS" | "MONTHS" | "LATER";
+        /**
+         * @description IDENTIFIED → ANALYZED → RESPONSE_PLANNED → MONITORING, then CLOSED
+         * @enum {string}
+         */
+        RiskStatus: "IDENTIFIED" | "ANALYZED" | "RESPONSE_PLANNED" | "MONITORING" | "CLOSED";
+        /**
+         * @description Threats: AVOID, MITIGATE, TRANSFER, ACCEPT, ESCALATE. Opportunities: EXPLOIT, ENHANCE, SHARE, ACCEPT,
+         *     ESCALATE. A strategy of the other kind is refused (400 on responseStrategy).
+         * @enum {string}
+         */
+        ResponseStrategy: "AVOID" | "MITIGATE" | "TRANSFER" | "EXPLOIT" | "ENHANCE" | "SHARE" | "ACCEPT" | "ESCALATE";
+        /**
+         * @description Score bands: 1–4 LOW, 5–9 MEDIUM, 10–14 HIGH, 15–25 CRITICAL
+         * @enum {string}
+         */
+        Severity: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
+        /**
+         * @description EXPIRED: can no longer happen; MATERIALIZED: it happened (see the linked issue)
+         * @enum {string}
+         */
+        RiskClosure: "EXPIRED" | "MATERIALIZED";
+        Risk: {
+            /** Format: uuid */
+            id: string;
+            /** @example AKG-12-R3 */
+            key: string;
+            /** Format: uuid */
+            projectId: string;
+            title: string;
+            description?: string;
+            category: components["schemas"]["RiskCategory"];
+            proximity?: components["schemas"]["RiskProximity"];
+            /** Format: uuid */
+            ownerId?: string;
+            responseStrategy?: components["schemas"]["ResponseStrategy"];
+            responsePlan?: string;
+            triggerConditions?: string;
+            /** Format: date */
+            reviewDate?: string;
+            kind: components["schemas"]["RiskKind"];
+            status: components["schemas"]["RiskStatus"];
+            /** Format: int32 */
+            probability: number;
+            /** Format: int32 */
+            impact: number;
+            /**
+             * Format: int32
+             * @description probability × impact, 1–25 (inherent risk)
+             */
+            score: number;
+            severity: components["schemas"]["Severity"];
+            /** Format: int32 */
+            residualProbability?: number;
+            /** Format: int32 */
+            residualImpact?: number;
+            /**
+             * Format: int32
+             * @description The score expected once the response works
+             */
+            residualScore?: number;
+            owner?: components["schemas"]["UserRef"];
+            identifiedBy: components["schemas"]["UserRef"];
+            /** @description Open with a review date in the past (organization time zone) */
+            reviewOverdue?: boolean;
+            closure?: components["schemas"]["RiskClosure"];
+            closureNote?: string;
+            /**
+             * Format: uuid
+             * @description The issue opened when the risk materialized
+             */
+            issueId?: string;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: int64 */
+            version: number;
+        };
+        RiskPage: components["schemas"]["PageMetadata"] & {
+            content: components["schemas"]["Risk"][];
+        };
+        CreateRiskRequest: {
+            title: string;
+            description?: string;
+            category: components["schemas"]["RiskCategory"];
+            proximity?: components["schemas"]["RiskProximity"];
+            /** Format: uuid */
+            ownerId?: string;
+            responseStrategy?: components["schemas"]["ResponseStrategy"];
+            responsePlan?: string;
+            triggerConditions?: string;
+            /** Format: date */
+            reviewDate?: string;
+            kind: components["schemas"]["RiskKind"];
+            /** Format: int32 */
+            probability: number;
+            /** Format: int32 */
+            impact: number;
+        };
+        UpdateRiskRequest: {
+            title?: string;
+            description?: string;
+            category?: components["schemas"]["RiskCategory"];
+            proximity?: components["schemas"]["RiskProximity"];
+            /** Format: uuid */
+            ownerId?: string;
+            responseStrategy?: components["schemas"]["ResponseStrategy"];
+            responsePlan?: string;
+            triggerConditions?: string;
+            /** Format: date */
+            reviewDate?: string;
+            /** @enum {string} */
+            status?: "IDENTIFIED" | "ANALYZED" | "RESPONSE_PLANNED" | "MONITORING";
+        };
+        RiskAssessment: {
+            /** Format: uuid */
+            id: string;
+            /** Format: int32 */
+            probability: number;
+            /** Format: int32 */
+            impact: number;
+            /** Format: int32 */
+            score: number;
+            /** Format: int32 */
+            residualProbability?: number;
+            /** Format: int32 */
+            residualImpact?: number;
+            note?: string;
+            assessedBy: components["schemas"]["UserRef"];
+            /** Format: date-time */
+            assessedAt: string;
+        };
+        AssessRiskRequest: {
+            /** Format: int32 */
+            probability: number;
+            /** Format: int32 */
+            impact: number;
+            /** Format: int32 */
+            residualProbability?: number;
+            /** Format: int32 */
+            residualImpact?: number;
+            note?: string;
+        };
+        CloseRiskRequest: {
+            note: string;
+        };
+        MaterializeRiskRequest: {
+            /** @description Defaults to the risk's title */
+            title?: string;
+            priority?: components["schemas"]["IssuePriority"];
+            /**
+             * Format: uuid
+             * @description Defaults to the risk owner
+             */
+            ownerId?: string;
+            /** Format: date */
+            dueDate?: string;
+        };
+        RiskHeatmapCell: {
+            /** Format: int32 */
+            probability: number;
+            /** Format: int32 */
+            impact: number;
+            /** Format: int32 */
+            score: number;
+            severity: components["schemas"]["Severity"];
+            /** Format: int32 */
+            count: number;
+            riskIds: string[];
+        };
+        RiskHeatmap: {
+            /** Format: uuid */
+            projectId: string;
+            /** @description All 25 cells, probability 5 to 1 (rows, top to bottom), impact 1 to 5 within a row */
+            cells: components["schemas"]["RiskHeatmapCell"][];
+        };
+        /** @enum {string} */
+        IssueType: "TECHNICAL" | "RESOURCE" | "SCOPE" | "VENDOR" | "OTHER";
+        /** @enum {string} */
+        IssuePriority: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
+        /**
+         * @description OPEN ⇄ IN_PROGRESS → RESOLVED → CLOSED; RESOLVED or CLOSED can be reopened
+         * @enum {string}
+         */
+        IssueStatus: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "CLOSED";
+        Issue: {
+            /** Format: uuid */
+            id: string;
+            /** @example AKG-12-I7 */
+            key: string;
+            /** Format: uuid */
+            projectId: string;
+            title: string;
+            description?: string;
+            type: components["schemas"]["IssueType"];
+            priority: components["schemas"]["IssuePriority"];
+            status: components["schemas"]["IssueStatus"];
+            owner?: components["schemas"]["UserRef"];
+            raisedBy: components["schemas"]["UserRef"];
+            /** Format: date */
+            dueDate?: string;
+            resolution?: string;
+            /** Format: date-time */
+            resolvedAt?: string;
+            /**
+             * Format: uuid
+             * @description The risk this issue materialized from
+             */
+            riskId?: string;
+            /**
+             * Format: uuid
+             * @description The change request raised to deal with it
+             */
+            changeRequestId?: string;
+            /** @description Unresolved and past its due date (organization time zone) */
+            overdue: boolean;
+            /** @description CRITICAL and unresolved for more than 3 days; the PMO should step in */
+            escalated: boolean;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: int64 */
+            version: number;
+        };
+        IssuePage: components["schemas"]["PageMetadata"] & {
+            content: components["schemas"]["Issue"][];
+        };
+        CreateIssueRequest: {
+            title: string;
+            description?: string;
+            type: components["schemas"]["IssueType"];
+            priority: components["schemas"]["IssuePriority"];
+            /** Format: uuid */
+            ownerId?: string;
+            /** Format: date */
+            dueDate?: string;
+        };
+        UpdateIssueRequest: {
+            title?: string;
+            description?: string;
+            type?: components["schemas"]["IssueType"];
+            priority?: components["schemas"]["IssuePriority"];
+            /** Format: uuid */
+            ownerId?: string;
+            /** Format: date */
+            dueDate?: string;
+            /** @enum {string} */
+            status?: "OPEN" | "IN_PROGRESS";
+        };
+        ResolveIssueRequest: {
+            resolution: string;
+        };
+        ReopenIssueRequest: {
+            reason: string;
+        };
+        /**
+         * @description From least to most engaged: UNAWARE, RESISTANT, NEUTRAL, SUPPORTIVE, LEADING
+         * @enum {string}
+         */
+        Engagement: "UNAWARE" | "RESISTANT" | "NEUTRAL" | "SUPPORTIVE" | "LEADING";
+        /**
+         * @description MANAGE_CLOSELY: high power, high interest; KEEP_SATISFIED: high power, low interest; KEEP_INFORMED: low
+         *     power, high interest; MONITOR: low power, low interest. High is 3 or more.
+         * @enum {string}
+         */
+        StakeholderQuadrant: "MANAGE_CLOSELY" | "KEEP_SATISFIED" | "KEEP_INFORMED" | "MONITOR";
+        Stakeholder: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            projectId: string;
+            name: string;
+            organization?: string;
+            role?: string;
+            /** Format: email */
+            email?: string;
+            phone?: string;
+            /**
+             * Format: uuid
+             * @description When the stakeholder is a member of the organization
+             */
+            userId?: string;
+            /** Format: int32 */
+            power: number;
+            /** Format: int32 */
+            interest: number;
+            /** Format: int32 */
+            influence?: number;
+            currentEngagement: components["schemas"]["Engagement"];
+            desiredEngagement: components["schemas"]["Engagement"];
+            /**
+             * Format: int32
+             * @description Desired minus current, in levels; positive means more engagement is needed
+             */
+            engagementGap: number;
+            quadrant: components["schemas"]["StakeholderQuadrant"];
+            communicationPreferences?: string;
+            notes?: string;
+            /** @description The stakeholder was removed and their personal data erased */
+            removed: boolean;
+            /** Format: int64 */
+            version: number;
+        };
+        StakeholderPage: components["schemas"]["PageMetadata"] & {
+            content: components["schemas"]["Stakeholder"][];
+        };
+        CreateStakeholderRequest: {
+            name: string;
+            organization?: string;
+            role?: string;
+            /** Format: email */
+            email?: string;
+            phone?: string;
+            /** Format: uuid */
+            userId?: string;
+            /** Format: int32 */
+            power: number;
+            /** Format: int32 */
+            interest: number;
+            /** Format: int32 */
+            influence?: number;
+            currentEngagement: components["schemas"]["Engagement"];
+            desiredEngagement: components["schemas"]["Engagement"];
+            communicationPreferences?: string;
+            notes?: string;
+        };
+        UpdateStakeholderRequest: {
+            name?: string;
+            organization?: string;
+            role?: string;
+            /** Format: email */
+            email?: string;
+            phone?: string;
+            /** Format: uuid */
+            userId?: string;
+            /** Format: int32 */
+            power?: number;
+            /** Format: int32 */
+            interest?: number;
+            /** Format: int32 */
+            influence?: number;
+            currentEngagement?: components["schemas"]["Engagement"];
+            desiredEngagement?: components["schemas"]["Engagement"];
+            communicationPreferences?: string;
+            notes?: string;
+        };
+        StakeholderGridEntry: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            /** Format: int32 */
+            power: number;
+            /** Format: int32 */
+            interest: number;
+            /** Format: int32 */
+            engagementGap: number;
+        };
+        StakeholderGridQuadrant: {
+            quadrant: components["schemas"]["StakeholderQuadrant"];
+            stakeholders: components["schemas"]["StakeholderGridEntry"][];
+        };
+        StakeholderGrid: {
+            /** Format: uuid */
+            projectId: string;
+            quadrants: components["schemas"]["StakeholderGridQuadrant"][];
+        };
+        /** @enum {string} */
+        ChangeRequestType: "SCOPE" | "SCHEDULE" | "COST" | "QUALITY" | "OTHER";
+        /**
+         * @description DRAFT → SUBMITTED → IN_REVIEW (after the first approval) → APPROVED → IMPLEMENTED; a rejection makes it
+         *     REJECTED (revise to try again); DRAFT, SUBMITTED and IN_REVIEW can be WITHDRAWN.
+         * @enum {string}
+         */
+        ChangeRequestStatus: "DRAFT" | "SUBMITTED" | "IN_REVIEW" | "APPROVED" | "REJECTED" | "WITHDRAWN" | "IMPLEMENTED";
+        ChangeImpact: {
+            /** @description Added cost (negative for a saving), in the organization's currency */
+            costDelta?: components["schemas"]["Money"];
+            /**
+             * Format: int32
+             * @description Working days added to the target end date (negative to pull it in)
+             */
+            scheduleDeltaDays?: number;
+            scopeSummary?: string;
+            riskSummary?: string;
+            /**
+             * @description Approving it adds the scope summary to a new charter version (the sponsor must approve)
+             * @default false
+             */
+            changesCharterScope?: boolean;
+        };
+        /** @enum {string} */
+        ApprovalLevel: "PROJECT_MANAGER" | "PMO" | "SPONSOR";
+        /** @enum {string} */
+        Decision: "APPROVE" | "REJECT";
+        ApprovalStep: {
+            /**
+             * Format: int32
+             * @description 1 for the first step
+             */
+            position: number;
+            level: components["schemas"]["ApprovalLevel"];
+            /** @description Why this step is in the chain, e.g. "Cost change of 8% exceeds 5%" */
+            reason: string;
+            /** @description The one person who decides, when the step names someone */
+            approver?: components["schemas"]["UserRef"];
+            /** @description Any member with this role (except the requester) decides, when the step names a role */
+            approverRole?: components["schemas"]["Role"];
+            /**
+             * @description PENDING: its turn now; WAITING: a later step; SKIPPED: not reached (after a rejection)
+             * @enum {string}
+             */
+            state: "WAITING" | "PENDING" | "APPROVED" | "REJECTED" | "SKIPPED";
+            decidedBy?: components["schemas"]["UserRef"];
+            comment?: string;
+            /** Format: date-time */
+            decidedAt?: string;
+        };
+        ChangeRequest: {
+            /** Format: uuid */
+            id: string;
+            /** @example AKG-12-CR2 */
+            key: string;
+            /**
+             * Format: int32
+             * @description 1, then 2, 3... for each revision after a rejection; the key stays the same
+             */
+            revision: number;
+            /** Format: uuid */
+            projectId: string;
+            title: string;
+            description?: string;
+            reason?: string;
+            type: components["schemas"]["ChangeRequestType"];
+            status: components["schemas"]["ChangeRequestStatus"];
+            impact: components["schemas"]["ChangeImpact"];
+            requestedBy: components["schemas"]["UserRef"];
+            /** Format: uuid */
+            issueId?: string;
+            /** Format: uuid */
+            previousRevisionId?: string;
+            /** @description The approval chain, empty until submission */
+            steps: components["schemas"]["ApprovalStep"][];
+            /** Format: date-time */
+            submittedAt?: string;
+            /** Format: date-time */
+            decidedAt?: string;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: int64 */
+            version: number;
+        };
+        ChangeRequestPage: components["schemas"]["PageMetadata"] & {
+            content: components["schemas"]["ChangeRequest"][];
+        };
+        CreateChangeRequestRequest: {
+            title: string;
+            description?: string;
+            reason: string;
+            type: components["schemas"]["ChangeRequestType"];
+            impact?: components["schemas"]["ChangeImpact"];
+            /** Format: uuid */
+            issueId?: string;
+        };
+        UpdateChangeRequestRequest: {
+            title?: string;
+            description?: string;
+            reason?: string;
+            type?: components["schemas"]["ChangeRequestType"];
+            impact?: components["schemas"]["ChangeImpact"];
+        };
+        DecisionRequest: {
+            decision: components["schemas"]["Decision"];
+            /** @description Required to reject */
+            comment?: string;
+        };
+        ChangeControlSettings: {
+            /** @description PMO approval when the cost change exceeds this share of the budget */
+            pmoCostPercent: number;
+            /**
+             * Format: int32
+             * @description PMO approval when the schedule change exceeds this many working days
+             */
+            pmoScheduleDays: number;
+            /** @description Sponsor approval when the cost change exceeds this share of the budget */
+            sponsorCostPercent: number;
+            /**
+             * Format: int64
+             * @description 0 until the settings are first changed
+             */
+            version: number;
+        };
+        UpdateChangeControlSettingsRequest: {
+            pmoCostPercent: number;
+            /** Format: int32 */
+            pmoScheduleDays: number;
+            sponsorCostPercent: number;
+        };
     };
     responses: {
         /** @description Invalid input. Code: `validation.failed` with `errors[]`, or `tenant.header_invalid`. */
@@ -2400,6 +3412,10 @@ export interface components {
         /** @description A board column (every task status except BACKLOG) */
         BoardStatus: "TODO" | "IN_PROGRESS" | "BLOCKED" | "IN_REVIEW" | "DONE";
         DependencyId: string;
+        RiskId: string;
+        IssueId: string;
+        StakeholderId: string;
+        ChangeRequestId: string;
     };
     requestBodies: never;
     headers: {
@@ -5539,6 +6555,1462 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["WorkingCalendar"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listRisks: {
+        parameters: {
+            query?: {
+                status?: components["schemas"]["RiskStatus"];
+                kind?: components["schemas"]["RiskKind"];
+                category?: components["schemas"]["RiskCategory"];
+                ownerId?: string;
+                minScore?: number;
+                /** @description Case-insensitive match on name (and code for projects) */
+                q?: string;
+                /** @description 0-based page index */
+                page?: components["parameters"]["Page"];
+                /** @description Page size (values above 100 are capped at 100) */
+                size?: components["parameters"]["Size"];
+                /** @description `field,asc` or `field,desc`; repeat for secondary sorts */
+                sort?: components["parameters"]["Sort"];
+            };
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                projectId: components["parameters"]["ProjectId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description One page of risks */
+            200: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RiskPage"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    createRisk: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                projectId: components["parameters"]["ProjectId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateRiskRequest"];
+            };
+        };
+        responses: {
+            /** @description Risk raised */
+            201: {
+                headers: {
+                    ETag: components["headers"]["ETag"];
+                    /** @description URL of the new resource */
+                    Location?: string;
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Risk"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getRiskHeatmap: {
+        parameters: {
+            query?: {
+                kind?: components["schemas"]["RiskKind"];
+                category?: components["schemas"]["RiskCategory"];
+                ownerId?: string;
+            };
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                projectId: components["parameters"]["ProjectId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The heat map */
+            200: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RiskHeatmap"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listPortfolioRisks: {
+        parameters: {
+            query?: {
+                portfolioId?: string;
+                minScore?: number;
+                /** @description 0-based page index */
+                page?: components["parameters"]["Page"];
+                /** @description Page size (values above 100 are capped at 100) */
+                size?: components["parameters"]["Size"];
+                /** @description `field,asc` or `field,desc`; repeat for secondary sorts */
+                sort?: components["parameters"]["Sort"];
+            };
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description One page of risks */
+            200: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RiskPage"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getRisk: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                riskId: components["parameters"]["RiskId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The risk */
+            200: {
+                headers: {
+                    ETag: components["headers"]["ETag"];
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Risk"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    updateRisk: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description The `ETag` of the version being updated, e.g. `"3"` */
+                "If-Match": components["parameters"]["IfMatch"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                riskId: components["parameters"]["RiskId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateRiskRequest"];
+            };
+        };
+        responses: {
+            /** @description The updated risk */
+            200: {
+                headers: {
+                    ETag: components["headers"]["ETag"];
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Risk"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            /** @description The risk is closed. Code: `risks.closed`. */
+            409: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listRiskAssessments: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                riskId: components["parameters"]["RiskId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The assessments */
+            200: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RiskAssessment"][];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    assessRisk: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                riskId: components["parameters"]["RiskId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AssessRiskRequest"];
+            };
+        };
+        responses: {
+            /** @description The new assessment; the risk now carries its scores */
+            201: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RiskAssessment"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            /** @description The risk is closed. Code: `risks.closed`. */
+            409: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            500: components["responses"]["InternalError"];
+        };
+    };
+    closeRisk: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                riskId: components["parameters"]["RiskId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CloseRiskRequest"];
+            };
+        };
+        responses: {
+            /** @description The closed risk */
+            200: {
+                headers: {
+                    ETag: components["headers"]["ETag"];
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Risk"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            /** @description The risk is already closed. Code: `risks.closed`. */
+            409: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            500: components["responses"]["InternalError"];
+        };
+    };
+    materializeRisk: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                riskId: components["parameters"]["RiskId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MaterializeRiskRequest"];
+            };
+        };
+        responses: {
+            /** @description The new issue */
+            201: {
+                headers: {
+                    ETag: components["headers"]["ETag"];
+                    /** @description URL of the new resource */
+                    Location?: string;
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Issue"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            /** @description The risk is already closed. Code: `risks.closed`. */
+            409: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listIssues: {
+        parameters: {
+            query?: {
+                status?: components["schemas"]["IssueStatus"];
+                priority?: components["schemas"]["IssuePriority"];
+                ownerId?: string;
+                /** @description Only unresolved issues past their due date */
+                overdue?: boolean;
+                /** @description Case-insensitive match on name (and code for projects) */
+                q?: string;
+                /** @description 0-based page index */
+                page?: components["parameters"]["Page"];
+                /** @description Page size (values above 100 are capped at 100) */
+                size?: components["parameters"]["Size"];
+                /** @description `field,asc` or `field,desc`; repeat for secondary sorts */
+                sort?: components["parameters"]["Sort"];
+            };
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                projectId: components["parameters"]["ProjectId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description One page of issues */
+            200: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IssuePage"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    createIssue: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                projectId: components["parameters"]["ProjectId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateIssueRequest"];
+            };
+        };
+        responses: {
+            /** @description Issue raised */
+            201: {
+                headers: {
+                    ETag: components["headers"]["ETag"];
+                    /** @description URL of the new resource */
+                    Location?: string;
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Issue"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getIssue: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                issueId: components["parameters"]["IssueId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The issue */
+            200: {
+                headers: {
+                    ETag: components["headers"]["ETag"];
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Issue"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    updateIssue: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description The `ETag` of the version being updated, e.g. `"3"` */
+                "If-Match": components["parameters"]["IfMatch"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                issueId: components["parameters"]["IssueId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateIssueRequest"];
+            };
+        };
+        responses: {
+            /** @description The updated issue */
+            200: {
+                headers: {
+                    ETag: components["headers"]["ETag"];
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Issue"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            /** @description `issues.invalid_transition`, e.g. editing a closed issue. */
+            409: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    resolveIssue: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                issueId: components["parameters"]["IssueId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResolveIssueRequest"];
+            };
+        };
+        responses: {
+            /** @description The resolved issue */
+            200: {
+                headers: {
+                    ETag: components["headers"]["ETag"];
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Issue"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            /** @description The issue is resolved or closed already. Code: `issues.invalid_transition`. */
+            409: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            500: components["responses"]["InternalError"];
+        };
+    };
+    closeIssue: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                issueId: components["parameters"]["IssueId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The closed issue */
+            200: {
+                headers: {
+                    ETag: components["headers"]["ETag"];
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Issue"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            /** @description Only a resolved issue closes. Code: `issues.invalid_transition`. */
+            409: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            500: components["responses"]["InternalError"];
+        };
+    };
+    reopenIssue: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                issueId: components["parameters"]["IssueId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReopenIssueRequest"];
+            };
+        };
+        responses: {
+            /** @description The reopened issue */
+            200: {
+                headers: {
+                    ETag: components["headers"]["ETag"];
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Issue"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            /** @description The issue is not resolved or closed. Code: `issues.invalid_transition`. */
+            409: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listStakeholders: {
+        parameters: {
+            query?: {
+                quadrant?: components["schemas"]["StakeholderQuadrant"];
+                /** @description Only stakeholders whose current engagement is below the desired one */
+                gap?: boolean;
+                /** @description 0-based page index */
+                page?: components["parameters"]["Page"];
+                /** @description Page size (values above 100 are capped at 100) */
+                size?: components["parameters"]["Size"];
+                /** @description `field,asc` or `field,desc`; repeat for secondary sorts */
+                sort?: components["parameters"]["Sort"];
+            };
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                projectId: components["parameters"]["ProjectId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description One page of stakeholders */
+            200: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StakeholderPage"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    createStakeholder: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                projectId: components["parameters"]["ProjectId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateStakeholderRequest"];
+            };
+        };
+        responses: {
+            /** @description Stakeholder added */
+            201: {
+                headers: {
+                    ETag: components["headers"]["ETag"];
+                    /** @description URL of the new resource */
+                    Location?: string;
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Stakeholder"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getStakeholderGrid: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                projectId: components["parameters"]["ProjectId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The grid */
+            200: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StakeholderGrid"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getStakeholder: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                stakeholderId: components["parameters"]["StakeholderId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The stakeholder */
+            200: {
+                headers: {
+                    ETag: components["headers"]["ETag"];
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Stakeholder"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    deleteStakeholder: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                stakeholderId: components["parameters"]["StakeholderId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Removed */
+            204: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    updateStakeholder: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description The `ETag` of the version being updated, e.g. `"3"` */
+                "If-Match": components["parameters"]["IfMatch"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                stakeholderId: components["parameters"]["StakeholderId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateStakeholderRequest"];
+            };
+        };
+        responses: {
+            /** @description The updated stakeholder */
+            200: {
+                headers: {
+                    ETag: components["headers"]["ETag"];
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Stakeholder"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listChangeRequests: {
+        parameters: {
+            query?: {
+                status?: components["schemas"]["ChangeRequestStatus"];
+                /** @description 0-based page index */
+                page?: components["parameters"]["Page"];
+                /** @description Page size (values above 100 are capped at 100) */
+                size?: components["parameters"]["Size"];
+                /** @description `field,asc` or `field,desc`; repeat for secondary sorts */
+                sort?: components["parameters"]["Sort"];
+            };
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                projectId: components["parameters"]["ProjectId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description One page of change requests */
+            200: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChangeRequestPage"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    createChangeRequest: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                projectId: components["parameters"]["ProjectId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateChangeRequestRequest"];
+            };
+        };
+        responses: {
+            /** @description Draft created */
+            201: {
+                headers: {
+                    ETag: components["headers"]["ETag"];
+                    /** @description URL of the new resource */
+                    Location?: string;
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChangeRequest"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getChangeRequest: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                changeRequestId: components["parameters"]["ChangeRequestId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The change request */
+            200: {
+                headers: {
+                    ETag: components["headers"]["ETag"];
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChangeRequest"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    updateChangeRequest: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description The `ETag` of the version being updated, e.g. `"3"` */
+                "If-Match": components["parameters"]["IfMatch"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                changeRequestId: components["parameters"]["ChangeRequestId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateChangeRequestRequest"];
+            };
+        };
+        responses: {
+            /** @description The updated draft */
+            200: {
+                headers: {
+                    ETag: components["headers"]["ETag"];
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChangeRequest"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            /** @description Only a draft can be edited. Code: `change_requests.not_draft`. */
+            409: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    submitChangeRequest: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                changeRequestId: components["parameters"]["ChangeRequestId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The submitted request */
+            200: {
+                headers: {
+                    ETag: components["headers"]["ETag"];
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChangeRequest"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            /** @description Only a draft can be submitted. Code: `change_requests.not_draft`. */
+            409: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            500: components["responses"]["InternalError"];
+        };
+    };
+    decideChangeRequest: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                changeRequestId: components["parameters"]["ChangeRequestId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DecisionRequest"];
+            };
+        };
+        responses: {
+            /** @description The request after the decision */
+            200: {
+                headers: {
+                    ETag: components["headers"]["ETag"];
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChangeRequest"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            /** @description `change_requests.not_in_review` or `change_requests.self_approval`. */
+            409: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            500: components["responses"]["InternalError"];
+        };
+    };
+    withdrawChangeRequest: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                changeRequestId: components["parameters"]["ChangeRequestId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The withdrawn request */
+            200: {
+                headers: {
+                    ETag: components["headers"]["ETag"];
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChangeRequest"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            /** @description It is decided already. Code: `change_requests.invalid_transition`. */
+            409: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            500: components["responses"]["InternalError"];
+        };
+    };
+    implementChangeRequest: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                changeRequestId: components["parameters"]["ChangeRequestId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The implemented request */
+            200: {
+                headers: {
+                    ETag: components["headers"]["ETag"];
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChangeRequest"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            /** @description Only an approved request. Code: `change_requests.invalid_transition`. */
+            409: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            500: components["responses"]["InternalError"];
+        };
+    };
+    reviseChangeRequest: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                changeRequestId: components["parameters"]["ChangeRequestId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The new draft revision */
+            201: {
+                headers: {
+                    ETag: components["headers"]["ETag"];
+                    /** @description URL of the new resource */
+                    Location?: string;
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChangeRequest"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            /** @description Only a rejected request. Code: `change_requests.invalid_transition`. */
+            409: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listPendingApprovals: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The requests */
+            200: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChangeRequest"][];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getChangeControlSettings: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The settings */
+            200: {
+                headers: {
+                    ETag: components["headers"]["ETag"];
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChangeControlSettings"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    updateChangeControlSettings: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description The `ETag` of the version being updated, e.g. `"3"` */
+                "If-Match": components["parameters"]["IfMatch"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateChangeControlSettingsRequest"];
+            };
+        };
+        responses: {
+            /** @description The settings */
+            200: {
+                headers: {
+                    ETag: components["headers"]["ETag"];
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChangeControlSettings"];
                 };
             };
             400: components["responses"]["BadRequest"];
