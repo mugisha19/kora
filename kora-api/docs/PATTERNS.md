@@ -7,11 +7,11 @@ lands in code; a pattern that doesn't earn its place is rejected in an ADR.
 | ------------------------------ | ----------------------------------------------------------------------------------------- | ------------------ | ----- |
 | Ports and adapters (Adapter)   | Email, token store, file storage, clock behind interfaces; in-memory fakes in tests        | Done — Phase 2     | `platform/mail/EmailSender`, `identity/application/RefreshTokenStore` + `adapter/redis`, `*Repository` ports + `adapter/persistence` |
 | Strategy                       | Password hashing; CPM scheduling; EAC and percent-complete methods; methodology rules     | Hashing done — 2; 5, 7 planned | `identity/application/PasswordHasher`, `identity/adapter/security/Argon2PasswordHasher` |
-| State                          | Lifecycles where illegal moves must be impossible: invitation, project, charter, task, issue, change request | Invitation, project, charter done — 2–3; 4–6 planned | `organization/domain/InvitationStatus`, `portfolio/domain/ProjectStatus`, `portfolio/domain/CharterStatus` |
-| Specification                  | Composable, tenant-safe filters for list endpoints (members, projects, tasks, risks)      | Done — Phases 2–3  | `MemberSpecifications`, `portfolio/adapter/persistence/PortfolioSpecifications` (incl. project visibility) |
+| State                          | Lifecycles where illegal moves must be impossible: invitation, project, charter, task, issue, change request | Invitation, project, charter, task done — 2–4; 6 planned | `organization/domain/InvitationStatus`, `portfolio/domain/ProjectStatus`, `portfolio/domain/CharterStatus`, `work/domain/TaskStatus` |
+| Specification                  | Composable, tenant-safe filters for list endpoints (members, projects, tasks, risks)      | Done — Phases 2–4  | `MemberSpecifications`, `portfolio/adapter/persistence/PortfolioSpecifications` (incl. project visibility), `work/adapter/persistence/TaskSpecifications` |
 | Builder                        | Readable test fixtures and the demo data seeder                                           | Planned — Phase 2  | —     |
 | Composite                      | WBS roll-up: a work package and a whole subtree compute effort, cost and progress the same way | Done — Phase 3 | `scope/domain/WbsComponent`, `scope/domain/WbsTree` |
-| Observer (domain events)       | Snapshot read models, WBS roll-up, notifications react to changes without coupling modules | Done — Phases 2–3 | `UserProfileChanged` → `OrganizationEventListeners`; `ProjectChanged`/`WbsChanged` → `reporting/application/SnapshotRefresher` |
+| Observer (domain events)       | Snapshot read models, WBS roll-up, notifications react to changes without coupling modules | Done — Phases 2–4 | `UserProfileChanged` → `OrganizationEventListeners`; `ProjectChanged`/`WbsChanged`/`TaskChanged` → `reporting/application/SnapshotRefresher`; `TaskChanged` → `work/application/BurndownRecorder` |
 | Chain of Responsibility        | Change-request approval levels (PM → PMO → Sponsor) decided by configurable rules         | Planned — Phase 6  | —     |
 | Transactional outbox           | Events are never lost or sent for a rolled-back change (Modulith publication registry)    | Planned — Phase 8  | —     |
 | Template Method + Factory      | Report exporters share load → build → render → store; a new format is one new class       | Planned — Phase 9  | —     |
@@ -50,3 +50,13 @@ Still plumbing rather than domain patterns, but two structural ideas landed in t
   rounded minor units) impossible to write.
 - **CQRS-lite read model**: the dashboard reads `project_snapshots`, a denormalized table the Observer above keeps
   exact; writes stay in the owning modules.
+
+## Phase 4
+
+- **State** again, for tasks: `work/domain/TaskStatus`. The same shape as projects, plus a rule that depends on who
+  asks (only managers reopen `DONE`), passed in rather than looked up, so the domain stays free of security code.
+- **Dependency inversion across modules**: `scope/WorkPackageProgress` is a port owned by the module that *uses* the
+  data and implemented by the module that *has* it (`work/application/WorkPackageProgressService`). The WBS gets task
+  progress without a `scope → work` dependency.
+- **Snapshot for time series**: `SprintDayProgress` stores one value per day instead of replaying history, the
+  same trade-off as the dashboard read model.

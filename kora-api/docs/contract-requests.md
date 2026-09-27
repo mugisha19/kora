@@ -35,3 +35,9 @@ Template:
 - Endpoints: 32 new operations (tags Portfolios, Projects, Charter, WBS, Dashboard); `PATCH /organization` gains
   `409 organization.currency_locked`
 - Status: accepted in 0.2.0; `GET /dashboard/trends` deferred to Phase 7 (EVM)
+
+### 0.3.0: tasks, board, backlog, sprints
+- Requested by: api, 2026-09-27 (start of API Phase 4, for web Phase 5)
+- Endpoints: 21 new operations (tags Tasks, Sprints); `WbsNode.percentCompleteSource`; 8 new error codes
+- Status: accepted in 0.3.0. Known gap: PATCH can't clear a task's assignee, work package or dates (null means
+  unchanged); to be added with explicit nulls when the web app needs it

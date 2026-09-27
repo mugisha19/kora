@@ -186,3 +186,33 @@ Amounts travel as decimal *strings* in JSON so no JavaScript client turns them i
 A test failed just after midnight in Kigali: the server compared dates in UTC, where it was still yesterday. Rules
 about days (late projects, deadlines, timesheet weeks) must use the organization's time zone. Store instants in
 UTC; decide "which day is it" in the user's or organization's zone.
+
+## Lexorank: ordering without renumbering (Phase 4)
+
+Storing positions as 1, 2, 3 means moving a card to the top rewrites every card below it. Lexorank stores a string
+per card instead; to put a card between `"b"` and `"c"`, give it `"bi"`. One row changes per move, however long the
+column. The price: keys grow when you keep inserting into the same gap, so real systems rebalance occasionally.
+**Interview line:** "Fractional indexing with strings: pick a key between the neighbours, write one row."
+
+## Kanban: WIP limits (Phase 4)
+
+A work-in-progress limit caps how many cards a column may hold. When "In review" is full, nobody starts new work;
+they help review instead. The limit makes a bottleneck visible and forces the team to finish before starting. Kora
+lets a manager override it, because rules that can't bend get worked around, but every override is recorded.
+
+## Scrum: commitment, burndown, velocity (Phase 4)
+
+- A **sprint** is a fixed time box (usually two weeks) with a goal. At the start the team commits to a set of
+  backlog items; the **committed points** are frozen then, so later scope changes are visible instead of silently
+  moving the goalposts.
+- The **burndown** plots the points still open each day against an ideal straight line to zero. Flat stretches
+  show blocked work; a line going *up* shows scope added mid-sprint.
+- **Velocity** is the points actually completed per sprint. It is a planning tool ("we usually finish 18–24
+  points"), not a performance score: comparing teams' velocities is meaningless because each team sizes points its
+  own way.
+
+## Physical percent complete from tasks (Phase 4)
+
+A work package's progress is now measured, not guessed: finished tasks count fully, open ones by how much of their
+estimate is burnt, weighted by the estimate. That percentage feeds earned value (EV = budget × percent complete), so
+EVM in Phase 7 rests on the team's actual task updates.
