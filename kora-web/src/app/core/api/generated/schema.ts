@@ -369,7 +369,7 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * List a portfolio''s programs
+         * List a portfolio's programs
          * @description Ordered by name.
          */
         get: operations["listPrograms"];
@@ -543,7 +543,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** The current charter (the latest version that isn''t superseded) */
+        /** The current charter (the latest version that isn't superseded) */
         get: operations["getCharter"];
         /**
          * Replace the draft charter
@@ -798,7 +798,7 @@ export interface paths {
         options?: never;
         head?: never;
         /**
-         * Update a task''s details
+         * Update a task's details
          * @description Managers edit any task; contributors edit tasks assigned to them or unassigned. The status changes through `POST /tasks/{taskId}/move`.
          */
         patch: operations["updateTask"];
@@ -814,7 +814,7 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Change a task''s status and/or position in one call
+         * Change a task's status and/or position in one call
          * @description Places the task between `afterTaskId` (above it) and `beforeTaskId` (below it) in the target status, or last when both are omitted. Moving into a column at its WIP limit needs `override: true`. `BLOCKED` needs a reason; reopening a `DONE` task is for managers only.
          */
         post: operations["moveTask"];
@@ -831,7 +831,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** The task''s comments, oldest first */
+        /** The task's comments, oldest first */
         get: operations["listTaskComments"];
         put?: never;
         /**
@@ -909,7 +909,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** The project''s sprints, newest first */
+        /** The project's sprints, newest first */
         get: operations["listSprints"];
         put?: never;
         /**
@@ -937,7 +937,7 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        /** Change a sprint''s name, goal or dates */
+        /** Change a sprint's name, goal or dates */
         patch: operations["updateSprint"];
         trace?: never;
     };
@@ -1049,6 +1049,108 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/projects/{projectId}/dependencies": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The dependencies between the project's tasks */
+        get: operations["listDependencies"];
+        put?: never;
+        /**
+         * Link two tasks of the project
+         * @description The project manager, PMO or ORG_ADMIN; Predictive and Hybrid projects only. A link that would close a loop is refused before anything is saved.
+         */
+        post: operations["createDependency"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/dependencies/{dependencyId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove a dependency */
+        delete: operations["deleteDependency"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/schedule": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The critical path schedule of the project's tasks
+         * @description Computed on request with the critical path method on the organization's working calendar, from the project start date. Floats and variances are in working days; a positive variance is late.
+         */
+        get: operations["getSchedule"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/schedule/baseline": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Save the current schedule as the new baseline
+         * @description The project manager, PMO or ORG_ADMIN. Every task's early start and finish are recorded; the schedule then reports variances against this baseline.
+         */
+        post: operations["saveBaseline"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organization/calendar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The organization's working days and holidays
+         * @description Monday to Friday and no holidays until an administrator changes it.
+         */
+        get: operations["getWorkingCalendar"];
+        /**
+         * Replace the working days and holidays
+         * @description `ORG_ADMIN` only. Every project schedule is computed with it from then on.
+         */
+        put: operations["updateWorkingCalendar"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1110,7 +1212,7 @@ export interface components {
          *     back to a generic message for unknown codes.
          * @enum {string}
          */
-        ErrorCode: "validation.failed" | "auth.unauthenticated" | "auth.invalid_credentials" | "auth.refresh_invalid" | "auth.email_taken" | "auth.reset_token_invalid" | "tenant.forbidden" | "tenant.header_invalid" | "access.denied" | "resource.not_found" | "method.not_allowed" | "media_type.unsupported" | "concurrency.stale_version" | "concurrency.if_match_required" | "members.last_admin" | "members.self_removal" | "invitations.already_member" | "invitations.already_pending" | "invitations.not_pending" | "invitations.not_found" | "invitations.expired" | "invitations.revoked" | "invitations.already_accepted" | "rate_limited" | "organization.currency_locked" | "portfolios.archived" | "portfolios.not_empty" | "projects.code_taken" | "projects.invalid_transition" | "projects.charter_approval_required" | "projects.methodology_locked" | "project_members.is_manager" | "charters.not_draft" | "charters.not_submitted" | "charters.incomplete" | "wbs.parent_not_deliverable" | "wbs.too_deep" | "wbs.cycle" | "wbs.has_children" | "wbs.type_change_not_allowed" | "tasks.invalid_transition" | "tasks.wip_limit_reached" | "tasks.remaining_work" | "sprints.not_agile" | "sprints.already_active" | "sprints.not_planned" | "sprints.not_active" | "sprints.closed" | "internal.error";
+        ErrorCode: "validation.failed" | "auth.unauthenticated" | "auth.invalid_credentials" | "auth.refresh_invalid" | "auth.email_taken" | "auth.reset_token_invalid" | "tenant.forbidden" | "tenant.header_invalid" | "access.denied" | "resource.not_found" | "method.not_allowed" | "media_type.unsupported" | "concurrency.stale_version" | "concurrency.if_match_required" | "members.last_admin" | "members.self_removal" | "invitations.already_member" | "invitations.already_pending" | "invitations.not_pending" | "invitations.not_found" | "invitations.expired" | "invitations.revoked" | "invitations.already_accepted" | "rate_limited" | "organization.currency_locked" | "portfolios.archived" | "portfolios.not_empty" | "projects.code_taken" | "projects.invalid_transition" | "projects.charter_approval_required" | "projects.methodology_locked" | "project_members.is_manager" | "charters.not_draft" | "charters.not_submitted" | "charters.incomplete" | "wbs.parent_not_deliverable" | "wbs.too_deep" | "wbs.cycle" | "wbs.has_children" | "wbs.type_change_not_allowed" | "tasks.invalid_transition" | "tasks.wip_limit_reached" | "tasks.remaining_work" | "sprints.not_agile" | "sprints.already_active" | "sprints.not_planned" | "sprints.not_active" | "sprints.closed" | "schedule.cycle" | "schedule.dependency_exists" | "schedule.not_predictive" | "internal.error";
         /** @enum {string} */
         Role: "ORG_ADMIN" | "PMO" | "PROJECT_MANAGER" | "MEMBER" | "VIEWER";
         /** @enum {string} */
@@ -1762,6 +1864,17 @@ export interface components {
             /** Format: date */
             dueDate?: string;
             labels: components["schemas"]["Labels"];
+            /**
+             * Format: int32
+             * @description Planned duration in working days; 0 is a milestone. The schedule assumes 1 when absent.
+             */
+            durationDays?: number;
+            scheduleConstraint?: components["schemas"]["ScheduleConstraint"];
+            /**
+             * Format: date
+             * @description Present with START_NO_EARLIER_THAN
+             */
+            constraintDate?: string;
             /** @description Opaque sort key (lexorank); order tasks by it, never parse it */
             rank: string;
             /** Format: date-time */
@@ -1799,6 +1912,14 @@ export interface components {
             /** Format: date */
             dueDate?: string;
             labels?: components["schemas"]["Labels"];
+            /** Format: int32 */
+            durationDays?: number;
+            scheduleConstraint?: components["schemas"]["ScheduleConstraint"];
+            /**
+             * Format: date
+             * @description Required with START_NO_EARLIER_THAN; ignored with ASAP
+             */
+            constraintDate?: string;
         };
         UpdateTaskRequest: {
             title?: string;
@@ -1818,6 +1939,14 @@ export interface components {
             /** Format: date */
             dueDate?: string;
             labels?: components["schemas"]["Labels"];
+            /** Format: int32 */
+            durationDays?: number;
+            scheduleConstraint?: components["schemas"]["ScheduleConstraint"];
+            /**
+             * Format: date
+             * @description Required with START_NO_EARLIER_THAN; ignored with ASAP
+             */
+            constraintDate?: string;
         };
         MoveTaskRequest: {
             status: components["schemas"]["TaskStatus"];
@@ -1985,6 +2114,149 @@ export interface components {
              */
             high?: number;
         };
+        /**
+         * @description ASAP: as soon as its predecessors allow; START_NO_EARLIER_THAN: not before `constraintDate`
+         * @enum {string}
+         */
+        ScheduleConstraint: "ASAP" | "START_NO_EARLIER_THAN";
+        /**
+         * @description FS: the successor starts after the predecessor finishes (the usual one); SS: starts after it starts;
+         *     FF: finishes after it finishes; SF: finishes after it starts.
+         * @enum {string}
+         */
+        DependencyType: "FS" | "SS" | "FF" | "SF";
+        Dependency: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            projectId: string;
+            /** Format: uuid */
+            predecessorId: string;
+            /** Format: uuid */
+            successorId: string;
+            type: components["schemas"]["DependencyType"];
+            /**
+             * Format: int32
+             * @description Working days of waiting after the link is satisfied; negative is a lead (overlap)
+             */
+            lagDays: number;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        CreateDependencyRequest: {
+            /** Format: uuid */
+            predecessorId: string;
+            /** Format: uuid */
+            successorId: string;
+            /** @default FS */
+            type?: components["schemas"]["DependencyType"];
+            /**
+             * Format: int32
+             * @default 0
+             */
+            lagDays?: number;
+        };
+        ScheduledTask: {
+            /** Format: uuid */
+            taskId: string;
+            key: string;
+            title: string;
+            status: components["schemas"]["TaskStatus"];
+            /**
+             * Format: int32
+             * @description The duration used, 1 when the task has none
+             */
+            durationDays: number;
+            /** Format: date */
+            earlyStart: string;
+            /**
+             * Format: date
+             * @description The last working day of the task (its start for a milestone)
+             */
+            earlyFinish: string;
+            /** Format: date */
+            lateStart: string;
+            /** Format: date */
+            lateFinish: string;
+            /**
+             * Format: int32
+             * @description Working days the task can slip without delaying the project
+             */
+            totalFloat: number;
+            /**
+             * Format: int32
+             * @description Working days the task can slip without delaying any successor
+             */
+            freeFloat: number;
+            /** @description No total float; show it distinctly without relying on colour alone */
+            critical: boolean;
+            /** Format: date */
+            baselineStart?: string;
+            /** Format: date */
+            baselineFinish?: string;
+            /**
+             * Format: int32
+             * @description Working days between the baseline start and the early start; positive is late
+             */
+            startVariance?: number;
+            /**
+             * Format: int32
+             * @description Working days between the baseline finish and the early finish; positive is late
+             */
+            finishVariance?: number;
+        };
+        Baseline: {
+            /**
+             * Format: int32
+             * @description 1 for the first baseline of the project, then 2, 3...
+             */
+            number: number;
+            /** Format: date-time */
+            savedAt: string;
+            savedBy: components["schemas"]["UserRef"];
+            /** Format: int32 */
+            taskCount: number;
+        };
+        Schedule: {
+            /** Format: uuid */
+            projectId: string;
+            /**
+             * Format: date
+             * @description The first working day on or after the project start date
+             */
+            projectStart: string;
+            /**
+             * Format: date
+             * @description The latest early finish; absent without tasks
+             */
+            projectFinish?: string;
+            baseline?: components["schemas"]["Baseline"];
+            /** @description Critical task ids in schedule order */
+            criticalPath: string[];
+            /** @description In schedule order (early start, then rank) */
+            tasks: components["schemas"]["ScheduledTask"][];
+        };
+        /** @enum {string} */
+        DayOfWeek: "MONDAY" | "TUESDAY" | "WEDNESDAY" | "THURSDAY" | "FRIDAY" | "SATURDAY" | "SUNDAY";
+        Holiday: {
+            /** Format: date */
+            date: string;
+            name: string;
+        };
+        WorkingCalendar: {
+            workingDays: components["schemas"]["DayOfWeek"][];
+            /** @description In date order */
+            holidays: components["schemas"]["Holiday"][];
+            /**
+             * Format: int64
+             * @description 0 until the calendar is first changed
+             */
+            version: number;
+        };
+        UpdateWorkingCalendarRequest: {
+            workingDays: components["schemas"]["DayOfWeek"][];
+            holidays: components["schemas"]["Holiday"][];
+        };
     };
     responses: {
         /** @description Invalid input. Code: `validation.failed` with `errors[]`, or `tenant.header_invalid`. */
@@ -2127,6 +2399,7 @@ export interface components {
         SprintId: string;
         /** @description A board column (every task status except BACKLOG) */
         BoardStatus: "TODO" | "IN_PROGRESS" | "BLOCKED" | "IN_REVIEW" | "DONE";
+        DependencyId: string;
     };
     requestBodies: never;
     headers: {
@@ -5004,6 +5277,275 @@ export interface operations {
             401: components["responses"]["Unauthenticated"];
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listDependencies: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                projectId: components["parameters"]["ProjectId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The dependencies */
+            200: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Dependency"][];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    createDependency: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                projectId: components["parameters"]["ProjectId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateDependencyRequest"];
+            };
+        };
+        responses: {
+            /** @description Dependency created */
+            201: {
+                headers: {
+                    /** @description URL of the new resource */
+                    Location?: string;
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Dependency"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            /** @description `schedule.cycle` (the error names the loop in `errors[0].params.cycle`), `schedule.dependency_exists` or `schedule.not_predictive`. */
+            409: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            500: components["responses"]["InternalError"];
+        };
+    };
+    deleteDependency: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                dependencyId: components["parameters"]["DependencyId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Removed */
+            204: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getSchedule: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                projectId: components["parameters"]["ProjectId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The schedule */
+            200: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Schedule"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            /** @description The dependencies form a loop. Code: `schedule.cycle`. */
+            409: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            500: components["responses"]["InternalError"];
+        };
+    };
+    saveBaseline: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                projectId: components["parameters"]["ProjectId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Baseline saved */
+            201: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Baseline"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            /** @description `schedule.not_predictive` or `schedule.cycle`. */
+            409: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getWorkingCalendar: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The working calendar */
+            200: {
+                headers: {
+                    ETag: components["headers"]["ETag"];
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WorkingCalendar"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    updateWorkingCalendar: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description The `ETag` of the version being updated, e.g. `"3"` */
+                "If-Match": components["parameters"]["IfMatch"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateWorkingCalendarRequest"];
+            };
+        };
+        responses: {
+            /** @description The working calendar */
+            200: {
+                headers: {
+                    ETag: components["headers"]["ETag"];
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WorkingCalendar"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
             500: components["responses"]["InternalError"];
         };
     };
