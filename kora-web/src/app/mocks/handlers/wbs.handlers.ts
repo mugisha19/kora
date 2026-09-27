@@ -28,6 +28,7 @@ import {
   wbsNodeView,
   wbsTree,
 } from '../projects-domain';
+import { tasksOfWorkPackage } from '../work-domain';
 import { caller } from './portfolio.handlers';
 import { requireEditor, visibleProject } from './project.handlers';
 
@@ -194,6 +195,14 @@ export const wbsHandlers = [
     const type = (body['type'] as WbsNodeType | undefined) ?? node.type;
     const domain = new Validator();
     figuresOnDeliverable(domain, body, type);
+    // Progress measured from tasks can't be reported by hand (contract 0.3.0).
+    if (body['percentComplete'] !== undefined && tasksOfWorkPackage(node.id).length) {
+      domain.add(
+        'percentComplete',
+        'invalid',
+        'progress comes from the tasks of this work package',
+      );
+    }
     if (!domain.ok) return domain.problem(r);
     if (type !== node.type && childrenOf(project.id, node.id).length) {
       return r.problem(409, 'wbs.type_change_not_allowed');

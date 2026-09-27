@@ -1,5 +1,6 @@
 import { MeResponse, Member } from '../core/api/api.models';
 import { ProjectSeed, createProjectSeed } from './data-projects';
+import { WorkSeed, createWorkSeed } from './data-work';
 import {
   InvitationRecord,
   MembershipRecord,
@@ -26,7 +27,7 @@ export interface ResetTokenRecord {
   used: boolean;
 }
 
-export interface MockState extends SeedData, ProjectSeed {
+export interface MockState extends SeedData, ProjectSeed, WorkSeed {
   refreshTokens: RefreshTokenRecord[];
   resetTokens: ResetTokenRecord[];
   /** Sign-in token buckets per lower-cased email, for the rate limit. */
@@ -39,7 +40,7 @@ export function must<T>(value: T | undefined, what: string): T {
   return value;
 }
 
-const STORAGE_KEY = 'kora.mock.db.v3';
+const STORAGE_KEY = 'kora.mock.db.v4';
 
 function storage(): Storage | null {
   try {
@@ -154,6 +155,7 @@ export class MockDb {
     return {
       ...createSeed(),
       ...createProjectSeed(),
+      ...createWorkSeed(),
       refreshTokens: [],
       resetTokens: [],
       loginBuckets: {},

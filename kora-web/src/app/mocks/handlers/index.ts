@@ -8,10 +8,12 @@ import { invitationsHandlers } from './invitations.handlers';
 import { membersHandlers } from './members.handlers';
 import { portfolioHandlers } from './portfolio.handlers';
 import { projectHandlers } from './project.handlers';
+import { sprintHandlers } from './sprint.handlers';
+import { taskHandlers } from './task.handlers';
 import { wbsHandlers } from './wbs.handlers';
 
 /**
- * Every mocked operation of contracts 0.1.1 and 0.2.0, then a catch-all like the API's: an unknown path is
+ * Every mocked operation of contracts 0.1.1 to 0.3.0, then a catch-all like the API's: an unknown path is
  * 401 without a valid token (security runs first) and 404 with one.
  */
 export const handlers = [
@@ -24,6 +26,8 @@ export const handlers = [
   ...charterHandlers,
   ...wbsHandlers,
   ...dashboardHandlers,
+  ...taskHandlers,
+  ...sprintHandlers,
   http.all(`${API}/*`, ({ request }) => {
     const r = reply(request);
     const userId = authenticate(request, r);

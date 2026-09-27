@@ -350,6 +350,7 @@ export function createProjectSeed(now = Date.now()): ProjectSeed {
     member('mobile', USER.member, 'CONTRIBUTOR'),
     member('mobile', USER.viewer, 'OBSERVER'),
     member('mobile', USER.pmo, 'OBSERVER'),
+    member('mobile', PEOPLE.odette, 'CONTRIBUTOR'),
     member('portal', USER.member, 'CONTRIBUTOR'),
     member('erp', USER.pm, 'CONTRIBUTOR'),
     member('warehouse', USER.pmo, 'OBSERVER'),

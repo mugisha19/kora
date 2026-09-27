@@ -23,6 +23,7 @@ import {
 import { MembershipRecord } from './data';
 import { db, must } from './db';
 import { currencyDigits, fromUnits, percentOf, toUnits } from './decimal';
+import { taskProgress, tasksOfWorkPackage } from './work-domain';
 
 /*
  * The project domain as the API implements it (contract 0.2.0 + backend notes), for the mock:
@@ -291,22 +292,26 @@ function roll(record: WbsNodeRecord, code: string, currency: string): Rolled {
   };
 
   if (record.type === 'WORK_PACKAGE') {
+    // A work package with tasks takes its progress from them (feature 08); otherwise as reported.
+    const tasks = tasksOfWorkPackage(record.id);
+    const fromTasks = tasks.length > 0;
+    const percentComplete = fromTasks ? taskProgress(tasks) : record.percentComplete;
     const cost = toUnits(record.plannedCost);
-    const earned = percentOf(record.plannedCost, record.percentComplete);
+    const earned = percentOf(record.plannedCost, percentComplete);
     return {
       node: {
         ...base,
         plannedEffortHours: record.plannedEffortHours,
         plannedCost: money(cost),
-        percentComplete: record.percentComplete,
-        percentCompleteSource: 'REPORTED',
+        percentComplete,
+        percentCompleteSource: fromTasks ? 'TASKS' : 'REPORTED',
         earnedValue: money(earned),
         children: [],
       },
       effort: record.plannedEffortHours,
       cost,
       earned,
-      percent: record.percentComplete,
+      percent: percentComplete,
     };
   }
 
