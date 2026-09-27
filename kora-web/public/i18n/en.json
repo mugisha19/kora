@@ -45,7 +45,10 @@
     "reload": "Reload",
     "optional": "Optional",
     "onePerLine": "One per line",
-    "undo": "Undo"
+    "undo": "Undo",
+    "notSet": "Not set",
+    "yes": "Yes",
+    "no": "No"
   },
   "status": {
     "success": "On track",
@@ -74,7 +77,9 @@
       "spiCpi": "SPI / CPI",
       "risks": "Open critical risks",
       "changes": "Pending change requests",
-      "later": "Available in a later release"
+      "later": "Available in a later release",
+      "risksNote": "Scoring 15 or more",
+      "changesNote": "Submitted or in review"
     },
     "charts": {
       "title": "Distributions",
@@ -90,7 +95,13 @@
       "nextMilestone": "Next milestone"
     },
     "spi": "Schedule performance index",
-    "cpi": "Cost performance index"
+    "cpi": "Cost performance index",
+    "risks": {
+      "title": "Critical risks",
+      "subtitle": "Open risks scoring 15 or more, across the projects in view.",
+      "review": "review {{ date }}",
+      "none": "No open critical risks."
+    }
   },
   "settings": {
     "title": "Settings",
@@ -238,6 +249,18 @@
         "cycle": "These dependencies would form a loop.",
         "not_predictive": "Dependencies and baselines are for Predictive and Hybrid projects.",
         "dependency_exists": "These two tasks are already linked."
+      },
+      "risks": {
+        "closed": "This risk is closed and can’t change."
+      },
+      "issues": {
+        "invalid_transition": "The issue can’t do that from its current status."
+      },
+      "change_requests": {
+        "not_draft": "Only a draft can be changed or submitted.",
+        "not_in_review": "This request isn’t waiting for a decision.",
+        "self_approval": "Nobody decides on their own change request.",
+        "invalid_transition": "The request can’t do that from its current status."
       }
     },
     "fields": {
@@ -359,7 +382,8 @@
       "members": "Members",
       "invitations": "Invitations",
       "organization": "Organization",
-      "calendar": "Working calendar"
+      "calendar": "Working calendar",
+      "changeControl": "Change control"
     },
     "members": {
       "search": "Search by name or email",
@@ -428,6 +452,23 @@
       "errors": {
         "noDays": "Choose at least one working day.",
         "duplicate": "That date is already a holiday."
+      }
+    },
+    "changeControl": {
+      "intro": "Who approves a change request depends on its size. The project manager always approves.",
+      "pmoCost": "PMO approves above this cost change",
+      "pmoCostHint": "Share of the project’s budget.",
+      "pmoDays": "PMO approves above this schedule change",
+      "pmoDaysHint": "Working days.",
+      "sponsorCost": "Sponsor approves above this cost change",
+      "sponsorCostHint": "Share of the budget. The sponsor also approves any change to the charter’s scope.",
+      "always": "Requests submitted from now on use these thresholds; submitted ones keep their approvers.",
+      "save": "Save thresholds",
+      "saved": "Change-control thresholds saved.",
+      "stale": "Someone else saved the thresholds while you were editing. Reload to see their version, then make your change again.",
+      "errors": {
+        "percent": "Enter a percentage from 0 to 100.",
+        "days": "Enter a whole number of days from 0 to 1000."
       }
     }
   },
@@ -621,7 +662,11 @@
       "wbs": "WBS",
       "board": "Board",
       "backlog": "Backlog",
-      "schedule": "Schedule"
+      "schedule": "Schedule",
+      "risks": "Risks",
+      "issues": "Issues",
+      "stakeholders": "Stakeholders",
+      "change-requests": "Changes"
     },
     "overview": {
       "details": "Details"
@@ -1108,5 +1153,453 @@
     "FRIDAY": "Friday",
     "SATURDAY": "Saturday",
     "SUNDAY": "Sunday"
+  },
+  "severity": {
+    "LOW": "Low",
+    "MEDIUM": "Medium",
+    "HIGH": "High",
+    "CRITICAL": "Critical"
+  },
+  "riskKind": {
+    "THREAT": "Threat",
+    "OPPORTUNITY": "Opportunity"
+  },
+  "riskKindHint": {
+    "THREAT": "Would harm the project’s objectives if it happened.",
+    "OPPORTUNITY": "Would help the project’s objectives if it happened."
+  },
+  "riskCategory": {
+    "TECHNICAL": "Technical",
+    "EXTERNAL": "External",
+    "ORGANIZATIONAL": "Organizational",
+    "PROJECT_MANAGEMENT": "Project management",
+    "FINANCIAL": "Financial",
+    "OTHER": "Other"
+  },
+  "riskProximity": {
+    "IMMEDIATE": "Within days",
+    "WEEKS": "Within weeks",
+    "MONTHS": "Within months",
+    "LATER": "Later"
+  },
+  "riskStatus": {
+    "IDENTIFIED": "Identified",
+    "ANALYZED": "Analyzed",
+    "RESPONSE_PLANNED": "Response planned",
+    "MONITORING": "Monitoring",
+    "CLOSED": "Closed"
+  },
+  "riskProbability": {
+    "1": "1 · Rare (under 10%)",
+    "2": "2 · Unlikely (10–30%)",
+    "3": "3 · Possible (30–50%)",
+    "4": "4 · Likely (50–80%)",
+    "5": "5 · Almost certain (over 80%)"
+  },
+  "riskImpact": {
+    "1": "1 · Negligible (hardly noticed)",
+    "2": "2 · Minor (days of delay, under 2% of the budget)",
+    "3": "3 · Moderate (weeks of delay, 2–5% of the budget)",
+    "4": "4 · Major (a milestone slips, 5–10% of the budget)",
+    "5": "5 · Severe (objectives missed, over 10% of the budget)"
+  },
+  "riskProbabilityShort": {
+    "1": "Rare",
+    "2": "Unlikely",
+    "3": "Possible",
+    "4": "Likely",
+    "5": "Almost certain"
+  },
+  "riskImpactShort": {
+    "1": "Negligible",
+    "2": "Minor",
+    "3": "Moderate",
+    "4": "Major",
+    "5": "Severe"
+  },
+  "responseStrategy": {
+    "AVOID": "Avoid",
+    "MITIGATE": "Mitigate",
+    "TRANSFER": "Transfer",
+    "EXPLOIT": "Exploit",
+    "ENHANCE": "Enhance",
+    "SHARE": "Share",
+    "ACCEPT": "Accept",
+    "ESCALATE": "Escalate"
+  },
+  "responseStrategyHint": {
+    "AVOID": "change the plan so it can’t happen",
+    "MITIGATE": "make it less likely or less harmful",
+    "TRANSFER": "give it to a third party (insurance, contract)",
+    "EXPLOIT": "make sure it happens",
+    "ENHANCE": "make it more likely or more valuable",
+    "SHARE": "team up with someone better placed to seize it",
+    "ACCEPT": "act only if it happens",
+    "ESCALATE": "hand it to someone above the project"
+  },
+  "riskClosure": {
+    "EXPIRED": "Closed: it can no longer happen",
+    "MATERIALIZED": "Closed: it happened"
+  },
+  "issueType": {
+    "TECHNICAL": "Technical",
+    "RESOURCE": "Resource",
+    "SCOPE": "Scope",
+    "VENDOR": "Vendor",
+    "OTHER": "Other"
+  },
+  "issueStatus": {
+    "OPEN": "Open",
+    "IN_PROGRESS": "In progress",
+    "RESOLVED": "Resolved",
+    "CLOSED": "Closed"
+  },
+  "engagement": {
+    "UNAWARE": "Unaware",
+    "RESISTANT": "Resistant",
+    "NEUTRAL": "Neutral",
+    "SUPPORTIVE": "Supportive",
+    "LEADING": "Leading"
+  },
+  "stakeholderQuadrant": {
+    "MANAGE_CLOSELY": "Manage closely",
+    "KEEP_SATISFIED": "Keep satisfied",
+    "KEEP_INFORMED": "Keep informed",
+    "MONITOR": "Monitor"
+  },
+  "stakeholderQuadrantHint": {
+    "MANAGE_CLOSELY": "High power, high interest",
+    "KEEP_SATISFIED": "High power, low interest",
+    "KEEP_INFORMED": "Low power, high interest",
+    "MONITOR": "Low power, low interest"
+  },
+  "changeType": {
+    "SCOPE": "Scope",
+    "SCHEDULE": "Schedule",
+    "COST": "Cost",
+    "QUALITY": "Quality",
+    "OTHER": "Other"
+  },
+  "changeStatus": {
+    "DRAFT": "Draft",
+    "SUBMITTED": "Submitted",
+    "IN_REVIEW": "In review",
+    "APPROVED": "Approved",
+    "REJECTED": "Rejected",
+    "WITHDRAWN": "Withdrawn",
+    "IMPLEMENTED": "Implemented"
+  },
+  "approvalLevel": {
+    "PROJECT_MANAGER": "Project manager",
+    "PMO": "PMO",
+    "SPONSOR": "Sponsor"
+  },
+  "stepState": {
+    "WAITING": "Waiting for earlier steps",
+    "PENDING": "Waiting for a decision",
+    "APPROVED": "Approved",
+    "REJECTED": "Rejected",
+    "SKIPPED": "Not reached"
+  },
+  "risks": {
+    "register": "Risk register",
+    "search": "Search risks",
+    "raise": "Raise risk",
+    "raiseTitle": "Raise a risk",
+    "editTitle": "Edit {{ key }}",
+    "assessTitle": "Re-assess {{ key }}",
+    "closeTitle": "Close {{ key }}",
+    "closeNote": "Why can it no longer happen?",
+    "materializeTitle": "{{ key }} happened",
+    "materializeIntro": "An issue is opened to deal with it, and the risk is closed as “it happened”.",
+    "sheetTitle": "Risk",
+    "raised": "{{ key }} raised.",
+    "saved": "{{ key }} saved.",
+    "assessed": "{{ key }} re-assessed.",
+    "closedToast": "{{ key }} closed.",
+    "materialized": "{{ key }} happened: issue {{ issue }} opened.",
+    "assess": "Re-assess",
+    "close": "Close risk",
+    "materialize": "It happened",
+    "count": "Risks: {{ count }}",
+    "noOwner": "No owner",
+    "noResponse": "No response planned yet.",
+    "notFound": "This risk doesn’t exist or was removed.",
+    "openIssue": "Open the issue it became",
+    "reviewOverdue": "Review overdue",
+    "response": "Response",
+    "scoring": "Scoring",
+    "inherent": "Inherent risk (before the response)",
+    "residual": "Residual risk (once the response works)",
+    "currentScore": "Current score",
+    "newScore": "New score",
+    "history": "Assessment history",
+    "historyLabel": "Score over time: {{ scores }}",
+    "assessedAs": "Probability {{ probability }} × impact {{ impact }}",
+    "residualAs": "residual {{ score }}",
+    "sortBy": "Sort by",
+    "sort": {
+      "score": "Score (highest first)",
+      "key": "Number",
+      "reviewDate": "Review date (soonest first)",
+      "createdAt": "Newest first"
+    },
+    "emptyTitle": "No risks yet",
+    "emptyMessage": "Raise the first risk: something that might happen and would change the project’s outcome.",
+    "noMatchTitle": "No risks match",
+    "noMatchMessage": "Try other filters, or clear them.",
+    "filters": {
+      "anyKind": "Any kind",
+      "anyCategory": "Any category",
+      "anyOwner": "Anyone",
+      "anyStatus": "Any status"
+    },
+    "fields": {
+      "risk": "Risk",
+      "title": "Title",
+      "description": "Description",
+      "kind": "Kind",
+      "category": "Category",
+      "proximity": "When it could happen",
+      "probability": "Probability",
+      "impact": "Impact",
+      "score": "Score",
+      "residualProbability": "Residual probability",
+      "residualImpact": "Residual impact",
+      "residualScore": "Residual score",
+      "owner": "Owner",
+      "reviewDate": "Review date",
+      "status": "Status",
+      "strategy": "Response strategy",
+      "plan": "Response plan",
+      "triggers": "Warning signs",
+      "note": "Note",
+      "identifiedBy": "Raised by"
+    },
+    "hints": {
+      "plan": "What will be done, by whom, by when.",
+      "residual": "Optional: the score you expect once the response is in place."
+    },
+    "errors": {
+      "strategyNeeded": "Choose a strategy for a planned or monitored risk.",
+      "planNeeded": "Describe the response for a planned or monitored risk.",
+      "residualPair": "Give both residual probability and residual impact, or neither."
+    },
+    "heatmap": {
+      "title": "Heat map",
+      "caption": "Open risks by probability and impact",
+      "cell": "Probability {{ probability }}, impact {{ impact }}: {{ count }} risks, {{ severity }}",
+      "none": "none",
+      "help": "Each cell shows how many open risks sit there and its band. Choose a cell to list its risks.",
+      "filtered": "Showing risks with probability {{ probability }} and impact {{ impact }}.",
+      "clear": "Show all"
+    }
+  },
+  "issues": {
+    "log": "Issue log",
+    "search": "Search issues",
+    "raise": "Raise issue",
+    "raiseTitle": "Raise an issue",
+    "editTitle": "Edit {{ key }}",
+    "sheetTitle": "Issue",
+    "raised": "{{ key }} raised.",
+    "saved": "{{ key }} saved.",
+    "started": "Work on {{ key }} started.",
+    "paused": "{{ key }} is open again.",
+    "resolved": "{{ key }} resolved.",
+    "closed": "{{ key }} closed.",
+    "reopened": "{{ key }} reopened.",
+    "count": "Issues: {{ count }}",
+    "anyStatus": "Any status",
+    "anyPriority": "Any priority",
+    "quickFilters": "Quick filters",
+    "quick": {
+      "mine": "Mine",
+      "overdue": "Overdue",
+      "critical": "Critical"
+    },
+    "overdue": "Overdue",
+    "escalated": "Escalated to the PMO",
+    "escalatedHelp": "Critical and unresolved for more than three days: the PMO has been asked to step in.",
+    "start": "Start work",
+    "pause": "Back to open",
+    "resolve": "Resolve",
+    "resolveTitle": "Resolve {{ key }}",
+    "resolution": "Resolution",
+    "resolvedOn": "Resolved on {{ date }}",
+    "close": "Close issue",
+    "closeTitle": "Close {{ key }}?",
+    "closeMessage": "A closed issue is done: it can be reopened if it comes back.",
+    "reopen": "Reopen",
+    "reopenTitle": "Reopen {{ key }}",
+    "reopenReason": "Why is it back?",
+    "raiseChange": "Raise a change request",
+    "links": "Linked",
+    "fromRisk": "The risk it materialized from",
+    "changeRequest": "The change request raised for it",
+    "notFound": "This issue doesn’t exist or was removed.",
+    "emptyTitle": "No issues",
+    "emptyMessage": "Nothing is going wrong right now. Raise an issue when something needs resolving.",
+    "noMatchTitle": "No issues match",
+    "noMatchMessage": "Try other filters, or clear them.",
+    "fields": {
+      "issue": "Issue",
+      "title": "Title",
+      "description": "Description",
+      "type": "Type",
+      "priority": "Priority",
+      "status": "Status",
+      "owner": "Owner",
+      "dueDate": "Due date",
+      "raisedBy": "Raised by"
+    }
+  },
+  "stakeholders": {
+    "grid": "Power/interest grid",
+    "register": "Register",
+    "matrix": "Engagement",
+    "matrixCaption": "Each stakeholder’s current (C) and desired (D) engagement",
+    "matrixLegend": "C = current engagement, D = desired engagement.",
+    "people": "People",
+    "add": "Add stakeholder",
+    "addTitle": "Add a stakeholder",
+    "added": "{{ name }} added.",
+    "saved": "{{ name }} saved.",
+    "remove": "Remove",
+    "removeTitle": "Remove {{ name }}?",
+    "removeMessage": "Their name, contact details and notes are erased; the record stays anonymous so nothing that refers to it breaks.",
+    "removed": "Stakeholder removed and their personal data erased.",
+    "count": "Stakeholders: {{ count }}",
+    "gapFilter": "Engagement gap only",
+    "clearQuadrant": "Show all, not only “{{ quadrant }}”",
+    "gapLabel": "needs {{ count }} more",
+    "aboveDesired": "Above target",
+    "onTarget": "On target",
+    "current": "current",
+    "desired": "desired",
+    "nobody": "Nobody here.",
+    "privacy": "Personal data: keep only what the project needs. Removing a stakeholder erases it.",
+    "quadrantPreview": "Grid quadrant",
+    "emptyTitle": "No stakeholders yet",
+    "emptyMessage": "List the people and groups the project affects, and plan how to engage them.",
+    "noMatchTitle": "No stakeholders match",
+    "noMatchMessage": "Try another quadrant, or show everyone.",
+    "level": {
+      "1": "1 · Very low",
+      "2": "2 · Low",
+      "3": "3 · Medium",
+      "4": "4 · High",
+      "5": "5 · Very high"
+    },
+    "fields": {
+      "name": "Name",
+      "organization": "Organization",
+      "role": "Role",
+      "email": "Email",
+      "phone": "Phone",
+      "power": "Power",
+      "interest": "Interest",
+      "influence": "Influence",
+      "quadrant": "Quadrant",
+      "engagement": "Engagement",
+      "current": "Current engagement",
+      "desired": "Desired engagement",
+      "gap": "Gap",
+      "contact": "Contact",
+      "communication": "Communication preferences",
+      "notes": "Notes"
+    },
+    "hints": {
+      "communication": "How and how often, e.g. “monthly one-page summary”."
+    },
+    "errors": {
+      "phone": "Digits, spaces, +, - and brackets only."
+    },
+    "currentShort": "C",
+    "desiredShort": "D"
+  },
+  "changes": {
+    "detailTitle": "Change request",
+    "draft": "New change request",
+    "draftTitle": "New change request",
+    "editTitle": "Edit {{ key }}",
+    "saveDraft": "Save draft",
+    "drafted": "Draft {{ key }} saved.",
+    "saved": "{{ key }} saved.",
+    "count": "Change requests: {{ count }}",
+    "anyStatus": "Any status",
+    "revision": "revision {{ number }}",
+    "days": "{{ count }} working days",
+    "waitingFor": "Waiting for",
+    "anyRole": "Any {{ role }}",
+    "decidedBy": "{{ name }}, {{ date }}",
+    "requestedOn": "Requested by {{ name }} on {{ date }}",
+    "backToList": "All change requests",
+    "impact": "Impact",
+    "chain": "Approval chain",
+    "chainLater": "Built when the request is submitted, from its impact and the organization’s thresholds.",
+    "links": "Linked",
+    "openIssue": "The issue it deals with",
+    "previousRevision": "The previous revision",
+    "fromIssue": "For issue {{ key }}.",
+    "notFoundTitle": "Change request not found",
+    "notFoundMessage": "It doesn’t exist, or you can’t see its project.",
+    "emptyTitle": "No change requests",
+    "emptyMessage": "Changes to scope, schedule or cost go through a change request and its approvals.",
+    "submit": "Submit for approval",
+    "submitTitle": "Submit {{ key }}?",
+    "submitMessage": "Its approvers are chosen now from its impact. It can’t be edited once submitted.",
+    "submitted": "{{ key }} submitted.",
+    "approve": "Approve",
+    "reject": "Reject",
+    "approveTitle": "Approve {{ key }}",
+    "rejectTitle": "Reject {{ key }}",
+    "approveComment": "Comment (optional)",
+    "rejectComment": "Why is it rejected?",
+    "approved": "Decision on {{ key }} recorded: approved.",
+    "rejected": "Decision on {{ key }} recorded: rejected.",
+    "withdraw": "Withdraw",
+    "withdrawTitle": "Withdraw {{ key }}?",
+    "withdrawMessage": "It stops here; nobody else is asked to decide.",
+    "withdrawn": "{{ key }} withdrawn.",
+    "implement": "Mark as implemented",
+    "implementTitle": "Mark {{ key }} as implemented?",
+    "implementMessage": "Say the approved change has been carried out.",
+    "implemented": "{{ key }} implemented.",
+    "revise": "Revise and resubmit",
+    "revised": "New revision of {{ key }} drafted.",
+    "fields": {
+      "request": "Request",
+      "title": "Title",
+      "type": "Type",
+      "status": "Status",
+      "reason": "Reason",
+      "description": "Description",
+      "cost": "Cost change",
+      "schedule": "Schedule change",
+      "scope": "Scope change",
+      "risk": "Risk",
+      "charterScope": "Changes the charter’s scope",
+      "requestedBy": "Requested by"
+    },
+    "hints": {
+      "reason": "Why the project needs this change.",
+      "cost": "Negative for a saving, e.g. -1 500 000.",
+      "schedule": "Working days added to the end date; negative to pull it in.",
+      "charterScope": "The sponsor then approves it too, and the scope is added to a new charter version."
+    },
+    "errors": {
+      "days": "Enter a whole number from −1000 to 1000.",
+      "scopeNeeded": "Describe the scope change it adds to the charter."
+    }
+  },
+  "approvals": {
+    "title": "My approvals",
+    "subtitle": "Change requests waiting for your decision, oldest first.",
+    "link": "My approvals: {{ count }} waiting",
+    "count": "Waiting for you: {{ count }}",
+    "requested": "Requested by {{ name }}, submitted {{ date }}",
+    "emptyTitle": "Nothing waits for you",
+    "emptyMessage": "Change requests that need your decision appear here."
   }
 }

@@ -45,7 +45,10 @@
     "reload": "Recharger",
     "optional": "Facultatif",
     "onePerLine": "Un par ligne",
-    "undo": "Annuler"
+    "undo": "Annuler",
+    "notSet": "Non renseigné",
+    "yes": "Oui",
+    "no": "Non"
   },
   "status": {
     "success": "Dans les temps",
@@ -74,7 +77,9 @@
       "spiCpi": "SPI / CPI",
       "risks": "Risques critiques ouverts",
       "changes": "Demandes de changement en attente",
-      "later": "Disponible dans une version ultérieure"
+      "later": "Disponible dans une version ultérieure",
+      "risksNote": "Note de 15 ou plus",
+      "changesNote": "Soumises ou en examen"
     },
     "charts": {
       "title": "Répartitions",
@@ -90,7 +95,13 @@
       "nextMilestone": "Prochain jalon"
     },
     "spi": "Indice de performance des délais",
-    "cpi": "Indice de performance des coûts"
+    "cpi": "Indice de performance des coûts",
+    "risks": {
+      "title": "Risques critiques",
+      "subtitle": "Risques ouverts notés 15 ou plus, sur les projets affichés.",
+      "review": "revue le {{ date }}",
+      "none": "Aucun risque critique ouvert."
+    }
   },
   "settings": {
     "title": "Paramètres",
@@ -238,6 +249,18 @@
         "cycle": "Ces dépendances formeraient une boucle.",
         "not_predictive": "Les dépendances et références sont réservées aux projets prédictifs et hybrides.",
         "dependency_exists": "Ces deux tâches sont déjà liées."
+      },
+      "risks": {
+        "closed": "Ce risque est clos et ne peut plus changer."
+      },
+      "issues": {
+        "invalid_transition": "Le problème ne peut pas faire cela depuis son statut actuel."
+      },
+      "change_requests": {
+        "not_draft": "Seul un brouillon peut être modifié ou soumis.",
+        "not_in_review": "Cette demande n’attend pas de décision.",
+        "self_approval": "Personne ne décide de sa propre demande de changement.",
+        "invalid_transition": "La demande ne peut pas faire cela depuis son statut actuel."
       }
     },
     "fields": {
@@ -359,7 +382,8 @@
       "members": "Membres",
       "invitations": "Invitations",
       "organization": "Organisation",
-      "calendar": "Calendrier ouvré"
+      "calendar": "Calendrier ouvré",
+      "changeControl": "Maîtrise des changements"
     },
     "members": {
       "search": "Rechercher par nom ou e-mail",
@@ -428,6 +452,23 @@
       "errors": {
         "noDays": "Choisissez au moins un jour travaillé.",
         "duplicate": "Cette date est déjà un jour férié."
+      }
+    },
+    "changeControl": {
+      "intro": "Qui approuve une demande de changement dépend de son ampleur. Le chef de projet approuve toujours.",
+      "pmoCost": "Le PMO approuve au-delà de cette variation de coût",
+      "pmoCostHint": "Part du budget du projet.",
+      "pmoDays": "Le PMO approuve au-delà de cette variation de planning",
+      "pmoDaysHint": "Jours ouvrés.",
+      "sponsorCost": "Le sponsor approuve au-delà de cette variation de coût",
+      "sponsorCostHint": "Part du budget. Le sponsor approuve aussi tout changement du périmètre de la charte.",
+      "always": "Les demandes soumises à partir de maintenant utilisent ces seuils ; celles déjà soumises gardent leurs approbateurs.",
+      "save": "Enregistrer les seuils",
+      "saved": "Seuils de maîtrise des changements enregistrés.",
+      "stale": "Quelqu’un d’autre a enregistré les seuils pendant votre modification. Rechargez pour voir sa version, puis refaites votre modification.",
+      "errors": {
+        "percent": "Saisissez un pourcentage entre 0 et 100.",
+        "days": "Saisissez un nombre entier de jours entre 0 et 1000."
       }
     }
   },
@@ -621,7 +662,11 @@
       "wbs": "WBS",
       "board": "Tableau",
       "backlog": "Backlog",
-      "schedule": "Planning"
+      "schedule": "Planning",
+      "risks": "Risques",
+      "issues": "Problèmes",
+      "stakeholders": "Parties prenantes",
+      "change-requests": "Changements"
     },
     "overview": {
       "details": "Détails"
@@ -1108,5 +1153,453 @@
     "FRIDAY": "Vendredi",
     "SATURDAY": "Samedi",
     "SUNDAY": "Dimanche"
+  },
+  "severity": {
+    "LOW": "Faible",
+    "MEDIUM": "Moyen",
+    "HIGH": "Élevé",
+    "CRITICAL": "Critique"
+  },
+  "riskKind": {
+    "THREAT": "Menace",
+    "OPPORTUNITY": "Opportunité"
+  },
+  "riskKindHint": {
+    "THREAT": "Nuirait aux objectifs du projet s’il se produisait.",
+    "OPPORTUNITY": "Servirait les objectifs du projet s’il se produisait."
+  },
+  "riskCategory": {
+    "TECHNICAL": "Technique",
+    "EXTERNAL": "Externe",
+    "ORGANIZATIONAL": "Organisationnel",
+    "PROJECT_MANAGEMENT": "Gestion de projet",
+    "FINANCIAL": "Financier",
+    "OTHER": "Autre"
+  },
+  "riskProximity": {
+    "IMMEDIATE": "D’ici quelques jours",
+    "WEEKS": "D’ici quelques semaines",
+    "MONTHS": "D’ici quelques mois",
+    "LATER": "Plus tard"
+  },
+  "riskStatus": {
+    "IDENTIFIED": "Identifié",
+    "ANALYZED": "Analysé",
+    "RESPONSE_PLANNED": "Réponse planifiée",
+    "MONITORING": "Sous surveillance",
+    "CLOSED": "Clos"
+  },
+  "riskProbability": {
+    "1": "1 · Rare (moins de 10 %)",
+    "2": "2 · Peu probable (10–30 %)",
+    "3": "3 · Possible (30–50 %)",
+    "4": "4 · Probable (50–80 %)",
+    "5": "5 · Presque certain (plus de 80 %)"
+  },
+  "riskImpact": {
+    "1": "1 · Négligeable (à peine visible)",
+    "2": "2 · Mineur (quelques jours de retard, moins de 2 % du budget)",
+    "3": "3 · Modéré (quelques semaines de retard, 2–5 % du budget)",
+    "4": "4 · Majeur (un jalon glisse, 5–10 % du budget)",
+    "5": "5 · Grave (objectifs manqués, plus de 10 % du budget)"
+  },
+  "riskProbabilityShort": {
+    "1": "Rare",
+    "2": "Peu probable",
+    "3": "Possible",
+    "4": "Probable",
+    "5": "Presque certain"
+  },
+  "riskImpactShort": {
+    "1": "Négligeable",
+    "2": "Mineur",
+    "3": "Modéré",
+    "4": "Majeur",
+    "5": "Grave"
+  },
+  "responseStrategy": {
+    "AVOID": "Éviter",
+    "MITIGATE": "Atténuer",
+    "TRANSFER": "Transférer",
+    "EXPLOIT": "Exploiter",
+    "ENHANCE": "Amplifier",
+    "SHARE": "Partager",
+    "ACCEPT": "Accepter",
+    "ESCALATE": "Remonter"
+  },
+  "responseStrategyHint": {
+    "AVOID": "changer le plan pour qu’il ne puisse pas se produire",
+    "MITIGATE": "le rendre moins probable ou moins grave",
+    "TRANSFER": "le confier à un tiers (assurance, contrat)",
+    "EXPLOIT": "s’assurer qu’il se produise",
+    "ENHANCE": "le rendre plus probable ou plus profitable",
+    "SHARE": "s’associer à quelqu’un de mieux placé pour le saisir",
+    "ACCEPT": "n’agir que s’il se produit",
+    "ESCALATE": "le confier à un niveau au-dessus du projet"
+  },
+  "riskClosure": {
+    "EXPIRED": "Clos : il ne peut plus se produire",
+    "MATERIALIZED": "Clos : il s’est produit"
+  },
+  "issueType": {
+    "TECHNICAL": "Technique",
+    "RESOURCE": "Ressources",
+    "SCOPE": "Périmètre",
+    "VENDOR": "Fournisseur",
+    "OTHER": "Autre"
+  },
+  "issueStatus": {
+    "OPEN": "Ouvert",
+    "IN_PROGRESS": "En cours",
+    "RESOLVED": "Résolu",
+    "CLOSED": "Clos"
+  },
+  "engagement": {
+    "UNAWARE": "Non informé",
+    "RESISTANT": "Réticent",
+    "NEUTRAL": "Neutre",
+    "SUPPORTIVE": "Favorable",
+    "LEADING": "Moteur"
+  },
+  "stakeholderQuadrant": {
+    "MANAGE_CLOSELY": "Gérer de près",
+    "KEEP_SATISFIED": "Satisfaire",
+    "KEEP_INFORMED": "Tenir informé",
+    "MONITOR": "Surveiller"
+  },
+  "stakeholderQuadrantHint": {
+    "MANAGE_CLOSELY": "Pouvoir élevé, intérêt élevé",
+    "KEEP_SATISFIED": "Pouvoir élevé, intérêt faible",
+    "KEEP_INFORMED": "Pouvoir faible, intérêt élevé",
+    "MONITOR": "Pouvoir faible, intérêt faible"
+  },
+  "changeType": {
+    "SCOPE": "Périmètre",
+    "SCHEDULE": "Planning",
+    "COST": "Coût",
+    "QUALITY": "Qualité",
+    "OTHER": "Autre"
+  },
+  "changeStatus": {
+    "DRAFT": "Brouillon",
+    "SUBMITTED": "Soumise",
+    "IN_REVIEW": "En examen",
+    "APPROVED": "Approuvée",
+    "REJECTED": "Rejetée",
+    "WITHDRAWN": "Retirée",
+    "IMPLEMENTED": "Mise en œuvre"
+  },
+  "approvalLevel": {
+    "PROJECT_MANAGER": "Chef de projet",
+    "PMO": "PMO",
+    "SPONSOR": "Sponsor"
+  },
+  "stepState": {
+    "WAITING": "Attend les étapes précédentes",
+    "PENDING": "Attend une décision",
+    "APPROVED": "Approuvée",
+    "REJECTED": "Rejetée",
+    "SKIPPED": "Non atteinte"
+  },
+  "risks": {
+    "register": "Registre des risques",
+    "search": "Rechercher des risques",
+    "raise": "Signaler un risque",
+    "raiseTitle": "Signaler un risque",
+    "editTitle": "Modifier {{ key }}",
+    "assessTitle": "Réévaluer {{ key }}",
+    "closeTitle": "Clore {{ key }}",
+    "closeNote": "Pourquoi ne peut-il plus se produire ?",
+    "materializeTitle": "{{ key }} s’est produit",
+    "materializeIntro": "Un problème est ouvert pour le traiter, et le risque est clos comme « il s’est produit ».",
+    "sheetTitle": "Risque",
+    "raised": "{{ key }} signalé.",
+    "saved": "{{ key }} enregistré.",
+    "assessed": "{{ key }} réévalué.",
+    "closedToast": "{{ key }} clos.",
+    "materialized": "{{ key }} s’est produit : problème {{ issue }} ouvert.",
+    "assess": "Réévaluer",
+    "close": "Clore le risque",
+    "materialize": "Il s’est produit",
+    "count": "Risques : {{ count }}",
+    "noOwner": "Sans responsable",
+    "noResponse": "Aucune réponse planifiée pour l’instant.",
+    "notFound": "Ce risque n’existe pas ou a été supprimé.",
+    "openIssue": "Ouvrir le problème qu’il est devenu",
+    "reviewOverdue": "Revue en retard",
+    "response": "Réponse",
+    "scoring": "Évaluation",
+    "inherent": "Risque inhérent (avant la réponse)",
+    "residual": "Risque résiduel (une fois la réponse en place)",
+    "currentScore": "Note actuelle",
+    "newScore": "Nouvelle note",
+    "history": "Historique des évaluations",
+    "historyLabel": "Note dans le temps : {{ scores }}",
+    "assessedAs": "Probabilité {{ probability }} × impact {{ impact }}",
+    "residualAs": "résiduel {{ score }}",
+    "sortBy": "Trier par",
+    "sort": {
+      "score": "Note (la plus haute d’abord)",
+      "key": "Numéro",
+      "reviewDate": "Date de revue (la plus proche d’abord)",
+      "createdAt": "Plus récents d’abord"
+    },
+    "emptyTitle": "Aucun risque pour l’instant",
+    "emptyMessage": "Signalez le premier risque : un événement possible qui changerait le résultat du projet.",
+    "noMatchTitle": "Aucun risque ne correspond",
+    "noMatchMessage": "Essayez d’autres filtres, ou effacez-les.",
+    "filters": {
+      "anyKind": "Tout type",
+      "anyCategory": "Toute catégorie",
+      "anyOwner": "N’importe qui",
+      "anyStatus": "Tout statut"
+    },
+    "fields": {
+      "risk": "Risque",
+      "title": "Titre",
+      "description": "Description",
+      "kind": "Type",
+      "category": "Catégorie",
+      "proximity": "Quand il pourrait se produire",
+      "probability": "Probabilité",
+      "impact": "Impact",
+      "score": "Note",
+      "residualProbability": "Probabilité résiduelle",
+      "residualImpact": "Impact résiduel",
+      "residualScore": "Note résiduelle",
+      "owner": "Responsable",
+      "reviewDate": "Date de revue",
+      "status": "Statut",
+      "strategy": "Stratégie de réponse",
+      "plan": "Plan de réponse",
+      "triggers": "Signes avant-coureurs",
+      "note": "Note",
+      "identifiedBy": "Signalé par"
+    },
+    "hints": {
+      "plan": "Ce qui sera fait, par qui, pour quand.",
+      "residual": "Facultatif : la note attendue une fois la réponse en place."
+    },
+    "errors": {
+      "strategyNeeded": "Choisissez une stratégie pour un risque planifié ou surveillé.",
+      "planNeeded": "Décrivez la réponse pour un risque planifié ou surveillé.",
+      "residualPair": "Indiquez la probabilité et l’impact résiduels, ou aucun des deux."
+    },
+    "heatmap": {
+      "title": "Carte de chaleur",
+      "caption": "Risques ouverts par probabilité et impact",
+      "cell": "Probabilité {{ probability }}, impact {{ impact }} : {{ count }} risques, {{ severity }}",
+      "none": "aucun",
+      "help": "Chaque case indique combien de risques ouverts s’y trouvent et leur niveau. Choisissez une case pour lister ses risques.",
+      "filtered": "Risques de probabilité {{ probability }} et d’impact {{ impact }}.",
+      "clear": "Tout afficher"
+    }
+  },
+  "issues": {
+    "log": "Journal des problèmes",
+    "search": "Rechercher des problèmes",
+    "raise": "Signaler un problème",
+    "raiseTitle": "Signaler un problème",
+    "editTitle": "Modifier {{ key }}",
+    "sheetTitle": "Problème",
+    "raised": "{{ key }} signalé.",
+    "saved": "{{ key }} enregistré.",
+    "started": "Traitement de {{ key }} commencé.",
+    "paused": "{{ key }} est de nouveau ouvert.",
+    "resolved": "{{ key }} résolu.",
+    "closed": "{{ key }} clos.",
+    "reopened": "{{ key }} rouvert.",
+    "count": "Problèmes : {{ count }}",
+    "anyStatus": "Tout statut",
+    "anyPriority": "Toute priorité",
+    "quickFilters": "Filtres rapides",
+    "quick": {
+      "mine": "Les miens",
+      "overdue": "En retard",
+      "critical": "Critiques"
+    },
+    "overdue": "En retard",
+    "escalated": "Remonté au PMO",
+    "escalatedHelp": "Critique et non résolu depuis plus de trois jours : le PMO a été sollicité.",
+    "start": "Commencer",
+    "pause": "Remettre à ouvert",
+    "resolve": "Résoudre",
+    "resolveTitle": "Résoudre {{ key }}",
+    "resolution": "Résolution",
+    "resolvedOn": "Résolu le {{ date }}",
+    "close": "Clore le problème",
+    "closeTitle": "Clore {{ key }} ?",
+    "closeMessage": "Un problème clos est terminé : il peut être rouvert s’il revient.",
+    "reopen": "Rouvrir",
+    "reopenTitle": "Rouvrir {{ key }}",
+    "reopenReason": "Pourquoi revient-il ?",
+    "raiseChange": "Demander un changement",
+    "links": "Liés",
+    "fromRisk": "Le risque dont il est issu",
+    "changeRequest": "La demande de changement associée",
+    "notFound": "Ce problème n’existe pas ou a été supprimé.",
+    "emptyTitle": "Aucun problème",
+    "emptyMessage": "Tout va bien pour l’instant. Signalez un problème quand quelque chose doit être résolu.",
+    "noMatchTitle": "Aucun problème ne correspond",
+    "noMatchMessage": "Essayez d’autres filtres, ou effacez-les.",
+    "fields": {
+      "issue": "Problème",
+      "title": "Titre",
+      "description": "Description",
+      "type": "Type",
+      "priority": "Priorité",
+      "status": "Statut",
+      "owner": "Responsable",
+      "dueDate": "Échéance",
+      "raisedBy": "Signalé par"
+    }
+  },
+  "stakeholders": {
+    "grid": "Grille pouvoir/intérêt",
+    "register": "Registre",
+    "matrix": "Engagement",
+    "matrixCaption": "Engagement actuel (A) et souhaité (S) de chaque partie prenante",
+    "matrixLegend": "A = engagement actuel, S = engagement souhaité.",
+    "people": "Personnes",
+    "add": "Ajouter une partie prenante",
+    "addTitle": "Ajouter une partie prenante",
+    "added": "{{ name }} ajouté(e).",
+    "saved": "{{ name }} enregistré(e).",
+    "remove": "Retirer",
+    "removeTitle": "Retirer {{ name }} ?",
+    "removeMessage": "Son nom, ses coordonnées et ses notes sont effacés ; la fiche reste anonyme pour que rien de ce qui y renvoie ne soit cassé.",
+    "removed": "Partie prenante retirée et données personnelles effacées.",
+    "count": "Parties prenantes : {{ count }}",
+    "gapFilter": "Seulement les écarts d’engagement",
+    "clearQuadrant": "Tout afficher, pas seulement « {{ quadrant }} »",
+    "gapLabel": "encore {{ count }} niveau(x)",
+    "aboveDesired": "Au-dessus de la cible",
+    "onTarget": "Sur la cible",
+    "current": "actuel",
+    "desired": "souhaité",
+    "nobody": "Personne ici.",
+    "privacy": "Données personnelles : ne gardez que ce dont le projet a besoin. Retirer une partie prenante les efface.",
+    "quadrantPreview": "Quadrant de la grille",
+    "emptyTitle": "Aucune partie prenante pour l’instant",
+    "emptyMessage": "Listez les personnes et groupes concernés par le projet, et planifiez leur engagement.",
+    "noMatchTitle": "Aucune partie prenante ne correspond",
+    "noMatchMessage": "Essayez un autre quadrant, ou affichez tout le monde.",
+    "level": {
+      "1": "1 · Très faible",
+      "2": "2 · Faible",
+      "3": "3 · Moyen",
+      "4": "4 · Élevé",
+      "5": "5 · Très élevé"
+    },
+    "fields": {
+      "name": "Nom",
+      "organization": "Organisation",
+      "role": "Rôle",
+      "email": "E-mail",
+      "phone": "Téléphone",
+      "power": "Pouvoir",
+      "interest": "Intérêt",
+      "influence": "Influence",
+      "quadrant": "Quadrant",
+      "engagement": "Engagement",
+      "current": "Engagement actuel",
+      "desired": "Engagement souhaité",
+      "gap": "Écart",
+      "contact": "Contact",
+      "communication": "Préférences de communication",
+      "notes": "Notes"
+    },
+    "hints": {
+      "communication": "Comment et à quelle fréquence, p. ex. « synthèse d’une page chaque mois »."
+    },
+    "errors": {
+      "phone": "Chiffres, espaces, +, - et parenthèses uniquement."
+    },
+    "currentShort": "A",
+    "desiredShort": "S"
+  },
+  "changes": {
+    "detailTitle": "Demande de changement",
+    "draft": "Nouvelle demande de changement",
+    "draftTitle": "Nouvelle demande de changement",
+    "editTitle": "Modifier {{ key }}",
+    "saveDraft": "Enregistrer le brouillon",
+    "drafted": "Brouillon {{ key }} enregistré.",
+    "saved": "{{ key }} enregistrée.",
+    "count": "Demandes de changement : {{ count }}",
+    "anyStatus": "Tout statut",
+    "revision": "révision {{ number }}",
+    "days": "{{ count }} jours ouvrés",
+    "waitingFor": "En attente de",
+    "anyRole": "Tout {{ role }}",
+    "decidedBy": "{{ name }}, {{ date }}",
+    "requestedOn": "Demandée par {{ name }} le {{ date }}",
+    "backToList": "Toutes les demandes de changement",
+    "impact": "Impact",
+    "chain": "Circuit d’approbation",
+    "chainLater": "Établi à la soumission, d’après l’impact et les seuils de l’organisation.",
+    "links": "Liés",
+    "openIssue": "Le problème qu’elle traite",
+    "previousRevision": "La révision précédente",
+    "fromIssue": "Pour le problème {{ key }}.",
+    "notFoundTitle": "Demande de changement introuvable",
+    "notFoundMessage": "Elle n’existe pas, ou vous ne voyez pas son projet.",
+    "emptyTitle": "Aucune demande de changement",
+    "emptyMessage": "Les changements de périmètre, de planning ou de coût passent par une demande et ses approbations.",
+    "submit": "Soumettre pour approbation",
+    "submitTitle": "Soumettre {{ key }} ?",
+    "submitMessage": "Ses approbateurs sont choisis maintenant d’après son impact. Elle ne peut plus être modifiée une fois soumise.",
+    "submitted": "{{ key }} soumise.",
+    "approve": "Approuver",
+    "reject": "Rejeter",
+    "approveTitle": "Approuver {{ key }}",
+    "rejectTitle": "Rejeter {{ key }}",
+    "approveComment": "Commentaire (facultatif)",
+    "rejectComment": "Pourquoi est-elle rejetée ?",
+    "approved": "Décision sur {{ key }} enregistrée : approuvée.",
+    "rejected": "Décision sur {{ key }} enregistrée : rejetée.",
+    "withdraw": "Retirer",
+    "withdrawTitle": "Retirer {{ key }} ?",
+    "withdrawMessage": "Elle s’arrête ici ; personne d’autre n’est sollicité.",
+    "withdrawn": "{{ key }} retirée.",
+    "implement": "Marquer comme mise en œuvre",
+    "implementTitle": "Marquer {{ key }} comme mise en œuvre ?",
+    "implementMessage": "Indique que le changement approuvé a été réalisé.",
+    "implemented": "{{ key }} mise en œuvre.",
+    "revise": "Réviser et resoumettre",
+    "revised": "Nouvelle révision de {{ key }} créée.",
+    "fields": {
+      "request": "Demande",
+      "title": "Titre",
+      "type": "Type",
+      "status": "Statut",
+      "reason": "Motif",
+      "description": "Description",
+      "cost": "Variation de coût",
+      "schedule": "Variation de planning",
+      "scope": "Changement de périmètre",
+      "risk": "Risques",
+      "charterScope": "Modifie le périmètre de la charte",
+      "requestedBy": "Demandée par"
+    },
+    "hints": {
+      "reason": "Pourquoi le projet a besoin de ce changement.",
+      "cost": "Négatif pour une économie, p. ex. -1 500 000.",
+      "schedule": "Jours ouvrés ajoutés à la date de fin ; négatif pour l’avancer.",
+      "charterScope": "Le sponsor l’approuve alors aussi, et le périmètre est ajouté à une nouvelle version de la charte."
+    },
+    "errors": {
+      "days": "Saisissez un nombre entier entre −1000 et 1000.",
+      "scopeNeeded": "Décrivez le changement de périmètre ajouté à la charte."
+    }
+  },
+  "approvals": {
+    "title": "Mes approbations",
+    "subtitle": "Demandes de changement en attente de votre décision, les plus anciennes d’abord.",
+    "link": "Mes approbations : {{ count }} en attente",
+    "count": "En attente de vous : {{ count }}",
+    "requested": "Demandée par {{ name }}, soumise le {{ date }}",
+    "emptyTitle": "Rien ne vous attend",
+    "emptyMessage": "Les demandes de changement qui attendent votre décision apparaissent ici."
   }
 }

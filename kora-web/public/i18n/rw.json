@@ -45,7 +45,10 @@
     "reload": "Ongera ufungure",
     "optional": "Si ngombwa",
     "onePerLine": "Kimwe ku murongo",
-    "undo": "Subiza uko byari"
+    "undo": "Subiza uko byari",
+    "notSet": "Ntibyashyizweho",
+    "yes": "Yego",
+    "no": "Oya"
   },
   "status": {
     "success": "Biragenda neza",
@@ -74,7 +77,9 @@
       "spiCpi": "SPI / CPI",
       "risks": "Ingaruka zikomeye zitarakemurwa",
       "changes": "Ubusabe bw’impinduka butegereje",
-      "later": "Bizaboneka mu ivugururwa rizaza"
+      "later": "Bizaboneka mu ivugururwa rizaza",
+      "risksNote": "Amanota 15 cyangwa arenga",
+      "changesNote": "Byoherejwe cyangwa birimo gusuzumwa"
     },
     "charts": {
       "title": "Isaranganya",
@@ -90,7 +95,13 @@
       "nextMilestone": "Intambwe ikurikira"
     },
     "spi": "Igipimo cyo kubahiriza igihe",
-    "cpi": "Igipimo cyo kubahiriza ikiguzi"
+    "cpi": "Igipimo cyo kubahiriza ikiguzi",
+    "risks": {
+      "title": "Ingaruka zikomeye cyane",
+      "subtitle": "Ingaruka zifunguye zifite amanota 15 cyangwa arenga, mu mishinga igaragara.",
+      "review": "isuzuma ku ya {{ date }}",
+      "none": "Nta ngaruka zikomeye cyane zifunguye."
+    }
   },
   "settings": {
     "title": "Igenamiterere",
@@ -238,6 +249,18 @@
         "cycle": "Aya masano yakora uruziga.",
         "not_predictive": "Amasano n’igenamigambi fatizo ni iby’imishinga iteganyijwe n’ivanze.",
         "dependency_exists": "Ibi bikorwa byombi bisanzwe bihujwe."
+      },
+      "risks": {
+        "closed": "Iyi ngaruka yafunzwe kandi ntishobora guhinduka."
+      },
+      "issues": {
+        "invalid_transition": "Ikibazo ntigishobora gukora ibyo uhereye ku miterere yacyo y’ubu."
+      },
+      "change_requests": {
+        "not_draft": "Umushinga w’inyandiko ni wo wonyine ushobora guhindurwa cyangwa koherezwa.",
+        "not_in_review": "Iki cyifuzo ntigitegereje icyemezo.",
+        "self_approval": "Nta muntu ufata icyemezo ku cyifuzo cye bwite.",
+        "invalid_transition": "Icyifuzo ntigishobora gukora ibyo uhereye ku miterere yacyo y’ubu."
       }
     },
     "fields": {
@@ -359,7 +382,8 @@
       "members": "Abanyamuryango",
       "invitations": "Ubutumire",
       "organization": "Umuryango",
-      "calendar": "Ingengabihe y’akazi"
+      "calendar": "Ingengabihe y’akazi",
+      "changeControl": "Igenzura ry’impinduka"
     },
     "members": {
       "search": "Shakisha ukoresheje izina cyangwa imeyili",
@@ -428,6 +452,23 @@
       "errors": {
         "noDays": "Hitamo nibura umunsi umwe w’akazi.",
         "duplicate": "Iyo tariki isanzwe ari umunsi mukuru."
+      }
+    },
+    "changeControl": {
+      "intro": "Uwemeza icyifuzo cy’impinduka biterwa n’ingano yacyo. Umuyobozi w’umushinga ahora acyemeza.",
+      "pmoCost": "PMO yemeza impinduka ku kiguzi irenze iki gipimo",
+      "pmoCostHint": "Ijanisha ry’ingengo y’imari y’umushinga.",
+      "pmoDays": "PMO yemeza impinduka ku gihe irenze iki gipimo",
+      "pmoDaysHint": "Iminsi y’akazi.",
+      "sponsorCost": "Umuterankunga yemeza impinduka ku kiguzi irenze iki gipimo",
+      "sponsorCostHint": "Ijanisha ry’ingengo y’imari. Umuterankunga yemeza kandi impinduka zose ku bikubiye mu masezerano y’umushinga.",
+      "always": "Ibyifuzo byoherezwa guhera ubu bikoresha izi mbibi; ibyamaze koherezwa bigumana ababyemeza.",
+      "save": "Bika imbibi",
+      "saved": "Imbibi z’igenzura ry’impinduka zabitswe.",
+      "stale": "Undi muntu yabitse imbibi mu gihe wazihinduraga. Ongera ufungure urebe ize, hanyuma wongere ukore impinduka yawe.",
+      "errors": {
+        "percent": "Andika ijanisha riri hagati ya 0 na 100.",
+        "days": "Andika umubare wuzuye w’iminsi uri hagati ya 0 na 1000."
       }
     }
   },
@@ -621,7 +662,11 @@
       "wbs": "WBS",
       "board": "Ikibaho cy’imirimo",
       "backlog": "Urutonde rw’imirimo",
-      "schedule": "Ingengabihe"
+      "schedule": "Ingengabihe",
+      "risks": "Ingaruka",
+      "issues": "Ibibazo",
+      "stakeholders": "Abafatanyabikorwa",
+      "change-requests": "Impinduka"
     },
     "overview": {
       "details": "Ibisobanuro birambuye"
@@ -1108,5 +1153,453 @@
     "FRIDAY": "Kuwa gatanu",
     "SATURDAY": "Kuwa gatandatu",
     "SUNDAY": "Ku cyumweru"
+  },
+  "severity": {
+    "LOW": "Nto",
+    "MEDIUM": "Iringaniye",
+    "HIGH": "Nini",
+    "CRITICAL": "Ikomeye cyane"
+  },
+  "riskKind": {
+    "THREAT": "Ikibangamiye",
+    "OPPORTUNITY": "Amahirwe"
+  },
+  "riskKindHint": {
+    "THREAT": "Cyabangamira intego z’umushinga kibaye.",
+    "OPPORTUNITY": "Cyafasha intego z’umushinga kibaye."
+  },
+  "riskCategory": {
+    "TECHNICAL": "Ikoranabuhanga",
+    "EXTERNAL": "Biturutse hanze",
+    "ORGANIZATIONAL": "Imiterere y’ikigo",
+    "PROJECT_MANAGEMENT": "Imicungire y’umushinga",
+    "FINANCIAL": "Imari",
+    "OTHER": "Ibindi"
+  },
+  "riskProximity": {
+    "IMMEDIATE": "Mu minsi mike",
+    "WEEKS": "Mu byumweru bike",
+    "MONTHS": "Mu mezi make",
+    "LATER": "Nyuma"
+  },
+  "riskStatus": {
+    "IDENTIFIED": "Cyagaragajwe",
+    "ANALYZED": "Cyasesenguwe",
+    "RESPONSE_PLANNED": "Igisubizo cyateguwe",
+    "MONITORING": "Kirakurikiranwa",
+    "CLOSED": "Cyafunzwe"
+  },
+  "riskProbability": {
+    "1": "1 · Gake cyane (munsi ya 10%)",
+    "2": "2 · Ntibishoboka cyane (10–30%)",
+    "3": "3 · Birashoboka (30–50%)",
+    "4": "4 · Birashoboka cyane (50–80%)",
+    "5": "5 · Hafi ya byanze bikunze (hejuru ya 80%)"
+  },
+  "riskImpact": {
+    "1": "1 · Nta kigenda (ntibigaragara)",
+    "2": "2 · Bito (iminsi yo gutinda, munsi ya 2% y’ingengo y’imari)",
+    "3": "3 · Biringaniye (ibyumweru byo gutinda, 2–5% y’ingengo y’imari)",
+    "4": "4 · Binini (intambwe ikomeye iratinda, 5–10% y’ingengo y’imari)",
+    "5": "5 · Bikomeye cyane (intego ntizigerwaho, hejuru ya 10% y’ingengo y’imari)"
+  },
+  "riskProbabilityShort": {
+    "1": "Gake cyane",
+    "2": "Ntibishoboka cyane",
+    "3": "Birashoboka",
+    "4": "Birashoboka cyane",
+    "5": "Hafi byanze bikunze"
+  },
+  "riskImpactShort": {
+    "1": "Nta kigenda",
+    "2": "Bito",
+    "3": "Biringaniye",
+    "4": "Binini",
+    "5": "Bikomeye cyane"
+  },
+  "responseStrategy": {
+    "AVOID": "Kwirinda",
+    "MITIGATE": "Kugabanya",
+    "TRANSFER": "Kwimurira undi",
+    "EXPLOIT": "Kubyaza umusaruro",
+    "ENHANCE": "Kongera",
+    "SHARE": "Gusangira",
+    "ACCEPT": "Kwemera",
+    "ESCALATE": "Kuzamura ku rwego rwisumbuye"
+  },
+  "responseStrategyHint": {
+    "AVOID": "guhindura igenamigambi kugira ngo bitaba",
+    "MITIGATE": "kugabanya amahirwe yo kuba cyangwa ingaruka zabyo",
+    "TRANSFER": "kubiha undi (ubwishingizi, amasezerano)",
+    "EXPLOIT": "kwemeza ko bibaye",
+    "ENHANCE": "kongera amahirwe yo kuba cyangwa inyungu zabyo",
+    "SHARE": "gufatanya n’ushoboye kubibyaza umusaruro kurushaho",
+    "ACCEPT": "gukora ari uko bibaye gusa",
+    "ESCALATE": "kubishyikiriza urwego ruri hejuru y’umushinga"
+  },
+  "riskClosure": {
+    "EXPIRED": "Cyafunzwe: ntigishobora kuba",
+    "MATERIALIZED": "Cyafunzwe: cyabaye"
+  },
+  "issueType": {
+    "TECHNICAL": "Ikoranabuhanga",
+    "RESOURCE": "Ubushobozi",
+    "SCOPE": "Ibikubiye mu mushinga",
+    "VENDOR": "Utanga serivisi",
+    "OTHER": "Ibindi"
+  },
+  "issueStatus": {
+    "OPEN": "Gifunguye",
+    "IN_PROGRESS": "Kirimo gukemurwa",
+    "RESOLVED": "Cyakemutse",
+    "CLOSED": "Cyafunzwe"
+  },
+  "engagement": {
+    "UNAWARE": "Ntabizi",
+    "RESISTANT": "Arabirwanya",
+    "NEUTRAL": "Ntaho abogamiye",
+    "SUPPORTIVE": "Arabishyigikiye",
+    "LEADING": "Arabiyoboye"
+  },
+  "stakeholderQuadrant": {
+    "MANAGE_CLOSELY": "Gukurikirana hafi",
+    "KEEP_SATISFIED": "Kunezeza",
+    "KEEP_INFORMED": "Kumenyesha",
+    "MONITOR": "Gukurikirana"
+  },
+  "stakeholderQuadrantHint": {
+    "MANAGE_CLOSELY": "Ububasha bwinshi, ubushake bwinshi",
+    "KEEP_SATISFIED": "Ububasha bwinshi, ubushake buke",
+    "KEEP_INFORMED": "Ububasha buke, ubushake bwinshi",
+    "MONITOR": "Ububasha buke, ubushake buke"
+  },
+  "changeType": {
+    "SCOPE": "Ibikubiye mu mushinga",
+    "SCHEDULE": "Igihe",
+    "COST": "Ikiguzi",
+    "QUALITY": "Ubuziranenge",
+    "OTHER": "Ibindi"
+  },
+  "changeStatus": {
+    "DRAFT": "Umushinga w’inyandiko",
+    "SUBMITTED": "Yoherejwe",
+    "IN_REVIEW": "Irimo gusuzumwa",
+    "APPROVED": "Yemejwe",
+    "REJECTED": "Yanzwe",
+    "WITHDRAWN": "Yakuweho",
+    "IMPLEMENTED": "Yashyizwe mu bikorwa"
+  },
+  "approvalLevel": {
+    "PROJECT_MANAGER": "Umuyobozi w’umushinga",
+    "PMO": "PMO",
+    "SPONSOR": "Umuterankunga"
+  },
+  "stepState": {
+    "WAITING": "Itegereje intambwe zibanza",
+    "PENDING": "Itegereje icyemezo",
+    "APPROVED": "Yemejwe",
+    "REJECTED": "Yanzwe",
+    "SKIPPED": "Ntiyagezweho"
+  },
+  "risks": {
+    "register": "Igitabo cy’ingaruka",
+    "search": "Shakisha ingaruka",
+    "raise": "Garagaza ingaruka",
+    "raiseTitle": "Garagaza ingaruka",
+    "editTitle": "Hindura {{ key }}",
+    "assessTitle": "Ongera usuzume {{ key }}",
+    "closeTitle": "Funga {{ key }}",
+    "closeNote": "Kuki itagishobora kuba?",
+    "materializeTitle": "{{ key }} yabaye",
+    "materializeIntro": "Hafungurwa ikibazo cyo kuyikemura, ingaruka igafungwa nk’“yabaye”.",
+    "sheetTitle": "Ingaruka",
+    "raised": "{{ key }} yagaragajwe.",
+    "saved": "{{ key }} yabitswe.",
+    "assessed": "{{ key }} yongeye gusuzumwa.",
+    "closedToast": "{{ key }} yafunzwe.",
+    "materialized": "{{ key }} yabaye: ikibazo {{ issue }} cyafunguwe.",
+    "assess": "Ongera usuzume",
+    "close": "Funga ingaruka",
+    "materialize": "Yabaye",
+    "count": "Ingaruka: {{ count }}",
+    "noOwner": "Nta nyirayo",
+    "noResponse": "Nta gisubizo kiraterurwa.",
+    "notFound": "Iyi ngaruka ntibaho cyangwa yavanyweho.",
+    "openIssue": "Fungura ikibazo yabyaye",
+    "reviewOverdue": "Isuzuma ryaratinze",
+    "response": "Igisubizo",
+    "scoring": "Isuzuma",
+    "inherent": "Ingaruka y’ibanze (mbere y’igisubizo)",
+    "residual": "Ingaruka isigaye (igisubizo kimaze gukora)",
+    "currentScore": "Amanota y’ubu",
+    "newScore": "Amanota mashya",
+    "history": "Amateka y’isuzuma",
+    "historyLabel": "Amanota uko ibihe bigenda: {{ scores }}",
+    "assessedAs": "Amahirwe {{ probability }} × ingaruka {{ impact }}",
+    "residualAs": "isigaye {{ score }}",
+    "sortBy": "Tondeka ukurikije",
+    "sort": {
+      "score": "Amanota (menshi mbere)",
+      "key": "Nimero",
+      "reviewDate": "Itariki y’isuzuma (iya vuba mbere)",
+      "createdAt": "Izishya mbere"
+    },
+    "emptyTitle": "Nta ngaruka ziraboneka",
+    "emptyMessage": "Garagaza ingaruka ya mbere: ikintu gishobora kuba kigahindura ibyavuye mu mushinga.",
+    "noMatchTitle": "Nta ngaruka zihuye n’ibyo",
+    "noMatchMessage": "Gerageza ibindi byo gushungura, cyangwa ubikureho.",
+    "filters": {
+      "anyKind": "Ubwoko ubwo ari bwo bwose",
+      "anyCategory": "Icyiciro icyo ari cyo cyose",
+      "anyOwner": "Uwo ari we wese",
+      "anyStatus": "Imiterere iyo ari yo yose"
+    },
+    "fields": {
+      "risk": "Ingaruka",
+      "title": "Umutwe",
+      "description": "Ibisobanuro",
+      "kind": "Ubwoko",
+      "category": "Icyiciro",
+      "proximity": "Igihe ishobora kubera",
+      "probability": "Amahirwe yo kuba",
+      "impact": "Ingaruka",
+      "score": "Amanota",
+      "residualProbability": "Amahirwe asigaye",
+      "residualImpact": "Ingaruka isigaye",
+      "residualScore": "Amanota asigaye",
+      "owner": "Nyirayo",
+      "reviewDate": "Itariki y’isuzuma",
+      "status": "Imiterere",
+      "strategy": "Uburyo bwo gusubiza",
+      "plan": "Igenamigambi ry’igisubizo",
+      "triggers": "Ibimenyetso bibanziriza",
+      "note": "Icyitonderwa",
+      "identifiedBy": "Yagaragajwe na"
+    },
+    "hints": {
+      "plan": "Ibizakorwa, na nde, ryari.",
+      "residual": "Si ngombwa: amanota witeze igisubizo kimaze gushyirwaho."
+    },
+    "errors": {
+      "strategyNeeded": "Hitamo uburyo bwo gusubiza ku ngaruka yateguriwe cyangwa ikurikiranwa.",
+      "planNeeded": "Sobanura igisubizo ku ngaruka yateguriwe cyangwa ikurikiranwa.",
+      "residualPair": "Tanga amahirwe asigaye n’ingaruka isigaye byombi, cyangwa ntutange na kimwe."
+    },
+    "heatmap": {
+      "title": "Ikarita y’ubukana",
+      "caption": "Ingaruka zifunguye ukurikije amahirwe n’ingaruka",
+      "cell": "Amahirwe {{ probability }}, ingaruka {{ impact }}: ingaruka {{ count }}, {{ severity }}",
+      "none": "nta na imwe",
+      "help": "Buri kazu kerekana umubare w’ingaruka zifunguye zirimo n’urwego rwazo. Hitamo akazu urebe ingaruka zako.",
+      "filtered": "Ingaruka zifite amahirwe {{ probability }} n’ingaruka {{ impact }}.",
+      "clear": "Erekana zose"
+    }
+  },
+  "issues": {
+    "log": "Igitabo cy’ibibazo",
+    "search": "Shakisha ibibazo",
+    "raise": "Garagaza ikibazo",
+    "raiseTitle": "Garagaza ikibazo",
+    "editTitle": "Hindura {{ key }}",
+    "sheetTitle": "Ikibazo",
+    "raised": "{{ key }} cyagaragajwe.",
+    "saved": "{{ key }} cyabitswe.",
+    "started": "Gukemura {{ key }} byatangiye.",
+    "paused": "{{ key }} cyongeye gufungurwa.",
+    "resolved": "{{ key }} cyakemutse.",
+    "closed": "{{ key }} cyafunzwe.",
+    "reopened": "{{ key }} cyongeye gufungurwa.",
+    "count": "Ibibazo: {{ count }}",
+    "anyStatus": "Imiterere iyo ari yo yose",
+    "anyPriority": "Icyihutirwa icyo ari cyo cyose",
+    "quickFilters": "Uburyo bwihuse bwo gushungura",
+    "quick": {
+      "mine": "Ibyanjye",
+      "overdue": "Byatinze",
+      "critical": "Bikomeye cyane"
+    },
+    "overdue": "Cyatinze",
+    "escalated": "Cyazamuwe kuri PMO",
+    "escalatedHelp": "Gikomeye cyane kandi kimaze iminsi irenga itatu kidakemuwe: PMO yasabwe kugira icyo ikora.",
+    "start": "Tangira gukemura",
+    "pause": "Garura gifunguye",
+    "resolve": "Kemura",
+    "resolveTitle": "Kemura {{ key }}",
+    "resolution": "Uko cyakemuwe",
+    "resolvedOn": "Cyakemuwe ku ya {{ date }}",
+    "close": "Funga ikibazo",
+    "closeTitle": "Gufunga {{ key }}?",
+    "closeMessage": "Ikibazo gifunze kiba cyarangiye: gishobora kongera gufungurwa kigarutse.",
+    "reopen": "Ongera ufungure",
+    "reopenTitle": "Ongera ufungure {{ key }}",
+    "reopenReason": "Kuki cyagarutse?",
+    "raiseChange": "Saba impinduka",
+    "links": "Bifitanye isano",
+    "fromRisk": "Ingaruka cyaturutseho",
+    "changeRequest": "Icyifuzo cy’impinduka cyagitangiwe",
+    "notFound": "Iki kibazo ntikibaho cyangwa cyavanyweho.",
+    "emptyTitle": "Nta bibazo",
+    "emptyMessage": "Nta kibazo gihari ubu. Garagaza ikibazo iyo hari igikeneye gukemurwa.",
+    "noMatchTitle": "Nta bibazo bihuye n’ibyo",
+    "noMatchMessage": "Gerageza ibindi byo gushungura, cyangwa ubikureho.",
+    "fields": {
+      "issue": "Ikibazo",
+      "title": "Umutwe",
+      "description": "Ibisobanuro",
+      "type": "Ubwoko",
+      "priority": "Icyihutirwa",
+      "status": "Imiterere",
+      "owner": "Ushinzwe",
+      "dueDate": "Itariki ntarengwa",
+      "raisedBy": "Cyagaragajwe na"
+    }
+  },
+  "stakeholders": {
+    "grid": "Imbonerahamwe y’ububasha n’ubushake",
+    "register": "Igitabo",
+    "matrix": "Uruhare",
+    "matrixCaption": "Uruhare rw’ubu (U) n’urwifuzwa (I) rwa buri mufatanyabikorwa",
+    "matrixLegend": "U = uruhare rw’ubu, I = uruhare rwifuzwa.",
+    "people": "Abantu",
+    "add": "Ongeraho umufatanyabikorwa",
+    "addTitle": "Ongeraho umufatanyabikorwa",
+    "added": "{{ name }} yongeweho.",
+    "saved": "{{ name }} yabitswe.",
+    "remove": "Kuraho",
+    "removeTitle": "Gukuraho {{ name }}?",
+    "removeMessage": "Izina rye, uburyo bwo kumuvugisha n’ibyanditswe birasibwa; inyandiko igumaho nta mazina kugira ngo ibiyishingiyeho bidapfa.",
+    "removed": "Umufatanyabikorwa yakuweho, amakuru ye bwite arasibwa.",
+    "count": "Abafatanyabikorwa: {{ count }}",
+    "gapFilter": "Abafite icyuho mu ruhare gusa",
+    "clearQuadrant": "Erekana bose, si “{{ quadrant }}” gusa",
+    "gapLabel": "hakenewe izindi ntera {{ count }}",
+    "aboveDesired": "Hejuru y’intego",
+    "onTarget": "Ku ntego",
+    "current": "ubu",
+    "desired": "rwifuzwa",
+    "nobody": "Nta muntu uri hano.",
+    "privacy": "Amakuru bwite: bika ayo umushinga ukeneye gusa. Gukuraho umufatanyabikorwa birayasiba.",
+    "quadrantPreview": "Igice cy’imbonerahamwe",
+    "emptyTitle": "Nta bafatanyabikorwa baraboneka",
+    "emptyMessage": "Andika abantu n’amatsinda umushinga ugiraho ingaruka, utegure uko uzabagira mu bikorwa.",
+    "noMatchTitle": "Nta bafatanyabikorwa bahuye n’ibyo",
+    "noMatchMessage": "Gerageza ikindi gice, cyangwa werekane bose.",
+    "level": {
+      "1": "1 · Buke cyane",
+      "2": "2 · Buke",
+      "3": "3 · Buringaniye",
+      "4": "4 · Bwinshi",
+      "5": "5 · Bwinshi cyane"
+    },
+    "fields": {
+      "name": "Izina",
+      "organization": "Ikigo",
+      "role": "Inshingano",
+      "email": "Imeri",
+      "phone": "Telefoni",
+      "power": "Ububasha",
+      "interest": "Ubushake",
+      "influence": "Ijambo",
+      "quadrant": "Igice",
+      "engagement": "Uruhare",
+      "current": "Uruhare rw’ubu",
+      "desired": "Uruhare rwifuzwa",
+      "gap": "Icyuho",
+      "contact": "Uko bavugishwa",
+      "communication": "Uko ashaka kumenyeshwa",
+      "notes": "Ibyanditswe"
+    },
+    "hints": {
+      "communication": "Uburyo n’inshuro, urugero “incamake y’urupapuro rumwe buri kwezi”."
+    },
+    "errors": {
+      "phone": "Imibare, imyanya, +, - n’udukubo gusa."
+    },
+    "currentShort": "U",
+    "desiredShort": "I"
+  },
+  "changes": {
+    "detailTitle": "Icyifuzo cy’impinduka",
+    "draft": "Icyifuzo gishya cy’impinduka",
+    "draftTitle": "Icyifuzo gishya cy’impinduka",
+    "editTitle": "Hindura {{ key }}",
+    "saveDraft": "Bika umushinga",
+    "drafted": "Umushinga {{ key }} wabitswe.",
+    "saved": "{{ key }} cyabitswe.",
+    "count": "Ibyifuzo by’impinduka: {{ count }}",
+    "anyStatus": "Imiterere iyo ari yo yose",
+    "revision": "ivugururwa rya {{ number }}",
+    "days": "iminsi y’akazi {{ count }}",
+    "waitingFor": "Gitegereje",
+    "anyRole": "{{ role }} uwo ari we wese",
+    "decidedBy": "{{ name }}, {{ date }}",
+    "requestedOn": "Cyasabwe na {{ name }} ku ya {{ date }}",
+    "backToList": "Ibyifuzo by’impinduka byose",
+    "impact": "Ingaruka",
+    "chain": "Uruhererekane rwo kwemeza",
+    "chainLater": "Rushyirwaho iyo icyifuzo cyoherejwe, hashingiwe ku ngaruka zacyo n’imbibi z’ikigo.",
+    "links": "Bifitanye isano",
+    "openIssue": "Ikibazo gikemura",
+    "previousRevision": "Ivugururwa ribanza",
+    "fromIssue": "Ku kibazo {{ key }}.",
+    "notFoundTitle": "Icyifuzo cy’impinduka ntikibonetse",
+    "notFoundMessage": "Ntikibaho, cyangwa ntushobora kubona umushinga wacyo.",
+    "emptyTitle": "Nta byifuzo by’impinduka",
+    "emptyMessage": "Impinduka ku bikubiye mu mushinga, igihe cyangwa ikiguzi zinyura mu cyifuzo n’iyemezwa ryacyo.",
+    "submit": "Ohereza ngo cyemezwe",
+    "submitTitle": "Kohereza {{ key }}?",
+    "submitMessage": "Abacyemeza batoranywa ubu hashingiwe ku ngaruka zacyo. Ntigishobora guhindurwa kimaze koherezwa.",
+    "submitted": "{{ key }} cyoherejwe.",
+    "approve": "Emeza",
+    "reject": "Anga",
+    "approveTitle": "Kwemeza {{ key }}",
+    "rejectTitle": "Kwanga {{ key }}",
+    "approveComment": "Igitekerezo (si ngombwa)",
+    "rejectComment": "Kuki cyanzwe?",
+    "approved": "Icyemezo kuri {{ key }} cyanditswe: cyemejwe.",
+    "rejected": "Icyemezo kuri {{ key }} cyanditswe: cyanzwe.",
+    "withdraw": "Kuraho",
+    "withdrawTitle": "Gukuraho {{ key }}?",
+    "withdrawMessage": "Kirahagarara hano; nta wundi usabwa gufata icyemezo.",
+    "withdrawn": "{{ key }} cyakuweho.",
+    "implement": "Shyira ko cyashyizwe mu bikorwa",
+    "implementTitle": "Gushyira ko {{ key }} cyashyizwe mu bikorwa?",
+    "implementMessage": "Byerekana ko impinduka yemejwe yakozwe.",
+    "implemented": "{{ key }} cyashyizwe mu bikorwa.",
+    "revise": "Vugurura wongere wohereze",
+    "revised": "Ivugururwa rishya rya {{ key }} ryakozwe.",
+    "fields": {
+      "request": "Icyifuzo",
+      "title": "Umutwe",
+      "type": "Ubwoko",
+      "status": "Imiterere",
+      "reason": "Impamvu",
+      "description": "Ibisobanuro",
+      "cost": "Impinduka ku kiguzi",
+      "schedule": "Impinduka ku gihe",
+      "scope": "Impinduka ku bikubiye mu mushinga",
+      "risk": "Ingaruka",
+      "charterScope": "Gihindura ibikubiye mu masezerano y’umushinga",
+      "requestedBy": "Cyasabwe na"
+    },
+    "hints": {
+      "reason": "Impamvu umushinga ukeneye iyi mpinduka.",
+      "cost": "Umubare uri munsi ya 0 ku bizigamwa, urugero -1 500 000.",
+      "schedule": "Iminsi y’akazi yongerwa ku itariki yo kurangiza; munsi ya 0 kugira ngo iyigabanye.",
+      "charterScope": "Umuterankunga nawe aracyemeza, kandi ibyongeweho bigashyirwa mu masezerano mashya."
+    },
+    "errors": {
+      "days": "Andika umubare wuzuye uri hagati ya −1000 na 1000.",
+      "scopeNeeded": "Sobanura impinduka cyongera ku masezerano y’umushinga."
+    }
+  },
+  "approvals": {
+    "title": "Ibyo ngomba kwemeza",
+    "subtitle": "Ibyifuzo by’impinduka bitegereje icyemezo cyawe, ibya kera mbere.",
+    "link": "Ibyo ngomba kwemeza: {{ count }} bitegereje",
+    "count": "Bigutegereje: {{ count }}",
+    "requested": "Cyasabwe na {{ name }}, cyoherejwe ku ya {{ date }}",
+    "emptyTitle": "Nta kigutegereje",
+    "emptyMessage": "Ibyifuzo by’impinduka bikeneye icyemezo cyawe bigaragara hano."
   }
 }
