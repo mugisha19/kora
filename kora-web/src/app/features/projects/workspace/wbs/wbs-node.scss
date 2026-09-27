@@ -1,0 +1,126 @@
+// Rows line up in columns whatever their depth: the grid is the same on every level and only
+// the name cell is indented.
+:host {
+  display: block;
+  outline: none;
+}
+
+:host(:focus-visible) > .row {
+  outline: 3px solid var(--mat-sys-primary);
+  outline-offset: -3px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 150px 90px 150px 150px;
+  align-items: center;
+  gap: var(--kora-space-3);
+  min-block-size: 44px;
+  padding-inline: var(--kora-space-2);
+  border-block-end: 1px solid var(--mat-sys-outline-variant);
+  cursor: pointer;
+
+  &.selected {
+    background: var(--mat-sys-secondary-container);
+    color: var(--mat-sys-on-secondary-container);
+  }
+}
+
+.name {
+  display: flex;
+  align-items: center;
+  gap: var(--kora-space-1);
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+}
+
+// Indentation per level (the WBS is at most 8 deep).
+@for $level from 2 through 8 {
+  .level-#{$level} .name {
+    padding-inline-start: ($level - 1) * 20px;
+  }
+}
+
+.toggle {
+  flex: none;
+  inline-size: 24px;
+  block-size: 24px;
+}
+
+.code {
+  margin-inline-end: var(--kora-space-2);
+  color: var(--mat-sys-on-surface-variant);
+  font-variant-numeric: tabular-nums;
+}
+
+.selected .code {
+  color: inherit;
+}
+
+.type {
+  display: flex;
+  align-items: center;
+  gap: var(--kora-space-1);
+  font: var(--mat-sys-body-small);
+
+  mat-icon {
+    inline-size: 18px;
+    block-size: 18px;
+  }
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+  white-space: nowrap;
+}
+
+.progress {
+  display: flex;
+  align-items: center;
+  gap: var(--kora-space-2);
+}
+
+progress {
+  flex: 1;
+  min-inline-size: 0;
+  block-size: 8px;
+  appearance: none;
+  border: 0;
+  border-radius: 4px;
+  background: var(--mat-sys-surface-container-highest);
+  color: var(--mat-sys-primary);
+
+  &::-webkit-progress-bar {
+    border-radius: 4px;
+    background: var(--mat-sys-surface-container-highest);
+  }
+
+  &::-webkit-progress-value {
+    border-radius: 4px;
+    background: var(--mat-sys-primary);
+  }
+
+  &::-moz-progress-bar {
+    border-radius: 4px;
+    background: var(--mat-sys-primary);
+  }
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (max-width: 720px) {
+  .row {
+    grid-template-columns: minmax(0, 1fr) 110px;
+  }
+
+  .type,
+  .effort,
+  .cost {
+    display: none;
+  }
+}

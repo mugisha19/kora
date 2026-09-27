@@ -1,0 +1,150 @@
+@if (store.tree(); as tree) {
+  <div class="head">
+    <h2 id="wbs-title">{{ 'wbs.title' | transloco }}</h2>
+    <div class="actions">
+      @if (!store.isEmpty()) {
+        <button mat-button type="button" (click)="store.expandAll()">
+          <mat-icon svgIcon="unfold_more" aria-hidden="true" />
+          {{ 'wbs.expandAll' | transloco }}
+        </button>
+        <button mat-button type="button" (click)="store.collapseAll()">
+          <mat-icon svgIcon="unfold_less" aria-hidden="true" />
+          {{ 'wbs.collapseAll' | transloco }}
+        </button>
+      }
+      @if (canEdit()) {
+        <button mat-stroked-button type="button" (click)="add(null, 'DELIVERABLE')">
+          <mat-icon svgIcon="add" aria-hidden="true" />
+          {{ 'wbs.addDeliverable' | transloco }}
+        </button>
+      }
+    </div>
+  </div>
+
+  <dl class="totals" [attr.aria-label]="'wbs.totals' | transloco">
+    <div>
+      <dt>{{ 'wbs.fields.effort' | transloco }}</dt>
+      <dd>{{ tree.plannedEffortHours | hours: language.current() }}</dd>
+    </div>
+    <div>
+      <dt>{{ 'wbs.fields.cost' | transloco }}</dt>
+      <dd>{{ tree.plannedCost | money: language.current() }}</dd>
+    </div>
+    <div>
+      <dt>{{ 'wbs.fields.percent' | transloco }}</dt>
+      <dd>{{ tree.percentComplete | percent100: language.current() }}</dd>
+    </div>
+    <div>
+      <dt>{{ 'wbs.fields.earnedValue' | transloco }}</dt>
+      <dd>{{ tree.earnedValue | money: language.current() }}</dd>
+    </div>
+  </dl>
+
+  @if (store.isEmpty()) {
+    <kora-empty-state
+      icon="account_tree"
+      [heading]="'wbs.emptyTitle' | transloco"
+      [message]="(canEdit() ? 'wbs.emptyMessageEditor' : 'wbs.emptyMessage') | transloco"
+    />
+  } @else {
+    @if (canEdit() && store.selected(); as selected) {
+      <div
+        class="toolbar no-print"
+        role="toolbar"
+        [attr.aria-label]="'wbs.toolbar' | transloco: { code: selected.node.code }"
+      >
+        <span class="selected-label" aria-hidden="true">
+          {{ selected.node.code }} {{ selected.node.name }}
+        </span>
+        @if (selected.node.type === 'DELIVERABLE') {
+          <button mat-button type="button" (click)="add(selected.node, 'WORK_PACKAGE')">
+            <mat-icon svgIcon="add" aria-hidden="true" />
+            {{ 'wbs.addChild' | transloco }}
+          </button>
+        }
+        <button mat-button type="button" (click)="edit(selected.node)">
+          <mat-icon svgIcon="edit" aria-hidden="true" />
+          {{ 'common.edit' | transloco }}
+        </button>
+        <button
+          mat-button
+          type="button"
+          [disabled]="store.busy() || !store.canMoveUp(selected)"
+          (click)="moveUp(selected)"
+        >
+          <mat-icon svgIcon="arrow_upward" aria-hidden="true" />
+          {{ 'wbs.moveUp' | transloco }}
+        </button>
+        <button
+          mat-button
+          type="button"
+          [disabled]="store.busy() || !store.canMoveDown(selected)"
+          (click)="moveDown(selected)"
+        >
+          <mat-icon svgIcon="arrow_downward" aria-hidden="true" />
+          {{ 'wbs.moveDown' | transloco }}
+        </button>
+        <button
+          mat-button
+          type="button"
+          [disabled]="store.busy() || !store.indentTarget(selected)"
+          (click)="indent(selected)"
+        >
+          <mat-icon svgIcon="format_indent_increase" aria-hidden="true" />
+          {{ 'wbs.indent' | transloco }}
+        </button>
+        <button
+          mat-button
+          type="button"
+          [disabled]="store.busy() || !store.canOutdent(selected)"
+          (click)="outdent(selected)"
+        >
+          <mat-icon svgIcon="format_indent_decrease" aria-hidden="true" />
+          {{ 'wbs.outdent' | transloco }}
+        </button>
+        <button mat-button type="button" [disabled]="store.busy()" (click)="remove(selected)">
+          <mat-icon svgIcon="delete" aria-hidden="true" />
+          {{ 'common.delete' | transloco }}
+        </button>
+      </div>
+    }
+
+    <p id="wbs-help" class="help kora-muted no-print">
+      {{ (canEdit() ? 'wbs.keyboardHelpEditor' : 'wbs.keyboardHelp') | transloco }}
+    </p>
+
+    <div class="columns" aria-hidden="true">
+      <span>{{ 'wbs.fields.name' | transloco }}</span>
+      <span class="wide-only">{{ 'wbs.fields.type' | transloco }}</span>
+      <span class="num wide-only">{{ 'wbs.fields.effort' | transloco }}</span>
+      <span class="num wide-only">{{ 'wbs.fields.cost' | transloco }}</span>
+      <span>{{ 'wbs.fields.percent' | transloco }}</span>
+    </div>
+    <!-- The tree isn't focusable itself: focus moves among its items (roving tabindex). -->
+    <!-- eslint-disable-next-line @angular-eslint/template/interactive-supports-focus -->
+    <ul
+      class="tree"
+      role="tree"
+      aria-labelledby="wbs-title"
+      aria-describedby="wbs-help"
+      [attr.aria-busy]="store.busy()"
+      (keydown)="onKeydown($event)"
+      (focusin)="onFocusIn()"
+      (focusout)="onFocusOut($event)"
+    >
+      @for (node of tree.nodes; track node.id; let i = $index) {
+        <li
+          kora-wbs-node
+          [node]="node"
+          [level]="1"
+          [position]="i + 1"
+          [setSize]="tree.nodes.length"
+        ></li>
+      }
+    </ul>
+  }
+} @else if (store.status() === 'error') {
+  <kora-error-state [correlationId]="store.error()?.correlationId" (retry)="store.load()" />
+} @else {
+  <kora-loading-state />
+}

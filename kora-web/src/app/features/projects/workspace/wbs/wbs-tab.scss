@@ -1,0 +1,92 @@
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--kora-space-3);
+  margin-block-end: var(--kora-space-3);
+}
+
+h2 {
+  font: var(--mat-sys-title-large);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--kora-space-2);
+}
+
+.totals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--kora-space-3) var(--kora-space-8);
+  margin: 0 0 var(--kora-space-4);
+  padding: var(--kora-space-3) var(--kora-space-4);
+  border-radius: var(--kora-radius);
+  background: var(--mat-sys-surface-container-low);
+
+  dt {
+    color: var(--mat-sys-on-surface-variant);
+    font: var(--mat-sys-label-medium);
+  }
+
+  dd {
+    margin: 0;
+    font: var(--mat-sys-title-medium);
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--kora-space-1);
+  margin-block-end: var(--kora-space-2);
+  padding: var(--kora-space-1) var(--kora-space-2);
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: var(--kora-radius);
+}
+
+.selected-label {
+  flex: 1 1 100%;
+  padding-inline: var(--kora-space-2);
+  font: var(--mat-sys-label-large);
+}
+
+.help {
+  margin: 0 0 var(--kora-space-2);
+  font: var(--mat-sys-body-small);
+}
+
+// Same grid as the rows (wbs-node.scss).
+.columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 150px 90px 150px 150px;
+  gap: var(--kora-space-3);
+  padding: var(--kora-space-2);
+  border-block-end: 2px solid var(--mat-sys-outline-variant);
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-label-medium);
+
+  .num {
+    text-align: end;
+  }
+}
+
+.tree {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (max-width: 720px) {
+  .columns {
+    grid-template-columns: minmax(0, 1fr) 110px;
+  }
+
+  .wide-only {
+    display: none;
+  }
+}
