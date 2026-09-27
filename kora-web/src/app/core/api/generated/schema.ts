@@ -1657,6 +1657,376 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/timesheets/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My timesheet for one ISO week
+         * @description Defaults to the current week in the organization's time zone.
+         */
+        get: operations["getMyTimesheetWeek"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/timesheets/me/{week}/entries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Save the week's entries (replaces them)
+         * @description Entries of projects whose timesheet is SUBMITTED or APPROVED can't change (409 `timesheets.locked`); the rest are replaced by the list sent. Hours are quarter hours; each day totals at most 24 h over all projects (400 on `entries`). Only tasks of projects the caller works on (manager or contributor).
+         */
+        put: operations["replaceMyTimesheetEntries"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/timesheets/me/{week}/submit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Submit the week for approval
+         * @description Every DRAFT or REJECTED project timesheet with entries goes to its project's managers.
+         */
+        post: operations["submitMyTimesheetWeek"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/timesheets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Timesheets of the project, for approval
+         * @description The project manager, `PMO` or `ORG_ADMIN`. Oldest week first.
+         */
+        get: operations["listProjectTimesheets"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/timesheets/{timesheetId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * One person's week on one project, with its entries
+         * @description Its owner or the project's managers.
+         */
+        get: operations["getTimesheet"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/timesheets/{timesheetId}/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Approve a submitted timesheet
+         * @description The project's managers, never the timesheet's owner. Approved hours become actual cost.
+         */
+        post: operations["approveTimesheet"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/timesheets/{timesheetId}/reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Send a submitted timesheet back with a comment
+         * @description The project's managers, never the timesheet's owner. The owner can then edit and resubmit.
+         */
+        post: operations["rejectTimesheet"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/{userId}/cost-rates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * A person's hourly cost rates, newest first
+         * @description `ORG_ADMIN` and `PMO` only: rates are confidential.
+         */
+        get: operations["listCostRates"];
+        put?: never;
+        /**
+         * Add an hourly cost rate from a date
+         * @description `ORG_ADMIN` and `PMO` only. Hours are costed at the rate valid on the day they were worked.
+         */
+        post: operations["addCostRate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/resources/heatmap": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Capacity, allocation and actual hours per person per week
+         * @description Managers (`ORG_ADMIN`, `PMO`, `PROJECT_MANAGER`) see everyone; others see themselves. At most 26 weeks; `from` and `to` are rounded to their Mondays. With `projectId`, only people on that project.
+         */
+        get: operations["getResourceHeatmap"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/allocations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Planned hours per person per week on the project */
+        get: operations["listAllocations"];
+        /**
+         * Set planned hours for people and weeks (0 removes)
+         * @description The project manager, `PMO` or `ORG_ADMIN`. Weeks start on Monday. Returns every allocation of the project.
+         */
+        put: operations["saveAllocations"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/{userId}/capacity": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * A person's weekly capacity, its history and their leave
+         * @description The person, `ORG_ADMIN`, `PMO` or `PROJECT_MANAGER`. 40 hours a week until changed.
+         */
+        get: operations["getCapacity"];
+        /**
+         * Change a person's weekly hours from a date
+         * @description `ORG_ADMIN` or `PMO`.
+         */
+        put: operations["changeCapacity"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/{userId}/leave": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Record leave; it removes capacity on its working days
+         * @description The person, `ORG_ADMIN` or `PMO`.
+         */
+        post: operations["addLeave"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/leave/{leaveId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Cancel leave
+         * @description The person, `ORG_ADMIN` or `PMO`.
+         */
+        delete: operations["deleteLeave"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organization/calendar/public-holidays": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Add a country's public holidays for a year to the calendar
+         * @description `ORG_ADMIN` only. Rwanda (RW): the fixed-date holidays, Good Friday, Easter Monday and Umuganura (first Friday of August). Eid al-Fitr and Eid al-Adha follow the moon and are announced each year: add them by hand. Dates already listed keep their name.
+         */
+        post: operations["addPublicHolidays"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/evm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Earned value metrics as of today
+         * @description Figures that need a division by zero (no planned value yet, no actual cost yet) are absent and listed in `unavailable` with the reason.
+         */
+        get: operations["getEvm"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/evm/series": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Weekly cumulative PV, EV and AC for the S-curve
+         * @description Weeks end on Sunday. PV is planned for every week; AC is known up to today; EV comes from the weekly snapshots (and today for the current week), so it is absent before the first snapshot. At most 104 weeks; defaults to the project's start to its target end.
+         */
+        get: operations["getEvmSeries"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/evm/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** How the project measures percent complete and forecasts cost */
+        get: operations["getEvmSettings"];
+        /**
+         * Choose the percent-complete and EAC methods
+         * @description The project manager, `PMO` or `ORG_ADMIN`.
+         */
+        put: operations["updateEvmSettings"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/dashboard/trends": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Monthly portfolio PV, EV, AC, SPI and CPI
+         * @description From the weekly EVM snapshots of the projects the caller can see; a month uses each project's last snapshot in it. Oldest month first.
+         */
+        get: operations["getDashboardTrends"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1718,7 +2088,7 @@ export interface components {
          *     back to a generic message for unknown codes.
          * @enum {string}
          */
-        ErrorCode: "validation.failed" | "auth.unauthenticated" | "auth.invalid_credentials" | "auth.refresh_invalid" | "auth.email_taken" | "auth.reset_token_invalid" | "tenant.forbidden" | "tenant.header_invalid" | "access.denied" | "resource.not_found" | "method.not_allowed" | "media_type.unsupported" | "concurrency.stale_version" | "concurrency.if_match_required" | "members.last_admin" | "members.self_removal" | "invitations.already_member" | "invitations.already_pending" | "invitations.not_pending" | "invitations.not_found" | "invitations.expired" | "invitations.revoked" | "invitations.already_accepted" | "rate_limited" | "organization.currency_locked" | "portfolios.archived" | "portfolios.not_empty" | "projects.code_taken" | "projects.invalid_transition" | "projects.charter_approval_required" | "projects.methodology_locked" | "project_members.is_manager" | "charters.not_draft" | "charters.not_submitted" | "charters.incomplete" | "wbs.parent_not_deliverable" | "wbs.too_deep" | "wbs.cycle" | "wbs.has_children" | "wbs.type_change_not_allowed" | "tasks.invalid_transition" | "tasks.wip_limit_reached" | "tasks.remaining_work" | "sprints.not_agile" | "sprints.already_active" | "sprints.not_planned" | "sprints.not_active" | "sprints.closed" | "schedule.cycle" | "schedule.dependency_exists" | "schedule.not_predictive" | "risks.closed" | "issues.invalid_transition" | "change_requests.not_draft" | "change_requests.not_in_review" | "change_requests.self_approval" | "change_requests.invalid_transition" | "internal.error";
+        ErrorCode: "validation.failed" | "auth.unauthenticated" | "auth.invalid_credentials" | "auth.refresh_invalid" | "auth.email_taken" | "auth.reset_token_invalid" | "tenant.forbidden" | "tenant.header_invalid" | "access.denied" | "resource.not_found" | "method.not_allowed" | "media_type.unsupported" | "concurrency.stale_version" | "concurrency.if_match_required" | "members.last_admin" | "members.self_removal" | "invitations.already_member" | "invitations.already_pending" | "invitations.not_pending" | "invitations.not_found" | "invitations.expired" | "invitations.revoked" | "invitations.already_accepted" | "rate_limited" | "organization.currency_locked" | "portfolios.archived" | "portfolios.not_empty" | "projects.code_taken" | "projects.invalid_transition" | "projects.charter_approval_required" | "projects.methodology_locked" | "project_members.is_manager" | "charters.not_draft" | "charters.not_submitted" | "charters.incomplete" | "wbs.parent_not_deliverable" | "wbs.too_deep" | "wbs.cycle" | "wbs.has_children" | "wbs.type_change_not_allowed" | "tasks.invalid_transition" | "tasks.wip_limit_reached" | "tasks.remaining_work" | "sprints.not_agile" | "sprints.already_active" | "sprints.not_planned" | "sprints.not_active" | "sprints.closed" | "schedule.cycle" | "schedule.dependency_exists" | "schedule.not_predictive" | "risks.closed" | "issues.invalid_transition" | "change_requests.not_draft" | "change_requests.not_in_review" | "change_requests.self_approval" | "change_requests.invalid_transition" | "timesheets.locked" | "timesheets.empty" | "timesheets.not_submitted" | "timesheets.self_approval" | "internal.error";
         /** @enum {string} */
         Role: "ORG_ADMIN" | "PMO" | "PROJECT_MANAGER" | "MEMBER" | "VIEWER";
         /** @enum {string} */
@@ -2277,23 +2647,25 @@ export interface components {
             totalBudget: components["schemas"]["Money"];
             totalPlannedCost: components["schemas"]["Money"];
             totalEarnedValue: components["schemas"]["Money"];
+            /** @description Approved timesheet hours × cost rates, over the visible projects */
+            totalActualCost?: components["schemas"]["Money"];
             /**
              * Format: int32
              * @description Projects in progress past their target end date
              */
             lateProjects: number;
-            /** @description Schedule performance index (from API Phase 7) */
+            /** @description Σ EV ÷ Σ PV over the visible projects; absent without planned value */
             portfolioSpi?: number;
-            /** @description Cost performance index (from API Phase 7) */
+            /** @description Σ EV ÷ Σ AC over the visible projects; absent without actual cost */
             portfolioCpi?: number;
             /**
              * Format: int32
-             * @description From API Phase 6
+             * @description Open risks scoring 15 or more
              */
             openCriticalRisks?: number;
             /**
              * Format: int32
-             * @description From API Phase 6
+             * @description Change requests submitted or in review
              */
             pendingChangeRequests?: number;
         };
@@ -2318,9 +2690,9 @@ export interface components {
             /** Format: date */
             targetEndDate?: string;
             nextMilestone?: components["schemas"]["NextMilestone"];
-            /** @description From API Phase 7 */
+            /** @description Schedule performance index; absent without planned value */
             spi?: number;
-            /** @description From API Phase 7 */
+            /** @description Cost performance index; absent without actual cost */
             cpi?: number;
         };
         DashboardProjectPage: components["schemas"]["PageMetadata"] & {
@@ -3269,6 +3641,306 @@ export interface components {
             pmoScheduleDays: number;
             sponsorCostPercent: number;
         };
+        /**
+         * @description DRAFT → SUBMITTED → APPROVED, or REJECTED (editable again) with the reviewer's comment
+         * @enum {string}
+         */
+        TimesheetStatus: "DRAFT" | "SUBMITTED" | "APPROVED" | "REJECTED";
+        TimesheetEntry: {
+            /** Format: uuid */
+            id: string;
+            /**
+             * Format: uuid
+             * @description Absent once the task was deleted; the logged time and its cost stay
+             */
+            taskId?: string;
+            /** @description As it was when the time was logged */
+            taskKey: string;
+            taskTitle: string;
+            /** Format: uuid */
+            projectId: string;
+            /** Format: date */
+            date: string;
+            hours: number;
+            note?: string;
+            billable: boolean;
+        };
+        TimesheetEntryInput: {
+            /** Format: uuid */
+            taskId: string;
+            /** Format: date */
+            date: string;
+            hours: number;
+            note?: string;
+            /** @default false */
+            billable?: boolean;
+        };
+        TimesheetEntriesRequest: {
+            entries: components["schemas"]["TimesheetEntryInput"][];
+        };
+        TimesheetSummary: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            projectId: string;
+            projectCode: string;
+            user: components["schemas"]["UserRef"];
+            /** Format: date */
+            weekStart: string;
+            status: components["schemas"]["TimesheetStatus"];
+            totalHours: number;
+            /** Format: date-time */
+            submittedAt?: string;
+            decidedBy?: components["schemas"]["UserRef"];
+            /** Format: date-time */
+            decidedAt?: string;
+            comment?: string;
+        };
+        Timesheet: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            projectId: string;
+            projectCode: string;
+            user: components["schemas"]["UserRef"];
+            /** Format: date */
+            weekStart: string;
+            status: components["schemas"]["TimesheetStatus"];
+            totalHours: number;
+            /** Format: date-time */
+            submittedAt?: string;
+            decidedBy?: components["schemas"]["UserRef"];
+            /** Format: date-time */
+            decidedAt?: string;
+            comment?: string;
+            entries: components["schemas"]["TimesheetEntry"][];
+        };
+        TimesheetPage: components["schemas"]["PageMetadata"] & {
+            content: components["schemas"]["TimesheetSummary"][];
+        };
+        DailyTotal: {
+            /** Format: date */
+            date: string;
+            hours: number;
+        };
+        TimesheetWeek: {
+            /** @example 2026-W40 */
+            week: string;
+            /** Format: date */
+            weekStart: string;
+            /** Format: date */
+            weekEnd: string;
+            /** @description APPROVED when every project approved it, REJECTED when any rejected it, SUBMITTED when all are submitted or approved, DRAFT otherwise */
+            status: components["schemas"]["TimesheetStatus"];
+            /** @description Some project timesheet of the week is DRAFT or REJECTED (or there is none yet) */
+            editable: boolean;
+            totalHours: number;
+            dailyTotals: components["schemas"]["DailyTotal"][];
+            entries: components["schemas"]["TimesheetEntry"][];
+            sheets: components["schemas"]["TimesheetSummary"][];
+        };
+        RejectTimesheetRequest: {
+            comment: string;
+        };
+        CostRate: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            userId: string;
+            hourlyRate: components["schemas"]["Money"];
+            /** Format: date */
+            validFrom: string;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        CreateCostRateRequest: {
+            hourlyRate: components["schemas"]["Money"];
+            /** Format: date */
+            validFrom: string;
+        };
+        /**
+         * @description Allocated ÷ capacity: below 70% UNDER, 70–100% HEALTHY, above 100% OVER
+         * @enum {string}
+         */
+        UtilizationBand: "UNDER" | "HEALTHY" | "OVER";
+        ResourceWeek: {
+            /** Format: date */
+            weekStart: string;
+            /** @description Weekly hours less holidays and leave */
+            capacityHours: number;
+            allocatedHours: number;
+            /** @description Hours logged on timesheets */
+            actualHours: number;
+            /** @description Allocated ÷ capacity in percent; absent without capacity */
+            utilization?: number;
+            band?: components["schemas"]["UtilizationBand"];
+        };
+        ResourceRow: {
+            user: components["schemas"]["UserRef"];
+            weeks: components["schemas"]["ResourceWeek"][];
+        };
+        ResourceHeatmap: {
+            /** Format: date */
+            from: string;
+            /** Format: date */
+            to: string;
+            people: components["schemas"]["ResourceRow"][];
+        };
+        Allocation: {
+            user: components["schemas"]["UserRef"];
+            /** Format: uuid */
+            projectId: string;
+            /** Format: date */
+            weekStart: string;
+            hours: number;
+        };
+        AllocationInput: {
+            /** Format: uuid */
+            userId: string;
+            /**
+             * Format: date
+             * @description A Monday
+             */
+            weekStart: string;
+            hours: number;
+        };
+        AllocationsRequest: {
+            allocations: components["schemas"]["AllocationInput"][];
+        };
+        CapacityPeriod: {
+            hoursPerWeek: number;
+            /** Format: date */
+            validFrom: string;
+        };
+        Leave: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            userId: string;
+            /** Format: date */
+            from: string;
+            /** Format: date */
+            to: string;
+            reason?: string;
+        };
+        Capacity: {
+            /** Format: uuid */
+            userId: string;
+            /** @description Valid today */
+            hoursPerWeek: number;
+            history: components["schemas"]["CapacityPeriod"][];
+            leave: components["schemas"]["Leave"][];
+        };
+        UpdateCapacityRequest: {
+            hoursPerWeek: number;
+            /** Format: date */
+            validFrom: string;
+        };
+        CreateLeaveRequest: {
+            /** Format: date */
+            from: string;
+            /** Format: date */
+            to: string;
+            reason?: string;
+        };
+        PublicHolidaysRequest: {
+            /** @enum {string} */
+            country: "RW";
+            /** Format: int32 */
+            year: number;
+        };
+        /**
+         * @description How much of a work package's budget is earned. PHYSICAL: its percent complete (from tasks or reported);
+         *     ZERO_HUNDRED: nothing until complete; FIFTY_FIFTY: half once started, all when complete; STORY_POINTS:
+         *     the project's budget in proportion to finished story points.
+         * @enum {string}
+         */
+        PercentCompleteMethod: "PHYSICAL" | "ZERO_HUNDRED" | "FIFTY_FIFTY" | "STORY_POINTS";
+        /**
+         * @description TYPICAL: BAC ÷ CPI (today's cost efficiency continues); ATYPICAL: AC + (BAC − EV) (the rest goes to plan);
+         *     COMPOSITE: AC + (BAC − EV) ÷ (CPI × SPI) (cost and schedule pressure both continue).
+         * @enum {string}
+         */
+        EacMethod: "TYPICAL" | "ATYPICAL" | "COMPOSITE";
+        EvmSettings: {
+            percentCompleteMethod: components["schemas"]["PercentCompleteMethod"];
+            eacMethod: components["schemas"]["EacMethod"];
+            /**
+             * Format: int64
+             * @description 0 until changed
+             */
+            version: number;
+        };
+        UpdateEvmSettingsRequest: {
+            percentCompleteMethod: components["schemas"]["PercentCompleteMethod"];
+            eacMethod: components["schemas"]["EacMethod"];
+        };
+        EvmUnavailable: {
+            /** @example cpi */
+            metric: string;
+            /** @example No actual cost yet */
+            reason: string;
+        };
+        EvmReport: {
+            /** Format: uuid */
+            projectId: string;
+            /** Format: date */
+            asOf: string;
+            percentCompleteMethod: components["schemas"]["PercentCompleteMethod"];
+            eacMethod: components["schemas"]["EacMethod"];
+            /** @description Budget at completion: the planned cost of the whole WBS */
+            bac?: components["schemas"]["Money"];
+            /** @description Planned value: the planned cost of the work scheduled up to today */
+            pv?: components["schemas"]["Money"];
+            /** @description Earned value: the planned cost of the work done */
+            ev?: components["schemas"]["Money"];
+            /** @description Actual cost: approved hours × cost rates */
+            ac?: components["schemas"]["Money"];
+            /** @description Schedule variance EV − PV; negative is behind */
+            sv?: components["schemas"]["Money"];
+            /** @description Cost variance EV − AC; negative is over budget */
+            cv?: components["schemas"]["Money"];
+            /** @description EV ÷ PV; below 1 is behind schedule */
+            spi?: number;
+            /** @description EV ÷ AC; below 1 is over budget */
+            cpi?: number;
+            /** @description Estimate at completion, by `eacMethod` */
+            eac?: components["schemas"]["Money"];
+            /** @description Estimate to complete: EAC − AC */
+            etc?: components["schemas"]["Money"];
+            /** @description Variance at completion: BAC − EAC */
+            vac?: components["schemas"]["Money"];
+            /** @description (BAC − EV) ÷ (BAC − AC): the efficiency needed to finish on budget */
+            tcpi?: number;
+            /** @description Approved hours without a cost rate for their day; they cost nothing in AC */
+            unratedHours: number;
+            unavailable: components["schemas"]["EvmUnavailable"][];
+        };
+        EvmPoint: {
+            /** Format: date */
+            weekEnding: string;
+            pv: components["schemas"]["Money"];
+            ev?: components["schemas"]["Money"];
+            ac?: components["schemas"]["Money"];
+        };
+        EvmSeries: {
+            /** Format: uuid */
+            projectId: string;
+            bac?: components["schemas"]["Money"];
+            points: components["schemas"]["EvmPoint"][];
+        };
+        DashboardTrendMonth: {
+            /** @example 2026-09 */
+            month: string;
+            pv: components["schemas"]["Money"];
+            ev: components["schemas"]["Money"];
+            ac: components["schemas"]["Money"];
+            spi?: number;
+            cpi?: number;
+        };
+        DashboardTrends: {
+            months: components["schemas"]["DashboardTrendMonth"][];
+        };
     };
     responses: {
         /** @description Invalid input. Code: `validation.failed` with `errors[]`, or `tenant.header_invalid`. */
@@ -3416,6 +4088,10 @@ export interface components {
         IssueId: string;
         StakeholderId: string;
         ChangeRequestId: string;
+        TimesheetId: string;
+        LeaveId: string;
+        /** @description ISO week, e.g. 2026-W40 */
+        Week: string;
     };
     requestBodies: never;
     headers: {
@@ -8018,6 +8694,831 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             412: components["responses"]["PreconditionFailed"];
             428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getMyTimesheetWeek: {
+        parameters: {
+            query?: {
+                /** @description ISO week, e.g. 2026-W40 */
+                week?: string;
+            };
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The week */
+            200: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TimesheetWeek"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    replaceMyTimesheetEntries: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                /** @description ISO week, e.g. 2026-W40 */
+                week: components["parameters"]["Week"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TimesheetEntriesRequest"];
+            };
+        };
+        responses: {
+            /** @description The week */
+            200: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TimesheetWeek"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            /** @description Entries of a submitted or approved timesheet changed. Code: `timesheets.locked`. */
+            409: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            500: components["responses"]["InternalError"];
+        };
+    };
+    submitMyTimesheetWeek: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                /** @description ISO week, e.g. 2026-W40 */
+                week: components["parameters"]["Week"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The week */
+            200: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TimesheetWeek"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            /** @description Nothing to submit. Code: `timesheets.empty`. */
+            409: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listProjectTimesheets: {
+        parameters: {
+            query?: {
+                status?: components["schemas"]["TimesheetStatus"];
+                week?: string;
+                /** @description 0-based page index */
+                page?: components["parameters"]["Page"];
+                /** @description Page size (values above 100 are capped at 100) */
+                size?: components["parameters"]["Size"];
+                /** @description `field,asc` or `field,desc`; repeat for secondary sorts */
+                sort?: components["parameters"]["Sort"];
+            };
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                projectId: components["parameters"]["ProjectId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description One page of timesheets */
+            200: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TimesheetPage"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getTimesheet: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                timesheetId: components["parameters"]["TimesheetId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The timesheet */
+            200: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Timesheet"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    approveTimesheet: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                timesheetId: components["parameters"]["TimesheetId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The approved timesheet */
+            200: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Timesheet"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            /** @description `timesheets.not_submitted` or `timesheets.self_approval`. */
+            409: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            500: components["responses"]["InternalError"];
+        };
+    };
+    rejectTimesheet: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                timesheetId: components["parameters"]["TimesheetId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RejectTimesheetRequest"];
+            };
+        };
+        responses: {
+            /** @description The rejected timesheet */
+            200: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Timesheet"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            /** @description `timesheets.not_submitted` or `timesheets.self_approval`. */
+            409: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listCostRates: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                /** @description The person's user id (as in `Member.userId`) */
+                userId: components["parameters"]["UserId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The rates */
+            200: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CostRate"][];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    addCostRate: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                /** @description The person's user id (as in `Member.userId`) */
+                userId: components["parameters"]["UserId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateCostRateRequest"];
+            };
+        };
+        responses: {
+            /** @description The rate */
+            201: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CostRate"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getResourceHeatmap: {
+        parameters: {
+            query?: {
+                from?: string;
+                to?: string;
+                projectId?: string;
+            };
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The heat map */
+            200: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResourceHeatmap"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listAllocations: {
+        parameters: {
+            query?: {
+                from?: string;
+                to?: string;
+            };
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                projectId: components["parameters"]["ProjectId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The allocations */
+            200: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Allocation"][];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    saveAllocations: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                projectId: components["parameters"]["ProjectId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AllocationsRequest"];
+            };
+        };
+        responses: {
+            /** @description The allocations */
+            200: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Allocation"][];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getCapacity: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                /** @description The person's user id (as in `Member.userId`) */
+                userId: components["parameters"]["UserId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The capacity */
+            200: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Capacity"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    changeCapacity: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                /** @description The person's user id (as in `Member.userId`) */
+                userId: components["parameters"]["UserId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateCapacityRequest"];
+            };
+        };
+        responses: {
+            /** @description The capacity */
+            200: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Capacity"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    addLeave: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                /** @description The person's user id (as in `Member.userId`) */
+                userId: components["parameters"]["UserId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateLeaveRequest"];
+            };
+        };
+        responses: {
+            /** @description The leave */
+            201: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Leave"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    deleteLeave: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                leaveId: components["parameters"]["LeaveId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Cancelled */
+            204: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    addPublicHolidays: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description The `ETag` of the version being updated, e.g. `"3"` */
+                "If-Match": components["parameters"]["IfMatch"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PublicHolidaysRequest"];
+            };
+        };
+        responses: {
+            /** @description The working calendar */
+            200: {
+                headers: {
+                    ETag: components["headers"]["ETag"];
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WorkingCalendar"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getEvm: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                projectId: components["parameters"]["ProjectId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The metrics */
+            200: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EvmReport"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getEvmSeries: {
+        parameters: {
+            query?: {
+                from?: string;
+                to?: string;
+            };
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                projectId: components["parameters"]["ProjectId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The series */
+            200: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EvmSeries"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getEvmSettings: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                projectId: components["parameters"]["ProjectId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The settings */
+            200: {
+                headers: {
+                    ETag: components["headers"]["ETag"];
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EvmSettings"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    updateEvmSettings: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description The `ETag` of the version being updated, e.g. `"3"` */
+                "If-Match": components["parameters"]["IfMatch"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                projectId: components["parameters"]["ProjectId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateEvmSettingsRequest"];
+            };
+        };
+        responses: {
+            /** @description The settings */
+            200: {
+                headers: {
+                    ETag: components["headers"]["ETag"];
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EvmSettings"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getDashboardTrends: {
+        parameters: {
+            query?: {
+                months?: number;
+                portfolioId?: string;
+            };
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The trends */
+            200: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DashboardTrends"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
             500: components["responses"]["InternalError"];
         };
     };
