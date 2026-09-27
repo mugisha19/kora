@@ -3,6 +3,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import type { EChartsCoreOption } from 'echarts/core';
 import { NgxEchartsDirective } from 'ngx-echarts';
 import { ThemeService } from '../../core/theme/theme.service';
+import { chartAnimation, themeColor } from '../../shared/charts/theme-colors';
 import { StatusTone } from '../../shared/ui/status-chip';
 
 export interface Slice {
@@ -12,19 +13,9 @@ export interface Slice {
   tone: StatusTone;
 }
 
-/**
- * A tone's colour in a colour scheme. The tokens use `light-dark()`, which only resolves on an
- * element, so a hidden probe with that scheme reads it (ECharts draws on a canvas, not with CSS).
- */
+/** A tone's colour in a colour scheme (see `themeColor`). */
 function toneColor(tone: StatusTone, scheme: 'light' | 'dark'): string {
-  const probe = document.createElement('span');
-  probe.style.colorScheme = scheme;
-  probe.style.color = `var(--kora-${tone}-fg)`;
-  probe.style.display = 'none';
-  document.body.append(probe);
-  const color = getComputedStyle(probe).color;
-  probe.remove();
-  return color;
+  return themeColor(`--kora-${tone}-fg`, scheme);
 }
 
 /**
@@ -190,7 +181,7 @@ export class DistributionChart {
     const base = {
       aria: { enabled: true, decal: { show: true } },
       textStyle: { color: text },
-      animation: !matchMedia('(prefers-reduced-motion: reduce)').matches,
+      animation: chartAnimation(),
     };
     return {
       ...base,

@@ -68,6 +68,16 @@ const ICONS = [
   'unfold_more',
   'view_kanban',
   'work',
+  'arrow_forward',
+  'bookmark',
+  'bug_report',
+  'build',
+  'check_box',
+  'drag_handle',
+  'drag_indicator',
+  'keyboard_arrow_up',
+  'keyboard_double_arrow_up',
+  'do_not_disturb_on',
 ];
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
