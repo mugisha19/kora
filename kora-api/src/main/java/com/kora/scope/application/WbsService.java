@@ -36,6 +36,7 @@ public class WbsService {
     private final ProjectAccess projects;
     private final OrganizationCurrency currency;
     private final MemberDirectory members;
+    private final TaskProgress taskProgress;
     private final ApplicationEventPublisher events;
     private final Clock clock;
 
@@ -44,12 +45,14 @@ public class WbsService {
             ProjectAccess projects,
             OrganizationCurrency currency,
             MemberDirectory members,
+            TaskProgress taskProgress,
             ApplicationEventPublisher events,
             Clock clock) {
         this.nodes = nodes;
         this.projects = projects;
         this.currency = currency;
         this.members = members;
+        this.taskProgress = taskProgress;
         this.events = events;
         this.clock = clock;
     }
@@ -136,6 +139,10 @@ public class WbsService {
             requireOwner(changes.ownerId());
             node.assignOwner(changes.ownerId());
         }
+        if (changes.percentComplete() != null && tree.hasTasks(nodeId)) {
+            throw new InvalidInputException(FieldViolation.of(
+                    "percentComplete", PlatformErrorCodes.Field.INVALID, "is measured from this work package's tasks"));
+        }
         if (hasPlanning(changes.plannedEffortHours(), changes.plannedCost(), changes.percentComplete())) {
             node.plan(
                     changes.plannedEffortHours(),
@@ -184,7 +191,7 @@ public class WbsService {
     }
 
     private WbsTree load(UUID projectId) {
-        return WbsTree.of(nodes.findByProjectId(projectId), currency.current());
+        return WbsTree.of(nodes.findByProjectId(projectId), currency.current(), taskProgress.of(projectId));
     }
 
     /** Nodes are found through their tenant-filtered row, then the project decides whether the caller may see it. */

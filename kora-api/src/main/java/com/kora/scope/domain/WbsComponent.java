@@ -23,7 +23,7 @@ public sealed interface WbsComponent permits WbsComponent.WorkPackage, WbsCompon
     /** Earned value: the budget of the work actually done (planned cost × percent complete). */
     Money earnedValue();
 
-    /** A leaf: its own planned figures and reported progress (physical percent complete, until tasks exist). */
+    /** A leaf: its own planned figures, and progress reported by hand or measured from its tasks. */
     record WorkPackage(BigDecimal plannedEffortHours, Money plannedCost, BigDecimal percentComplete)
             implements WbsComponent {
 

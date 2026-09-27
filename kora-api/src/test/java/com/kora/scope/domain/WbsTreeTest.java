@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -66,6 +67,32 @@ class WbsTreeTest {
         // (50 × 100 + 10 × 300) / 400 = 20, not the plain average of 30
         assertThat(figures.percentComplete()).isEqualByComparingTo("20.00");
         assertThat(figures.earnedValue()).isEqualTo(Money.of("800000", "RWF"));
+    }
+
+    @Test
+    void progressMeasuredFromTasksReplacesTheReportedValue() {
+        WbsNode design = add(null, WbsNodeType.DELIVERABLE, "Design");
+        WbsNode measured = workPackage(design.getId(), "Measured", 100, "0", 10);
+        WbsNode reported = workPackage(design.getId(), "Reported", 100, "0", 40);
+
+        WbsTree tree = WbsTree.of(rows, "RWF", Map.of(measured.getId(), new BigDecimal("80.00")));
+        WbsTree.Entry root = tree.roots().getFirst();
+
+        assertThat(root.figures().percentComplete()).isEqualByComparingTo("60.00");
+        assertThat(root.percentCompleteSource()).isEqualTo(PercentCompleteSource.ROLLED_UP);
+        assertThat(root.children())
+                .extracting(WbsTree.Entry::percentCompleteSource)
+                .containsExactly(PercentCompleteSource.TASKS, PercentCompleteSource.REPORTED);
+        assertThat(tree.hasTasks(reported.getId())).isFalse();
+    }
+
+    @Test
+    void aWorkPackageWithTasksStaysAWorkPackage() {
+        WbsNode measured = workPackage(null, "Measured", 10, "0", 0);
+        WbsTree tree = WbsTree.of(rows, "RWF", Map.of(measured.getId(), BigDecimal.ZERO));
+
+        assertThatThrownBy(() -> tree.checkCanChangeType(measured.getId(), WbsNodeType.DELIVERABLE))
+                .isInstanceOf(ConflictException.class);
     }
 
     @Test

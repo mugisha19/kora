@@ -3,6 +3,7 @@ package com.kora.scope.domain;
 import com.kora.platform.error.ConflictException;
 import com.kora.platform.error.NotFoundException;
 import com.kora.scope.ScopeErrorCodes;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -14,18 +15,21 @@ import java.util.UUID;
 /**
  * A project's whole WBS, assembled in memory from its rows (one query, no N+1). It derives the outline codes, rolls up
  * figures through {@link WbsComponent}, and checks every structural rule before a change is saved: a parent is a
- * deliverable, the tree is at most {@value #MAX_DEPTH} levels deep, and nothing moves under its own descendant.
+ * deliverable, the tree is at most {@value #MAX_DEPTH} levels deep, and nothing moves under its own descendant. Work
+ * packages with tasks report the progress measured from their tasks (feature 08).
  */
 public final class WbsTree {
 
     public static final int MAX_DEPTH = 8;
 
     private final String currency;
+    private final Map<UUID, BigDecimal> taskProgress;
     private final Map<UUID, WbsNode> nodes = new HashMap<>();
     private final Map<UUID, List<WbsNode>> childrenByParent = new HashMap<>();
 
-    private WbsTree(List<WbsNode> rows, String currency) {
+    private WbsTree(List<WbsNode> rows, String currency, Map<UUID, BigDecimal> taskProgress) {
         this.currency = currency;
+        this.taskProgress = Map.copyOf(taskProgress);
         rows.forEach(node -> nodes.put(node.getId(), node));
         rows.forEach(node -> childrenByParent
                 .computeIfAbsent(node.getParentId(), parent -> new ArrayList<>())
@@ -34,11 +38,25 @@ public final class WbsTree {
     }
 
     public static WbsTree of(List<WbsNode> rows, String currency) {
-        return new WbsTree(rows, currency);
+        return of(rows, currency, Map.of());
+    }
+
+    /**
+     * @param taskProgress percent complete measured from tasks, for the work packages that have tasks; it replaces
+     *     their reported value
+     */
+    public static WbsTree of(List<WbsNode> rows, String currency, Map<UUID, BigDecimal> taskProgress) {
+        return new WbsTree(rows, currency, taskProgress);
     }
 
     /** A node with its derived code, depth (1 for top level), children and rolled-up figures. */
-    public record Entry(WbsNode node, String code, int depth, List<Entry> children, WbsComponent figures) {}
+    public record Entry(
+            WbsNode node,
+            String code,
+            int depth,
+            List<Entry> children,
+            WbsComponent figures,
+            PercentCompleteSource percentCompleteSource) {}
 
     public List<Entry> roots() {
         return entries(null, "", 1);
@@ -51,6 +69,11 @@ public final class WbsTree {
 
     public Entry entry(UUID nodeId) {
         return find(roots(), nodeId).orElseThrow(() -> NotFoundException.of("WBS node", nodeId));
+    }
+
+    /** A work package with tasks: its progress is measured, not reported, and it must stay a work package. */
+    public boolean hasTasks(UUID nodeId) {
+        return taskProgress.containsKey(nodeId);
     }
 
     public boolean hasChildren(UUID nodeId) {
@@ -104,6 +127,11 @@ public final class WbsTree {
                     ScopeErrorCodes.TYPE_CHANGE_NOT_ALLOWED,
                     "Only a deliverable can have children; move or delete them first");
         }
+        if (newType == WbsNodeType.DELIVERABLE && hasTasks(nodeId)) {
+            throw new ConflictException(
+                    ScopeErrorCodes.TYPE_CHANGE_NOT_ALLOWED,
+                    "Tasks are planned under this work package; move them to another one first");
+        }
     }
 
     // ---- Changes (positions are kept 0..n-1 among siblings) --------------------------------------------------------
@@ -155,7 +183,7 @@ public final class WbsTree {
             WbsNode node = siblings.get(i);
             String code = prefix + (i + 1);
             List<Entry> children = entries(node.getId(), code + ".", depth + 1);
-            result.add(new Entry(node, code, depth, children, figures(node, children)));
+            result.add(new Entry(node, code, depth, children, figures(node, children), source(node)));
         }
         return result;
     }
@@ -163,10 +191,19 @@ public final class WbsTree {
     private WbsComponent figures(WbsNode node, List<Entry> children) {
         if (node.getType() == WbsNodeType.WORK_PACKAGE) {
             return new WbsComponent.WorkPackage(
-                    node.getPlannedEffortHours(), node.getPlannedCost(), node.getPercentComplete());
+                    node.getPlannedEffortHours(),
+                    node.getPlannedCost(),
+                    taskProgress.getOrDefault(node.getId(), node.getPercentComplete()));
         }
         return new WbsComponent.Deliverable(
                 children.stream().map(Entry::figures).toList(), currency);
+    }
+
+    private PercentCompleteSource source(WbsNode node) {
+        if (node.getType() == WbsNodeType.DELIVERABLE) {
+            return PercentCompleteSource.ROLLED_UP;
+        }
+        return hasTasks(node.getId()) ? PercentCompleteSource.TASKS : PercentCompleteSource.REPORTED;
     }
 
     private static Optional<Entry> find(List<Entry> entries, UUID nodeId) {

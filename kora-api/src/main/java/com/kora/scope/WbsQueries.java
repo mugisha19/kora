@@ -9,4 +9,7 @@ public interface WbsQueries {
      * @param currency used when the project has no WBS yet, so empty totals are still in the organization's currency
      */
     WbsTotals totals(UUID projectId, String currency);
+
+    /** Whether the node is a work package of the project: the only nodes tasks can be planned under. */
+    boolean isWorkPackage(UUID projectId, UUID nodeId);
 }

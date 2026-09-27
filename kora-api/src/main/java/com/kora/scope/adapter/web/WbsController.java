@@ -9,6 +9,7 @@ import com.kora.platform.web.UserRefJson;
 import com.kora.scope.application.WbsService;
 import com.kora.scope.application.WbsService.NewNode;
 import com.kora.scope.application.WbsService.NodeChanges;
+import com.kora.scope.domain.PercentCompleteSource;
 import com.kora.scope.domain.WbsComponent;
 import com.kora.scope.domain.WbsNodeType;
 import com.kora.scope.domain.WbsTree;
@@ -59,6 +60,7 @@ class WbsController {
             BigDecimal plannedEffortHours,
             MoneyJson plannedCost,
             BigDecimal percentComplete,
+            PercentCompleteSource percentCompleteSource,
             MoneyJson earnedValue,
             long version,
             List<WbsNodeResponse> children) {}
@@ -184,6 +186,7 @@ class WbsController {
                 figures.plannedEffortHours(),
                 MoneyJson.from(figures.plannedCost()),
                 figures.percentComplete(),
+                entry.percentCompleteSource(),
                 MoneyJson.from(figures.earnedValue()),
                 entry.node().getVersion(),
                 entry.children().stream()
