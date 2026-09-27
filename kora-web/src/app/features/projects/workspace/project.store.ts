@@ -41,13 +41,33 @@ const initialState: ProjectState = {
  */
 export const ProjectStore = signalStore(
   withState(initialState),
-  withComputed(({ project }, session = inject(SessionStore)) => ({
-    canEdit: computed(() => canEditProject(project(), session.user()?.id, session.activeRole())),
-    tabs: computed(() => {
-      const current = project();
-      return current ? tabsFor(current.methodology) : [];
-    }),
-  })),
+  withComputed(({ project, members }, session = inject(SessionStore)) => {
+    const canEdit = computed(() =>
+      canEditProject(project(), session.user()?.id, session.activeRole()),
+    );
+    const myUserId = computed(() => session.user()?.id);
+    /** Managers and the project's contributors create tasks and comment (feature 08). */
+    const canContribute = computed(
+      () =>
+        canEdit() ||
+        (members() ?? []).some((m) => m.userId === myUserId() && m.projectRole === 'CONTRIBUTOR'),
+    );
+    return {
+      canEdit,
+      canContribute,
+      myUserId,
+      /** Tasks can be assigned to the manager or a contributor. */
+      assignable: computed(() =>
+        (members() ?? []).filter(
+          (m) => m.projectRole === 'MANAGER' || m.projectRole === 'CONTRIBUTOR',
+        ),
+      ),
+      tabs: computed(() => {
+        const current = project();
+        return current ? tabsFor(current.methodology) : [];
+      }),
+    };
+  }),
   withMethods(
     (
       store,

@@ -1,0 +1,233 @@
+<div class="head">
+  <h2 mat-dialog-title>
+    @if (task(); as t) {
+      <span class="key">{{ t.key }}</span>
+      {{ t.title }}
+    } @else {
+      {{ 'tasks.createTitle' | transloco }}
+    }
+  </h2>
+  <button mat-button type="button" class="close" (click)="close()">
+    <mat-icon svgIcon="close" aria-hidden="true" />
+    {{ 'common.close' | transloco }}
+  </button>
+</div>
+
+<mat-dialog-content>
+  @if (editing()) {
+    <form id="task-form" class="kora-form" novalidate (submit)="save($event)">
+      @if (formError()) {
+        <div class="kora-notice error" role="alert">
+          <mat-icon svgIcon="error" aria-hidden="true" />
+          <p>{{ formError() }}</p>
+        </div>
+      }
+      <mat-form-field>
+        <mat-label>{{ 'tasks.fields.title' | transloco }}</mat-label>
+        <input matInput [formField]="form.title" />
+        <mat-error><kora-field-error [field]="form.title" /></mat-error>
+      </mat-form-field>
+      <div class="row">
+        <mat-form-field>
+          <mat-label>{{ 'tasks.fields.type' | transloco }}</mat-label>
+          <mat-select [formField]="form.type">
+            @for (value of types; track value) {
+              <mat-option [value]="value">{{ 'taskType.' + value | transloco }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>{{ 'tasks.fields.priority' | transloco }}</mat-label>
+          <mat-select [formField]="form.priority">
+            @for (value of priorities; track value) {
+              <mat-option [value]="value">{{ 'taskPriority.' + value | transloco }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>{{ 'tasks.fields.assignee' | transloco }}</mat-label>
+          <mat-select [formField]="form.assigneeId">
+            <mat-option value="">{{ 'tasks.unassigned' | transloco }}</mat-option>
+            @for (person of data.assignable; track person.userId) {
+              <mat-option [value]="person.userId">{{ person.fullName }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div class="row">
+        <mat-form-field>
+          <mat-label>{{ 'tasks.fields.storyPoints' | transloco }}</mat-label>
+          <input matInput inputmode="numeric" [formField]="form.storyPoints" />
+          <mat-error><kora-field-error [field]="form.storyPoints" /></mat-error>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>{{ 'tasks.fields.estimateHours' | transloco }}</mat-label>
+          <input matInput inputmode="decimal" [formField]="form.estimateHours" />
+          <span matTextSuffix>h</span>
+          <mat-error><kora-field-error [field]="form.estimateHours" /></mat-error>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>{{ 'tasks.fields.remainingHours' | transloco }}</mat-label>
+          <input matInput inputmode="decimal" [formField]="form.remainingHours" />
+          <span matTextSuffix>h</span>
+          <mat-error><kora-field-error [field]="form.remainingHours" /></mat-error>
+        </mat-form-field>
+      </div>
+      <div class="row">
+        <mat-form-field>
+          <mat-label>{{ 'tasks.fields.startDate' | transloco }}</mat-label>
+          <input matInput type="date" [formField]="form.startDate" />
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>{{ 'tasks.fields.dueDate' | transloco }}</mat-label>
+          <input matInput type="date" [formField]="form.dueDate" />
+          <mat-error><kora-field-error [field]="form.dueDate" /></mat-error>
+        </mat-form-field>
+      </div>
+      <mat-form-field>
+        <mat-label>{{ 'tasks.fields.labels' | transloco }}</mat-label>
+        <input matInput [formField]="form.labels" />
+        <mat-hint>{{ 'tasks.hints.labels' | transloco }}</mat-hint>
+        <mat-error><kora-field-error [field]="form.labels" /></mat-error>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>{{ 'tasks.fields.description' | transloco }}</mat-label>
+        <textarea matInput rows="6" [formField]="form.description"></textarea>
+        <mat-hint>{{ 'tasks.hints.markdown' | transloco }}</mat-hint>
+        <mat-error><kora-field-error [field]="form.description" /></mat-error>
+      </mat-form-field>
+    </form>
+  } @else if (task(); as t) {
+    <dl class="facts">
+      <div>
+        <dt>{{ 'tasks.fields.status' | transloco }}</dt>
+        <dd>
+          <kora-status-chip
+            tone="info"
+            icon="schedule"
+            [label]="'taskStatus.' + t.status | transloco"
+          />
+        </dd>
+      </div>
+      <div>
+        <dt>{{ 'tasks.fields.type' | transloco }}</dt>
+        <dd><kora-task-type [type]="t.type" /> {{ 'taskType.' + t.type | transloco }}</dd>
+      </div>
+      <div>
+        <dt>{{ 'tasks.fields.priority' | transloco }}</dt>
+        <dd><kora-priority-chip [priority]="t.priority" /></dd>
+      </div>
+      <div>
+        <dt>{{ 'tasks.fields.assignee' | transloco }}</dt>
+        <dd>{{ assigneeName() ?? ('tasks.unassigned' | transloco) }}</dd>
+      </div>
+      <div>
+        <dt>{{ 'tasks.fields.storyPoints' | transloco }}</dt>
+        <dd>{{ t.storyPoints ?? '—' }}</dd>
+      </div>
+      <div>
+        <dt>{{ 'tasks.fields.remaining' | transloco }}</dt>
+        <dd>
+          @if (t.estimateHours !== undefined || t.remainingHours !== undefined) {
+            {{
+              'tasks.hoursOf'
+                | transloco
+                  : { remaining: t.remainingHours ?? '—', estimate: t.estimateHours ?? '—' }
+            }}
+          } @else {
+            —
+          }
+        </dd>
+      </div>
+      <div>
+        <dt>{{ 'tasks.fields.dueDate' | transloco }}</dt>
+        <dd>{{ (t.dueDate | localizedDate: language.current()) || '—' }}</dd>
+      </div>
+      @if (t.labels.length) {
+        <div>
+          <dt>{{ 'tasks.fields.labels' | transloco }}</dt>
+          <dd>{{ t.labels.join(', ') }}</dd>
+        </div>
+      }
+    </dl>
+    @if (t.blockedReason) {
+      <div class="kora-notice error" role="note">
+        <mat-icon svgIcon="block" aria-hidden="true" />
+        <p>
+          <strong>{{ 'tasks.blockedBy' | transloco }}</strong> {{ t.blockedReason }}
+        </p>
+      </div>
+    }
+    <h3>{{ 'tasks.fields.description' | transloco }}</h3>
+    @if (t.description) {
+      <kora-markdown [text]="t.description" />
+    } @else {
+      <p class="kora-muted">{{ 'tasks.noDescription' | transloco }}</p>
+    }
+
+    <section class="comments" aria-labelledby="comments-title">
+      <h3 id="comments-title">{{ 'tasks.comments' | transloco }}</h3>
+      @if (comments.hasValue()) {
+        <ol>
+          @for (c of comments.value(); track c.id) {
+            <li>
+              <p class="meta">
+                <strong>{{ c.author.fullName }}</strong>
+                · {{ c.createdAt | localizedDate: language.current() }}
+              </p>
+              <kora-markdown [text]="c.body" />
+            </li>
+          } @empty {
+            <li class="kora-muted">{{ 'tasks.noComments' | transloco }}</li>
+          }
+        </ol>
+      }
+      @if (data.canComment) {
+        <form class="kora-form" novalidate (submit)="comment($event)">
+          <mat-form-field>
+            <mat-label>{{ 'tasks.addComment' | transloco }}</mat-label>
+            <textarea
+              matInput
+              rows="3"
+              [value]="commentText()"
+              (input)="onCommentInput($event)"
+            ></textarea>
+            <mat-hint>{{ 'tasks.hints.markdown' | transloco }}</mat-hint>
+          </mat-form-field>
+          @if (commentError()) {
+            <p class="comment-error" role="alert">{{ commentError() }}</p>
+          }
+          <div>
+            <button mat-stroked-button type="submit" [disabled]="posting()">
+              {{ 'tasks.postComment' | transloco }}
+            </button>
+          </div>
+        </form>
+      }
+    </section>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  @if (editing()) {
+    <button mat-button type="button" (click)="cancelEdit()">
+      {{ 'common.cancel' | transloco }}
+    </button>
+    <button mat-flat-button type="submit" form="task-form" [disabled]="form().submitting()">
+      {{ (data.task ? 'common.save' : 'tasks.create') | transloco }}
+    </button>
+  } @else {
+    @if (data.canDelete) {
+      <button mat-button type="button" class="danger" (click)="remove()">
+        <mat-icon svgIcon="delete" aria-hidden="true" />
+        {{ 'common.delete' | transloco }}
+      </button>
+    }
+    @if (data.canChange) {
+      <button mat-flat-button type="button" (click)="editing.set(true)">
+        <mat-icon svgIcon="edit" aria-hidden="true" />
+        {{ 'common.edit' | transloco }}
+      </button>
+    }
+  }
+</mat-dialog-actions>
