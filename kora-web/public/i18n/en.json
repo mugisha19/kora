@@ -221,6 +221,18 @@
         "cycle": "An item can't be moved under itself.",
         "has_children": "It has items under it: delete them first, or delete everything together.",
         "type_change_not_allowed": "An item with items under it must stay a deliverable."
+      },
+      "tasks": {
+        "invalid_transition": "The task can't move to that column from where it is.",
+        "wip_limit_reached": "That column is at its work-in-progress limit.",
+        "remaining_work": "Set the remaining hours to 0 before finishing the task."
+      },
+      "sprints": {
+        "not_agile": "Sprints are for Agile and Hybrid projects.",
+        "already_active": "Another sprint is running. Close it first.",
+        "not_planned": "Only a planned sprint can start.",
+        "not_active": "The sprint isn't running.",
+        "closed": "A closed sprint can't change."
       }
     },
     "fields": {
@@ -637,14 +649,6 @@
       "removed": "{{ name }} removed from the team."
     },
     "comingSoon": {
-      "board": {
-        "title": "The board is coming",
-        "message": "Tasks and the Kanban board arrive in the next release."
-      },
-      "backlog": {
-        "title": "The backlog is coming",
-        "message": "The backlog and sprints arrive in the next release."
-      },
       "schedule": {
         "title": "The schedule is coming",
         "message": "Dependencies, the Gantt chart and the critical path arrive in a later release."
@@ -777,6 +781,182 @@
       "editTitle": "Edit {{ code }}",
       "addUnder": "Add under {{ code }} {{ name }}",
       "addTop": "Add a deliverable"
+    }
+  },
+  "charts": {
+    "showData": "Show the data"
+  },
+  "taskStatus": {
+    "BACKLOG": "Backlog",
+    "TODO": "To do",
+    "IN_PROGRESS": "In progress",
+    "BLOCKED": "Blocked",
+    "IN_REVIEW": "In review",
+    "DONE": "Done"
+  },
+  "taskType": {
+    "STORY": "Story",
+    "TASK": "Task",
+    "BUG": "Bug",
+    "CHORE": "Chore"
+  },
+  "taskPriority": {
+    "CRITICAL": "Critical",
+    "HIGH": "High",
+    "MEDIUM": "Medium",
+    "LOW": "Low"
+  },
+  "sprintStatus": {
+    "PLANNED": "Planned",
+    "ACTIVE": "Active",
+    "CLOSED": "Closed"
+  },
+  "tasks": {
+    "create": "New task",
+    "createTitle": "New task",
+    "created": "Task {{ key }} created.",
+    "saved": "Task {{ key }} saved.",
+    "deleted": "Task {{ key }} deleted.",
+    "deleteTitle": "Delete {{ key }}?",
+    "deleteMessage": "“{{ title }}” and its comments will be deleted.",
+    "unassigned": "Unassigned",
+    "noDescription": "No description yet.",
+    "comments": "Comments",
+    "noComments": "No comments yet.",
+    "addComment": "Add a comment",
+    "postComment": "Comment",
+    "blockedBy": "Blocked:",
+    "block": "Block",
+    "blockTitle": "Why is {{ key }} blocked?",
+    "blockReason": "What blocks it",
+    "hoursOf": "{{ remaining }} h left of {{ estimate }} h",
+    "fields": {
+      "title": "Title",
+      "type": "Type",
+      "priority": "Priority",
+      "status": "Status",
+      "assignee": "Assignee",
+      "storyPoints": "Story points",
+      "estimateHours": "Estimate",
+      "remainingHours": "Remaining",
+      "remaining": "Remaining work",
+      "startDate": "Start date",
+      "dueDate": "Due date",
+      "labels": "Labels",
+      "description": "Description"
+    },
+    "hints": {
+      "labels": "Separate labels with commas.",
+      "markdown": "Markdown: **bold**, *italic*, lists, [links](https://…)"
+    },
+    "errors": {
+      "dueBeforeStart": "The due date must not be before the start date.",
+      "points": "Enter a whole number from 0 to 100.",
+      "hours": "Enter hours from 0 to 10,000.",
+      "label": "Labels use letters, digits, spaces, _ and -, at most 30 characters.",
+      "tooManyLabels": "At most 10 labels."
+    }
+  },
+  "board": {
+    "sprint": "Sprint",
+    "allTasks": "All tasks",
+    "anyone": "Anyone",
+    "anyType": "Any type",
+    "anyLabel": "Any label",
+    "swimlanes": "Swimlanes by assignee",
+    "keyboardHelp": "Drag cards between columns, or use a card’s menu to move it with the keyboard.",
+    "countOfLimit": "{{ count }} / {{ limit }}",
+    "atLimit": "At limit",
+    "overLimit": "Over limit",
+    "configure": "Settings of {{ column }}",
+    "columnTitle": "Column settings",
+    "columnName": "Name",
+    "wipLimit": "WIP limit",
+    "wipHint": "Leave empty for no limit.",
+    "wipInvalid": "Enter a whole number from 1 to 100.",
+    "wipTitle": "Column at its limit",
+    "wipMessage": "Move {{ key }} anyway? Finishing work first keeps the flow healthy.",
+    "moveAnyway": "Move anyway",
+    "moveLabel": "Move {{ key }}",
+    "moveUp": "Move up",
+    "moveDown": "Move down",
+    "moveTo": "Move to {{ column }}",
+    "moved": "Moved {{ key }} to {{ column }}, position {{ position }} of {{ total }}.",
+    "notMoved": "{{ key }} stayed where it was.",
+    "points": "{{ count }} points",
+    "emptyColumn": "Nothing here",
+    "emptyTitle": "The board is empty",
+    "emptyMessage": "Create a task, or plan backlog items into a sprint."
+  },
+  "backlog": {
+    "title": "Backlog and sprints",
+    "newItem": "New backlog item",
+    "product": "Product backlog",
+    "summary": "{{ count }} items · {{ points }} points",
+    "planning": "Sprint planning",
+    "selected": "{{ count }} selected",
+    "targetSprint": "Sprint",
+    "addToSprint": "Add to sprint",
+    "clearSelection": "Clear selection",
+    "select": "Select {{ key }}",
+    "keyboardHelp": "Most important first. Drag to reorder, or use the arrows; select items to plan them into a sprint.",
+    "moveUp": "Move {{ key }} up",
+    "moveDown": "Move {{ key }} down",
+    "moved": "{{ key }} is now at position {{ position }} of {{ total }}.",
+    "emptyTitle": "The backlog is empty",
+    "emptyMessage": "Add the work you know of; order it by what matters most."
+  },
+  "sprints": {
+    "create": "Plan a sprint",
+    "createTitle": "Plan a sprint",
+    "editTitle": "Edit sprint",
+    "defaultName": "Sprint {{ n }}",
+    "created": "{{ name }} planned.",
+    "saved": "{{ name }} saved.",
+    "started": "{{ name }} started: its commitment is set.",
+    "closed": "{{ name }} closed with {{ points }} points done.",
+    "tasksAdded": "{{ count }} items added to {{ name }}.",
+    "taskRemoved": "{{ key }} is back in the backlog.",
+    "start": "Start sprint",
+    "close": "Close sprint",
+    "oneActive": "Close the active sprint first.",
+    "daysLeft": "{{ count }} days left",
+    "committed": "Committed",
+    "done": "Done",
+    "remaining": "Remaining",
+    "planned": "{{ points }} points planned",
+    "tasksOf": "Tasks of {{ name }}",
+    "noTasks": "No tasks in this sprint.",
+    "noTasksYet": "Select backlog items below to plan them here.",
+    "removeTask": "Put {{ key }} back in the backlog",
+    "closeTitle": "Close {{ name }}?",
+    "closeMessage": "{{ count }} unfinished tasks ({{ points }} points) will move on. Completed points are recorded for velocity.",
+    "carryOverTo": "Move unfinished tasks to",
+    "toBacklog": "The product backlog",
+    "fields": {
+      "name": "Name",
+      "goal": "Goal",
+      "startDate": "Start date",
+      "endDate": "End date"
+    },
+    "errors": {
+      "endBeforeStart": "The end date must not be before the start date."
+    },
+    "burndown": {
+      "title": "Burndown",
+      "day": "Day",
+      "ideal": "Ideal",
+      "actual": "Actual"
+    },
+    "velocity": {
+      "title": "Velocity",
+      "sprint": "Sprint",
+      "committed": "Committed",
+      "completed": "Completed",
+      "average": "Average",
+      "forecast": "Recent sprints finished {{ low }} to {{ high }} points, {{ average }} on average: a realistic range for the next one.",
+      "recent": "recent velocity {{ average }} ({{ low }}–{{ high }})",
+      "none": "Velocity appears once a sprint has been closed."
     }
   }
 }

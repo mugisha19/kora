@@ -221,6 +221,18 @@
         "cycle": "Un élément ne peut pas être déplacé sous lui-même.",
         "has_children": "Il contient des éléments : supprimez-les d’abord, ou supprimez le tout.",
         "type_change_not_allowed": "Un élément qui en contient d’autres doit rester un livrable."
+      },
+      "tasks": {
+        "invalid_transition": "La tâche ne peut pas aller dans cette colonne depuis sa position actuelle.",
+        "wip_limit_reached": "Cette colonne a atteint sa limite de travail en cours.",
+        "remaining_work": "Mettez les heures restantes à 0 avant de terminer la tâche."
+      },
+      "sprints": {
+        "not_agile": "Les sprints sont réservés aux projets Agile et Hybride.",
+        "already_active": "Un autre sprint est en cours. Clôturez-le d'abord.",
+        "not_planned": "Seul un sprint planifié peut démarrer.",
+        "not_active": "Le sprint n'est pas en cours.",
+        "closed": "Un sprint clôturé ne peut plus changer."
       }
     },
     "fields": {
@@ -637,14 +649,6 @@
       "removed": "{{ name }} a été retiré de l'équipe."
     },
     "comingSoon": {
-      "board": {
-        "title": "Le tableau arrive bientôt",
-        "message": "Les tâches et le tableau Kanban arrivent dans la prochaine version."
-      },
-      "backlog": {
-        "title": "Le backlog arrive bientôt",
-        "message": "Le backlog et les sprints arrivent dans la prochaine version."
-      },
       "schedule": {
         "title": "Le planning arrive bientôt",
         "message": "Les dépendances, le diagramme de Gantt et le chemin critique arrivent dans une version ultérieure."
@@ -777,6 +781,182 @@
       "editTitle": "Modifier {{ code }}",
       "addUnder": "Ajouter sous {{ code }} {{ name }}",
       "addTop": "Ajouter un livrable"
+    }
+  },
+  "charts": {
+    "showData": "Afficher les données"
+  },
+  "taskStatus": {
+    "BACKLOG": "Backlog",
+    "TODO": "À faire",
+    "IN_PROGRESS": "En cours",
+    "BLOCKED": "Bloqué",
+    "IN_REVIEW": "En revue",
+    "DONE": "Terminé"
+  },
+  "taskType": {
+    "STORY": "Récit",
+    "TASK": "Tâche",
+    "BUG": "Anomalie",
+    "CHORE": "Corvée"
+  },
+  "taskPriority": {
+    "CRITICAL": "Critique",
+    "HIGH": "Haute",
+    "MEDIUM": "Moyenne",
+    "LOW": "Basse"
+  },
+  "sprintStatus": {
+    "PLANNED": "Planifié",
+    "ACTIVE": "En cours",
+    "CLOSED": "Clôturé"
+  },
+  "tasks": {
+    "create": "Nouvelle tâche",
+    "createTitle": "Nouvelle tâche",
+    "created": "Tâche {{ key }} créée.",
+    "saved": "Tâche {{ key }} enregistrée.",
+    "deleted": "Tâche {{ key }} supprimée.",
+    "deleteTitle": "Supprimer {{ key }} ?",
+    "deleteMessage": "« {{ title }} » et ses commentaires seront supprimés.",
+    "unassigned": "Non attribuée",
+    "noDescription": "Pas encore de description.",
+    "comments": "Commentaires",
+    "noComments": "Pas encore de commentaires.",
+    "addComment": "Ajouter un commentaire",
+    "postComment": "Commenter",
+    "blockedBy": "Bloquée :",
+    "block": "Bloquer",
+    "blockTitle": "Pourquoi {{ key }} est-elle bloquée ?",
+    "blockReason": "Ce qui la bloque",
+    "hoursOf": "{{ remaining }} h restantes sur {{ estimate }} h",
+    "fields": {
+      "title": "Titre",
+      "type": "Type",
+      "priority": "Priorité",
+      "status": "Statut",
+      "assignee": "Responsable",
+      "storyPoints": "Points",
+      "estimateHours": "Estimation",
+      "remainingHours": "Restant",
+      "remaining": "Travail restant",
+      "startDate": "Date de début",
+      "dueDate": "Date d'échéance",
+      "labels": "Étiquettes",
+      "description": "Description"
+    },
+    "hints": {
+      "labels": "Séparez les étiquettes par des virgules.",
+      "markdown": "Markdown : **gras**, *italique*, listes, [liens](https://…)"
+    },
+    "errors": {
+      "dueBeforeStart": "L'échéance ne peut pas précéder la date de début.",
+      "points": "Saisissez un nombre entier de 0 à 100.",
+      "hours": "Saisissez des heures entre 0 et 10 000.",
+      "label": "Les étiquettes contiennent lettres, chiffres, espaces, _ et -, 30 caractères au plus.",
+      "tooManyLabels": "10 étiquettes au maximum."
+    }
+  },
+  "board": {
+    "sprint": "Sprint",
+    "allTasks": "Toutes les tâches",
+    "anyone": "N'importe qui",
+    "anyType": "N'importe quel type",
+    "anyLabel": "N'importe quelle étiquette",
+    "swimlanes": "Couloirs par responsable",
+    "keyboardHelp": "Glissez les cartes entre les colonnes, ou utilisez le menu d’une carte pour la déplacer au clavier.",
+    "countOfLimit": "{{ count }} / {{ limit }}",
+    "atLimit": "Limite atteinte",
+    "overLimit": "Limite dépassée",
+    "configure": "Paramètres de {{ column }}",
+    "columnTitle": "Paramètres de la colonne",
+    "columnName": "Nom",
+    "wipLimit": "Limite de travail en cours",
+    "wipHint": "Laissez vide pour ne pas limiter.",
+    "wipInvalid": "Saisissez un nombre entier de 1 à 100.",
+    "wipTitle": "Colonne à sa limite",
+    "wipMessage": "Déplacer {{ key }} quand même ? Terminer le travail d’abord garde un flux sain.",
+    "moveAnyway": "Déplacer quand même",
+    "moveLabel": "Déplacer {{ key }}",
+    "moveUp": "Monter",
+    "moveDown": "Descendre",
+    "moveTo": "Déplacer vers {{ column }}",
+    "moved": "{{ key }} déplacée vers {{ column }}, position {{ position }} sur {{ total }}.",
+    "notMoved": "{{ key }} est restée à sa place.",
+    "points": "{{ count }} points",
+    "emptyColumn": "Rien ici",
+    "emptyTitle": "Le tableau est vide",
+    "emptyMessage": "Créez une tâche, ou planifiez des éléments du backlog dans un sprint."
+  },
+  "backlog": {
+    "title": "Backlog et sprints",
+    "newItem": "Nouvel élément",
+    "product": "Backlog produit",
+    "summary": "{{ count }} éléments · {{ points }} points",
+    "planning": "Planification du sprint",
+    "selected": "{{ count }} sélectionné(s)",
+    "targetSprint": "Sprint",
+    "addToSprint": "Ajouter au sprint",
+    "clearSelection": "Effacer la sélection",
+    "select": "Sélectionner {{ key }}",
+    "keyboardHelp": "Le plus important d'abord. Glissez pour réordonner, ou utilisez les flèches ; sélectionnez des éléments pour les planifier dans un sprint.",
+    "moveUp": "Monter {{ key }}",
+    "moveDown": "Descendre {{ key }}",
+    "moved": "{{ key }} est maintenant en position {{ position }} sur {{ total }}.",
+    "emptyTitle": "Le backlog est vide",
+    "emptyMessage": "Ajoutez le travail connu ; classez-le par ordre d'importance."
+  },
+  "sprints": {
+    "create": "Planifier un sprint",
+    "createTitle": "Planifier un sprint",
+    "editTitle": "Modifier le sprint",
+    "defaultName": "Sprint {{ n }}",
+    "created": "{{ name }} planifié.",
+    "saved": "{{ name }} enregistré.",
+    "started": "{{ name }} a démarré : son engagement est fixé.",
+    "closed": "{{ name }} clôturé avec {{ points }} points terminés.",
+    "tasksAdded": "{{ count }} éléments ajoutés à {{ name }}.",
+    "taskRemoved": "{{ key }} est de retour dans le backlog.",
+    "start": "Démarrer le sprint",
+    "close": "Clôturer le sprint",
+    "oneActive": "Clôturez d'abord le sprint en cours.",
+    "daysLeft": "{{ count }} jours restants",
+    "committed": "Engagés",
+    "done": "Terminés",
+    "remaining": "Restants",
+    "planned": "{{ points }} points planifiés",
+    "tasksOf": "Tâches de {{ name }}",
+    "noTasks": "Aucune tâche dans ce sprint.",
+    "noTasksYet": "Sélectionnez des éléments du backlog ci-dessous pour les planifier ici.",
+    "removeTask": "Remettre {{ key }} dans le backlog",
+    "closeTitle": "Clôturer {{ name }} ?",
+    "closeMessage": "{{ count }} tâches non terminées ({{ points }} points) seront reportées. Les points terminés sont enregistrés pour la vélocité.",
+    "carryOverTo": "Reporter les tâches non terminées vers",
+    "toBacklog": "Le backlog produit",
+    "fields": {
+      "name": "Nom",
+      "goal": "Objectif",
+      "startDate": "Date de début",
+      "endDate": "Date de fin"
+    },
+    "errors": {
+      "endBeforeStart": "La date de fin ne peut pas précéder la date de début."
+    },
+    "burndown": {
+      "title": "Burndown",
+      "day": "Jour",
+      "ideal": "Idéal",
+      "actual": "Réel"
+    },
+    "velocity": {
+      "title": "Vélocité",
+      "sprint": "Sprint",
+      "committed": "Engagés",
+      "completed": "Terminés",
+      "average": "Moyenne",
+      "forecast": "Les derniers sprints ont terminé de {{ low }} à {{ high }} points, {{ average }} en moyenne : une fourchette réaliste pour le prochain.",
+      "recent": "vélocité récente {{ average }} ({{ low }}–{{ high }})",
+      "none": "La vélocité apparaît dès qu’un sprint est clôturé."
     }
   }
 }

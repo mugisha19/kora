@@ -221,6 +221,18 @@
         "cycle": "Igice ntigishobora kwimurirwa munsi yacyo ubwacyo.",
         "has_children": "Gifite ibindi bice munsi yacyo: banza ubisibe, cyangwa usibe byose hamwe.",
         "type_change_not_allowed": "Igice gifite ibindi munsi yacyo kigomba kuguma ari igisubizo (deliverable)."
+      },
+      "tasks": {
+        "invalid_transition": "Umurimo ntushobora kujya muri iyo nkingi uvuye aho uri.",
+        "wip_limit_reached": "Iyo nkingi yageze ku mubare ntarengwa w’imirimo irimo gukorwa.",
+        "remaining_work": "Shyira amasaha asigaye kuri 0 mbere yo kurangiza umurimo."
+      },
+      "sprints": {
+        "not_agile": "Ibyiciro (sprints) ni iby’imishinga Agile n’Ivanze.",
+        "already_active": "Hari ikindi cyiciro kirimo gukorwa. Banza ugisoze.",
+        "not_planned": "Icyiciro cyateganyijwe ni cyo gishobora gutangira.",
+        "not_active": "Icyiciro ntikirimo gukorwa.",
+        "closed": "Icyiciro cyarangiye ntigihinduka."
       }
     },
     "fields": {
@@ -637,14 +649,6 @@
       "removed": "{{ name }} yakuwe mu itsinda."
     },
     "comingSoon": {
-      "board": {
-        "title": "Ikibaho cy’imirimo kiraza vuba",
-        "message": "Imirimo n’ikibaho cya Kanban bizaza mu ivugururwa rikurikira."
-      },
-      "backlog": {
-        "title": "Urutonde rw’imirimo ruraza vuba",
-        "message": "Urutonde rw’imirimo n’ibyiciro (sprints) bizaza mu ivugururwa rikurikira."
-      },
       "schedule": {
         "title": "Ingengabihe iraza vuba",
         "message": "Imirimo ishingiye ku yindi, igishushanyo cya Gantt n’inzira y’ingenzi bizaza nyuma."
@@ -777,6 +781,182 @@
       "editTitle": "Hindura {{ code }}",
       "addUnder": "Ongera munsi ya {{ code }} {{ name }}",
       "addTop": "Ongeramo igisubizo"
+    }
+  },
+  "charts": {
+    "showData": "Erekana imibare"
+  },
+  "taskStatus": {
+    "BACKLOG": "Urutonde",
+    "TODO": "Bigomba gukorwa",
+    "IN_PROGRESS": "Birakorwa",
+    "BLOCKED": "Byahagaze",
+    "IN_REVIEW": "Birasuzumwa",
+    "DONE": "Byarangiye"
+  },
+  "taskType": {
+    "STORY": "Inkuru",
+    "TASK": "Umurimo",
+    "BUG": "Ikosa",
+    "CHORE": "Igikorwa gisanzwe"
+  },
+  "taskPriority": {
+    "CRITICAL": "Byihutirwa cyane",
+    "HIGH": "Hejuru",
+    "MEDIUM": "Hagati",
+    "LOW": "Hasi"
+  },
+  "sprintStatus": {
+    "PLANNED": "Byateganyijwe",
+    "ACTIVE": "Birakora",
+    "CLOSED": "Byarangiye"
+  },
+  "tasks": {
+    "create": "Umurimo mushya",
+    "createTitle": "Umurimo mushya",
+    "created": "Umurimo {{ key }} wakozwe.",
+    "saved": "Umurimo {{ key }} wabitswe.",
+    "deleted": "Umurimo {{ key }} wasibwe.",
+    "deleteTitle": "Gusiba {{ key }}?",
+    "deleteMessage": "“{{ title }}” n’ibitekerezo byawo bizasibwa.",
+    "unassigned": "Nta wawuhawe",
+    "noDescription": "Nta bisobanuro birahari.",
+    "comments": "Ibitekerezo",
+    "noComments": "Nta gitekerezo kirahari.",
+    "addComment": "Ongeraho igitekerezo",
+    "postComment": "Tanga igitekerezo",
+    "blockedBy": "Byahagaritswe na:",
+    "block": "Hagarika",
+    "blockTitle": "Kuki {{ key }} yahagaze?",
+    "blockReason": "Icyawuhagaritse",
+    "hoursOf": "Hasigaye amasaha {{ remaining }} kuri {{ estimate }}",
+    "fields": {
+      "title": "Umutwe",
+      "type": "Ubwoko",
+      "priority": "Icyihutirwa",
+      "status": "Aho bigeze",
+      "assignee": "Uwawuhawe",
+      "storyPoints": "Amanota",
+      "estimateHours": "Igihe giteganyijwe",
+      "remainingHours": "Igisigaye",
+      "remaining": "Imirimo isigaye",
+      "startDate": "Itariki yo gutangira",
+      "dueDate": "Itariki ntarengwa",
+      "labels": "Ibirango",
+      "description": "Ibisobanuro"
+    },
+    "hints": {
+      "labels": "Tandukanya ibirango ukoresheje akitso.",
+      "markdown": "Markdown: **inyuguti zibyibushye**, *zihengamye*, intonde, [amahuza](https://…)"
+    },
+    "errors": {
+      "dueBeforeStart": "Itariki ntarengwa ntigomba kuba mbere y’itariki yo gutangira.",
+      "points": "Andika umubare wuzuye kuva kuri 0 kugeza kuri 100.",
+      "hours": "Andika amasaha kuva kuri 0 kugeza ku 10 000.",
+      "label": "Ibirango bikoresha inyuguti, imibare, imyanya, _ na -, bitarenze inyuguti 30.",
+      "tooManyLabels": "Ibirango 10 ntarengwa."
+    }
+  },
+  "board": {
+    "sprint": "Icyiciro",
+    "allTasks": "Imirimo yose",
+    "anyone": "Uwo ari we wese",
+    "anyType": "Ubwoko ubwo ari bwo bwose",
+    "anyLabel": "Ikirango icyo ari cyo cyose",
+    "swimlanes": "Imirongo hakurikijwe abahawe imirimo",
+    "keyboardHelp": "Kurura amakarita hagati y’inkingi, cyangwa ukoreshe menu y’ikarita kugira ngo uyimure ukoresheje clavier.",
+    "countOfLimit": "{{ count }} / {{ limit }}",
+    "atLimit": "Byageze ku mbibi",
+    "overLimit": "Byarenze imbibi",
+    "configure": "Igenamiterere rya {{ column }}",
+    "columnTitle": "Igenamiterere ry’inkingi",
+    "columnName": "Izina",
+    "wipLimit": "Imbibi z’imirimo irimo gukorwa",
+    "wipHint": "Siga ubusa niba nta mbibi.",
+    "wipInvalid": "Andika umubare wuzuye kuva kuri 1 kugeza ku 100.",
+    "wipTitle": "Inkingi yageze ku mbibi",
+    "wipMessage": "Kwimura {{ key }} uko byagenda kose? Kurangiza imirimo mbere bifasha akazi kugenda neza.",
+    "moveAnyway": "Imura uko byagenda kose",
+    "moveLabel": "Imura {{ key }}",
+    "moveUp": "Zamura",
+    "moveDown": "Manura",
+    "moveTo": "Imurira muri {{ column }}",
+    "moved": "{{ key }} yimuriwe muri {{ column }}, ku mwanya wa {{ position }} muri {{ total }}.",
+    "notMoved": "{{ key }} yagumye aho yari iri.",
+    "points": "Amanota {{ count }}",
+    "emptyColumn": "Nta kintu kirimo",
+    "emptyTitle": "Ikibaho kirimo ubusa",
+    "emptyMessage": "Kora umurimo, cyangwa ushyire ibiri ku rutonde mu cyiciro."
+  },
+  "backlog": {
+    "title": "Urutonde n’ibyiciro",
+    "newItem": "Ikintu gishya",
+    "product": "Urutonde rw’ibicuruzwa",
+    "summary": "Ibintu {{ count }} · amanota {{ points }}",
+    "planning": "Gutegura icyiciro",
+    "selected": "{{ count }} byatoranyijwe",
+    "targetSprint": "Icyiciro",
+    "addToSprint": "Shyira mu cyiciro",
+    "clearSelection": "Kuraho ibyatoranyijwe",
+    "select": "Hitamo {{ key }}",
+    "keyboardHelp": "Iby’ingenzi biza mbere. Kurura kugira ngo uhindure urutonde, cyangwa ukoreshe utwambi; hitamo ibintu kugira ngo ubishyire mu cyiciro.",
+    "moveUp": "Zamura {{ key }}",
+    "moveDown": "Manura {{ key }}",
+    "moved": "{{ key }} ubu iri ku mwanya wa {{ position }} muri {{ total }}.",
+    "emptyTitle": "Urutonde rurimo ubusa",
+    "emptyMessage": "Ongeramo imirimo uzi; uyitondeke hakurikijwe iy’ingenzi."
+  },
+  "sprints": {
+    "create": "Tegura icyiciro",
+    "createTitle": "Tegura icyiciro",
+    "editTitle": "Hindura icyiciro",
+    "defaultName": "Icyiciro cya {{ n }}",
+    "created": "{{ name }} cyateganyijwe.",
+    "saved": "{{ name }} cyabitswe.",
+    "started": "{{ name }} cyatangiye: icyo cyiyemeje cyashyizweho.",
+    "closed": "{{ name }} cyasojwe hamaze kurangira amanota {{ points }}.",
+    "tasksAdded": "Ibintu {{ count }} byongewe muri {{ name }}.",
+    "taskRemoved": "{{ key }} yasubijwe ku rutonde.",
+    "start": "Tangiza icyiciro",
+    "close": "Soza icyiciro",
+    "oneActive": "Banza usoze icyiciro kirimo gukorwa.",
+    "daysLeft": "Hasigaye iminsi {{ count }}",
+    "committed": "Byiyemejwe",
+    "done": "Byarangiye",
+    "remaining": "Bisigaye",
+    "planned": "Amanota {{ points }} ateganyijwe",
+    "tasksOf": "Imirimo ya {{ name }}",
+    "noTasks": "Nta murimo uri muri iki cyiciro.",
+    "noTasksYet": "Hitamo ibintu byo ku rutonde hepfo kugira ngo ubiteganye hano.",
+    "removeTask": "Subiza {{ key }} ku rutonde",
+    "closeTitle": "Gusoza {{ name }}?",
+    "closeMessage": "Imirimo {{ count }} itararangira (amanota {{ points }}) izimurwa. Amanota yarangiye abikwa ku muvuduko.",
+    "carryOverTo": "Imurira imirimo itararangira muri",
+    "toBacklog": "Urutonde rw’ibicuruzwa",
+    "fields": {
+      "name": "Izina",
+      "goal": "Intego",
+      "startDate": "Itariki yo gutangira",
+      "endDate": "Itariki yo kurangiza"
+    },
+    "errors": {
+      "endBeforeStart": "Itariki yo kurangiza ntigomba kuba mbere y’itariki yo gutangira."
+    },
+    "burndown": {
+      "title": "Igabanuka ry’imirimo",
+      "day": "Umunsi",
+      "ideal": "Biteganyijwe",
+      "actual": "Nyabyo"
+    },
+    "velocity": {
+      "title": "Umuvuduko",
+      "sprint": "Icyiciro",
+      "committed": "Byiyemejwe",
+      "completed": "Byarangiye",
+      "average": "Impuzandengo",
+      "forecast": "Ibyiciro biheruka byarangije amanota {{ low }} kugeza kuri {{ high }}, impuzandengo {{ average }}: iyi ni intera ishoboka ku gikurikiraho.",
+      "recent": "umuvuduko uheruka {{ average }} ({{ low }}–{{ high }})",
+      "none": "Umuvuduko ugaragara iyo icyiciro kimaze gusozwa."
     }
   }
 }
