@@ -22,6 +22,9 @@ import {
 } from './data-projects';
 import { MembershipRecord } from './data';
 import { db, must } from './db';
+import { ratio } from './evm';
+import { acOf, evOf, indicesOf, pvOf } from './evm-domain';
+import { scheduleOf } from './schedule-domain';
 import { currencyDigits, fromUnits, percentOf, toUnits } from './decimal';
 import { taskProgress, tasksOfWorkPackage } from './work-domain';
 
@@ -100,21 +103,50 @@ export function health(
           : 'Not started';
     return { health: 'GREY', healthReason: reason, healthOverridden: false };
   }
+  // The API's rule, first match wins (ADR 0008 on the API side).
+  const { spi, cpi } = indicesOf(project);
+  const result = (h: Health, healthReason: string) => ({
+    health: h,
+    healthReason,
+    healthOverridden: false,
+  });
+  if (spi !== undefined && spi < 0.8) {
+    return result('RED', `Schedule performance index ${spi.toFixed(2)} is below 0.80`);
+  }
+  if (cpi !== undefined && cpi < 0.8) {
+    return result('RED', `Cost performance index ${cpi.toFixed(2)} is below 0.80`);
+  }
   if (criticalRiskOverdue(project, now)) {
-    return {
-      health: 'RED',
-      healthReason: 'A critical risk is open past its response date',
-      healthOverridden: false,
-    };
+    return result('RED', 'A critical risk is open past its response date');
+  }
+  if (spi !== undefined && spi < 0.95) {
+    return result('AMBER', `Schedule performance index ${spi.toFixed(2)} is below 0.95`);
+  }
+  if (cpi !== undefined && cpi < 0.95) {
+    return result('AMBER', `Cost performance index ${cpi.toFixed(2)} is below 0.95`);
   }
   if (isLate(project, now)) {
-    return {
-      health: 'AMBER',
-      healthReason: `Past its target end date (${project.targetEndDate})`,
-      healthOverridden: false,
-    };
+    return result('AMBER', `Past its target end date (${project.targetEndDate})`);
+  }
+  const forecast = forecastFinish(project);
+  if (forecast && forecast > project.targetEndDate) {
+    return result(
+      'AMBER',
+      `Forecast to finish on ${forecast}, after its target end date (${project.targetEndDate})`,
+    );
   }
   return { health: 'GREEN', healthReason: 'On track', healthOverridden: false };
+}
+
+/** The critical path's finish of a plan-driven project with tasks (none on a loop). */
+function forecastFinish(project: ProjectRecord): string | undefined {
+  if (project.methodology === 'AGILE') return undefined;
+  if (!db.state.tasks.some((t) => t.projectId === project.id)) return undefined;
+  try {
+    return scheduleOf(project).projectFinish;
+  } catch {
+    return undefined;
+  }
 }
 
 /**
@@ -449,6 +481,32 @@ export function dashboardRow(project: ProjectRecord, today: string): DashboardPr
     percentComplete: wbsTree(project).percentComplete,
     targetEndDate: project.targetEndDate,
     ...(next ? { nextMilestone: next } : {}),
+    ...indicesOf(project),
+  };
+}
+
+/** Σ EV ÷ Σ PV and Σ EV ÷ Σ AC over the projects, and their approved cost. */
+function portfolioPerformance(
+  projects: readonly ProjectRecord[],
+  digits: number,
+  currency: string,
+) {
+  let pv = 0n;
+  let ev = 0n;
+  let ac = 0n;
+  for (const project of projects) {
+    const today = orgToday(project.organizationId);
+    const cost = acOf(project, today).ac;
+    ac += cost;
+    const earned = evOf(project).ev;
+    if (earned === null) continue;
+    pv += pvOf(project, today);
+    ev += earned;
+  }
+  return {
+    totalActualCost: { amount: fromUnits(ac, digits), currency },
+    ...(pv ? { portfolioSpi: ratio(ev, pv) } : {}),
+    ...(ac ? { portfolioCpi: ratio(ev, ac) } : {}),
   };
 }
 
@@ -477,6 +535,7 @@ export function dashboardSummary(
     totalPlannedCost: money(trees.reduce((t, tree) => t + toUnits(tree.plannedCost.amount), 0n)),
     totalEarnedValue: money(trees.reduce((t, tree) => t + toUnits(tree.earnedValue.amount), 0n)),
     lateProjects: projects.filter((p) => isLate(p)).length,
+    ...portfolioPerformance(projects, digits, currency),
     openCriticalRisks: (db.state.risks ?? []).filter(
       (r) => ids.has(r.projectId) && r.status !== 'CLOSED' && r.probability * r.impact >= 15,
     ).length,

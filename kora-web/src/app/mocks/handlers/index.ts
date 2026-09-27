@@ -13,6 +13,8 @@ import { riskHandlers } from './risk.handlers';
 import { issueHandlers } from './issue.handlers';
 import { stakeholderHandlers } from './stakeholder.handlers';
 import { changeRequestHandlers } from './change-request.handlers';
+import { resourceHandlers } from './resource.handlers';
+import { timesheetHandlers } from './timesheet.handlers';
 import { sprintHandlers } from './sprint.handlers';
 import { taskHandlers } from './task.handlers';
 import { wbsHandlers } from './wbs.handlers';
@@ -38,6 +40,8 @@ export const handlers = [
   ...issueHandlers,
   ...stakeholderHandlers,
   ...changeRequestHandlers,
+  ...timesheetHandlers,
+  ...resourceHandlers,
   http.all(`${API}/*`, ({ request }) => {
     const r = reply(request);
     const userId = authenticate(request, r);

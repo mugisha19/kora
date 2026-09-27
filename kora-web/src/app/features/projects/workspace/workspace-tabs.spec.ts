@@ -117,7 +117,7 @@ describe('project workspace tabs', () => {
       expect(mvp.getAttribute('tabindex')).toBe('0');
       // Figures are read as the description, not as part of the name.
       expect(
-        screen.getByText(/Effort 550 h, cost RWF\s16,500,000, 76.4% complete \(rolled up\)/),
+        screen.getByText(/Effort 550 h, cost RWF\s16,500,000, 97.7% complete \(rolled up\)/),
       ).toBeTruthy();
     });
 

@@ -442,16 +442,16 @@ describe('mock API — projects', () => {
         type: 'DELIVERABLE',
         percentCompleteSource: 'ROLLED_UP',
         plannedEffortHours: 550,
-        // (300 × 90 + 250 × 60) / 550
-        percentComplete: 76.36,
+        // (300 × 100 + 250 × 95) / 550
+        percentComplete: 97.73,
         plannedCost: { amount: '16500000', currency: 'RWF' },
-        earnedValue: { amount: '12600000', currency: 'RWF' },
+        earnedValue: { amount: '16125000', currency: 'RWF' },
       });
       expect(mvp.children.map((c: { code: string }) => c.code)).toEqual(['1.1', '1.2']);
       expect(integration).toMatchObject({
         code: '2',
         percentCompleteSource: 'REPORTED',
-        percentComplete: 30,
+        percentComplete: 90,
       });
     });
 
@@ -614,7 +614,8 @@ describe('mock API — projects', () => {
         lateProjects: 1,
         totalBudget: { amount: '730000000', currency: 'RWF' },
       });
-      expect(res.body!['portfolioSpi']).toBeUndefined();
+      // Σ EV ÷ Σ PV and Σ EV ÷ Σ AC over the running projects (contract 0.6.0).
+      expect(res.body).toMatchObject({ portfolioSpi: 0.87, portfolioCpi: 1.53 });
     });
 
     it('lists the worst projects first unless a sort is given', async () => {

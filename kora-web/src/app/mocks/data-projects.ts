@@ -536,11 +536,11 @@ export function createProjectSeed(now = Date.now()): ProjectSeed {
     [
       'Portal MVP',
       [
-        ['Account requests', 300, '9000000', 90],
-        ['Document upload', 250, '7500000', 60],
+        ['Account requests', 300, '9000000', 100],
+        ['Document upload', 250, '7500000', 95],
       ],
     ],
-    ['Contact centre integration', 200, '6000000', 30],
+    ['Contact centre integration', 200, '6000000', 90],
   ]);
   addTree('erp', [
     [

@@ -21,14 +21,14 @@ describe('dashboard', () => {
   beforeEach(() => resetMockApi());
   afterEach(() => localStorage.clear());
 
-  it('summarizes the organization for the PMO, with "—" for figures of later releases', async () => {
+  it('summarizes the organization for the PMO', async () => {
     await openRoute(routes, '/dashboard', 'pmo@kora.demo');
 
     await screen.findByText('Active projects');
     expect(kpi('Active projects')).toBe('5');
     expect(kpi('On track')).toBe('50%');
     expect(kpi('Late projects')).toBe('1');
-    expect(kpi('SPI / CPI')).toBe('— / —');
+    expect(kpi('SPI / CPI')).toBe('0.87 / 1.53');
     expect(kpi('Open critical risks')).toBe('3');
     expect(kpi('Pending change requests')).toBe('2');
   });
