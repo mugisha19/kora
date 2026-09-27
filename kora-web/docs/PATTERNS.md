@@ -112,3 +112,18 @@ proxy, a network failure) into a single `ApiError` shape, so later layers never 
   `errors[0].params`; `loopOf()` adapts it for every place that shows it.
 - **Local edit, one save.** The working calendar edits days and holidays locally, then saves them
   together with `If-Match` (412 → reload the other version).
+
+## Phase 7
+
+- **Chain of Responsibility (server-side), rendered.** The API builds the approval chain from
+  handlers (project manager, PMO, sponsor); the UI draws the steps it returns as a timeline and
+  never recomputes who should approve. The mock mirrors the handlers in `chainFor()`.
+- **State (server-side).** Issue and change-request lifecycles live in the API; the sheet and page
+  offer only the moves the status allows and show `…invalid_transition` refusals.
+- **Facade + `resource()`.** A facade per tab runs commands and bumps a `version` signal; reads
+  are `resource()`s keyed on it — lighter than a store when a tab has no client-side state to
+  merge.
+- **Routed side sheet.** `routeSheet()` ties a dialog to a child route: the URL opens it, closing
+  it navigates back, leaving the route closes it.
+- **Specification (server-side), in the URL.** Register filters (kind, category, owner, status,
+  overdue, gap, quadrant, heat map cell) are query parameters mapped to API filters.

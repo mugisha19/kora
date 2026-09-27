@@ -2,13 +2,13 @@
 
 ## Current status
 
-Phase 6 complete (tag `web-v0.6.0`). Waiting for "continue".
+Phase 7 complete (tag `web-v0.7.0`). Waiting for "continue".
 
 ## Next step
 
-Phase 7 — risks with the heat map, issues, stakeholders and change requests (features 11–14).
-Contract 0.5.0 is live since `api-v0.6.0`; see the backend notes in memory (risk scoring,
-escalation, the change-request approval chain).
+Phase 8 — timesheets, the resource heat map and the EVM dashboard (features 15–17). Contract
+0.6.0 is live since `api-v0.7.0`; see the backend notes in memory (timesheet approval, capacity,
+EVM formulas, dashboard trends).
 
 ## Checklist
 
@@ -19,10 +19,56 @@ escalation, the change-request approval chain).
 - [x] 4. Portfolio dashboard, projects, charter, WBS tree
 - [x] 5. Kanban, backlog, sprints
 - [x] 6. Gantt with dependencies and critical path
-- [ ] 7. Risks + heat map, issues, stakeholders, change requests
+- [x] 7. Risks + heat map, issues, stakeholders, change requests
 - [ ] 8. Timesheets, resource heat map, EVM dashboard
 - [ ] 9. Real-time notifications, activity feed, attachments, report exports
 - [ ] 10. E2E flows, performance, Nginx Docker image, final README; tag v1.0.0
+
+## Phase 7 — what exists
+
+- Mock API for the 35 contract 0.5.0 operations: risks (scoring, bands, strategies by kind,
+  assessments, close, materialize into an issue, heat map, portfolio view), issues (lifecycle,
+  overdue, escalated), stakeholders (grid, gap, anonymizing removal), change requests (the
+  approval chain from the organization's thresholds, no self-approval, decisions, withdraw,
+  implement, revise, the inbox) and the change-control settings; the last approval changes the
+  budget, target end date, charter and schedule baseline; the health rule includes critical
+  risks — `src/app/mocks/governance-domain.ts`, `handlers/{risk,issue,stakeholder,change-request}.handlers.ts`,
+  demo data in `data-governance.ts`
+- API clients: `src/app/core/api/{risks,issues,stakeholders,change-requests}.api.ts`; types
+  regenerated for contracts 0.7.0 and 0.8.0
+- Risks tab: heat map (a table of toggle buttons, count and band in words) filtering the register,
+  guided scoring, strategies by kind, the risk sheet at `/risks/<id>` with assessment history,
+  re-assess, close, "it happened" — `workspace/risks/`
+- Issues tab: quick filters (mine, overdue, critical), escalated and overdue marks, the issue sheet
+  at `/issues/<id>` (start, resolve with a resolution, close, reopen, raise a change request) —
+  `workspace/issues/`
+- Stakeholders tab: power/interest grid, engagement matrix, register, gap and quadrant filters,
+  read-only view for non-managers, removal that erases personal data — `workspace/stakeholders/`
+- Changes tab and page: list, impact, approval timeline, approve/reject (comment required to
+  reject), submit, withdraw, implement, revise — `workspace/changes/`
+- "My approvals": toolbar badge and `/approvals` — `core/approvals/`, `features/approvals/`
+- Admin → Change control thresholds with `If-Match`; dashboard: open critical risks, pending
+  change requests and a list of critical risks
+- ADR 0010
+- Fixed along the way: demo data is dated in Kigali time (the seed used UTC dates, so tests
+  failed between midnight and 02:00 in Kigali), and the schedule e2e no longer hardcodes the
+  finish date (the demo dates move with today)
+- Tests: 457 unit tests (≈ 90% statements), 116 e2e tests (desktop and 375 px, axe), including
+  every governance tab and the PMO's approvals end to end
+
+## Feature acceptance criteria covered (Phase 7)
+
+- 11: heat map counts match the register filters (the cell filters the register to its ids —
+  unit + e2e); strategies depend on threat vs opportunity (mock + unit); "overdue review notifies
+  the owner" is the API's job (Phase 8 events) — the register marks overdue reviews
+- 12: materializing a risk creates a linked issue in one step (mock, unit, e2e); overdue critical
+  issues are marked escalated (mock + unit + e2e); a resolution is required and shown (unit + e2e)
+- 13: quadrants follow the power/interest rule and are keyboard-reachable (mock, unit, e2e); the
+  gap filter lists only current < desired (mock + unit); removal erases personal fields (mock +
+  unit)
+- 14: a small change needs only the PM, a large one PM → PMO → sponsor (mock + unit + e2e);
+  approving updates budget, end date, charter and baseline together (mock + unit + e2e); nobody
+  approves their own request (mock + unit)
 
 ## Phase 6 — what exists
 

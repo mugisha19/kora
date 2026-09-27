@@ -338,3 +338,33 @@ red.
 A baseline freezes every task's planned dates. After that, the schedule reports variance in
 working days (positive = late), so "the legal review took four more days" shows up on every
 task after it. Saving a new baseline resets the comparison; old baselines are kept for history.
+
+## Qualitative risk analysis (Phase 7)
+
+Probability × impact on 1–5 scales gives a score from 1 to 25, banded low (1–4), medium (5–9),
+high (10–14) and critical (15–25). The heat map places every open risk in its cell, so a
+steering meeting sees at a glance where attention goes. Inherent risk is the score before any
+response; residual risk is what is expected once the response works. Threats are avoided,
+mitigated, transferred or accepted; opportunities are exploited, enhanced, shared or accepted;
+either can be escalated beyond the project.
+
+## Risks, issues and change requests (Phase 7)
+
+A risk might happen; an issue is happening. When a risk happens it materializes into an issue
+in one step (the risk closes, the issue links back). An issue that needs a change to scope,
+schedule or cost raises a change request, which goes through integrated change control.
+
+## Chain of Responsibility for approvals (Phase 7)
+
+Instead of a growing `if/else`, each approval level is a handler that decides whether it must
+approve and passes the request on: the project manager always, the PMO above a cost or schedule
+threshold, the sponsor above a larger cost threshold or when the charter's scope changes.
+Adding a level (legal review above some amount) is one new handler. Nobody approves their own
+request; the last approval changes the budget, end date, charter and schedule baseline together.
+
+## Stakeholder engagement (Phase 7)
+
+The power/interest grid says how to treat people: manage closely (high power, high interest),
+keep satisfied, keep informed, monitor. The engagement matrix compares where each person is
+(unaware → leading) with where the project needs them; the gap is the work to do. Personal data
+is kept minimal and erased when someone is removed, leaving an anonymous record.
