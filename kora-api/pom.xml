@@ -25,6 +25,11 @@
         <openapi-request-validator.version>3.0.0</openapi-request-validator.version>
         <bouncycastle.version>1.86</bouncycastle.version>
         <bucket4j.version>8.20.0</bucket4j.version>
+        <!-- Report exports (feature 21); checked against Maven Central on 2026-09-27. -->
+        <poi.version>5.5.1</poi.version>
+        <flying-saucer.version>10.5.0</flying-saucer.version>
+        <commons-io.version>2.21.0</commons-io.version>
+        <openpdf.version>3.0.5</openpdf.version>
         <spotless-maven-plugin.version>3.10.2</spotless-maven-plugin.version>
         <palantir-java-format.version>2.99.0</palantir-java-format.version>
         <maven-checkstyle-plugin.version>3.6.0</maven-checkstyle-plugin.version>
@@ -42,6 +47,12 @@
                 <version>${spring-modulith.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <!-- POI and its commons-compress disagree on commons-io; take the newer one (dependency convergence). -->
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${commons-io.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -132,6 +143,30 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-websocket</artifactId>
+        </dependency>
+        <!-- Report exports: Excel with Apache POI (streaming SXSSF), PDF from an HTML template (Thymeleaf, Flying Saucer on
+             OpenPDF). Flying Saucer needs Batik on the class path even without SVG; the renderer fetches nothing
+             (PdfReportExporter), so Batik never sees outside content. -->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>${poi.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.xhtmlrenderer</groupId>
+            <artifactId>flying-saucer-pdf</artifactId>
+            <version>${flying-saucer.version}</version>
+        </dependency>
+        <!-- Liberation Sans (SIL OFL), embedded in PDFs: the built-in PDF fonts stop at Western European characters, and
+             French number formatting alone needs U+202F. Same version as the OpenPDF Flying Saucer brings. -->
+        <dependency>
+            <groupId>com.github.librepdf</groupId>
+            <artifactId>openpdf-fonts-extra</artifactId>
+            <version>${openpdf.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.thymeleaf</groupId>
+            <artifactId>thymeleaf</artifactId>
         </dependency>
 
         <!-- Local development: `spring-boot:run` starts compose.yaml services (ignored in tests) -->
