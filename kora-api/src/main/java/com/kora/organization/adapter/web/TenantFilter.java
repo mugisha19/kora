@@ -17,6 +17,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.UUID;
+import org.slf4j.MDC;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -37,6 +38,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 class TenantFilter extends OncePerRequestFilter {
 
     static final String HEADER = "X-Organization-Id";
+    static final String ORGANIZATION_KEY = "organizationId";
+    static final String USER_KEY = "userId";
 
     private final ActiveMemberLookup members;
     private final ProblemResponseWriter problems;
@@ -81,6 +84,9 @@ class TenantFilter extends OncePerRequestFilter {
     private static void continueAs(
             ActiveMember member, HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
+        // Every log line of the request says whose it was: ids only, never names or emails (feature 24).
+        MDC.put(ORGANIZATION_KEY, member.organizationId().toString());
+        MDC.put(USER_KEY, member.userId().toString());
         try {
             TenantScope.<Void, Exception>callAs(
                     member.organizationId(),
@@ -92,6 +98,9 @@ class TenantFilter extends OncePerRequestFilter {
             throw e;
         } catch (Exception e) {
             throw new ServletException(e);
+        } finally {
+            MDC.remove(ORGANIZATION_KEY);
+            MDC.remove(USER_KEY);
         }
     }
 
