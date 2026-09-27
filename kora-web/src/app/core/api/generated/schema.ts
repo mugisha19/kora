@@ -2279,6 +2279,50 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/reports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My report jobs, newest first
+         * @description The last 50; files are kept 7 days.
+         */
+        get: operations["listReports"];
+        put?: never;
+        /**
+         * Request a report export
+         * @description Generated in the background, in my language and the organization's currency and time zone, showing exactly what I can see on screen. Poll the job or wait for the REPORT_READY notification. Which params each type uses: PROJECT_STATUS, EVM and TIMESHEETS need projectId (TIMESHEETS also takes from/to and is for the project's managers); RISK_REGISTER takes projectId or portfolioId, or neither for every project I can see; PORTFOLIO_SUMMARY takes portfolioId or nothing.
+         */
+        post: operations["createReport"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/reports/{reportId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * One of my report jobs
+         * @description When READY it carries a short-lived download link; ask again for a fresh one.
+         */
+        get: operations["getReport"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -2340,7 +2384,7 @@ export interface components {
          *     back to a generic message for unknown codes.
          * @enum {string}
          */
-        ErrorCode: "validation.failed" | "auth.unauthenticated" | "auth.invalid_credentials" | "auth.refresh_invalid" | "auth.email_taken" | "auth.reset_token_invalid" | "tenant.forbidden" | "tenant.header_invalid" | "access.denied" | "resource.not_found" | "method.not_allowed" | "media_type.unsupported" | "concurrency.stale_version" | "concurrency.if_match_required" | "members.last_admin" | "members.self_removal" | "invitations.already_member" | "invitations.already_pending" | "invitations.not_pending" | "invitations.not_found" | "invitations.expired" | "invitations.revoked" | "invitations.already_accepted" | "rate_limited" | "organization.currency_locked" | "portfolios.archived" | "portfolios.not_empty" | "projects.code_taken" | "projects.invalid_transition" | "projects.charter_approval_required" | "projects.methodology_locked" | "project_members.is_manager" | "charters.not_draft" | "charters.not_submitted" | "charters.incomplete" | "wbs.parent_not_deliverable" | "wbs.too_deep" | "wbs.cycle" | "wbs.has_children" | "wbs.type_change_not_allowed" | "tasks.invalid_transition" | "tasks.wip_limit_reached" | "tasks.remaining_work" | "sprints.not_agile" | "sprints.already_active" | "sprints.not_planned" | "sprints.not_active" | "sprints.closed" | "schedule.cycle" | "schedule.dependency_exists" | "schedule.not_predictive" | "risks.closed" | "issues.invalid_transition" | "change_requests.not_draft" | "change_requests.not_in_review" | "change_requests.self_approval" | "change_requests.invalid_transition" | "timesheets.locked" | "timesheets.empty" | "timesheets.not_submitted" | "timesheets.self_approval" | "attachments.not_uploaded" | "attachments.content_mismatch" | "attachments.already_completed" | "internal.error";
+        ErrorCode: "validation.failed" | "auth.unauthenticated" | "auth.invalid_credentials" | "auth.refresh_invalid" | "auth.email_taken" | "auth.reset_token_invalid" | "tenant.forbidden" | "tenant.header_invalid" | "access.denied" | "resource.not_found" | "method.not_allowed" | "media_type.unsupported" | "concurrency.stale_version" | "concurrency.if_match_required" | "members.last_admin" | "members.self_removal" | "invitations.already_member" | "invitations.already_pending" | "invitations.not_pending" | "invitations.not_found" | "invitations.expired" | "invitations.revoked" | "invitations.already_accepted" | "rate_limited" | "organization.currency_locked" | "portfolios.archived" | "portfolios.not_empty" | "projects.code_taken" | "projects.invalid_transition" | "projects.charter_approval_required" | "projects.methodology_locked" | "project_members.is_manager" | "charters.not_draft" | "charters.not_submitted" | "charters.incomplete" | "wbs.parent_not_deliverable" | "wbs.too_deep" | "wbs.cycle" | "wbs.has_children" | "wbs.type_change_not_allowed" | "tasks.invalid_transition" | "tasks.wip_limit_reached" | "tasks.remaining_work" | "sprints.not_agile" | "sprints.already_active" | "sprints.not_planned" | "sprints.not_active" | "sprints.closed" | "schedule.cycle" | "schedule.dependency_exists" | "schedule.not_predictive" | "risks.closed" | "issues.invalid_transition" | "change_requests.not_draft" | "change_requests.not_in_review" | "change_requests.self_approval" | "change_requests.invalid_transition" | "timesheets.locked" | "timesheets.empty" | "timesheets.not_submitted" | "timesheets.self_approval" | "attachments.not_uploaded" | "attachments.content_mismatch" | "attachments.already_completed" | "reports.too_many_pending" | "internal.error";
         /** @enum {string} */
         Role: "ORG_ADMIN" | "PMO" | "PROJECT_MANAGER" | "MEMBER" | "VIEWER";
         /** @enum {string} */
@@ -4194,7 +4238,7 @@ export interface components {
             months: components["schemas"]["DashboardTrendMonth"][];
         };
         /** @enum {string} */
-        NotificationType: "TASK_ASSIGNED" | "APPROVAL_REQUESTED" | "CHANGE_REQUEST_DECIDED" | "TIMESHEET_DECIDED" | "RISK_REVIEW_OVERDUE" | "ISSUE_ESCALATED";
+        NotificationType: "TASK_ASSIGNED" | "APPROVAL_REQUESTED" | "CHANGE_REQUEST_DECIDED" | "TIMESHEET_DECIDED" | "RISK_REVIEW_OVERDUE" | "ISSUE_ESCALATED" | "REPORT_READY" | "REPORT_FAILED";
         Notification: {
             /** Format: uuid */
             id: string;
@@ -4364,6 +4408,67 @@ export interface components {
             /** Format: date-time */
             expiresAt: string;
         };
+        /** @enum {string} */
+        ReportType: "PROJECT_STATUS" | "PORTFOLIO_SUMMARY" | "RISK_REGISTER" | "EVM" | "TIMESHEETS";
+        /**
+         * @description PDF for reading, XLSX for analysis
+         * @enum {string}
+         */
+        ReportFormat: "PDF" | "XLSX";
+        /** @enum {string} */
+        ReportStatus: "QUEUED" | "RUNNING" | "READY" | "FAILED";
+        /** @description What the report covers; see createReport for which type uses which */
+        ReportParams: {
+            /** Format: uuid */
+            projectId?: string;
+            /** Format: uuid */
+            portfolioId?: string;
+            /**
+             * Format: date
+             * @description TIMESHEETS, first day (default four weeks back)
+             */
+            from?: string;
+            /**
+             * Format: date
+             * @description TIMESHEETS, last day (default today); at most 26 weeks
+             */
+            to?: string;
+        };
+        CreateReportRequest: {
+            type: components["schemas"]["ReportType"];
+            format: components["schemas"]["ReportFormat"];
+            params?: components["schemas"]["ReportParams"];
+        };
+        ReportJob: {
+            /** Format: uuid */
+            id: string;
+            type: components["schemas"]["ReportType"];
+            format: components["schemas"]["ReportFormat"];
+            params: components["schemas"]["ReportParams"];
+            status: components["schemas"]["ReportStatus"];
+            /**
+             * @description Once READY
+             * @example project-status-AKG-MB-2026-09-27.pdf
+             */
+            fileName?: string;
+            /** Format: int64 */
+            sizeBytes?: number;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            completedAt?: string;
+            /**
+             * Format: date-time
+             * @description When the file is deleted (7 days after it was made)
+             */
+            expiresAt?: string;
+            /** @description Only when READY; valid 5 minutes, always downloads */
+            downloadUrl?: string;
+            /** Format: date-time */
+            downloadExpiresAt?: string;
+            /** @description Only when FAILED */
+            failureReason?: string;
+        };
     };
     responses: {
         /** @description Invalid input. Code: `validation.failed` with `errors[]`, or `tenant.header_invalid`. */
@@ -4519,6 +4624,7 @@ export interface components {
         AttachmentId: string;
         EntityId: string;
         EntityType: string;
+        ReportId: string;
     };
     requestBodies: never;
     headers: {
@@ -10433,6 +10539,116 @@ export interface operations {
                     "application/problem+json": components["schemas"]["Problem"];
                 };
             };
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listReports: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description My report jobs */
+            200: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReportJob"][];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    createReport: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateReportRequest"];
+            };
+        };
+        responses: {
+            /** @description The queued job */
+            202: {
+                headers: {
+                    /** @description URL of the new resource */
+                    Location?: string;
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReportJob"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            /** @description Too many of my reports are still waiting. Code: `reports.too_many_pending`. */
+            409: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getReport: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                reportId: components["parameters"]["ReportId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The job */
+            200: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReportJob"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
             500: components["responses"]["InternalError"];
         };
     };
