@@ -51,6 +51,18 @@ logging:
     level: '%5p [%X{correlationId:-}]'
 
 management:
+  tracing:
+    sampling:
+      # Share of requests whose spans are exported. Every request still gets a trace id (it is the default
+      # correlation id); set KORA_TRACING_SAMPLING=1.0 to export them all while investigating.
+      probability: ${KORA_TRACING_SAMPLING:0.1}
+  # Spans go to an OpenTelemetry collector once MANAGEMENT_OPENTELEMETRY_TRACING_EXPORT_OTLP_ENDPOINT is set
+  # (e.g. http://otel-collector:4318/v1/traces); without it nothing is exported.
+  otlp:
+    metrics:
+      export:
+        # Metrics are scraped by Prometheus (/actuator/prometheus); OTLP carries traces only.
+        enabled: false
   endpoints:
     web:
       exposure:

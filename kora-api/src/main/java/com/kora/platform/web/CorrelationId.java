@@ -26,8 +26,16 @@ public final class CorrelationId {
     }
 
     static String resolve(String incoming) {
-        return incoming != null && SAFE.matcher(incoming).matches()
-                ? incoming
+        return resolve(incoming, null);
+    }
+
+    /** The client's id when it is safe, else the fallback (the request's trace id), else a new one. */
+    static String resolve(String incoming, String fallback) {
+        if (incoming != null && SAFE.matcher(incoming).matches()) {
+            return incoming;
+        }
+        return fallback != null && SAFE.matcher(fallback).matches()
+                ? fallback
                 : UUID.randomUUID().toString();
     }
 }
