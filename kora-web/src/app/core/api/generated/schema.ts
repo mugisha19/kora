@@ -2111,7 +2111,7 @@ export interface paths {
         };
         /**
          * What happened on the project, newest first
-         * @description Everyone who sees the project. Cursor-paginated; live entries arrive on the project''s WebSocket topic.
+         * @description Everyone who sees the project. Cursor-paginated; live entries arrive on the project's WebSocket topic.
          */
         get: operations["listProjectActivity"];
         put?: never;
@@ -2150,8 +2150,8 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Check that the audit log hasn''t been tampered with
-         * @description `ORG_ADMIN` only. Recomputes the hash chain of the organization''s entries in the period.
+         * Check that the audit log hasn't been tampered with
+         * @description `ORG_ADMIN` only. Recomputes the hash chain of the organization's entries in the period.
          */
         get: operations["verifyAuditChain"];
         put?: never;
@@ -2193,7 +2193,7 @@ export interface paths {
         put?: never;
         /**
          * Start an upload: get a presigned URL to PUT the file to
-         * @description The project''s managers and contributors. Allowed types: PDF, PNG, JPEG, GIF, WebP, plain text, CSV, Word, Excel and PowerPoint (OOXML); at most 25 MB. PUT the bytes to `uploadUrl` with the headers given, within 15 minutes, then call complete.
+         * @description The project's managers and contributors. Allowed types: PDF, PNG, JPEG, GIF, WebP, plain text, CSV, Word, Excel and PowerPoint (OOXML); at most 25 MB. PUT the bytes to `uploadUrl` with the headers given, within 15 minutes, then call complete.
          */
         post: operations["startAttachmentUpload"];
         delete?: never;
@@ -2251,7 +2251,7 @@ export interface paths {
         post?: never;
         /**
          * Delete an attachment
-         * @description Its uploader or the project''s managers. Kept 30 days before the file is purged.
+         * @description Its uploader or the project's managers. Kept 30 days before the file is purged.
          */
         delete: operations["deleteAttachment"];
         options?: never;
@@ -10423,7 +10423,7 @@ export interface operations {
             401: components["responses"]["Unauthenticated"];
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
-            /** @description The file isn''t available yet. Code: `attachments.not_uploaded`. */
+            /** @description The file isn't available yet. Code: `attachments.not_uploaded`. */
             409: {
                 headers: {
                     "X-Correlation-Id": components["headers"]["CorrelationId"];
