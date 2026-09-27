@@ -2,6 +2,7 @@ package com.kora.platform.web;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.kora.platform.audit.AuditTrail;
 import com.kora.platform.error.ConflictException;
 import com.kora.platform.error.FieldViolation;
 import com.kora.platform.error.NotFoundException;
@@ -32,6 +33,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -66,6 +68,10 @@ class PlatformWebTest {
                     .build();
         }
     }
+
+    /** Refused requests are audited, which needs the database this slice doesn't have. */
+    @MockitoBean
+    private AuditTrail audit;
 
     @Autowired
     private MockMvcTester mvc;

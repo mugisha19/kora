@@ -1,5 +1,6 @@
 package com.kora.platform.web;
 
+import com.kora.platform.audit.AuditTrail;
 import com.kora.platform.error.ProblemException;
 import com.kora.platform.error.RateLimitedException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,14 +21,19 @@ import tools.jackson.databind.json.JsonMapper;
 public class ProblemResponseWriter {
 
     private final JsonMapper json;
+    private final AuditTrail audit;
 
-    ProblemResponseWriter(JsonMapper json) {
+    ProblemResponseWriter(JsonMapper json, AuditTrail audit) {
         this.json = json;
+        this.audit = audit;
     }
 
     public void write(HttpServletRequest request, HttpServletResponse response, ProblemException problem)
             throws IOException {
         HttpStatus status = ProblemDetailsFactory.statusOf(problem);
+        if (status == HttpStatus.FORBIDDEN) {
+            audit.denied(request);
+        }
         if (problem instanceof RateLimitedException rateLimited) {
             response.setHeader(HttpHeaders.RETRY_AFTER, String.valueOf(rateLimited.retryAfterSeconds()));
         }

@@ -1,5 +1,6 @@
 package com.kora.platform.web;
 
+import com.kora.platform.audit.AuditTrail;
 import com.kora.platform.error.FieldViolation;
 import com.kora.platform.error.ForbiddenException;
 import com.kora.platform.error.OptimisticLock;
@@ -61,6 +62,12 @@ class ProblemDetailsHandler extends ResponseEntityExceptionHandler {
     private static final String INVALID_FIELDS = "The request has invalid fields";
     private static final Set<String> MESSAGE_PARAMS = Set.of("min", "max", "value");
 
+    private final AuditTrail audit;
+
+    ProblemDetailsHandler(AuditTrail audit) {
+        this.audit = audit;
+    }
+
     // ---- Kora's own problems -------------------------------------------------------------------------------
 
     @ExceptionHandler(ProblemException.class)
@@ -70,6 +77,9 @@ class ProblemDetailsHandler extends ResponseEntityExceptionHandler {
             headers.set(HttpHeaders.RETRY_AFTER, String.valueOf(rateLimited.retryAfterSeconds()));
         }
         HttpStatus status = ProblemDetailsFactory.statusOf(ex);
+        if (status == HttpStatus.FORBIDDEN && request instanceof ServletWebRequest servlet) {
+            audit.denied(servlet.getRequest());
+        }
         return handleExceptionInternal(ex, ProblemDetailsFactory.from(ex), headers, status, request);
     }
 
