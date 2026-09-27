@@ -12,7 +12,7 @@ Testcontainers · ArchUnit · JaCoCo · Spotless + Checkstyle · GitHub Actions 
 
 ## Run locally
 
-Requires JDK 25 and Docker (PostgreSQL, Redis and Mailpit run from `compose.yaml`; the integration tests use
+Requires JDK 25 and Docker (PostgreSQL, Redis, Mailpit and SeaweedFS run from `compose.yaml`; the integration tests use
 Testcontainers). Maven comes with the wrapper.
 
 ```bash
@@ -24,7 +24,8 @@ cd kora-api
 ```
 
 Health: `GET /actuator/health` · build info: `GET /actuator/info` · metrics: `GET /actuator/prometheus` ·
-emails sent locally: http://localhost:8025 (Mailpit)
+emails sent locally: http://localhost:8025 (Mailpit); attachments are stored in SeaweedFS (S3 API on
+http://localhost:8333)
 
 ### Signing keys
 

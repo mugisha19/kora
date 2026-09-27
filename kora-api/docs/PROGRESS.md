@@ -2,17 +2,22 @@
 
 ## Current status
 
-Phase 7 complete (tag `api-v0.7.0`). Waiting for "continue".
+Phase 8 complete (tag `api-v0.8.0`). Waiting for "continue".
 
-Contract 0.6.0 is implemented: weekly timesheets per project with approval and cost rates, capacity, leave,
-allocations and the resource heat map (with Rwanda's public holidays), earned value management (four percent-complete
-and three EAC methods, weekly snapshots, S-curve series), dashboard trends, and SPI/CPI and the schedule forecast in
-project health. 247 unit and 664 integration tests, 94.5% line coverage.
+Contract 0.7.0 is implemented:
+- a transactional outbox (Spring Modulith) for domain events;
+- notifications in the app and by email, with per-kind preferences, idempotent on redelivery;
+- live notifications and project activity over STOMP WebSocket, authenticated per frame;
+- an audit trail captured from every entity change, hash-chained per organization and not rewritable by the
+  application, with verification, item history and the activity feed;
+- attachments through presigned URLs to S3-compatible storage (SeaweedFS locally), with content-type sniffing and a
+  purge.
+
+256 unit and 780 integration tests, 94.1% line coverage.
 
 ## Next step
 
-Phase 8 — transactional outbox, notifications with live updates (WebSocket), the activity feed, the audit trail
-and attachments (features 18–20). Contract 0.7.0 first.
+Phase 9 — report exports (PDF/Excel) and demo data (features 21–22). Contract 0.8.0 first.
 
 ## Checklist
 
@@ -24,7 +29,7 @@ and attachments (features 18–20). Contract 0.7.0 first.
 - [x] 5. Dependencies, critical path, baselines, working calendar (10)
 - [x] 6. Risks, issues, stakeholders, change requests with approval chain (11–14)
 - [x] 7. Timesheets, capacity, EVM (15–17)
-- [ ] 8. Outbox, notifications, WebSocket, audit trail, attachments (18–20)
+- [x] 8. Outbox, notifications, WebSocket, audit trail, attachments (18–20)
 - [ ] 9. Report exports, demo data (21–22)
 - [ ] 10. Tracing, performance, Docker image, full-stack compose, final README; tag v1.0.0
 
@@ -43,3 +48,5 @@ and attachments (features 18–20). Contract 0.7.0 first.
 - ADR 0011 — governance module: registers, health from overdue critical risks, approval Chain of Responsibility,
   atomic application of approved changes
 - ADR 0012 — per-project timesheets, dated cost rates, capacity, EVM strategies and snapshots, SPI/CPI in health
+- ADR 0013 — transactional outbox, persistence-level hash-chained audit trail, notifications and STOMP, presigned
+  attachments with content sniffing, SeaweedFS for local S3

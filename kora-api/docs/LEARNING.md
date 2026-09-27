@@ -317,3 +317,39 @@ rewrite history. Separation of duties again: nobody approves their own time.
 Capacity is what a person can give in a week (their hours, less holidays and leave); allocation is what projects have
 planned for them. Utilization = allocation ÷ capacity. Over 100% means someone will slip. Under 70% means people are
 waiting. Plan by the week, because "40 hours" is fiction in a week with a public holiday.
+
+## The transactional outbox (Phase 8)
+
+The problem is the dual write. "Save the change, then send the message" loses the message if the process dies between
+the two. "Send, then save" announces changes that then roll back. The outbox makes the message part of the change: it
+is a row written in the same transaction. A relay (here, Spring Modulith after commit, plus resubmission after a
+restart) delivers it later. Delivery becomes at least once, so receivers must be idempotent: a unique event key
+turns a duplicate into a no-op.
+
+**Interview line:** "Exactly-once delivery is a myth; at-least-once plus idempotent consumers is what you build."
+
+## An audit trail you can trust (Phase 8)
+
+- **Completeness:** audit at the persistence layer, not in services, and opt out explicitly.
+- **Atomicity:** write the audit row in the same transaction as the change.
+- **Integrity:** the application's database role can't UPDATE or DELETE audit rows, and a hash chain makes any edit
+  by someone with more rights detectable.
+- **Privacy:** store what changed, not secrets, and keep only the network part of IP addresses.
+
+This is what ISO 27001's logging control and SOC 2's change-management criteria look for.
+
+## Presigned URLs and untrusted uploads (Phase 8)
+
+With presigned URLs, the API hands out a signed, short-lived URL and the client uploads straight to object storage.
+The API stays out of the data path (no 25 MB request bodies, no memory pressure) and keeps control: the signature
+fixes the method, key, content type and expiry.
+
+Never trust the file name or the declared type. Sniff the bytes: magic numbers, the package layout of Office files,
+strict UTF-8 for text. Refuse macros, and always serve downloads as attachments, so an uploaded HTML file can't run
+as your site (stored XSS).
+
+## WebSockets and security (Phase 8)
+
+A browser can't put an `Authorization` header on the WebSocket handshake, so authenticate the first STOMP frame
+instead, and authorize every subscription exactly like the equivalent REST read. Pushes are best effort. The REST
+endpoints stay the source of truth, and a reconnecting client refetches.

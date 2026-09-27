@@ -45,6 +45,11 @@ into `domain` → `application` → `adapter.{web,persistence,...}`; dependencie
 - Counts of days in plans (durations, lags, float, variance) are working days on the organization's calendar
   (`schedule` module); derived views such as the schedule are computed on read unless an ADR says otherwise.
 - Integration tests use `@IntegrationTest` and are named `*IT`; never H2.
+- Every entity change is audited automatically (ADR 0013); mark snapshots, counters and tokens `@NotAudited` with a
+  reason. Events that notify people carry an `eventKey` and their `organizationId` and go through the outbox;
+  asynchronous listeners bind their organization before starting a transaction (not `@ApplicationModuleListener`).
+- Files go through `attachments.application.FileStorage` (presigned URLs); the API never streams uploads or
+  downloads itself.
 - Comments explain WHY. Record decisions in `docs/adr/`, patterns in `docs/PATTERNS.md`, interview
   explanations in `docs/LEARNING.md`.
 - Check the latest stable version of a dependency before adding it.

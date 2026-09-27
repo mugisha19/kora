@@ -90,3 +90,20 @@ Still plumbing rather than domain patterns, but two structural ideas landed in t
   day's remaining points.
 - **Derived aggregate status**: `TimesheetWeek` summarizes several per-project timesheets into the one week a person
   sees, without storing a second status that could disagree.
+
+## Phase 8
+
+- **Transactional outbox**: Spring Modulith's `event_publication` table stores each event for each listener in the
+  transaction that raised it. Listeners (`notifications/application/NotificationDispatcher`) run after the commit, and
+  unfinished ones are resubmitted, so delivery is at least once. **Idempotent receiver** on top: the event key is
+  unique per recipient.
+- **Observer below the services**: `platform/audit/EntityChangeAuditor` listens to Hibernate's insert, update and
+  delete events, so every entity is audited without a line in any service. Opting out takes `@NotAudited` and a reason.
+- **Hash chain** (tamper evidence): each audit row hashes its content with the previous row's hash
+  (`AuditChain`). Editing or deleting a row breaks every link after it, and `GET /audit/verify` names the first one.
+- **Projection instead of a second write**: the project activity feed is a filtered view of the audit trail, so the
+  two can never disagree.
+- **Adapter** for storage: `attachments/application/FileStorage`, with `S3FileStorage` for S3 and compatible stores.
+  **Adapter** for live delivery too: `LivePush`, with `StompLivePush`.
+- **Interceptor** for authorization: `StompAuthorization` checks every inbound STOMP frame (CONNECT, SUBSCRIBE, SEND)
+  before the broker sees it, with the same rules as REST.

@@ -59,3 +59,10 @@ Template:
   trends); DashboardSummary gains `totalActualCost` and fills SPI/CPI and the governance counts; 4 new error codes
 - Follow-up: `TimesheetEntry.taskId` optional (time outlives a deleted task)
 - Status: accepted in 0.6.0
+
+### 0.7.0: notifications, activity, audit, attachments
+- Requested by: api, 2026-09-27 (start of API Phase 8, for web Phase 9)
+- Endpoints: 13 new operations (tags Notifications, Activity, Audit, Attachments) and the STOMP channel on `/ws`
+  (described in the Notifications tag); 3 new error codes
+- Follow-up: six descriptions with doubled apostrophes fixed (text only)
+- Status: accepted in 0.7.0
