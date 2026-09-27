@@ -1,6 +1,5 @@
 # Local development services. `./mvnw spring-boot:run` starts them automatically (spring-boot-docker-compose)
 # and points the app at them; `docker compose up -d` starts them by hand.
-# S3-compatible storage arrives in Phase 8 (attachments).
 services:
   postgres:
     image: postgres:18-alpine
@@ -38,5 +37,16 @@ services:
       - '127.0.0.1:1025:1025'
       - '127.0.0.1:8025:8025'
 
+  seaweedfs:
+    # S3-compatible storage for attachments (MinIO no longer publishes images). The API creates the bucket.
+    image: chrislusf/seaweedfs:4.47
+    command: ['server', '-s3', '-s3.config=/etc/seaweedfs/s3.json', '-dir=/data']
+    ports:
+      - '127.0.0.1:8333:8333'
+    volumes:
+      - ./config/seaweedfs-s3.json:/etc/seaweedfs/s3.json:ro
+      - seaweedfs-data:/data
+
 volumes:
   postgres-data:
+  seaweedfs-data:

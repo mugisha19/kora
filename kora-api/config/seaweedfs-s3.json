@@ -1,0 +1,9 @@
+{
+  "identities": [
+    {
+      "name": "kora",
+      "credentials": [{"accessKey": "kora", "secretKey": "kora-local-secret"}],
+      "actions": ["Admin", "Read", "Write", "List", "Tagging"]
+    }
+  ]
+}

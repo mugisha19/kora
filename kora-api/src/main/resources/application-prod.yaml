@@ -11,3 +11,9 @@ kora:
     jwt:
       # Production must use a configured, persistent signing key.
       allow-ephemeral-key: false
+  storage:
+    # No development defaults in production: the store and its credentials must be configured.
+    endpoint: ${KORA_STORAGE_ENDPOINT}
+    access-key: ${KORA_STORAGE_ACCESS_KEY}
+    secret-key: ${KORA_STORAGE_SECRET_KEY}
+    create-bucket: false
