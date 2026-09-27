@@ -109,12 +109,35 @@ export type CreateWbsNodeRequest = Schemas['CreateWbsNodeRequest'];
 export type UpdateWbsNodeRequest = Schemas['UpdateWbsNodeRequest'];
 export type MoveWbsNodeRequest = Schemas['MoveWbsNodeRequest'];
 
+export type TaskStatus = Schemas['TaskStatus'];
+export type TaskType = Schemas['TaskType'];
+export type TaskPriority = Schemas['TaskPriority'];
+export type Task = Schemas['Task'];
+export type TaskPage = Schemas['TaskPage'];
+export type CreateTaskRequest = Schemas['CreateTaskRequest'];
+export type UpdateTaskRequest = Schemas['UpdateTaskRequest'];
+export type MoveTaskRequest = Schemas['MoveTaskRequest'];
+export type TaskComment = Schemas['TaskComment'];
+export type BoardColumn = Schemas['BoardColumn'];
+export type BoardColumnSettings = Schemas['BoardColumnSettings'];
+export type Board = Schemas['Board'];
+
+export type SprintStatus = Schemas['SprintStatus'];
+export type Sprint = Schemas['Sprint'];
+export type CreateSprintRequest = Schemas['CreateSprintRequest'];
+export type UpdateSprintRequest = Schemas['UpdateSprintRequest'];
+export type Burndown = Schemas['Burndown'];
+export type BurndownDay = Schemas['BurndownDay'];
+export type Velocity = Schemas['Velocity'];
+
 export type DashboardSummary = Schemas['DashboardSummary'];
 export type DashboardProject = Schemas['DashboardProject'];
 export type DashboardProjectPage = Schemas['DashboardProjectPage'];
 
 export type ListPortfoliosQuery = NonNullable<operations['listPortfolios']['parameters']['query']>;
 export type ListProjectsQuery = NonNullable<operations['listProjects']['parameters']['query']>;
+export type ListTasksQuery = NonNullable<operations['listTasks']['parameters']['query']>;
+export type BacklogQuery = NonNullable<operations['getBacklog']['parameters']['query']>;
 export type ListDashboardProjectsQuery = NonNullable<
   operations['listDashboardProjects']['parameters']['query']
 >;
@@ -147,3 +170,30 @@ export const DASHBOARD_SORT_FIELDS = ['code', 'name', 'percentComplete', 'target
 export const TRANSITIONS_NEEDING_REASON: readonly ProjectStatus[] = ['ON_HOLD', 'CANCELLED'];
 /** The WBS is at most this many levels deep (409 `wbs.too_deep`). */
 export const WBS_MAX_DEPTH = 8;
+
+export const TASK_STATUSES = [
+  'BACKLOG',
+  'TODO',
+  'IN_PROGRESS',
+  'BLOCKED',
+  'IN_REVIEW',
+  'DONE',
+] as const satisfies readonly TaskStatus[];
+/** The board's columns, left to right: every status except the backlog. */
+export const BOARD_STATUSES = [
+  'TODO',
+  'IN_PROGRESS',
+  'BLOCKED',
+  'IN_REVIEW',
+  'DONE',
+] as const satisfies readonly TaskStatus[];
+export type BoardStatus = (typeof BOARD_STATUSES)[number];
+export const TASK_TYPES = ['STORY', 'TASK', 'BUG', 'CHORE'] as const satisfies readonly TaskType[];
+export const TASK_PRIORITIES = [
+  'CRITICAL',
+  'HIGH',
+  'MEDIUM',
+  'LOW',
+] as const satisfies readonly TaskPriority[];
+/** `carryOverTo` value that sends unfinished tasks back to the backlog when a sprint closes. */
+export const CARRY_OVER_TO_BACKLOG = 'BACKLOG';
