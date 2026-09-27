@@ -19,6 +19,7 @@ import { TranslatedPaginatorIntl } from '../../core/i18n/translated-paginator-in
 import { SessionStore } from '../../core/session/session.store';
 import { ORG_AKAGERA } from '../../mocks/data';
 import { db } from '../../mocks/db';
+import { CalendarPage } from './calendar/calendar-page';
 import { InvitationsPage } from './invitations/invitations-page';
 import { MembersPage } from './members/members-page';
 import { OrganizationPage } from './organization/organization-page';
@@ -318,6 +319,72 @@ describe('administration', () => {
       await userEvent.click(screen.getByRole('button', { name: 'Save changes' }));
 
       expect(await screen.findByText('Must be at least 2 characters.')).toBeTruthy();
+    });
+  });
+
+  describe('CalendarPage', () => {
+    const calendar = () => db.state.calendars.find((c) => c.organizationId === ORG_AKAGERA)!;
+    const save = () => screen.getByRole('button', { name: 'Save calendar' });
+
+    it('shows the working days and holidays, and saves changes with If-Match', async () => {
+      await open(CalendarPage);
+      const saturday = await screen.findByRole('checkbox', { name: 'Saturday' });
+      expect((screen.getByRole('checkbox', { name: 'Monday' }) as HTMLInputElement).checked).toBe(
+        true,
+      );
+      expect((saturday as HTMLInputElement).checked).toBe(false);
+      expect(screen.getByText('Christmas Day')).toBeTruthy();
+      expect(save().hasAttribute('disabled')).toBe(true);
+
+      await userEvent.click(saturday);
+      await userEvent.click(screen.getByRole('button', { name: 'Remove Christmas Day' }));
+      await userEvent.type(screen.getByLabelText('Date'), '2026-10-05');
+      await userEvent.type(screen.getByRole('textbox', { name: 'Name' }), 'Company day');
+      await userEvent.click(screen.getByRole('button', { name: 'Add holiday' }));
+      expect(screen.getByText('You have unsaved changes.')).toBeTruthy();
+      await userEvent.click(save());
+
+      expect(await screen.findByText('Working calendar saved.')).toBeTruthy();
+      expect(calendar()).toMatchObject({ version: 2 });
+      expect(calendar().workingDays).toContain('SATURDAY');
+      expect(calendar().holidays.map((h) => h.name)).toContain('Company day');
+      expect(calendar().holidays.map((h) => h.name)).not.toContain('Christmas Day');
+    });
+
+    it('refuses a holiday listed twice and a week without working days', async () => {
+      await open(CalendarPage);
+      await screen.findByText('Christmas Day');
+
+      await userEvent.type(screen.getByLabelText('Date'), '2026-12-25');
+      await userEvent.type(screen.getByRole('textbox', { name: 'Name' }), 'Again');
+      await userEvent.click(screen.getByRole('button', { name: 'Add holiday' }));
+      expect(await screen.findByText('That date is already a holiday.')).toBeTruthy();
+
+      for (const day of ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']) {
+        await userEvent.click(screen.getByRole('checkbox', { name: day }));
+      }
+      await userEvent.click(save());
+      expect(await screen.findByText('Choose at least one working day.')).toBeTruthy();
+      expect(calendar().version).toBe(1);
+    });
+
+    it('explains a concurrent change (412) and reloads the latest version', async () => {
+      await open(CalendarPage);
+      await userEvent.click(await screen.findByRole('checkbox', { name: 'Sunday' }));
+      calendar().version += 1;
+      db.save();
+
+      await userEvent.click(save());
+
+      expect((await screen.findByRole('alert')).textContent).toContain(
+        'Someone else saved the calendar',
+      );
+      await userEvent.click(screen.getByRole('button', { name: 'Reload latest' }));
+      await vi.waitFor(() =>
+        expect((screen.getByRole('checkbox', { name: 'Sunday' }) as HTMLInputElement).checked).toBe(
+          false,
+        ),
+      );
     });
   });
 

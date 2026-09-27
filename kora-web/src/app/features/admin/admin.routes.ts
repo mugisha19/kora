@@ -30,6 +30,11 @@ export const ADMIN_ROUTES: Routes = [
         loadComponent: () =>
           import('./organization/organization-page').then((m) => m.OrganizationPage),
       },
+      {
+        path: 'calendar',
+        title: 'admin.tabs.calendar',
+        loadComponent: () => import('./calendar/calendar-page').then((m) => m.CalendarPage),
+      },
     ],
   },
 ];

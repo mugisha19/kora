@@ -1,0 +1,104 @@
+<h2 class="visually-hidden">{{ 'admin.tabs.calendar' | transloco }}</h2>
+
+@if (calendar.isLoading() && !calendar.hasValue()) {
+  <kora-loading-state />
+} @else if (calendar.error()) {
+  <kora-error-state (retry)="calendar.reload()" />
+} @else if (calendar.hasValue()) {
+  <div class="settings">
+    <p class="kora-muted intro">{{ 'admin.calendar.intro' | transloco }}</p>
+
+    @if (stale()) {
+      <div class="kora-notice error" role="alert">
+        <mat-icon svgIcon="warning" aria-hidden="true" />
+        <p>{{ 'admin.calendar.stale' | transloco }}</p>
+      </div>
+      <button mat-stroked-button type="button" class="reload" (click)="reloadLatest()">
+        <mat-icon svgIcon="refresh" aria-hidden="true" />
+        {{ 'admin.organization.reload' | transloco }}
+      </button>
+    }
+    @if (formError()) {
+      <div class="kora-notice error" role="alert">
+        <mat-icon svgIcon="error" aria-hidden="true" />
+        <p>{{ formError() }}</p>
+      </div>
+    }
+
+    <form id="calendar-form" novalidate (submit)="save($event)">
+      @let daysInvalid = form.workingDays().invalid() && form.workingDays().touched();
+      <fieldset
+        class="days"
+        [attr.aria-invalid]="daysInvalid"
+        [attr.aria-describedby]="daysInvalid ? 'days-error' : null"
+      >
+        <legend>{{ 'admin.calendar.workingDays' | transloco }}</legend>
+        @for (day of days; track day; let i = $index) {
+          <mat-checkbox [checked]="model().workingDays[i]" (change)="toggleDay(i, $event.checked)">
+            {{ 'dayOfWeek.' + day | transloco }}
+          </mat-checkbox>
+        }
+        @if (daysInvalid) {
+          <p id="days-error" class="field-error" role="alert">
+            <kora-field-error [field]="form.workingDays" />
+          </p>
+        }
+      </fieldset>
+    </form>
+
+    <section class="holidays" aria-labelledby="holidays-title">
+      <h3 id="holidays-title">{{ 'admin.calendar.holidays' | transloco }}</h3>
+      @if (model().holidays.length) {
+        <ul>
+          @for (h of model().holidays; track h.date) {
+            <li>
+              <span class="date">{{ h.date | localizedDate: language.current() : 'full' }}</span>
+              <span class="name">{{ h.name }}</span>
+              <button
+                mat-icon-button
+                type="button"
+                [attr.aria-label]="'admin.calendar.removeHoliday' | transloco: { name: h.name }"
+                (click)="removeHoliday(h)"
+              >
+                <mat-icon svgIcon="delete" aria-hidden="true" />
+              </button>
+            </li>
+          }
+        </ul>
+      } @else {
+        <p class="kora-muted">{{ 'admin.calendar.noHolidays' | transloco }}</p>
+      }
+
+      <form class="add" novalidate (submit)="addHoliday($event)">
+        <mat-form-field>
+          <mat-label>{{ 'admin.calendar.date' | transloco }}</mat-label>
+          <input matInput type="date" [formField]="holidayForm.date" />
+          <mat-error><kora-field-error [field]="holidayForm.date" /></mat-error>
+        </mat-form-field>
+        <mat-form-field class="grow">
+          <mat-label>{{ 'admin.calendar.name' | transloco }}</mat-label>
+          <input matInput [formField]="holidayForm.name" />
+          <mat-error><kora-field-error [field]="holidayForm.name" /></mat-error>
+        </mat-form-field>
+        <button mat-stroked-button type="submit">
+          <mat-icon svgIcon="add" aria-hidden="true" />
+          {{ 'admin.calendar.addHoliday' | transloco }}
+        </button>
+      </form>
+    </section>
+
+    <div class="actions">
+      @if (changed()) {
+        <p class="kora-muted" aria-live="polite">{{ 'admin.calendar.unsaved' | transloco }}</p>
+      }
+      <button
+        mat-flat-button
+        type="submit"
+        form="calendar-form"
+        [disabled]="form().submitting() || !changed() || stale()"
+      >
+        {{ 'admin.calendar.save' | transloco }}
+      </button>
+    </div>
+  </div>
+}
