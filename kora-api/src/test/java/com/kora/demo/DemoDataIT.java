@@ -57,6 +57,16 @@ class DemoDataIT {
                 .bodyJson()
                 .extractingPath("$.memberships.length()")
                 .isEqualTo(2);
+        // The same languages as the web app's mock data.
+        assertThat(get("/api/v1/me", member))
+                .bodyJson()
+                .extractingPath("$.locale")
+                .isEqualTo("rw");
+        Session olivier = accounts.login("olivier.hakizimana@virunga.example", DemoStory.PASSWORD);
+        assertThat(get("/api/v1/me", olivier))
+                .bodyJson()
+                .extractingPath("$.locale")
+                .isEqualTo("fr");
     }
 
     @Test

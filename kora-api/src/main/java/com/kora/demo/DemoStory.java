@@ -104,8 +104,8 @@ final class DemoStory {
         signedIn("admin", admin);
         member("pmo", "pmo@kora.demo", "Jean-Paul Habimana", Role.PMO, UserLocale.FR);
         member("pm", "pm@kora.demo", "Grace Mukamana", Role.PROJECT_MANAGER, UserLocale.EN);
-        member("member", "member@kora.demo", "Eric Nshimiyimana", Role.MEMBER, UserLocale.EN);
-        member("viewer", "viewer@kora.demo", "Diane Ingabire", Role.VIEWER, UserLocale.RW);
+        member("member", "member@kora.demo", "Eric Nshimiyimana", Role.MEMBER, UserLocale.RW);
+        member("viewer", "viewer@kora.demo", "Diane Ingabire", Role.VIEWER, UserLocale.EN);
         String[] staff = {
             "alice Alice Umutoni PROJECT_MANAGER",
             "bosco Bosco Niyonsaba MEMBER",
@@ -137,6 +137,8 @@ final class DemoStory {
                 "Virunga Build Partners", "Olivier Hakizimana", "olivier.hakizimana@virunga.example", PASSWORD);
         virunga = olivier.organizationId();
         signedIn("olivier", olivier);
+        // Languages as in the web app's mock data: registration starts in English.
+        api.patch(olivier, "/me", body("locale", "fr"));
         // The administrator of Akagera is also in Virunga's PMO: the organization switcher has two entries.
         provisioning.addMember(virunga, id("admin"), Role.PMO);
     }

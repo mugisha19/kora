@@ -82,6 +82,11 @@ final class DemoApi {
         return send("PUT", path, session, null, body);
     }
 
+    /** A PATCH to an unversioned resource (the caller's own profile). */
+    JsonNode patch(Session session, String path, Object body) {
+        return send("PATCH", path, session, null, body);
+    }
+
     /** PUT or PATCH to a versioned resource: reads its current ETag first, as a client would. */
     JsonNode update(Session session, String method, String path, Object body) {
         return send(method, path, session, etag(session, path), body);
