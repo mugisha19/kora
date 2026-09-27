@@ -130,6 +130,18 @@ export type Burndown = Schemas['Burndown'];
 export type BurndownDay = Schemas['BurndownDay'];
 export type Velocity = Schemas['Velocity'];
 
+export type ScheduleConstraint = Schemas['ScheduleConstraint'];
+export type DependencyType = Schemas['DependencyType'];
+export type Dependency = Schemas['Dependency'];
+export type CreateDependencyRequest = Schemas['CreateDependencyRequest'];
+export type ScheduledTask = Schemas['ScheduledTask'];
+export type Schedule = Schemas['Schedule'];
+export type Baseline = Schemas['Baseline'];
+export type DayOfWeek = Schemas['DayOfWeek'];
+export type Holiday = Schemas['Holiday'];
+export type WorkingCalendar = Schemas['WorkingCalendar'];
+export type UpdateWorkingCalendarRequest = Schemas['UpdateWorkingCalendarRequest'];
+
 export type DashboardSummary = Schemas['DashboardSummary'];
 export type DashboardProject = Schemas['DashboardProject'];
 export type DashboardProjectPage = Schemas['DashboardProjectPage'];
@@ -197,3 +209,19 @@ export const TASK_PRIORITIES = [
 ] as const satisfies readonly TaskPriority[];
 /** `carryOverTo` value that sends unfinished tasks back to the backlog when a sprint closes. */
 export const CARRY_OVER_TO_BACKLOG = 'BACKLOG';
+
+export const DEPENDENCY_TYPES = [
+  'FS',
+  'SS',
+  'FF',
+  'SF',
+] as const satisfies readonly DependencyType[];
+export const DAYS_OF_WEEK = [
+  'MONDAY',
+  'TUESDAY',
+  'WEDNESDAY',
+  'THURSDAY',
+  'FRIDAY',
+  'SATURDAY',
+  'SUNDAY',
+] as const satisfies readonly DayOfWeek[];
