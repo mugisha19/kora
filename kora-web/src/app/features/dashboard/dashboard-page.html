@@ -1,0 +1,231 @@
+<kora-page-header
+  [heading]="'dashboard.title' | transloco"
+  [subtitle]="'dashboard.subtitle' | transloco"
+>
+  <mat-form-field class="portfolio" subscriptSizing="dynamic">
+    <mat-label>{{ 'projects.fields.portfolio' | transloco }}</mat-label>
+    <mat-select
+      [value]="portfolioFilter() ?? null"
+      (selectionChange)="query.set({ portfolioId: $event.value, page: null })"
+    >
+      <mat-option [value]="null">{{ 'projects.filters.allPortfolios' | transloco }}</mat-option>
+      @for (portfolio of portfolios(); track portfolio.id) {
+        <mat-option [value]="portfolio.id">{{ portfolio.name }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+</kora-page-header>
+
+@if (summary.error()) {
+  <kora-error-state [correlationId]="summaryErrorId()" (retry)="summary.reload()" />
+} @else if (!kpis()) {
+  <kora-loading-state />
+} @else if (kpis(); as k) {
+  @if (k.summary.projectCount === 0) {
+    <kora-empty-state
+      icon="dashboard"
+      [heading]="'dashboard.emptyTitle' | transloco"
+      [message]="'dashboard.emptyMessage' | transloco"
+    />
+  } @else {
+    <section aria-labelledby="kpi-title">
+      <h2 id="kpi-title" class="visually-hidden">{{ 'dashboard.kpis.title' | transloco }}</h2>
+      <ul class="kpis">
+        <li>
+          <span class="label">{{ 'dashboard.kpis.active' | transloco }}</span>
+          <span class="value">{{ k.active }}</span>
+          <span class="note">
+            {{ 'dashboard.kpis.ofTotal' | transloco: { total: k.summary.projectCount } }}
+          </span>
+        </li>
+        <li>
+          <span class="label">{{ 'dashboard.kpis.onTrack' | transloco }}</span>
+          <span class="value">{{
+            k.onTrack === null ? '—' : (k.onTrack | percent100: language.current())
+          }}</span>
+          <span class="note">{{ 'dashboard.kpis.onTrackNote' | transloco }}</span>
+        </li>
+        <li>
+          <span class="label">{{ 'dashboard.kpis.late' | transloco }}</span>
+          <span class="value">{{ k.summary.lateProjects }}</span>
+          <span class="note">{{ 'dashboard.kpis.lateNote' | transloco }}</span>
+        </li>
+        <li>
+          <span class="label">{{ 'dashboard.kpis.budget' | transloco }}</span>
+          <span class="value money">{{ k.summary.totalBudget | money: language.current() }}</span>
+          <span class="note">
+            {{
+              'dashboard.kpis.planned'
+                | transloco: { amount: (k.summary.totalPlannedCost | money: language.current()) }
+            }}
+          </span>
+        </li>
+        <li>
+          <span class="label">{{ 'dashboard.kpis.earned' | transloco }}</span>
+          <span class="value money">{{
+            k.summary.totalEarnedValue | money: language.current()
+          }}</span>
+          <span class="note">{{ 'dashboard.kpis.earnedNote' | transloco }}</span>
+        </li>
+        <li>
+          <span class="label">{{ 'dashboard.kpis.spiCpi' | transloco }}</span>
+          <span class="value"
+            >{{ ratio(k.summary.portfolioSpi) }} / {{ ratio(k.summary.portfolioCpi) }}</span
+          >
+          <span class="note">{{ 'dashboard.kpis.later' | transloco }}</span>
+        </li>
+        <li>
+          <span class="label">{{ 'dashboard.kpis.risks' | transloco }}</span>
+          <span class="value">{{ k.summary.openCriticalRisks ?? '—' }}</span>
+          <span class="note">{{ 'dashboard.kpis.later' | transloco }}</span>
+        </li>
+        <li>
+          <span class="label">{{ 'dashboard.kpis.changes' | transloco }}</span>
+          <span class="value">{{ k.summary.pendingChangeRequests ?? '—' }}</span>
+          <span class="note">{{ 'dashboard.kpis.later' | transloco }}</span>
+        </li>
+      </ul>
+    </section>
+
+    <section class="charts" aria-labelledby="charts-title">
+      <h2 id="charts-title" class="visually-hidden">{{ 'dashboard.charts.title' | transloco }}</h2>
+      <kora-distribution-chart
+        [heading]="'dashboard.charts.health' | transloco"
+        [categoryLabel]="'projects.fields.health' | transloco"
+        [slices]="healthSlices()"
+        kind="pie"
+      />
+      <kora-distribution-chart
+        [heading]="'dashboard.charts.status' | transloco"
+        [categoryLabel]="'projects.fields.status' | transloco"
+        [slices]="statusSlices()"
+        kind="bar"
+      />
+    </section>
+  }
+}
+
+<section class="attention" aria-labelledby="attention-title">
+  <div class="attention-head">
+    <h2 id="attention-title">{{ 'dashboard.attention.title' | transloco }}</h2>
+    <mat-form-field class="filter" subscriptSizing="dynamic">
+      <mat-label>{{ 'projects.fields.health' | transloco }}</mat-label>
+      <mat-select
+        [value]="healthFilter()"
+        (selectionChange)="query.set({ health: $event.value, page: null })"
+      >
+        <mat-select-trigger>{{ 'health.' + healthFilter() | transloco }}</mat-select-trigger>
+        <mat-option [value]="null">{{ 'projects.filters.allHealth' | transloco }}</mat-option>
+        @for (value of healths; track value) {
+          <mat-option [value]="value">{{ 'health.' + value | transloco }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  </div>
+  <p class="count">{{ 'dashboard.attention.subtitle' | transloco }}</p>
+
+  @if (rows.error()) {
+    <kora-error-state [correlationId]="rowsErrorId()" (retry)="rows.reload()" />
+  } @else if (!rows.hasValue()) {
+    <kora-loading-state />
+  } @else if (rows.value().totalElements === 0) {
+    <p class="kora-muted">{{ 'dashboard.attention.none' | transloco }}</p>
+  } @else {
+    <div class="table-wrap" [attr.aria-busy]="rows.isLoading()">
+      <table
+        mat-table
+        [dataSource]="rows.value().content"
+        matSort
+        [matSortActive]="sortField() ?? ''"
+        [matSortDirection]="sortField() ? sortDirection() : ''"
+        (matSortChange)="onSort($event)"
+      >
+        <caption class="visually-hidden">
+          {{
+            'dashboard.attention.title' | transloco
+          }}
+        </caption>
+        <ng-container matColumnDef="code">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="wide-only">
+            {{ 'projects.fields.code' | transloco }}
+          </th>
+          <td mat-cell *matCellDef="let row" class="wide-only">{{ row.code }}</td>
+        </ng-container>
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>
+            {{ 'projects.fields.name' | transloco }}
+          </th>
+          <td mat-cell *matCellDef="let row">
+            <a [routerLink]="['/projects', row.projectId]">{{ row.name }}</a>
+            <span class="secondary">{{ row.manager.fullName }}</span>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="health">
+          <th mat-header-cell *matHeaderCellDef>{{ 'projects.fields.health' | transloco }}</th>
+          <td mat-cell *matCellDef="let row">
+            <kora-health-chip
+              [health]="row.health"
+              [overridden]="row.healthOverridden"
+              [reason]="row.healthReason"
+            />
+            @if (row.healthReason) {
+              <span class="secondary">{{ row.healthReason }}</span>
+            }
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="percentComplete">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>
+            {{ 'dashboard.attention.progress' | transloco }}
+          </th>
+          <td mat-cell *matCellDef="let row" class="num">
+            {{ row.percentComplete | percent100: language.current() }}
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="targetEndDate">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="wide-only">
+            {{ 'projects.fields.targetEndDate' | transloco }}
+          </th>
+          <td mat-cell *matCellDef="let row" class="wide-only">
+            {{ row.targetEndDate | localizedDate: language.current() }}
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="nextMilestone">
+          <th mat-header-cell *matHeaderCellDef class="wide-only">
+            {{ 'dashboard.attention.nextMilestone' | transloco }}
+          </th>
+          <td mat-cell *matCellDef="let row" class="wide-only">
+            @if (row.nextMilestone; as milestone) {
+              {{ milestone.name }}
+              <span class="secondary">{{
+                milestone.targetDate | localizedDate: language.current()
+              }}</span>
+            } @else {
+              —
+            }
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="spi">
+          <th mat-header-cell *matHeaderCellDef class="wide-only">
+            <abbr [title]="'dashboard.spi' | transloco">SPI</abbr>
+          </th>
+          <td mat-cell *matCellDef="let row" class="num wide-only">{{ ratio(row.spi) }}</td>
+        </ng-container>
+        <ng-container matColumnDef="cpi">
+          <th mat-header-cell *matHeaderCellDef class="wide-only">
+            <abbr [title]="'dashboard.cpi' | transloco">CPI</abbr>
+          </th>
+          <td mat-cell *matCellDef="let row" class="num wide-only">{{ ratio(row.cpi) }}</td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="columns"></tr>
+        <tr mat-row *matRowDef="let row; columns: columns"></tr>
+      </table>
+    </div>
+    <mat-paginator
+      [length]="rows.value().totalElements"
+      [pageIndex]="pageIndex()"
+      [pageSize]="pageSize"
+      [hidePageSize]="true"
+      (page)="onPage($event)"
+    />
+  }
+</section>

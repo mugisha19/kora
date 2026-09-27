@@ -63,9 +63,18 @@ export const routes: Routes = [
     children: [
       {
         path: 'dashboard',
-        title: 'nav.dashboard',
-        loadComponent: () =>
-          import('./features/dashboard/dashboard-page').then((m) => m.DashboardPage),
+        loadChildren: () =>
+          import('./features/dashboard/dashboard.routes').then((m) => m.DASHBOARD_ROUTES),
+      },
+      {
+        path: 'portfolios',
+        loadChildren: () =>
+          import('./features/portfolios/portfolios.routes').then((m) => m.PORTFOLIO_ROUTES),
+      },
+      {
+        path: 'projects',
+        loadChildren: () =>
+          import('./features/projects/projects.routes').then((m) => m.PROJECT_ROUTES),
       },
       {
         path: 'admin',

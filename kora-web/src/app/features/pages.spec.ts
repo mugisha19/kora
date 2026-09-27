@@ -6,7 +6,6 @@ import { provideMockApi } from '../../testing/mock-api';
 import { provideTestUi } from '../../testing/test-providers';
 import { LanguageService } from '../core/i18n/language.service';
 import { ThemeService } from '../core/theme/theme.service';
-import { DashboardPage } from './dashboard/dashboard-page';
 import { NotFoundPage } from './not-found/not-found-page';
 import { SettingsPage } from './settings/settings-page';
 
@@ -16,15 +15,6 @@ describe('pages', () => {
   afterEach(() => {
     localStorage.clear();
     document.documentElement.removeAttribute('data-theme');
-  });
-
-  it('dashboard explains what will appear', async () => {
-    await render(DashboardPage, { providers });
-
-    expect(screen.getByRole('heading', { level: 1, name: 'Dashboard' })).toBeTruthy();
-    expect(
-      screen.getByRole('heading', { name: 'Your portfolio overview will appear here' }),
-    ).toBeTruthy();
   });
 
   it('not-found links back to the dashboard', async () => {
