@@ -1,0 +1,301 @@
+<div class="head">
+  <h2>{{ 'backlog.title' | transloco }}</h2>
+  <div class="actions">
+    @if (project.canEdit()) {
+      <button mat-stroked-button type="button" (click)="plan()">
+        <mat-icon svgIcon="add" aria-hidden="true" />
+        {{ 'sprints.create' | transloco }}
+      </button>
+    }
+    @if (project.canContribute()) {
+      <button mat-flat-button type="button" (click)="create()">
+        <mat-icon svgIcon="add" aria-hidden="true" />
+        {{ 'backlog.newItem' | transloco }}
+      </button>
+    }
+  </div>
+</div>
+
+<ng-template #taskRow let-task let-sprint="sprint">
+  <div class="row" [attr.data-task]="task.id">
+    <kora-task-type [type]="task.type" />
+    <span class="key">{{ task.key }}</span>
+    <button type="button" class="title" (click)="open(task)">{{ task.title }}</button>
+    <kora-status-chip
+      tone="neutral"
+      icon="schedule"
+      [label]="'taskStatus.' + task.status | transloco"
+    />
+    <span
+      class="points"
+      [attr.aria-label]="'board.points' | transloco: { count: task.storyPoints ?? 0 }"
+    >
+      {{ task.storyPoints ?? '–' }}
+    </span>
+    @if (project.canEdit()) {
+      <button
+        mat-icon-button
+        type="button"
+        [attr.aria-label]="'sprints.removeTask' | transloco: { key: task.key }"
+        [matTooltip]="'sprints.removeTask' | transloco: { key: task.key }"
+        (click)="store.removeFromSprint(sprint, task)"
+      >
+        <mat-icon svgIcon="do_not_disturb_on" aria-hidden="true" />
+      </button>
+    }
+  </div>
+</ng-template>
+
+@if (store.status() === 'loading' && !store.sprints().length && !store.backlog().length) {
+  <kora-loading-state />
+} @else if (store.status() === 'error') {
+  <kora-error-state [correlationId]="store.error()?.correlationId" (retry)="store.load()" />
+} @else {
+  @if (store.active(); as sprint) {
+    <section class="sprint active" aria-labelledby="active-title">
+      <div class="sprint-head">
+        <h3 id="active-title">{{ sprint.name }}</h3>
+        <kora-status-chip tone="info" icon="refresh" [label]="'sprintStatus.ACTIVE' | transloco" />
+        <span class="dates">
+          {{ sprint.startDate | localizedDate: language.current() }} –
+          {{ sprint.endDate | localizedDate: language.current() }} ·
+          {{ 'sprints.daysLeft' | transloco: { count: daysLeft(sprint) } }}
+        </span>
+        @if (project.canEdit()) {
+          <button
+            mat-stroked-button
+            type="button"
+            class="push"
+            [disabled]="store.busy()"
+            (click)="close(sprint)"
+          >
+            {{ 'sprints.close' | transloco }}
+          </button>
+        }
+      </div>
+      @if (sprint.goal) {
+        <p class="goal">
+          <strong>{{ 'sprints.fields.goal' | transloco }}:</strong> {{ sprint.goal }}
+        </p>
+      }
+      <dl class="figures">
+        <div>
+          <dt>{{ 'sprints.committed' | transloco }}</dt>
+          <dd>{{ sprint.committedPoints ?? '—' }}</dd>
+        </div>
+        <div>
+          <dt>{{ 'sprints.done' | transloco }}</dt>
+          <dd>{{ donePoints(sprint) }}</dd>
+        </div>
+        <div>
+          <dt>{{ 'sprints.remaining' | transloco }}</dt>
+          <dd>{{ store.pointsOf()(sprint.id) - donePoints(sprint) }}</dd>
+        </div>
+      </dl>
+      <div class="sprint-body">
+        @if (burndown.hasValue()) {
+          <kora-burndown-chart [burndown]="burndown.value()" />
+        }
+        <ul class="list" [attr.aria-label]="'sprints.tasksOf' | transloco: { name: sprint.name }">
+          @for (task of store.tasksOf()(sprint.id); track task.id) {
+            <li>
+              <ng-container
+                *ngTemplateOutlet="taskRow; context: { $implicit: task, sprint: sprint }"
+              />
+            </li>
+          } @empty {
+            <li class="kora-muted">{{ 'sprints.noTasks' | transloco }}</li>
+          }
+        </ul>
+      </div>
+    </section>
+  }
+
+  @for (sprint of store.planned(); track sprint.id) {
+    <section class="sprint" [attr.aria-labelledby]="'sprint-' + sprint.id">
+      <div class="sprint-head">
+        <h3 [id]="'sprint-' + sprint.id">{{ sprint.name }}</h3>
+        <kora-status-chip
+          tone="neutral"
+          icon="schedule"
+          [label]="'sprintStatus.PLANNED' | transloco"
+        />
+        <span class="dates">
+          {{ sprint.startDate | localizedDate: language.current() }} –
+          {{ sprint.endDate | localizedDate: language.current() }}
+        </span>
+        @if (project.canEdit()) {
+          <span class="push">
+            <button mat-button type="button" (click)="edit(sprint)">
+              {{ 'common.edit' | transloco }}
+            </button>
+            <button
+              mat-stroked-button
+              type="button"
+              [disabled]="store.busy() || !!store.active()"
+              [matTooltip]="store.active() ? ('sprints.oneActive' | transloco) : ''"
+              [matTooltipDisabled]="!store.active()"
+              (click)="store.start(sprint)"
+            >
+              {{ 'sprints.start' | transloco }}
+            </button>
+          </span>
+        }
+      </div>
+      @if (sprint.goal) {
+        <p class="goal">
+          <strong>{{ 'sprints.fields.goal' | transloco }}:</strong> {{ sprint.goal }}
+        </p>
+      }
+      <p class="capacity">
+        {{ 'sprints.planned' | transloco: { points: store.pointsOf()(sprint.id) } }}
+        @if (store.velocity()?.average !== undefined) {
+          ·
+          {{
+            'sprints.velocity.recent'
+              | transloco
+                : {
+                    average: store.velocity()?.average,
+                    low: store.velocity()?.low,
+                    high: store.velocity()?.high,
+                  }
+          }}
+        }
+      </p>
+      <ul class="list" [attr.aria-label]="'sprints.tasksOf' | transloco: { name: sprint.name }">
+        @for (task of store.tasksOf()(sprint.id); track task.id) {
+          <li>
+            <ng-container
+              *ngTemplateOutlet="taskRow; context: { $implicit: task, sprint: sprint }"
+            />
+          </li>
+        } @empty {
+          <li class="kora-muted">{{ 'sprints.noTasksYet' | transloco }}</li>
+        }
+      </ul>
+    </section>
+  }
+
+  <section class="product" aria-labelledby="backlog-title">
+    <div class="sprint-head">
+      <h3 id="backlog-title">{{ 'backlog.product' | transloco }}</h3>
+      <span class="dates">
+        {{
+          'backlog.summary'
+            | transloco: { count: store.backlog().length, points: store.backlogPoints() }
+        }}
+      </span>
+    </div>
+
+    @if (project.canEdit() && openSprints().length) {
+      <div class="plan-bar" role="group" [attr.aria-label]="'backlog.planning' | transloco">
+        <span>{{ 'backlog.selected' | transloco: { count: store.selected().length } }}</span>
+        <mat-form-field subscriptSizing="dynamic">
+          <mat-label>{{ 'backlog.targetSprint' | transloco }}</mat-label>
+          <mat-select [value]="targetSprint()?.id" (selectionChange)="target.set($event.value)">
+            @for (s of openSprints(); track s.id) {
+              <mat-option [value]="s.id">{{ s.name }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+        <button
+          mat-flat-button
+          type="button"
+          [disabled]="!store.selected().length || store.busy()"
+          (click)="addSelected()"
+        >
+          {{ 'backlog.addToSprint' | transloco }}
+        </button>
+        @if (store.selected().length) {
+          <button mat-button type="button" (click)="store.clearSelection()">
+            {{ 'backlog.clearSelection' | transloco }}
+          </button>
+        }
+      </div>
+    }
+
+    <p class="help kora-muted">{{ 'backlog.keyboardHelp' | transloco }}</p>
+
+    @if (store.backlog().length === 0) {
+      <kora-empty-state
+        icon="assignment"
+        [heading]="'backlog.emptyTitle' | transloco"
+        [message]="'backlog.emptyMessage' | transloco"
+      />
+    } @else {
+      <ol
+        class="list ranked"
+        cdkDropList
+        [cdkDropListData]="store.backlog()"
+        [cdkDropListDisabled]="!project.canContribute()"
+        [attr.aria-label]="'backlog.product' | transloco"
+        (cdkDropListDropped)="drop($event)"
+      >
+        @for (
+          task of store.backlog();
+          track task.id;
+          let first = $first, last = $last, i = $index
+        ) {
+          <li cdkDrag [cdkDragData]="task" [cdkDragDisabled]="!tasks.canChange(task)">
+            <div class="row" [attr.data-task]="task.id">
+              @if (project.canEdit()) {
+                <mat-checkbox
+                  [checked]="store.selected().includes(task.id)"
+                  [aria-label]="'backlog.select' | transloco: { key: task.key }"
+                  (change)="store.toggle(task.id, $event.checked)"
+                />
+              }
+              @if (tasks.canChange(task)) {
+                <mat-icon
+                  class="handle"
+                  svgIcon="drag_indicator"
+                  cdkDragHandle
+                  aria-hidden="true"
+                />
+              }
+              <span class="rank" aria-hidden="true">{{ i + 1 }}</span>
+              <kora-task-type [type]="task.type" />
+              <span class="key">{{ task.key }}</span>
+              <button type="button" class="title" (click)="open(task)">{{ task.title }}</button>
+              <kora-priority-chip [priority]="task.priority" />
+              <span
+                class="points"
+                [attr.aria-label]="'board.points' | transloco: { count: task.storyPoints ?? 0 }"
+              >
+                {{ task.storyPoints ?? '–' }}
+              </span>
+              @if (tasks.canChange(task)) {
+                <button
+                  mat-icon-button
+                  type="button"
+                  [disabled]="first"
+                  [attr.aria-label]="'backlog.moveUp' | transloco: { key: task.key }"
+                  [matTooltip]="'backlog.moveUp' | transloco: { key: task.key }"
+                  (click)="moveBy(task, -1)"
+                >
+                  <mat-icon svgIcon="arrow_upward" aria-hidden="true" />
+                </button>
+                <button
+                  mat-icon-button
+                  type="button"
+                  [disabled]="last"
+                  [attr.aria-label]="'backlog.moveDown' | transloco: { key: task.key }"
+                  [matTooltip]="'backlog.moveDown' | transloco: { key: task.key }"
+                  (click)="moveBy(task, 1)"
+                >
+                  <mat-icon svgIcon="arrow_downward" aria-hidden="true" />
+                </button>
+              }
+            </div>
+          </li>
+        }
+      </ol>
+    }
+  </section>
+
+  @if (store.velocity(); as velocity) {
+    <div class="velocity">
+      <kora-velocity-chart [velocity]="velocity" />
+    </div>
+  }
+}

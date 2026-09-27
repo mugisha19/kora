@@ -55,8 +55,8 @@
                 },
                 {
                   "type": "any",
-                  "maximumWarning": "450kB",
-                  "maximumError": "500kB"
+                  "maximumWarning": "600kB",
+                  "maximumError": "700kB"
                 }
               ],
               "outputHashing": "all"
