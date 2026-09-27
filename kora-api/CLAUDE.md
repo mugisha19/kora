@@ -38,6 +38,8 @@ into `domain` → `application` → `adapter.{web,persistence,...}`; dependencie
 - Project-scoped data goes through `ProjectAccess` (`readable`/`participating`/`manageable`); changes that affect
   the dashboard publish `ProjectChanged`, `WbsChanged` or `TaskChanged` inside the transaction.
 - Invalid input is `400 validation.failed` with `errors[].field` naming the request field (never 422).
+- Counts of days in plans (durations, lags, float, variance) are working days on the organization's calendar
+  (`schedule` module); derived views such as the schedule are computed on read unless an ADR says otherwise.
 - Integration tests use `@IntegrationTest` and are named `*IT`; never H2.
 - Comments explain WHY. Record decisions in `docs/adr/`, patterns in `docs/PATTERNS.md`, interview
   explanations in `docs/LEARNING.md`.
