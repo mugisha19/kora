@@ -12,11 +12,25 @@ export async function resetMockApi(page: Page): Promise<void> {
   await page.evaluate(() => window.koraMock?.reset());
 }
 
-/** Signs in with a one-click demo account and waits for the dashboard. */
+/** Signs in with a one-click demo account and waits for the dashboard (in the user's language). */
 export async function signInAs(page: Page, role: DemoRole = 'Administrator'): Promise<void> {
   await resetMockApi(page);
   await page.getByRole('button', { name: new RegExp(`^${role} `) }).click();
-  await expect(page.getByRole('heading', { level: 1, name: 'Dashboard' })).toBeVisible();
+  // Any language: the user's profile locale applies on sign-in.
+  await expect(page).toHaveURL(/\/dashboard$/);
+  await expect(page.getByRole('main').getByRole('heading', { level: 1 })).toBeVisible();
+}
+
+/**
+ * Switches the UI to English. Some demo users have a French or Kinyarwanda profile, and signing in
+ * applies it; tests written against English labels switch back first.
+ */
+export async function useEnglish(page: Page): Promise<void> {
+  const current = page.getByRole('button', { name: /language|langue|ururimi/i });
+  if ((await current.getAttribute('aria-label'))?.includes('English')) return;
+  await current.click();
+  await page.getByRole('menuitemradio', { name: 'English' }).click();
+  await expect(page.getByRole('button', { name: /Change language/ })).toBeVisible();
 }
 
 /** Opens the navigation drawer on phones, where the side navigation is hidden. */
