@@ -23,6 +23,8 @@ import { DASHBOARD_SORT_FIELDS, HEALTHS, PROJECT_STATUSES } from '../../core/api
 import { toApiError } from '../../core/api/api-error';
 import { DashboardApi } from '../../core/api/dashboard.api';
 import { PortfoliosApi } from '../../core/api/portfolios.api';
+import { RisksApi } from '../../core/api/risks.api';
+import { SeverityChip } from '../../shared/ui/severity-chip';
 import { LanguageService } from '../../core/i18n/language.service';
 import { SessionStore } from '../../core/session/session.store';
 import { LocalizedDatePipe } from '../../shared/forms/localized-date.pipe';
@@ -75,6 +77,7 @@ type SortField = (typeof DASHBOARD_SORT_FIELDS)[number];
     PageHeader,
     Percent100Pipe,
     RouterLink,
+    SeverityChip,
     TranslocoPipe,
   ],
   providers: [QueryParams],
@@ -90,6 +93,7 @@ export class DashboardPage {
 
   private readonly api = inject(DashboardApi);
   private readonly portfoliosApi = inject(PortfoliosApi);
+  private readonly risksApi = inject(RisksApi);
   private readonly session = inject(SessionStore);
   private readonly transloco = inject(TranslocoService);
   protected readonly language = inject(LanguageService);
@@ -124,6 +128,13 @@ export class DashboardPage {
   protected readonly summary = resource({
     params: () => ({ portfolioId: this.portfolioFilter(), org: this.org() }),
     loader: ({ params }) => firstValueFrom(this.api.summary(params.portfolioId)),
+  });
+
+  /** Open critical risks (15+) across the projects in view (feature 11's portfolio view). */
+  protected readonly criticalRisks = resource({
+    params: () => ({ portfolioId: this.portfolioFilter(), org: this.org() }),
+    loader: ({ params }) =>
+      firstValueFrom(this.risksApi.portfolio({ portfolioId: params.portfolioId, size: 10 })),
   });
 
   protected readonly rows = resource({

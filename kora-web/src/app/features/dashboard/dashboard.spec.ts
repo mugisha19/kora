@@ -29,7 +29,22 @@ describe('dashboard', () => {
     expect(kpi('On track')).toBe('50%');
     expect(kpi('Late projects')).toBe('1');
     expect(kpi('SPI / CPI')).toBe('— / —');
-    expect(kpi('Open critical risks')).toBe('—');
+    expect(kpi('Open critical risks')).toBe('3');
+    expect(kpi('Pending change requests')).toBe('2');
+  });
+
+  it('lists the open critical risks across projects, highest score first', async () => {
+    await openRoute(routes, '/dashboard', 'pmo@kora.demo');
+
+    const section = await screen.findByRole('region', { name: 'Critical risks' });
+    const items = await within(section).findAllByRole('listitem');
+    expect(items.map((i) => i.querySelector('.key')?.textContent)).toEqual([
+      'AKG-003-R1',
+      'AKG-001-R1',
+      'AKG-001-R2',
+    ]);
+    expect(within(items[0]).getByText('Critical · 20')).toBeTruthy();
+    expect(within(items[0]).getByRole('link').getAttribute('href')).toContain('/risks/');
   });
 
   it('gives every chart a table with the same numbers', async () => {

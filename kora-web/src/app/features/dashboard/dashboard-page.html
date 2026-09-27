@@ -77,12 +77,12 @@
         <li>
           <span class="label">{{ 'dashboard.kpis.risks' | transloco }}</span>
           <span class="value">{{ k.summary.openCriticalRisks ?? '—' }}</span>
-          <span class="note">{{ 'dashboard.kpis.later' | transloco }}</span>
+          <span class="note">{{ 'dashboard.kpis.risksNote' | transloco }}</span>
         </li>
         <li>
           <span class="label">{{ 'dashboard.kpis.changes' | transloco }}</span>
           <span class="value">{{ k.summary.pendingChangeRequests ?? '—' }}</span>
-          <span class="note">{{ 'dashboard.kpis.later' | transloco }}</span>
+          <span class="note">{{ 'dashboard.kpis.changesNote' | transloco }}</span>
         </li>
       </ul>
     </section>
@@ -227,5 +227,44 @@
       [hidePageSize]="true"
       (page)="onPage($event)"
     />
+  }
+</section>
+
+<section class="risks" aria-labelledby="risks-title">
+  <h2 id="risks-title">{{ 'dashboard.risks.title' | transloco }}</h2>
+  <p class="count">{{ 'dashboard.risks.subtitle' | transloco }}</p>
+  @if (criticalRisks.error()) {
+    <kora-error-state (retry)="criticalRisks.reload()" />
+  } @else if (criticalRisks.hasValue()) {
+    @if (criticalRisks.value().content.length) {
+      <ul class="risk-list">
+        @for (risk of criticalRisks.value().content; track risk.id) {
+          <li>
+            <kora-severity-chip [severity]="risk.severity" [score]="risk.score" />
+            <a [routerLink]="['/projects', risk.projectId, 'risks', risk.id]">
+              <span class="key">{{ risk.key }}</span
+              >&ngsp;<span>{{ risk.title }}</span>
+            </a>
+            <span class="meta">
+              {{ risk.owner?.fullName ?? ('risks.noOwner' | transloco) }}
+              @if (risk.reviewDate) {
+                ·
+                {{
+                  'dashboard.risks.review'
+                    | transloco: { date: (risk.reviewDate | localizedDate: language.current()) }
+                }}
+              }
+              @if (risk.reviewOverdue) {
+                · <strong>{{ 'risks.reviewOverdue' | transloco }}</strong>
+              }
+            </span>
+          </li>
+        }
+      </ul>
+    } @else {
+      <p class="kora-muted">{{ 'dashboard.risks.none' | transloco }}</p>
+    }
+  } @else {
+    <kora-loading-state />
   }
 </section>

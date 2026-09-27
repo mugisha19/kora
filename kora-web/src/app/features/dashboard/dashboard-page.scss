@@ -68,3 +68,35 @@
 abbr {
   text-decoration: none;
 }
+
+.risks {
+  margin-block-start: var(--kora-space-6);
+
+  h2 {
+    margin: 0;
+    font: var(--mat-sys-title-large);
+  }
+}
+
+.risk-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--kora-space-1) var(--kora-space-3);
+    padding-block: var(--kora-space-2);
+    border-block-end: 1px solid var(--mat-sys-outline-variant);
+  }
+  .key {
+    color: var(--mat-sys-on-surface-variant);
+  }
+  .meta {
+    flex-basis: 100%;
+    color: var(--mat-sys-on-surface-variant);
+    font: var(--mat-sys-body-small);
+  }
+}
