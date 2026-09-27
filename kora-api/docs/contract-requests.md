@@ -41,3 +41,9 @@ Template:
 - Endpoints: 21 new operations (tags Tasks, Sprints); `WbsNode.percentCompleteSource`; 8 new error codes
 - Status: accepted in 0.3.0. Known gap: PATCH can't clear a task's assignee, work package or dates (null means
   unchanged); to be added with explicit nulls when the web app needs it
+
+### 0.4.0: dependencies, schedule, baselines, working calendar
+- Requested by: api, 2026-09-27 (start of API Phase 5, for web Phase 6)
+- Endpoints: 7 new operations (tag Schedule); Task gains `durationDays`, `scheduleConstraint`, `constraintDate`;
+  3 new error codes; seven summaries with doubled apostrophes fixed
+- Status: accepted in 0.4.0

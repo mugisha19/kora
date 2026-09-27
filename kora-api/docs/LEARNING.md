@@ -216,3 +216,38 @@ lets a manager override it, because rules that can't bend get worked around, but
 A work package's progress is now measured, not guessed: finished tasks count fully, open ones by how much of their
 estimate is burnt, weighted by the estimate. That percentage feeds earned value (EV = budget × percent complete), so
 EVM in Phase 7 rests on the team's actual task updates.
+
+## The critical path method (Phase 5)
+
+Tasks are nodes and dependencies are arrows. The **forward pass** walks the tasks in dependency order and gives
+each its **early start** (ES) and **early finish** (EF = ES + duration): the soonest it can happen. The project
+finishes at the latest EF. The **backward pass** walks the other way from that finish and gives each task its
+**late start** (LS) and **late finish** (LF): the latest it can happen without moving the project finish.
+**Total float** = LS − ES. Tasks with zero float form the **critical path**: any delay on them delays the project.
+**Free float** is how far a task can slip before its *next* task has to move. It is often smaller than total float,
+because the total float of a chain is shared along it.
+**Interview line:** "Forward pass for early dates, backward pass for late dates, float is the difference, and the
+zero-float chain is the critical path."
+
+## The four dependency types, lag and lead (Phase 5)
+
+- **FS** (finish to start): pour the concrete, then build the walls. By far the most common.
+- **SS** (start to start): testing can start two days after coding starts (SS + 2).
+- **FF** (finish to finish): documentation finishes when development finishes.
+- **SF** (start to finish): the old system runs until the new one starts. Rare.
+
+**Lag** adds waiting time (let the concrete cure: FS + 3); a **lead** is a negative lag that lets work overlap
+(FS − 2).
+
+## Topological sort and loops (Phase 5)
+
+A schedule only exists when the dependencies have no loop ("A before B before C before A" is impossible). **Kahn's
+algorithm** keeps taking a task nothing is waiting on; if tasks are left over, they sit on a loop. Checking a new
+link is a reachability question: does a path already lead from its successor back to its predecessor? A
+breadth-first search answers it and returns the shortest such loop to show the user.
+
+## Baselines and variance (Phase 5)
+
+A **baseline** is a frozen copy of the approved schedule. Progress is judged against it: a task finishing 3 working
+days after its baseline finish has a finish variance of +3. Re-planning creates a new baseline rather than
+overwriting the old one, so repeated re-planning stays visible.

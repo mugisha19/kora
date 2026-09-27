@@ -6,7 +6,7 @@ lands in code; a pattern that doesn't earn its place is rejected in an ADR.
 | Pattern                        | Problem it solves in Kora                                                                 | Status             | Where |
 | ------------------------------ | ----------------------------------------------------------------------------------------- | ------------------ | ----- |
 | Ports and adapters (Adapter)   | Email, token store, file storage, clock behind interfaces; in-memory fakes in tests        | Done — Phase 2     | `platform/mail/EmailSender`, `identity/application/RefreshTokenStore` + `adapter/redis`, `*Repository` ports + `adapter/persistence` |
-| Strategy                       | Password hashing; CPM scheduling; EAC and percent-complete methods; methodology rules     | Hashing done — 2; 5, 7 planned | `identity/application/PasswordHasher`, `identity/adapter/security/Argon2PasswordHasher` |
+| Strategy                       | Password hashing; CPM scheduling; EAC and percent-complete methods; methodology rules     | Hashing, CPM done — 2, 5; 7 planned | `identity/application/PasswordHasher`, `schedule/domain/SchedulingStrategy` + `CriticalPathMethod` |
 | State                          | Lifecycles where illegal moves must be impossible: invitation, project, charter, task, issue, change request | Invitation, project, charter, task done — 2–4; 6 planned | `organization/domain/InvitationStatus`, `portfolio/domain/ProjectStatus`, `portfolio/domain/CharterStatus`, `work/domain/TaskStatus` |
 | Specification                  | Composable, tenant-safe filters for list endpoints (members, projects, tasks, risks)      | Done — Phases 2–4  | `MemberSpecifications`, `portfolio/adapter/persistence/PortfolioSpecifications` (incl. project visibility), `work/adapter/persistence/TaskSpecifications` |
 | Builder                        | Readable test fixtures and the demo data seeder                                           | Planned — Phase 2  | —     |
@@ -60,3 +60,13 @@ Still plumbing rather than domain patterns, but two structural ideas landed in t
   progress without a `scope → work` dependency.
 - **Snapshot for time series**: `SprintDayProgress` stores one value per day instead of replaying history, the
   same trade-off as the dashboard read model.
+
+## Phase 5
+
+- **Strategy** for scheduling: `schedule/domain/SchedulingStrategy` with `CriticalPathMethod`, chosen in
+  `SchedulingConfiguration`. A resource-levelling or Monte Carlo scheduler would be another implementation, with
+  the controllers and the calendar untouched.
+- **Separating calculation from representation**: CPM works on working-day numbers; `WorkingDays` translates to
+  dates at the edges. The algorithm stays textbook-simple and the calendar rules stay in one class.
+- **Graph algorithms**: Kahn's topological sort (order and loop detection) and breadth-first search (the shortest
+  loop a new link would close) in `schedule/domain/DependencyGraph`.
