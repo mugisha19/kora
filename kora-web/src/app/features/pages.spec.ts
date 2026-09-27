@@ -45,7 +45,7 @@ describe('pages', () => {
 
       expect(screen.getByText('Web app version')).toBeTruthy();
       expect(screen.getByText('0.1.0')).toBeTruthy();
-      expect(screen.getByText('0.4.0')).toBeTruthy();
+      expect(screen.getByText('0.5.0')).toBeTruthy();
       // Unit tests build with the production environment file (live API).
       expect(screen.getByText('Live API')).toBeTruthy();
     });
