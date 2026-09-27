@@ -79,7 +79,14 @@ describe('error handling', () => {
 
     function aForm() {
       return TestBed.runInInjectionContext(() =>
-        form(signal({ email: '', password: '', objectives: [{ metric: '' }, { metric: '' }] })),
+        form(
+          signal({
+            email: '',
+            password: '',
+            budget: '',
+            objectives: [{ metric: '' }, { metric: '' }],
+          }),
+        ),
       );
     }
 
@@ -102,6 +109,19 @@ describe('error handling', () => {
         { kind: 'server', message: 'msg:email', fieldTree: f.email },
         { kind: 'server', message: 'msg:required', fieldTree: f.objectives[1].metric },
       ]);
+    });
+
+    it('puts an error on a nested value on the control that edits it as a whole', () => {
+      TestBed.configureTestingModule({});
+      const f = aForm();
+
+      expect(
+        serverErrors(
+          f,
+          apiError({ fieldErrors: [{ field: 'budget.amount', code: 'format' }] }),
+          translate,
+        ),
+      ).toEqual([{ kind: 'server', message: 'msg:format', fieldTree: f.budget }]);
     });
 
     it('turns unknown fields into form-level errors', () => {

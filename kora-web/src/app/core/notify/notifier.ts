@@ -35,4 +35,21 @@ export class Notifier {
       politeness: 'polite',
     });
   }
+
+  /**
+   * A confirmation with an "Undo" action. Resolves `true` if the user chose to undo. It stays
+   * 15 seconds (longer than confirmations, so there's time to reach the button with a keyboard).
+   */
+  undoable(message: string): Promise<boolean> {
+    const ref = this.snackBar.open(message, this.transloco.translate('common.undo'), {
+      duration: 15_000,
+      politeness: 'polite',
+    });
+    return new Promise((resolve) => {
+      ref.onAction().subscribe(() => resolve(true));
+      ref.afterDismissed().subscribe(({ dismissedByAction }) => {
+        if (!dismissedByAction) resolve(false);
+      });
+    });
+  }
 }

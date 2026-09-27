@@ -79,7 +79,7 @@ export const INVITATION_STATUS_LOOK: Record<InvitationStatus, { tone: StatusTone
   ],
   providers: [InvitationsStore],
   templateUrl: './invitations-page.html',
-  styleUrl: '../admin-tables.scss',
+  styleUrl: '../../../shared/ui/data-table.scss',
 })
 export class InvitationsPage {
   protected readonly store = inject(InvitationsStore);

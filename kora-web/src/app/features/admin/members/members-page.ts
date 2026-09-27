@@ -69,7 +69,7 @@ import { MemberSortField, MembersStore } from './members.store';
   ],
   providers: [MembersStore],
   templateUrl: './members-page.html',
-  styleUrl: '../admin-tables.scss',
+  styleUrl: '../../../shared/ui/data-table.scss',
 })
 export class MembersPage {
   protected readonly store = inject(MembersStore);

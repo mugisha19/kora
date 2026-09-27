@@ -1,4 +1,4 @@
-import { DOCUMENT, Injectable, effect, inject, signal } from '@angular/core';
+import { DOCUMENT, Injectable, computed, effect, inject, signal } from '@angular/core';
 import { PREFERENCE_KEYS, readPreference, writePreference } from '../storage/preferences';
 
 export const THEME_MODES = ['light', 'dark', 'system'] as const;
@@ -27,7 +27,15 @@ export class ThemeService {
 
   readonly mode = this.modeSignal.asReadonly();
 
+  private readonly systemDark = signal(this.prefersDark()?.matches ?? false);
+  /** The scheme actually shown, for code that draws its own colours (charts). */
+  readonly scheme = computed<'light' | 'dark'>(() => {
+    const mode = this.modeSignal();
+    return mode === 'system' ? (this.systemDark() ? 'dark' : 'light') : mode;
+  });
+
   constructor() {
+    this.prefersDark()?.addEventListener('change', (event) => this.systemDark.set(event.matches));
     effect(() => {
       const mode = this.modeSignal();
       const root = this.document.documentElement;
@@ -42,6 +50,13 @@ export class ThemeService {
   setMode(mode: ThemeMode): void {
     this.modeSignal.set(mode);
     writePreference(PREFERENCE_KEYS.theme, mode === 'system' ? null : mode);
+  }
+
+  private prefersDark(): MediaQueryList | null {
+    const view = this.document.defaultView;
+    return typeof view?.matchMedia === 'function'
+      ? view.matchMedia('(prefers-color-scheme: dark)')
+      : null;
   }
 
   private storedMode(): ThemeMode {
