@@ -71,6 +71,18 @@ describe('Shell', () => {
     );
   });
 
+  it('keeps focus where it is when only the query changes (filters live in the URL)', async () => {
+    const { fixture } = await setup(false);
+    const search = document.createElement('input');
+    screen.getByRole('main').append(search);
+    search.focus();
+
+    await TestBed.inject(Router).navigateByUrl('/dashboard?health=RED');
+    await fixture.whenStable();
+
+    expect(document.activeElement).toBe(search);
+  });
+
   it('on small screens opens the drawer from the toolbar and closes it after navigating', async () => {
     const { fixture } = await setup(true);
     const menuButton = screen.getByRole('button', { name: 'Open navigation menu' });

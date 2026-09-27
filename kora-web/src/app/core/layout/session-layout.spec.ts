@@ -44,7 +44,12 @@ describe('signed-in layout pieces', () => {
     it('shows Administration only to organization admins', () => {
       expect(visibleNavItems('ORG_ADMIN').map((i) => i.label)).toContain('nav.admin');
       expect(visibleNavItems('PMO').map((i) => i.label)).not.toContain('nav.admin');
-      expect(visibleNavItems(null).map((i) => i.label)).toEqual(['nav.dashboard', 'nav.settings']);
+      expect(visibleNavItems(null).map((i) => i.label)).toEqual([
+        'nav.dashboard',
+        'nav.portfolios',
+        'nav.projects',
+        'nav.settings',
+      ]);
     });
 
     it('the shell follows the active role', async () => {

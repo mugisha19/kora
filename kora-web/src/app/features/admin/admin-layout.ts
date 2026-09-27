@@ -22,7 +22,12 @@ import { PageHeader } from '../../shared/ui/page-header';
       [heading]="'admin.title' | transloco"
       [subtitle]="'admin.subtitle' | transloco"
     />
-    <nav mat-tab-nav-bar [tabPanel]="panel" [attr.aria-label]="'admin.tabs.label' | transloco">
+    <nav
+      mat-tab-nav-bar
+      data-keep-focus
+      [tabPanel]="panel"
+      [attr.aria-label]="'admin.tabs.label' | transloco"
+    >
       @for (tab of tabs; track tab.path) {
         <a
           mat-tab-link
