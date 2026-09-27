@@ -8497,7 +8497,7 @@ components:
       enum: [DRAFT, SUBMITTED, APPROVED, REJECTED]
     TimesheetEntry:
       type: object
-      required: [id, taskId, taskKey, taskTitle, projectId, date, hours, billable]
+      required: [id, taskKey, taskTitle, projectId, date, hours, billable]
       properties:
         id:
           type: string
@@ -8505,8 +8505,10 @@ components:
         taskId:
           type: string
           format: uuid
+          description: Absent once the task was deleted; the logged time and its cost stay
         taskKey:
           type: string
+          description: As it was when the time was logged
         taskTitle:
           type: string
         projectId:
