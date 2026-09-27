@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Kora API
-  version: 0.5.0
+  version: 0.6.0
   description: |
     Multi-tenant project and portfolio management built on PMI practices.
 
@@ -66,6 +66,12 @@ tags:
     description: Stakeholder register and the power/interest grid (feature 13)
   - name: ChangeRequests
     description: Change requests and their approval chain (feature 14)
+  - name: Timesheets
+    description: Weekly timesheets, their approval and cost rates (feature 15)
+  - name: Resources
+    description: Capacity, allocations and the resource heat map (feature 16)
+  - name: EarnedValue
+    description: Earned value management (feature 17)
 
 security:
   - bearerAuth: []
@@ -4539,6 +4545,815 @@ paths:
         '500':
           $ref: '#/components/responses/InternalError'
 
+  /timesheets/me:
+    get:
+      tags: [Timesheets]
+      operationId: getMyTimesheetWeek
+      summary: 'My timesheet for one ISO week'
+      description: 'Defaults to the current week in the organization''s time zone.'
+      parameters:
+        - $ref: '#/components/parameters/OrganizationId'
+        - name: week
+          in: query
+          description: 'ISO week, e.g. 2026-W40'
+          schema:
+            type: string
+            pattern: '^[0-9]{4}-W[0-9]{2}$'
+            example: 2026-W40
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: The week
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimesheetWeek'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /timesheets/me/{week}/entries:
+    put:
+      tags: [Timesheets]
+      operationId: replaceMyTimesheetEntries
+      summary: 'Save the week''s entries (replaces them)'
+      description: 'Entries of projects whose timesheet is SUBMITTED or APPROVED can''t change (409 `timesheets.locked`); the rest are replaced by the list sent. Hours are quarter hours; each day totals at most 24 h over all projects (400 on `entries`). Only tasks of projects the caller works on (manager or contributor).'
+      parameters:
+        - $ref: '#/components/parameters/Week'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TimesheetEntriesRequest'
+      responses:
+        '200':
+          description: The week
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimesheetWeek'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          description: 'Entries of a submitted or approved timesheet changed. Code: `timesheets.locked`.'
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /timesheets/me/{week}/submit:
+    post:
+      tags: [Timesheets]
+      operationId: submitMyTimesheetWeek
+      summary: 'Submit the week for approval'
+      description: 'Every DRAFT or REJECTED project timesheet with entries goes to its project''s managers.'
+      parameters:
+        - $ref: '#/components/parameters/Week'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: The week
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimesheetWeek'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          description: 'Nothing to submit. Code: `timesheets.empty`.'
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /projects/{projectId}/timesheets:
+    get:
+      tags: [Timesheets]
+      operationId: listProjectTimesheets
+      summary: 'Timesheets of the project, for approval'
+      description: 'The project manager, `PMO` or `ORG_ADMIN`. Oldest week first.'
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/TimesheetStatus'
+        - name: week
+          in: query
+          schema:
+            type: string
+            pattern: '^[0-9]{4}-W[0-9]{2}$'
+            example: 2026-W40
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+        - $ref: '#/components/parameters/Sort'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: One page of timesheets
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimesheetPage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /timesheets/{timesheetId}:
+    get:
+      tags: [Timesheets]
+      operationId: getTimesheet
+      summary: 'One person''s week on one project, with its entries'
+      description: 'Its owner or the project''s managers.'
+      parameters:
+        - $ref: '#/components/parameters/TimesheetId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: The timesheet
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Timesheet'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /timesheets/{timesheetId}/approve:
+    post:
+      tags: [Timesheets]
+      operationId: approveTimesheet
+      summary: 'Approve a submitted timesheet'
+      description: 'The project''s managers, never the timesheet''s owner. Approved hours become actual cost.'
+      parameters:
+        - $ref: '#/components/parameters/TimesheetId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: The approved timesheet
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Timesheet'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: '`timesheets.not_submitted` or `timesheets.self_approval`.'
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /timesheets/{timesheetId}/reject:
+    post:
+      tags: [Timesheets]
+      operationId: rejectTimesheet
+      summary: 'Send a submitted timesheet back with a comment'
+      description: 'The project''s managers, never the timesheet''s owner. The owner can then edit and resubmit.'
+      parameters:
+        - $ref: '#/components/parameters/TimesheetId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RejectTimesheetRequest'
+      responses:
+        '200':
+          description: The rejected timesheet
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Timesheet'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: '`timesheets.not_submitted` or `timesheets.self_approval`.'
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /users/{userId}/cost-rates:
+    get:
+      tags: [Timesheets]
+      operationId: listCostRates
+      summary: 'A person''s hourly cost rates, newest first'
+      description: '`ORG_ADMIN` and `PMO` only: rates are confidential.'
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: The rates
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CostRate'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      tags: [Timesheets]
+      operationId: addCostRate
+      summary: 'Add an hourly cost rate from a date'
+      description: '`ORG_ADMIN` and `PMO` only. Hours are costed at the rate valid on the day they were worked.'
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCostRateRequest'
+      responses:
+        '201':
+          description: The rate
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CostRate'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /resources/heatmap:
+    get:
+      tags: [Resources]
+      operationId: getResourceHeatmap
+      summary: 'Capacity, allocation and actual hours per person per week'
+      description: 'Managers (`ORG_ADMIN`, `PMO`, `PROJECT_MANAGER`) see everyone; others see themselves. At most 26 weeks; `from` and `to` are rounded to their Mondays. With `projectId`, only people on that project.'
+      parameters:
+        - $ref: '#/components/parameters/OrganizationId'
+        - name: from
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: to
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: projectId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: The heat map
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceHeatmap'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /projects/{projectId}/allocations:
+    get:
+      tags: [Resources]
+      operationId: listAllocations
+      summary: 'Planned hours per person per week on the project'
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - name: from
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: to
+          in: query
+          schema:
+            type: string
+            format: date
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: The allocations
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Allocation'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    put:
+      tags: [Resources]
+      operationId: saveAllocations
+      summary: 'Set planned hours for people and weeks (0 removes)'
+      description: 'The project manager, `PMO` or `ORG_ADMIN`. Weeks start on Monday. Returns every allocation of the project.'
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AllocationsRequest'
+      responses:
+        '200':
+          description: The allocations
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Allocation'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /users/{userId}/capacity:
+    get:
+      tags: [Resources]
+      operationId: getCapacity
+      summary: 'A person''s weekly capacity, its history and their leave'
+      description: 'The person, `ORG_ADMIN`, `PMO` or `PROJECT_MANAGER`. 40 hours a week until changed.'
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: The capacity
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Capacity'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    put:
+      tags: [Resources]
+      operationId: changeCapacity
+      summary: 'Change a person''s weekly hours from a date'
+      description: '`ORG_ADMIN` or `PMO`.'
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCapacityRequest'
+      responses:
+        '200':
+          description: The capacity
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Capacity'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /users/{userId}/leave:
+    post:
+      tags: [Resources]
+      operationId: addLeave
+      summary: 'Record leave; it removes capacity on its working days'
+      description: 'The person, `ORG_ADMIN` or `PMO`.'
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateLeaveRequest'
+      responses:
+        '201':
+          description: The leave
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Leave'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /leave/{leaveId}:
+    delete:
+      tags: [Resources]
+      operationId: deleteLeave
+      summary: 'Cancel leave'
+      description: 'The person, `ORG_ADMIN` or `PMO`.'
+      parameters:
+        - $ref: '#/components/parameters/LeaveId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '204':
+          description: Cancelled
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /organization/calendar/public-holidays:
+    post:
+      tags: [Schedule]
+      operationId: addPublicHolidays
+      summary: 'Add a country''s public holidays for a year to the calendar'
+      description: '`ORG_ADMIN` only. Rwanda (RW): the fixed-date holidays, Good Friday, Easter Monday and Umuganura (first Friday of August). Eid al-Fitr and Eid al-Adha follow the moon and are announced each year: add them by hand. Dates already listed keep their name.'
+      parameters:
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/IfMatch'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PublicHolidaysRequest'
+      responses:
+        '200':
+          description: The working calendar
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkingCalendar'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '412':
+          $ref: '#/components/responses/PreconditionFailed'
+        '428':
+          $ref: '#/components/responses/PreconditionRequired'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /projects/{projectId}/evm:
+    get:
+      tags: [EarnedValue]
+      operationId: getEvm
+      summary: 'Earned value metrics as of today'
+      description: 'Figures that need a division by zero (no planned value yet, no actual cost yet) are absent and listed in `unavailable` with the reason.'
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: The metrics
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvmReport'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /projects/{projectId}/evm/series:
+    get:
+      tags: [EarnedValue]
+      operationId: getEvmSeries
+      summary: 'Weekly cumulative PV, EV and AC for the S-curve'
+      description: 'Weeks end on Sunday. PV is planned for every week; AC is known up to today; EV comes from the weekly snapshots (and today for the current week), so it is absent before the first snapshot. At most 104 weeks; defaults to the project''s start to its target end.'
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - name: from
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: to
+          in: query
+          schema:
+            type: string
+            format: date
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: The series
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvmSeries'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /projects/{projectId}/evm/settings:
+    get:
+      tags: [EarnedValue]
+      operationId: getEvmSettings
+      summary: 'How the project measures percent complete and forecasts cost'
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: The settings
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvmSettings'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    put:
+      tags: [EarnedValue]
+      operationId: updateEvmSettings
+      summary: 'Choose the percent-complete and EAC methods'
+      description: 'The project manager, `PMO` or `ORG_ADMIN`.'
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/IfMatch'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateEvmSettingsRequest'
+      responses:
+        '200':
+          description: The settings
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvmSettings'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '412':
+          $ref: '#/components/responses/PreconditionFailed'
+        '428':
+          $ref: '#/components/responses/PreconditionRequired'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /dashboard/trends:
+    get:
+      tags: [Dashboard]
+      operationId: getDashboardTrends
+      summary: 'Monthly portfolio PV, EV, AC, SPI and CPI'
+      description: 'From the weekly EVM snapshots of the projects the caller can see; a month uses each project''s last snapshot in it. Oldest month first.'
+      parameters:
+        - $ref: '#/components/parameters/OrganizationId'
+        - name: months
+          in: query
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 24
+            default: 6
+        - name: portfolioId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: The trends
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardTrends'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -4728,6 +5543,29 @@ components:
       schema:
         type: string
         format: uuid
+
+    TimesheetId:
+      name: timesheetId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    LeaveId:
+      name: leaveId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    Week:
+      name: week
+      in: path
+      required: true
+      description: ISO week, e.g. 2026-W40
+      schema:
+        type: string
+        pattern: '^[0-9]{4}-W[0-9]{2}$'
 
   headers:
     CorrelationId:
@@ -4975,6 +5813,10 @@ components:
         - change_requests.not_in_review
         - change_requests.self_approval
         - change_requests.invalid_transition
+        - timesheets.locked
+        - timesheets.empty
+        - timesheets.not_submitted
+        - timesheets.self_approval
         - internal.error
 
     # ---------- Shared ----------
@@ -5964,24 +6806,28 @@ components:
           $ref: '#/components/schemas/Money'
         totalEarnedValue:
           $ref: '#/components/schemas/Money'
+        totalActualCost:
+          allOf:
+            - $ref: '#/components/schemas/Money'
+          description: Approved timesheet hours × cost rates, over the visible projects
         lateProjects:
           type: integer
           format: int32
           description: Projects in progress past their target end date
         portfolioSpi:
           type: number
-          description: Schedule performance index (from API Phase 7)
+          description: Σ EV ÷ Σ PV over the visible projects; absent without planned value
         portfolioCpi:
           type: number
-          description: Cost performance index (from API Phase 7)
+          description: Σ EV ÷ Σ AC over the visible projects; absent without actual cost
         openCriticalRisks:
           type: integer
           format: int32
-          description: From API Phase 6
+          description: Open risks scoring 15 or more
         pendingChangeRequests:
           type: integer
           format: int32
-          description: From API Phase 6
+          description: Change requests submitted or in review
     NextMilestone:
       type: object
       required: [name, targetDate]
@@ -6024,10 +6870,10 @@ components:
           $ref: '#/components/schemas/NextMilestone'
         spi:
           type: number
-          description: From API Phase 7
+          description: Schedule performance index; absent without planned value
         cpi:
           type: number
-          description: From API Phase 7
+          description: Cost performance index; absent without actual cost
     DashboardProjectPage:
       allOf:
         - $ref: '#/components/schemas/PageMetadata'
@@ -7643,3 +8489,550 @@ components:
           type: number
           minimum: 0
           maximum: 100
+
+    # ---------- Timesheets (0.6.0) ----------
+    TimesheetStatus:
+      type: string
+      description: 'DRAFT → SUBMITTED → APPROVED, or REJECTED (editable again) with the reviewer''s comment'
+      enum: [DRAFT, SUBMITTED, APPROVED, REJECTED]
+    TimesheetEntry:
+      type: object
+      required: [id, taskId, taskKey, taskTitle, projectId, date, hours, billable]
+      properties:
+        id:
+          type: string
+          format: uuid
+        taskId:
+          type: string
+          format: uuid
+        taskKey:
+          type: string
+        taskTitle:
+          type: string
+        projectId:
+          type: string
+          format: uuid
+        date:
+          type: string
+          format: date
+        hours:
+          type: number
+        note:
+          type: string
+        billable:
+          type: boolean
+    TimesheetEntryInput:
+      type: object
+      required: [taskId, date, hours]
+      properties:
+        taskId:
+          type: string
+          format: uuid
+        date:
+          type: string
+          format: date
+        hours:
+          type: number
+          minimum: 0.25
+          maximum: 24
+          multipleOf: 0.25
+        note:
+          type: string
+          maxLength: 500
+        billable:
+          type: boolean
+          default: false
+    TimesheetEntriesRequest:
+      type: object
+      required: [entries]
+      properties:
+        entries:
+          type: array
+          maxItems: 500
+          items:
+            $ref: '#/components/schemas/TimesheetEntryInput'
+    TimesheetSummary:
+      type: object
+      required: [id, projectId, projectCode, user, weekStart, status, totalHours]
+      properties:
+        id:
+          type: string
+          format: uuid
+        projectId:
+          type: string
+          format: uuid
+        projectCode:
+          type: string
+        user:
+          $ref: '#/components/schemas/UserRef'
+        weekStart:
+          type: string
+          format: date
+        status:
+          $ref: '#/components/schemas/TimesheetStatus'
+        totalHours:
+          type: number
+        submittedAt:
+          type: string
+          format: date-time
+        decidedBy:
+          $ref: '#/components/schemas/UserRef'
+        decidedAt:
+          type: string
+          format: date-time
+        comment:
+          type: string
+    Timesheet:
+      type: object
+      required: [id, projectId, projectCode, user, weekStart, status, totalHours, entries]
+      properties:
+        id:
+          type: string
+          format: uuid
+        projectId:
+          type: string
+          format: uuid
+        projectCode:
+          type: string
+        user:
+          $ref: '#/components/schemas/UserRef'
+        weekStart:
+          type: string
+          format: date
+        status:
+          $ref: '#/components/schemas/TimesheetStatus'
+        totalHours:
+          type: number
+        submittedAt:
+          type: string
+          format: date-time
+        decidedBy:
+          $ref: '#/components/schemas/UserRef'
+        decidedAt:
+          type: string
+          format: date-time
+        comment:
+          type: string
+        entries:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimesheetEntry'
+    TimesheetPage:
+      allOf:
+        - $ref: '#/components/schemas/PageMetadata'
+        - type: object
+          required: [content]
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/TimesheetSummary'
+    DailyTotal:
+      type: object
+      required: [date, hours]
+      properties:
+        date:
+          type: string
+          format: date
+        hours:
+          type: number
+    TimesheetWeek:
+      type: object
+      required: [week, weekStart, weekEnd, status, editable, totalHours, dailyTotals, entries, sheets]
+      properties:
+        week:
+          type: string
+          example: 2026-W40
+        weekStart:
+          type: string
+          format: date
+        weekEnd:
+          type: string
+          format: date
+        status:
+          allOf:
+            - $ref: '#/components/schemas/TimesheetStatus'
+          description: 'APPROVED when every project approved it, REJECTED when any rejected it, SUBMITTED when all are submitted or approved, DRAFT otherwise'
+        editable:
+          type: boolean
+          description: Some project timesheet of the week is DRAFT or REJECTED (or there is none yet)
+        totalHours:
+          type: number
+        dailyTotals:
+          type: array
+          items:
+            $ref: '#/components/schemas/DailyTotal'
+        entries:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimesheetEntry'
+        sheets:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimesheetSummary'
+    RejectTimesheetRequest:
+      type: object
+      required: [comment]
+      properties:
+        comment:
+          type: string
+          minLength: 1
+          maxLength: 1000
+    CostRate:
+      type: object
+      required: [id, userId, hourlyRate, validFrom, createdAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        hourlyRate:
+          $ref: '#/components/schemas/Money'
+        validFrom:
+          type: string
+          format: date
+        createdAt:
+          type: string
+          format: date-time
+    CreateCostRateRequest:
+      type: object
+      required: [hourlyRate, validFrom]
+      properties:
+        hourlyRate:
+          $ref: '#/components/schemas/Money'
+        validFrom:
+          type: string
+          format: date
+
+    # ---------- Resources ----------
+    UtilizationBand:
+      type: string
+      description: 'Allocated ÷ capacity: below 70% UNDER, 70–100% HEALTHY, above 100% OVER'
+      enum: [UNDER, HEALTHY, OVER]
+    ResourceWeek:
+      type: object
+      required: [weekStart, capacityHours, allocatedHours, actualHours]
+      properties:
+        weekStart:
+          type: string
+          format: date
+        capacityHours:
+          type: number
+          description: Weekly hours less holidays and leave
+        allocatedHours:
+          type: number
+        actualHours:
+          type: number
+          description: Hours logged on timesheets
+        utilization:
+          type: number
+          description: Allocated ÷ capacity in percent; absent without capacity
+        band:
+          $ref: '#/components/schemas/UtilizationBand'
+    ResourceRow:
+      type: object
+      required: [user, weeks]
+      properties:
+        user:
+          $ref: '#/components/schemas/UserRef'
+        weeks:
+          type: array
+          items:
+            $ref: '#/components/schemas/ResourceWeek'
+    ResourceHeatmap:
+      type: object
+      required: [from, to, people]
+      properties:
+        from:
+          type: string
+          format: date
+        to:
+          type: string
+          format: date
+        people:
+          type: array
+          items:
+            $ref: '#/components/schemas/ResourceRow'
+    Allocation:
+      type: object
+      required: [user, projectId, weekStart, hours]
+      properties:
+        user:
+          $ref: '#/components/schemas/UserRef'
+        projectId:
+          type: string
+          format: uuid
+        weekStart:
+          type: string
+          format: date
+        hours:
+          type: number
+    AllocationInput:
+      type: object
+      required: [userId, weekStart, hours]
+      properties:
+        userId:
+          type: string
+          format: uuid
+        weekStart:
+          type: string
+          format: date
+          description: A Monday
+        hours:
+          type: number
+          minimum: 0
+          maximum: 168
+    AllocationsRequest:
+      type: object
+      required: [allocations]
+      properties:
+        allocations:
+          type: array
+          maxItems: 500
+          items:
+            $ref: '#/components/schemas/AllocationInput'
+    CapacityPeriod:
+      type: object
+      required: [hoursPerWeek, validFrom]
+      properties:
+        hoursPerWeek:
+          type: number
+        validFrom:
+          type: string
+          format: date
+    Leave:
+      type: object
+      required: [id, userId, from, to]
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        from:
+          type: string
+          format: date
+        to:
+          type: string
+          format: date
+        reason:
+          type: string
+    Capacity:
+      type: object
+      required: [userId, hoursPerWeek, history, leave]
+      properties:
+        userId:
+          type: string
+          format: uuid
+        hoursPerWeek:
+          type: number
+          description: Valid today
+        history:
+          type: array
+          items:
+            $ref: '#/components/schemas/CapacityPeriod'
+        leave:
+          type: array
+          items:
+            $ref: '#/components/schemas/Leave'
+    UpdateCapacityRequest:
+      type: object
+      required: [hoursPerWeek, validFrom]
+      properties:
+        hoursPerWeek:
+          type: number
+          minimum: 0
+          maximum: 80
+        validFrom:
+          type: string
+          format: date
+    CreateLeaveRequest:
+      type: object
+      required: [from, to]
+      properties:
+        from:
+          type: string
+          format: date
+        to:
+          type: string
+          format: date
+        reason:
+          type: string
+          maxLength: 200
+    PublicHolidaysRequest:
+      type: object
+      required: [country, year]
+      properties:
+        country:
+          type: string
+          enum: [RW]
+        year:
+          type: integer
+          format: int32
+          minimum: 2000
+          maximum: 2100
+
+    # ---------- Earned value ----------
+    PercentCompleteMethod:
+      type: string
+      description: |
+        How much of a work package's budget is earned. PHYSICAL: its percent complete (from tasks or reported);
+        ZERO_HUNDRED: nothing until complete; FIFTY_FIFTY: half once started, all when complete; STORY_POINTS:
+        the project's budget in proportion to finished story points.
+      enum: [PHYSICAL, ZERO_HUNDRED, FIFTY_FIFTY, STORY_POINTS]
+    EacMethod:
+      type: string
+      description: |
+        TYPICAL: BAC ÷ CPI (today's cost efficiency continues); ATYPICAL: AC + (BAC − EV) (the rest goes to plan);
+        COMPOSITE: AC + (BAC − EV) ÷ (CPI × SPI) (cost and schedule pressure both continue).
+      enum: [TYPICAL, ATYPICAL, COMPOSITE]
+    EvmSettings:
+      type: object
+      required: [percentCompleteMethod, eacMethod, version]
+      properties:
+        percentCompleteMethod:
+          $ref: '#/components/schemas/PercentCompleteMethod'
+        eacMethod:
+          $ref: '#/components/schemas/EacMethod'
+        version:
+          type: integer
+          format: int64
+          description: 0 until changed
+    UpdateEvmSettingsRequest:
+      type: object
+      required: [percentCompleteMethod, eacMethod]
+      properties:
+        percentCompleteMethod:
+          $ref: '#/components/schemas/PercentCompleteMethod'
+        eacMethod:
+          $ref: '#/components/schemas/EacMethod'
+    EvmUnavailable:
+      type: object
+      required: [metric, reason]
+      properties:
+        metric:
+          type: string
+          example: cpi
+        reason:
+          type: string
+          example: No actual cost yet
+    EvmReport:
+      type: object
+      required: [projectId, asOf, percentCompleteMethod, eacMethod, unratedHours, unavailable]
+      properties:
+        projectId:
+          type: string
+          format: uuid
+        asOf:
+          type: string
+          format: date
+        percentCompleteMethod:
+          $ref: '#/components/schemas/PercentCompleteMethod'
+        eacMethod:
+          $ref: '#/components/schemas/EacMethod'
+        bac:
+          allOf:
+            - $ref: '#/components/schemas/Money'
+          description: 'Budget at completion: the planned cost of the whole WBS'
+        pv:
+          allOf:
+            - $ref: '#/components/schemas/Money'
+          description: 'Planned value: the planned cost of the work scheduled up to today'
+        ev:
+          allOf:
+            - $ref: '#/components/schemas/Money'
+          description: 'Earned value: the planned cost of the work done'
+        ac:
+          allOf:
+            - $ref: '#/components/schemas/Money'
+          description: 'Actual cost: approved hours × cost rates'
+        sv:
+          allOf:
+            - $ref: '#/components/schemas/Money'
+          description: 'Schedule variance EV − PV; negative is behind'
+        cv:
+          allOf:
+            - $ref: '#/components/schemas/Money'
+          description: 'Cost variance EV − AC; negative is over budget'
+        spi:
+          type: number
+          description: EV ÷ PV; below 1 is behind schedule
+        cpi:
+          type: number
+          description: EV ÷ AC; below 1 is over budget
+        eac:
+          allOf:
+            - $ref: '#/components/schemas/Money'
+          description: 'Estimate at completion, by `eacMethod`'
+        etc:
+          allOf:
+            - $ref: '#/components/schemas/Money'
+          description: 'Estimate to complete: EAC − AC'
+        vac:
+          allOf:
+            - $ref: '#/components/schemas/Money'
+          description: 'Variance at completion: BAC − EAC'
+        tcpi:
+          type: number
+          description: '(BAC − EV) ÷ (BAC − AC): the efficiency needed to finish on budget'
+        unratedHours:
+          type: number
+          description: Approved hours without a cost rate for their day; they cost nothing in AC
+        unavailable:
+          type: array
+          items:
+            $ref: '#/components/schemas/EvmUnavailable'
+    EvmPoint:
+      type: object
+      required: [weekEnding, pv]
+      properties:
+        weekEnding:
+          type: string
+          format: date
+        pv:
+          $ref: '#/components/schemas/Money'
+        ev:
+          $ref: '#/components/schemas/Money'
+        ac:
+          $ref: '#/components/schemas/Money'
+    EvmSeries:
+      type: object
+      required: [projectId, points]
+      properties:
+        projectId:
+          type: string
+          format: uuid
+        bac:
+          $ref: '#/components/schemas/Money'
+        points:
+          type: array
+          items:
+            $ref: '#/components/schemas/EvmPoint'
+    DashboardTrendMonth:
+      type: object
+      required: [month, pv, ev, ac]
+      properties:
+        month:
+          type: string
+          example: 2026-09
+        pv:
+          $ref: '#/components/schemas/Money'
+        ev:
+          $ref: '#/components/schemas/Money'
+        ac:
+          $ref: '#/components/schemas/Money'
+        spi:
+          type: number
+        cpi:
+          type: number
+    DashboardTrends:
+      type: object
+      required: [months]
+      properties:
+        months:
+          type: array
+          items:
+            $ref: '#/components/schemas/DashboardTrendMonth'
