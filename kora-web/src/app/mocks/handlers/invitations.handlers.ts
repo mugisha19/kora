@@ -1,4 +1,4 @@
-import { delay, http } from 'msw';
+import { http } from 'msw';
 import {
   INVITATION_SORT_FIELDS,
   INVITATION_STATUSES,
@@ -15,6 +15,7 @@ import {
   authenticate,
   checkPathId,
   invalidBody,
+  latency,
   paging,
   readBody,
   reply,
@@ -57,7 +58,7 @@ function usableInvitation(token: string, r: Reply): InvitationRecord | Response 
 
 export const invitationsHandlers = [
   http.get(`${API}/invitations`, async ({ request }) => {
-    await delay();
+    await latency();
     const r = reply(request);
     const userId = authenticate(request, r);
     if (userId instanceof Response) return userId;
@@ -88,7 +89,7 @@ export const invitationsHandlers = [
   }),
 
   http.post(`${API}/invitations`, async ({ request }) => {
-    await delay();
+    await latency();
     const r = reply(request);
     const userId = authenticate(request, r);
     if (userId instanceof Response) return userId;
@@ -146,7 +147,7 @@ export const invitationsHandlers = [
   }),
 
   http.delete(`${API}/invitations/:invitationId`, async ({ request, params }) => {
-    await delay();
+    await latency();
     const r = reply(request);
     const userId = authenticate(request, r);
     if (userId instanceof Response) return userId;
@@ -169,7 +170,7 @@ export const invitationsHandlers = [
   }),
 
   http.get(`${API}/invitations/token/:token`, async ({ request, params }) => {
-    await delay();
+    await latency();
     const r = reply(request);
     const invitation = usableInvitation(String(params['token']), r);
     if (invitation instanceof Response) return invitation;
@@ -184,7 +185,7 @@ export const invitationsHandlers = [
   }),
 
   http.post(`${API}/invitations/token/:token/accept`, async ({ request, params }) => {
-    await delay();
+    await latency();
     const r = reply(request);
     const invitation = usableInvitation(String(params['token']), r);
     if (invitation instanceof Response) return invitation;

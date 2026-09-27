@@ -1,4 +1,4 @@
-import { delay, http } from 'msw';
+import { http } from 'msw';
 import { MEMBER_SORT_FIELDS, ROLES, Role } from '../../core/api/api.models';
 import { db } from '../db';
 import {
@@ -10,6 +10,7 @@ import {
   etag,
   ifMatchVersion,
   invalidBody,
+  latency,
   paging,
   readBody,
   reply,
@@ -20,7 +21,7 @@ import {
 
 export const membersHandlers = [
   http.get(`${API}/members`, async ({ request }) => {
-    await delay();
+    await latency();
     const r = reply(request);
     const userId = authenticate(request, r);
     if (userId instanceof Response) return userId;
@@ -55,7 +56,7 @@ export const membersHandlers = [
   }),
 
   http.patch(`${API}/members/:memberId`, async ({ request, params }) => {
-    await delay();
+    await latency();
     const r = reply(request);
     const userId = authenticate(request, r);
     if (userId instanceof Response) return userId;
@@ -96,7 +97,7 @@ export const membersHandlers = [
   }),
 
   http.delete(`${API}/members/:memberId`, async ({ request, params }) => {
-    await delay();
+    await latency();
     const r = reply(request);
     const userId = authenticate(request, r);
     if (userId instanceof Response) return userId;

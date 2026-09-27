@@ -1,6 +1,6 @@
-import { delay, http } from 'msw';
+import { http } from 'msw';
 import { DASHBOARD_SORT_FIELDS, HEALTHS } from '../../core/api/api.models';
-import { API, Validator, paging, reply, sortAndPage } from '../http';
+import { API, Validator, latency, paging, reply, sortAndPage } from '../http';
 import {
   dashboardRow,
   dashboardSummary,
@@ -12,7 +12,7 @@ import { caller } from './portfolio.handlers';
 
 export const dashboardHandlers = [
   http.get(`${API}/dashboard/summary`, async ({ request }) => {
-    await delay();
+    await latency();
     const r = reply(request);
     const membership = caller(request, r);
     if (membership instanceof Response) return membership;
@@ -27,7 +27,7 @@ export const dashboardHandlers = [
   }),
 
   http.get(`${API}/dashboard/projects`, async ({ request }) => {
-    await delay();
+    await latency();
     const r = reply(request);
     const membership = caller(request, r);
     if (membership instanceof Response) return membership;

@@ -1,4 +1,4 @@
-import { delay, http } from 'msw';
+import { http } from 'msw';
 import { db, must } from '../db';
 import {
   API,
@@ -7,6 +7,7 @@ import {
   clearedRefreshCookie,
   invalidBody,
   isTimeZone,
+  latency,
   readBody,
   reply,
   sessionResponse,
@@ -54,7 +55,7 @@ function slugify(name: string): string {
 
 export const authHandlers = [
   http.post(`${API}/auth/login`, async ({ request }) => {
-    await delay();
+    await latency();
     const r = reply(request);
     const body = await readBody(request);
     if (!body) return invalidBody(r);
@@ -79,7 +80,7 @@ export const authHandlers = [
   }),
 
   http.post(`${API}/auth/refresh`, async ({ request, cookies }) => {
-    await delay();
+    await latency();
     const r = reply(request);
     const presented = db.state.refreshTokens.find((t) => t.token === cookies[REFRESH_COOKIE]);
     if (!presented || presented.status === 'revoked') {
@@ -108,7 +109,7 @@ export const authHandlers = [
   }),
 
   http.post(`${API}/auth/logout`, async ({ request, cookies }) => {
-    await delay();
+    await latency();
     const presented = db.state.refreshTokens.find((t) => t.token === cookies[REFRESH_COOKIE]);
     if (presented) {
       for (const token of db.state.refreshTokens) {
@@ -120,7 +121,7 @@ export const authHandlers = [
   }),
 
   http.post(`${API}/auth/register-organization`, async ({ request }) => {
-    await delay();
+    await latency();
     const r = reply(request);
     const body = await readBody(request);
     if (!body) return invalidBody(r);
@@ -181,7 +182,7 @@ export const authHandlers = [
   }),
 
   http.post(`${API}/auth/password/forgot`, async ({ request }) => {
-    await delay();
+    await latency();
     const r = reply(request);
     const body = await readBody(request);
     if (!body) return invalidBody(r);
@@ -209,7 +210,7 @@ export const authHandlers = [
   }),
 
   http.post(`${API}/auth/password/reset`, async ({ request }) => {
-    await delay();
+    await latency();
     const r = reply(request);
     const body = await readBody(request);
     if (!body) return invalidBody(r);

@@ -1,6 +1,10 @@
 import { getResponse } from 'msw';
 import { DEMO_PASSWORD, ORG_AKAGERA } from '../app/mocks/data';
 import { handlers } from '../app/mocks/handlers';
+import { setMockLatency } from '../app/mocks/http';
+
+// Unit tests answer instantly: chained requests with simulated latency race the tests' waits.
+setMockLatency(0);
 
 /** Raw requests straight through the MSW handlers (no service worker, no Angular), for mock-API specs. */
 const BASE = 'http://localhost/api/v1';

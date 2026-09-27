@@ -1,4 +1,4 @@
-import { delay, http } from 'msw';
+import { http } from 'msw';
 import { LOCALES } from '../../core/api/api.models';
 import { db, must } from '../db';
 import {
@@ -10,6 +10,7 @@ import {
   ifMatchVersion,
   invalidBody,
   isTimeZone,
+  latency,
   readBody,
   reply,
   requireRole,
@@ -19,7 +20,7 @@ import {
 /** `/me` (not tenant-scoped) and `/organization` (the active organization). */
 export const accountHandlers = [
   http.get(`${API}/me`, async ({ request }) => {
-    await delay();
+    await latency();
     const r = reply(request);
     const userId = authenticate(request, r);
     if (userId instanceof Response) return userId;
@@ -27,7 +28,7 @@ export const accountHandlers = [
   }),
 
   http.patch(`${API}/me`, async ({ request }) => {
-    await delay();
+    await latency();
     const r = reply(request);
     const userId = authenticate(request, r);
     if (userId instanceof Response) return userId;
@@ -53,7 +54,7 @@ export const accountHandlers = [
   }),
 
   http.get(`${API}/organization`, async ({ request }) => {
-    await delay();
+    await latency();
     const r = reply(request);
     const userId = authenticate(request, r);
     if (userId instanceof Response) return userId;
@@ -64,7 +65,7 @@ export const accountHandlers = [
   }),
 
   http.patch(`${API}/organization`, async ({ request }) => {
-    await delay();
+    await latency();
     const r = reply(request);
     const userId = authenticate(request, r);
     if (userId instanceof Response) return userId;

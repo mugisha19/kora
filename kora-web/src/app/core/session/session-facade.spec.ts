@@ -46,6 +46,8 @@ describe('SessionFacade', () => {
   afterEach(() => {
     localStorage.clear();
     vi.restoreAllMocks();
+    // Also when a fake-timer test fails midway: later spec files share this worker.
+    vi.useRealTimers();
   });
 
   it('begins a session, applies the profile language and follows a safe return URL', async () => {

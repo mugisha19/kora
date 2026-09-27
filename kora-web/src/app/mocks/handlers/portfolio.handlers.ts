@@ -1,4 +1,4 @@
-import { delay, http } from 'msw';
+import { http } from 'msw';
 import { PORTFOLIO_SORT_FIELDS, Role } from '../../core/api/api.models';
 import { MembershipRecord } from '../data';
 import { PortfolioRecord, ProgramRecord } from '../data-projects';
@@ -13,6 +13,7 @@ import {
   etag,
   ifMatchVersion,
   invalidBody,
+  latency,
   paging,
   readBody,
   reply,
@@ -76,7 +77,7 @@ function programShape(v: Validator, body: Record<string, unknown>, creating: boo
 
 export const portfolioHandlers = [
   http.get(`${API}/portfolios`, async ({ request }) => {
-    await delay();
+    await latency();
     const r = reply(request);
     const membership = caller(request, r);
     if (membership instanceof Response) return membership;
@@ -101,7 +102,7 @@ export const portfolioHandlers = [
   }),
 
   http.post(`${API}/portfolios`, async ({ request }) => {
-    await delay();
+    await latency();
     const r = reply(request);
     const membership = caller(request, r);
     if (membership instanceof Response) return membership;
@@ -136,7 +137,7 @@ export const portfolioHandlers = [
   }),
 
   http.get(`${API}/portfolios/:portfolioId`, async ({ request, params }) => {
-    await delay();
+    await latency();
     const r = reply(request);
     const membership = caller(request, r);
     if (membership instanceof Response) return membership;
@@ -148,7 +149,7 @@ export const portfolioHandlers = [
   }),
 
   http.patch(`${API}/portfolios/:portfolioId`, async ({ request, params }) => {
-    await delay();
+    await latency();
     const r = reply(request);
     const membership = caller(request, r);
     if (membership instanceof Response) return membership;
@@ -187,7 +188,7 @@ export const portfolioHandlers = [
   }),
 
   http.delete(`${API}/portfolios/:portfolioId`, async ({ request, params }) => {
-    await delay();
+    await latency();
     const r = reply(request);
     const membership = caller(request, r);
     if (membership instanceof Response) return membership;
@@ -207,7 +208,7 @@ export const portfolioHandlers = [
   }),
 
   http.get(`${API}/portfolios/:portfolioId/programs`, async ({ request, params }) => {
-    await delay();
+    await latency();
     const r = reply(request);
     const membership = caller(request, r);
     if (membership instanceof Response) return membership;
@@ -224,7 +225,7 @@ export const portfolioHandlers = [
   }),
 
   http.post(`${API}/portfolios/:portfolioId/programs`, async ({ request, params }) => {
-    await delay();
+    await latency();
     const r = reply(request);
     const membership = caller(request, r);
     if (membership instanceof Response) return membership;
@@ -264,7 +265,7 @@ export const portfolioHandlers = [
   }),
 
   http.get(`${API}/programs/:programId`, async ({ request, params }) => {
-    await delay();
+    await latency();
     const r = reply(request);
     const membership = caller(request, r);
     if (membership instanceof Response) return membership;
@@ -278,7 +279,7 @@ export const portfolioHandlers = [
   }),
 
   http.patch(`${API}/programs/:programId`, async ({ request, params }) => {
-    await delay();
+    await latency();
     const r = reply(request);
     const membership = caller(request, r);
     if (membership instanceof Response) return membership;

@@ -1,4 +1,4 @@
-import { delay, http } from 'msw';
+import { http } from 'msw';
 import {
   HEALTHS,
   METHODOLOGIES,
@@ -23,6 +23,7 @@ import {
   etag,
   ifMatchVersion,
   invalidBody,
+  latency,
   paging,
   readBody,
   reply,
@@ -95,7 +96,7 @@ function checkDates(v: Validator, start: string, end: string): void {
 
 export const projectHandlers = [
   http.get(`${API}/projects`, async ({ request }) => {
-    await delay();
+    await latency();
     const r = reply(request);
     const membership = caller(request, r);
     if (membership instanceof Response) return membership;
@@ -133,7 +134,7 @@ export const projectHandlers = [
   }),
 
   http.post(`${API}/projects`, async ({ request }) => {
-    await delay();
+    await latency();
     const r = reply(request);
     const membership = caller(request, r);
     if (membership instanceof Response) return membership;
@@ -213,7 +214,7 @@ export const projectHandlers = [
   }),
 
   http.get(`${API}/projects/:projectId`, async ({ request, params }) => {
-    await delay();
+    await latency();
     const r = reply(request);
     const membership = caller(request, r);
     if (membership instanceof Response) return membership;
@@ -223,7 +224,7 @@ export const projectHandlers = [
   }),
 
   http.patch(`${API}/projects/:projectId`, async ({ request, params }) => {
-    await delay();
+    await latency();
     const r = reply(request);
     const membership = caller(request, r);
     if (membership instanceof Response) return membership;
@@ -282,7 +283,7 @@ export const projectHandlers = [
   }),
 
   http.post(`${API}/projects/:projectId/transitions`, async ({ request, params }) => {
-    await delay();
+    await latency();
     const r = reply(request);
     const membership = caller(request, r);
     if (membership instanceof Response) return membership;
@@ -316,7 +317,7 @@ export const projectHandlers = [
   }),
 
   http.put(`${API}/projects/:projectId/health-override`, async ({ request, params }) => {
-    await delay();
+    await latency();
     const r = reply(request);
     const membership = caller(request, r);
     if (membership instanceof Response) return membership;
@@ -340,7 +341,7 @@ export const projectHandlers = [
   }),
 
   http.delete(`${API}/projects/:projectId/health-override`, async ({ request, params }) => {
-    await delay();
+    await latency();
     const r = reply(request);
     const membership = caller(request, r);
     if (membership instanceof Response) return membership;
@@ -355,7 +356,7 @@ export const projectHandlers = [
   }),
 
   http.get(`${API}/projects/:projectId/members`, async ({ request, params }) => {
-    await delay();
+    await latency();
     const r = reply(request);
     const membership = caller(request, r);
     if (membership instanceof Response) return membership;
@@ -365,7 +366,7 @@ export const projectHandlers = [
   }),
 
   http.put(`${API}/projects/:projectId/members/:userId`, async ({ request, params }) => {
-    await delay();
+    await latency();
     const r = reply(request);
     const membership = caller(request, r);
     if (membership instanceof Response) return membership;
@@ -406,7 +407,7 @@ export const projectHandlers = [
   }),
 
   http.delete(`${API}/projects/:projectId/members/:userId`, async ({ request, params }) => {
-    await delay();
+    await latency();
     const r = reply(request);
     const membership = caller(request, r);
     if (membership instanceof Response) return membership;

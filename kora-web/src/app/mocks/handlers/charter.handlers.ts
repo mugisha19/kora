@@ -1,4 +1,4 @@
-import { delay, http } from 'msw';
+import { http } from 'msw';
 import { CharterMilestone, CharterObjective, Money } from '../../core/api/api.models';
 import { MembershipRecord } from '../data';
 import { CharterRecord, ProjectRecord } from '../data-projects';
@@ -11,6 +11,7 @@ import {
   etag,
   ifMatchVersion,
   invalidBody,
+  latency,
   readBody,
   reply,
 } from '../http';
@@ -88,7 +89,7 @@ function canDecide(charter: CharterRecord, membership: MembershipRecord): boolea
 
 export const charterHandlers = [
   http.get(`${API}/projects/:projectId/charter`, async ({ request, params }) => {
-    await delay();
+    await latency();
     const r = reply(request);
     const membership = caller(request, r);
     if (membership instanceof Response) return membership;
@@ -99,7 +100,7 @@ export const charterHandlers = [
   }),
 
   http.put(`${API}/projects/:projectId/charter`, async ({ request, params }) => {
-    await delay();
+    await latency();
     const r = reply(request);
     const membership = caller(request, r);
     if (membership instanceof Response) return membership;
@@ -151,7 +152,7 @@ export const charterHandlers = [
   }),
 
   http.post(`${API}/projects/:projectId/charter/submit`, async ({ request, params }) => {
-    await delay();
+    await latency();
     const r = reply(request);
     const membership = caller(request, r);
     if (membership instanceof Response) return membership;
@@ -176,7 +177,7 @@ export const charterHandlers = [
   }),
 
   http.post(`${API}/projects/:projectId/charter/approve`, async ({ request, params }) => {
-    await delay();
+    await latency();
     const r = reply(request);
     const membership = caller(request, r);
     if (membership instanceof Response) return membership;
@@ -200,7 +201,7 @@ export const charterHandlers = [
   }),
 
   http.post(`${API}/projects/:projectId/charter/return`, async ({ request, params }) => {
-    await delay();
+    await latency();
     const r = reply(request);
     const membership = caller(request, r);
     if (membership instanceof Response) return membership;
@@ -224,7 +225,7 @@ export const charterHandlers = [
   }),
 
   http.get(`${API}/projects/:projectId/charter/versions`, async ({ request, params }) => {
-    await delay();
+    await latency();
     const r = reply(request);
     const membership = caller(request, r);
     if (membership instanceof Response) return membership;

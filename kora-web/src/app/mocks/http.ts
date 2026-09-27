@@ -1,10 +1,25 @@
-import { HttpResponse, JsonBodyType } from 'msw';
+import { HttpResponse, JsonBodyType, delay } from 'msw';
 import { ErrorCode, ProblemFieldError, Role } from '../core/api/api.models';
 import { BREACHED_PASSWORDS } from './data';
 import { db } from './db';
 
 /** Matches the API on any origin (browser worker and unit tests alike). */
 export const API = '*/api/v1';
+
+/**
+ * Simulated server latency: MSW's realistic 100–400 ms in the browser (so loading states are
+ * visible), none in unit tests (several chained requests would otherwise race the tests' waits).
+ */
+let latencyMs: number | undefined;
+
+export function setMockLatency(ms: number | undefined): void {
+  latencyMs = ms;
+}
+
+/** Every handler awaits this before answering. */
+export function latency(): Promise<void> {
+  return latencyMs === undefined ? delay() : delay(latencyMs);
+}
 
 export const ACCESS_TOKEN_SECONDS = 900;
 export const REFRESH_COOKIE = 'kora_refresh';

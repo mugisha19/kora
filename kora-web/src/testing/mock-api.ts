@@ -27,6 +27,10 @@ import { SessionStore } from '../app/core/session/session.store';
 import { DEMO_PASSWORD } from '../app/mocks/data';
 import { db } from '../app/mocks/db';
 import { handlers } from '../app/mocks/handlers';
+import { setMockLatency } from '../app/mocks/http';
+
+// Unit tests answer instantly: chained requests with simulated latency race the tests' waits.
+setMockLatency(0);
 
 /**
  * An HttpBackend that answers from the MSW mock API in-process: requests go through the real

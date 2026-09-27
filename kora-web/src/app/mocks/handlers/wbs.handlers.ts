@@ -1,4 +1,4 @@
-import { delay, http } from 'msw';
+import { http } from 'msw';
 import { WBS_MAX_DEPTH, WbsNodeType } from '../../core/api/api.models';
 import { MembershipRecord } from '../data';
 import { ProjectRecord, WbsNodeRecord } from '../data-projects';
@@ -13,6 +13,7 @@ import {
   etag,
   ifMatchVersion,
   invalidBody,
+  latency,
   readBody,
   reply,
 } from '../http';
@@ -114,7 +115,7 @@ function subtreeIds(nodeId: string): string[] {
 
 export const wbsHandlers = [
   http.get(`${API}/projects/:projectId/wbs`, async ({ request, params }) => {
-    await delay();
+    await latency();
     const r = reply(request);
     const membership = caller(request, r);
     if (membership instanceof Response) return membership;
@@ -124,7 +125,7 @@ export const wbsHandlers = [
   }),
 
   http.post(`${API}/projects/:projectId/wbs/nodes`, async ({ request, params }) => {
-    await delay();
+    await latency();
     const r = reply(request);
     const membership = caller(request, r);
     if (membership instanceof Response) return membership;
@@ -170,7 +171,7 @@ export const wbsHandlers = [
   }),
 
   http.patch(`${API}/wbs/nodes/:nodeId`, async ({ request, params }) => {
-    await delay();
+    await latency();
     const r = reply(request);
     const membership = caller(request, r);
     if (membership instanceof Response) return membership;
@@ -219,7 +220,7 @@ export const wbsHandlers = [
   }),
 
   http.delete(`${API}/wbs/nodes/:nodeId`, async ({ request, params }) => {
-    await delay();
+    await latency();
     const r = reply(request);
     const membership = caller(request, r);
     if (membership instanceof Response) return membership;
@@ -245,7 +246,7 @@ export const wbsHandlers = [
   }),
 
   http.post(`${API}/wbs/nodes/:nodeId/move`, async ({ request, params }) => {
-    await delay();
+    await latency();
     const r = reply(request);
     const membership = caller(request, r);
     if (membership instanceof Response) return membership;
