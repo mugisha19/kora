@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Every report's layout (feature 21). Thymeleaf in XML mode escapes every value; Flying Saucer prints it. -->
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" th:attr="lang=${lang}">
+<head>
+    <title th:text="${title}">Report</title>
+    <style type="text/css">
+        @page {
+            size: A4 landscape;
+            margin: 16mm 14mm 18mm 14mm;
+            @bottom-left {
+                content: element(footer);
+            }
+            @bottom-right {
+                content: counter(page) " / " counter(pages);
+                font-family: 'Liberation Sans', sans-serif;
+                font-size: 8pt;
+                color: #7b8794;
+            }
+        }
+        body { font-family: 'Liberation Sans', sans-serif; font-size: 9pt; color: #1f2933; }
+        .footer { position: running(footer); font-size: 8pt; color: #7b8794; }
+        h1 { font-size: 18pt; margin: 0 0 2pt 0; color: #0b3d5c; }
+        .subject { font-size: 11pt; margin: 0 0 8pt 0; color: #334e68; }
+        h2 { font-size: 11pt; margin: 14pt 0 4pt 0; color: #0b3d5c; border-bottom: 1px solid #9fb3c8;
+             padding-bottom: 2pt; page-break-after: avoid; }
+        table { border-collapse: collapse; }
+        table.data { width: 100%; -fs-table-paginate: paginate; }
+        thead { display: table-header-group; }
+        th { text-align: left; background-color: #e4ecf4; padding: 3pt 4pt; font-size: 8pt; }
+        td { padding: 2.5pt 4pt; border-bottom: 1px solid #e1e7ec; vertical-align: top; }
+        td.num { text-align: right; }
+        tr { page-break-inside: avoid; }
+        table.facts td { border-bottom: none; padding: 1.5pt 12pt 1.5pt 0; }
+        table.facts td.label { font-weight: bold; }
+        table.about { color: #52606d; font-size: 8pt; margin-bottom: 4pt; }
+        .empty { color: #7b8794; font-style: italic; }
+    </style>
+</head>
+<body>
+<div class="footer" th:text="${footer}">Kora</div>
+<h1 th:text="${title}">Title</h1>
+<p class="subject" th:text="${subject}">Subject</p>
+<table class="facts about">
+    <tr th:each="fact : ${about}">
+        <td class="label" th:text="${fact.key}">Label</td>
+        <td th:text="${fact.value}">Value</td>
+    </tr>
+</table>
+<th:block th:each="section : ${sections}">
+    <h2 th:text="${section.title()}">Section</h2>
+    <table class="facts" th:unless="${section.facts().isEmpty()}">
+        <tr th:each="fact : ${section.facts()}">
+            <td class="label" th:text="${fact.key}">Label</td>
+            <td th:text="${fact.value}">Value</td>
+        </tr>
+    </table>
+    <th:block th:unless="${section.headers().isEmpty()}">
+        <table class="data" th:unless="${section.rows().isEmpty()}">
+            <thead>
+            <tr>
+                <th th:each="header : ${section.headers()}" th:text="${header}">Header</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="row : ${section.rows()}">
+                <td th:each="cell : ${row.cells()}" th:text="${cell.text()}" th:class="${cell.numeric()} ? 'num' : null">
+                    Value
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <p class="empty" th:if="${section.rows().isEmpty()}" th:text="${section.emptyText()}">None</p>
+    </th:block>
+</th:block>
+</body>
+</html>
