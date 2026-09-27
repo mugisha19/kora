@@ -1,9 +1,11 @@
 package com.kora.schedule.application;
 
 import com.kora.organization.CurrentMember;
+import com.kora.platform.error.ConflictException;
 import com.kora.portfolio.ProjectAccess;
 import com.kora.portfolio.ProjectRef;
 import com.kora.schedule.SchedulePlanning;
+import com.kora.schedule.ScheduleQueries;
 import com.kora.schedule.application.ProjectSchedule.Row;
 import com.kora.schedule.domain.Baseline;
 import com.kora.schedule.domain.BaselineTask;
@@ -13,11 +15,13 @@ import com.kora.schedule.domain.SchedulingStrategy;
 import com.kora.schedule.domain.SchedulingStrategy.Activity;
 import com.kora.schedule.domain.SchedulingStrategy.Schedule;
 import com.kora.schedule.domain.SchedulingStrategy.Timing;
+import com.kora.schedule.domain.WorkingCalendar;
 import com.kora.schedule.domain.WorkingDays;
 import com.kora.work.SchedulableTask;
 import com.kora.work.WorkQueries;
 import java.time.Clock;
 import java.time.LocalDate;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -32,7 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
  * calculation linear, so a stored copy would only add a way to be stale. Baselines are the one thing stored.
  */
 @Service
-public class ScheduleService implements SchedulePlanning {
+public class ScheduleService implements SchedulePlanning, ScheduleQueries {
 
     /** A task nobody gave a duration still takes a day, so it shows on the chart and its links mean something. */
     static final int DEFAULT_DURATION = 1;
@@ -91,6 +95,42 @@ public class ScheduleService implements SchedulePlanning {
         }
         record(project, savedBy);
         return true;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Map<UUID, DateRange> baselineWindows(UUID projectId) {
+        return baselines
+                .findFirstByProjectIdOrderByNumberDesc(projectId)
+                .map(baseline -> baselineTasks.findByBaselineId(baseline.getId()).stream()
+                        .collect(Collectors.toMap(
+                                BaselineTask::getTaskId,
+                                task -> new DateRange(task.getStartDate(), task.getFinishDate()))))
+                .orElse(Map.of());
+    }
+
+    /** Only the project's id and start date are needed to compute its schedule. */
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<LocalDate> forecastFinish(UUID projectId, LocalDate projectStart) {
+        try {
+            return Optional.ofNullable(
+                    compute(new ProjectRef(projectId, null, null, null, null, null, projectStart, null))
+                            .projectFinish());
+        } catch (ConflictException loop) {
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public WorkingWeek workingWeek() {
+        WorkingCalendar current = calendar.current();
+        return new WorkingWeek(
+                EnumSet.copyOf(current.getWorkingDays()),
+                current.getHolidays().stream()
+                        .map(WorkingCalendar.Holiday::date)
+                        .collect(Collectors.toSet()));
     }
 
     private Baseline record(ProjectRef project, UUID savedBy) {
