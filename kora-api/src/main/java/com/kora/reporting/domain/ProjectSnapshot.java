@@ -94,6 +94,25 @@ public class ProjectSnapshot {
     @Column(nullable = false)
     private boolean late;
 
+    @Column(name = "pv_amount")
+    private BigDecimal pvAmount;
+
+    @Column(name = "evm_ev_amount")
+    private BigDecimal evmEvAmount;
+
+    @Column(name = "actual_cost_amount")
+    private BigDecimal actualCostAmount;
+
+    private BigDecimal spi;
+
+    private BigDecimal cpi;
+
+    @Column(name = "open_critical_risks", nullable = false)
+    private int openCriticalRisks;
+
+    @Column(name = "pending_change_requests", nullable = false)
+    private int pendingChangeRequests;
+
     @Column(name = "refreshed_at", nullable = false)
     private Instant refreshedAt;
 
@@ -129,7 +148,28 @@ public class ProjectSnapshot {
             boolean healthOverridden,
             boolean late) {}
 
-    public void refresh(Values values, Instant now) {
+    /**
+     * Earned value (feature 17) and governance (features 11, 14) figures.
+     *
+     * @param ev null when the project's percent-complete method has nothing to measure with
+     */
+    public record Performance(
+            Money pv,
+            Money ev,
+            Money actualCost,
+            BigDecimal spi,
+            BigDecimal cpi,
+            int openCriticalRisks,
+            int pendingChangeRequests) {}
+
+    public void refresh(Values values, Performance performance, Instant now) {
+        this.pvAmount = performance.pv().amount();
+        this.evmEvAmount = performance.ev() == null ? null : performance.ev().amount();
+        this.actualCostAmount = performance.actualCost().amount();
+        this.spi = performance.spi();
+        this.cpi = performance.cpi();
+        this.openCriticalRisks = performance.openCriticalRisks();
+        this.pendingChangeRequests = performance.pendingChangeRequests();
         this.portfolioId = values.portfolioId();
         this.programId = values.programId();
         this.code = values.code();
@@ -216,6 +256,34 @@ public class ProjectSnapshot {
 
     public boolean isHealthOverridden() {
         return healthOverridden;
+    }
+
+    public Money getPlannedValue() {
+        return pvAmount == null ? null : new Money(pvAmount, currency);
+    }
+
+    public Money getEvmEarnedValue() {
+        return evmEvAmount == null ? null : new Money(evmEvAmount, currency);
+    }
+
+    public Money getActualCost() {
+        return actualCostAmount == null ? null : new Money(actualCostAmount, currency);
+    }
+
+    public BigDecimal getSpi() {
+        return spi;
+    }
+
+    public BigDecimal getCpi() {
+        return cpi;
+    }
+
+    public int getOpenCriticalRisks() {
+        return openCriticalRisks;
+    }
+
+    public int getPendingChangeRequests() {
+        return pendingChangeRequests;
     }
 
     public boolean isLate() {

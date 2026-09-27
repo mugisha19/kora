@@ -9,6 +9,8 @@ import com.kora.portfolio.Health;
 import com.kora.reporting.application.DashboardService;
 import com.kora.reporting.application.DashboardService.Summary;
 import com.kora.reporting.domain.ProjectSnapshot;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -35,7 +37,7 @@ class DashboardController {
         this.members = members;
     }
 
-    /** Figures from later phases (SPI, CPI, risks, change requests) are absent rather than null or zero. */
+    /** Indices that would divide by zero are absent rather than null or zero. */
     record DashboardSummaryResponse(
             int projectCount,
             Map<String, Integer> byStatus,
@@ -43,7 +45,17 @@ class DashboardController {
             MoneyJson totalBudget,
             MoneyJson totalPlannedCost,
             MoneyJson totalEarnedValue,
-            int lateProjects) {}
+            MoneyJson totalActualCost,
+            int lateProjects,
+            BigDecimal portfolioSpi,
+            BigDecimal portfolioCpi,
+            int openCriticalRisks,
+            int pendingChangeRequests) {}
+
+    record DashboardTrendMonthResponse(
+            String month, MoneyJson pv, MoneyJson ev, MoneyJson ac, BigDecimal spi, BigDecimal cpi) {}
+
+    record DashboardTrendsResponse(List<DashboardTrendMonthResponse> months) {}
 
     record NextMilestone(String name, LocalDate targetDate) {}
 
@@ -59,7 +71,9 @@ class DashboardController {
             boolean healthOverridden,
             BigDecimal percentComplete,
             LocalDate targetEndDate,
-            NextMilestone nextMilestone) {}
+            NextMilestone nextMilestone,
+            BigDecimal spi,
+            BigDecimal cpi) {}
 
     @GetMapping("/summary")
     DashboardSummaryResponse summary(@RequestParam(name = "portfolioId", required = false) UUID portfolioId) {
@@ -71,7 +85,27 @@ class DashboardController {
                 MoneyJson.from(summary.totalBudget()),
                 MoneyJson.from(summary.totalPlannedCost()),
                 MoneyJson.from(summary.totalEarnedValue()),
-                summary.lateProjects());
+                MoneyJson.from(summary.totalActualCost()),
+                summary.lateProjects(),
+                summary.portfolioSpi(),
+                summary.portfolioCpi(),
+                summary.openCriticalRisks(),
+                summary.pendingChangeRequests());
+    }
+
+    @GetMapping("/trends")
+    DashboardTrendsResponse trends(
+            @RequestParam(name = "months", defaultValue = "6") @Min(1) @Max(24) int months,
+            @RequestParam(name = "portfolioId", required = false) UUID portfolioId) {
+        return new DashboardTrendsResponse(dashboard.trends(months, portfolioId).stream()
+                .map(month -> new DashboardTrendMonthResponse(
+                        month.month().toString(),
+                        MoneyJson.from(month.pv()),
+                        MoneyJson.from(month.ev()),
+                        MoneyJson.from(month.ac()),
+                        month.spi(),
+                        month.cpi()))
+                .toList());
     }
 
     @GetMapping("/projects")
@@ -103,6 +137,8 @@ class DashboardController {
                 row.getTargetEndDate(),
                 row.getNextMilestoneName() == null
                         ? null
-                        : new NextMilestone(row.getNextMilestoneName(), row.getNextMilestoneDate()));
+                        : new NextMilestone(row.getNextMilestoneName(), row.getNextMilestoneDate()),
+                row.getSpi(),
+                row.getCpi());
     }
 }
