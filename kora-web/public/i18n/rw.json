@@ -10,7 +10,9 @@
     "openMenu": "Fungura urutonde",
     "dashboard": "Ikibaho",
     "settings": "Igenamiterere",
-    "admin": "Ubuyobozi"
+    "admin": "Ubuyobozi",
+    "portfolios": "Portefeuye",
+    "projects": "Imishinga"
   },
   "theme": {
     "label": "Isura",
@@ -35,7 +37,15 @@
     "errorTitle": "Habaye ikibazo",
     "errorMessage": "Ntibyashobotse gufungura ibi. Genzura interineti yawe wongere ugerageze.",
     "dismiss": "Funga",
-    "loadingBar": "Birimo gufunguka"
+    "loadingBar": "Birimo gufunguka",
+    "save": "Bika",
+    "edit": "Hindura",
+    "more": "Ibindi",
+    "moreActions": "Ibindi bikorwa",
+    "reload": "Ongera ufungure",
+    "optional": "Si ngombwa",
+    "onePerLine": "Kimwe ku murongo",
+    "undo": "Subiza uko byari"
   },
   "status": {
     "success": "Biragenda neza",
@@ -46,9 +56,41 @@
   },
   "dashboard": {
     "title": "Ikibaho",
-    "subtitle": "Imishinga ikeneye kwitabwaho, n'impamvu.",
-    "emptyTitle": "Incamake y'imishinga yawe izagaragara hano",
-    "emptyMessage": "Uko imishinga ihagaze, iyubahirizwa ry'igihe n'ingengo y'imari, ibyago by'ingenzi n'ibyemezo bitegerejwe ku mishinga ushobora kubona."
+    "subtitle": "Imishinga ikeneye kwitabwaho, n’impamvu.",
+    "emptyTitle": "Nta kintu cyo kwerekana kiraboneka",
+    "emptyMessage": "Imishinga ushobora kubona izavunagurirwa hano.",
+    "kpis": {
+      "title": "Imibare y’ingenzi",
+      "active": "Imishinga ikora",
+      "ofTotal": "mu mishinga {{ total }}",
+      "onTrack": "Biri ku murongo",
+      "onTrackNote": "Igice cy’imishinga yasuzumwe iri ku murongo",
+      "late": "Imishinga yatinze",
+      "lateNote": "Irenze itariki yo kurangiza iteganyijwe",
+      "budget": "Ingengo y’imari yose",
+      "planned": "{{ amount }} biteganyijwe muri WBS",
+      "earned": "Agaciro kagezweho",
+      "earnedNote": "Ikiguzi giteganyijwe cy’imirimo yakozwe",
+      "spiCpi": "SPI / CPI",
+      "risks": "Ingaruka zikomeye zitarakemurwa",
+      "changes": "Ubusabe bw’impinduka butegereje",
+      "later": "Bizaboneka mu ivugururwa rizaza"
+    },
+    "charts": {
+      "title": "Isaranganya",
+      "health": "Imishinga hakurikijwe uko imeze",
+      "status": "Imishinga hakurikijwe aho igeze",
+      "count": "Imishinga"
+    },
+    "attention": {
+      "title": "Ikeneye kwitabwaho",
+      "subtitle": "Imishinga imeze nabi ibanza. Hitamo inkingi kugira ngo utondeke ukundi.",
+      "none": "Nta mushinga uhuye n’ibyo washatse.",
+      "progress": "Byarangiye",
+      "nextMilestone": "Intambwe ikurikira"
+    },
+    "spi": "Igipimo cyo kubahiriza igihe",
+    "cpi": "Igipimo cyo kubahiriza ikiguzi"
   },
   "settings": {
     "title": "Igenamiterere",
@@ -154,6 +196,31 @@
       "unknown": "Habaye ikibazo. Ongera ugerageze.",
       "organization": {
         "currency_locked": "Ifaranga ntirishobora guhinduka: hari imishinga isanzwe ifite ingengo y'imari mu ifaranga riri."
+      },
+      "portfolios": {
+        "archived": "Iyi portefeuye yarabitswe. Banza uyisubizeho.",
+        "not_empty": "Portefeuye irimo ubusa ni yo yonyine isibwa. Banza wimure cyangwa usibe porogaramu n’imishinga biyirimo."
+      },
+      "projects": {
+        "code_taken": "Undi mushinga usanzwe ukoresha iyi kode.",
+        "invalid_transition": "Umushinga ntushobora kujya kuri iyo ntera uvuye aho uri ubu.",
+        "charter_approval_required": "Umushinga wemezwa iyo amasezerano yawo (charter) yemejwe.",
+        "methodology_locked": "Uburyo bw’imikorere buhindurwa gusa igihe umushinga ukiri icyifuzo."
+      },
+      "project_members": {
+        "is_manager": "Umuyobozi w’umushinga ntashobora gukurwa mu itsinda."
+      },
+      "charters": {
+        "not_draft": "Charter iri mu nyandiko y’agateganyo ni yo yonyine ihindurwa.",
+        "not_submitted": "Charter ntiri gutegereza kwemezwa.",
+        "incomplete": "Mbere yo kohereza charter, igomba kuba ifite:"
+      },
+      "wbs": {
+        "parent_not_deliverable": "Ibice byongerwa munsi y’igisubizo (deliverable) gusa.",
+        "too_deep": "WBS ntishobora kurenza inzego 8.",
+        "cycle": "Igice ntigishobora kwimurirwa munsi yacyo ubwacyo.",
+        "has_children": "Gifite ibindi bice munsi yacyo: banza ubisibe, cyangwa usibe byose hamwe.",
+        "type_change_not_allowed": "Igice gifite ibindi munsi yacyo kigomba kuguma ari igisubizo (deliverable)."
       }
     },
     "fields": {
@@ -170,7 +237,11 @@
       "invalid_allowed": "Hagomba kuba kimwe muri ibi: {{ allowed }}.",
       "password": {
         "breached": "Iri jambo ry’ibanga ryagaragaye mu makuru yibwe. Hitamo irindi."
-      }
+      },
+      "tooManyLines": "Imirongo 50 gusa ntarengwa.",
+      "lineTooLong": "Buri murongo ntugomba kurenza inyuguti 500.",
+      "amount": "Andika amafaranga, urugero 1 250 000 cyangwa 99.90.",
+      "number": "Andika umubare ufite ibice bibiri nyuma y’akadomo ntarengwa."
     }
   },
   "roles": {
@@ -332,5 +403,380 @@
     "lastPage": "Paji ya nyuma",
     "range": "{{ start }}–{{ end }} kuri {{ total }}",
     "rangeEmpty": "0 kuri {{ total }}"
+  },
+  "health": {
+    "GREEN": "Biri ku murongo",
+    "AMBER": "Biri mu kaga",
+    "RED": "Byaratinze cyane",
+    "GREY": "Ntibyasuzumwe",
+    "overriddenLabel": "{{ health }} (byahinduwe)"
+  },
+  "projectStatus": {
+    "PROPOSED": "Byasabwe",
+    "APPROVED": "Byemejwe",
+    "IN_PROGRESS": "Birakorwa",
+    "ON_HOLD": "Byahagaritswe by’agateganyo",
+    "CLOSING": "Birasozwa",
+    "CLOSED": "Byarasojwe",
+    "CANCELLED": "Byarahagaritswe"
+  },
+  "methodology": {
+    "AGILE": {
+      "name": "Agile",
+      "hint": "Urutonde rw’imirimo n’ibyiciro (sprints) ku kibaho."
+    },
+    "PREDICTIVE": {
+      "name": "Iteganyijwe",
+      "hint": "Ingengabihe iteganyijwe ifite imirimo ishingiye ku yindi."
+    },
+    "HYBRID": {
+      "name": "Ivanze",
+      "hint": "Byombi: ikibaho n’ingengabihe."
+    }
+  },
+  "portfolioStatus": {
+    "ACTIVE": "Irakora",
+    "ARCHIVED": "Yabitswe"
+  },
+  "programStatus": {
+    "ACTIVE": "Irakora",
+    "CLOSED": "Yarasojwe"
+  },
+  "projectRole": {
+    "MANAGER": "Umuyobozi",
+    "CONTRIBUTOR": "Umukozi",
+    "OBSERVER": "Indorerezi"
+  },
+  "projectRoleHints": {
+    "CONTRIBUTOR": "Akora imirimo kandi ashobora kuyivugurura.",
+    "OBSERVER": "Abona umushinga ariko ntashobora kuwuhindura."
+  },
+  "charterStatus": {
+    "DRAFT": "Inyandiko y’agateganyo",
+    "SUBMITTED": "Itegereje kwemezwa",
+    "APPROVED": "Yemejwe",
+    "SUPERSEDED": "Yasimbuwe"
+  },
+  "wbsType": {
+    "DELIVERABLE": "Igisubizo",
+    "WORK_PACKAGE": "Icyiciro cy’imirimo"
+  },
+  "portfolios": {
+    "title": "Portefeuye",
+    "subtitle": "Imishinga ishyizwe hamwe hakurikijwe intego z’igihe kirekire.",
+    "detailTitle": "Portefeuye",
+    "create": "Portefeuye nshya",
+    "createTitle": "Portefeuye nshya",
+    "editTitle": "Hindura portefeuye",
+    "search": "Shakisha portefeuye",
+    "statusFilter": "Erekana portefeuye",
+    "filter": {
+      "ACTIVE": "Izikora",
+      "ARCHIVED": "Izabitswe",
+      "ALL": "Zose"
+    },
+    "emptyTitle": "Nta portefeuye irahari",
+    "emptyMessage": "Portefeuye zizagaragara hano PMO imaze kuzikora.",
+    "emptyMessageManager": "Kora portefeuye kugira ngo uhurize imishinga ku ntego imwe.",
+    "fields": {
+      "name": "Izina",
+      "description": "Ibisobanuro",
+      "objectives": "Intego z’igihe kirekire",
+      "owner": "Nyirayo",
+      "programs": "Porogaramu",
+      "projects": "Imishinga",
+      "status": "Uko ihagaze"
+    },
+    "backToList": "Portefeuye zose",
+    "summary": "Incamake",
+    "archivedNotice": "Iyi portefeuye yarabitswe; irasomwa gusa. Yisubizeho kugira ngo uyihindure.",
+    "programsAndProjects": "Porogaramu n’imishinga",
+    "withoutProgram": "Bitari muri porogaramu",
+    "noProjectsTitle": "Nta porogaramu cyangwa umushinga birahari",
+    "noProjectsMessage": "Ongeramo porogaramu cyangwa ukore umushinga muri iyi portefeuye.",
+    "created": "Portefeuye “{{ name }}” yakozwe.",
+    "saved": "Portefeuye “{{ name }}” yabitswe.",
+    "archive": "Bika mu bubiko",
+    "archiveTitle": "Gushyira “{{ name }}” mu bubiko?",
+    "archiveMessage": "Portefeuye iri mu bubiko irasomwa gusa: nta porogaramu cyangwa umushinga mushya, nta mpinduka. Ushobora kuyisubizaho nyuma.",
+    "archived": "Portefeuye “{{ name }}” yashyizwe mu bubiko.",
+    "reactivate": "Subizaho",
+    "reactivateTitle": "Gusubizaho “{{ name }}”?",
+    "reactivateMessage": "Portefeuye izongera guhindurwa.",
+    "reactivated": "Portefeuye “{{ name }}” yasubijweho.",
+    "deleteTitle": "Gusiba “{{ name }}”?",
+    "deleteMessage": "Ibi ntibishobora gusubizwa inyuma.",
+    "deleted": "Portefeuye “{{ name }}” yasibwe.",
+    "deleteNotEmpty": "Siba (iyo irimo ubusa gusa)",
+    "notFoundTitle": "Portefeuye ntibonetse",
+    "notFoundMessage": "Ntiriho cyangwa yasibwe."
+  },
+  "programs": {
+    "create": "Porogaramu nshya",
+    "createTitle": "Porogaramu nshya",
+    "editTitle": "Hindura porogaramu",
+    "editNamed": "Hindura porogaramu {{ name }}",
+    "fields": {
+      "name": "Izina",
+      "description": "Ibisobanuro",
+      "manager": "Umuyobozi wa porogaramu",
+      "status": "Uko ihagaze"
+    },
+    "managedBy": "Iyobowe na {{ name }}",
+    "noProjects": "Nta mushinga uri muri iyi porogaramu.",
+    "created": "Porogaramu “{{ name }}” yakozwe.",
+    "saved": "Porogaramu “{{ name }}” yabitswe."
+  },
+  "projects": {
+    "title": "Imishinga",
+    "subtitle": "Imishinga yose ushobora kubona, n’uko ihagaze.",
+    "search": "Shakisha ukoresheje izina cyangwa kode",
+    "count": "Imishinga {{ count }}",
+    "create": "Umushinga mushya",
+    "createTitle": "Umushinga mushya",
+    "createSubtitle": "Tangira n’iby’ingenzi; charter izakurikiraho.",
+    "editTitle": "Hindura umushinga",
+    "workspaceTitle": "Umushinga",
+    "backToList": "Imishinga yose",
+    "noProgram": "Nta porogaramu",
+    "fields": {
+      "code": "Kode",
+      "name": "Izina",
+      "description": "Ibisobanuro",
+      "portfolio": "Portefeuye",
+      "program": "Porogaramu",
+      "manager": "Umuyobozi w’umushinga",
+      "methodology": "Uburyo bw’imikorere",
+      "status": "Aho bigeze",
+      "health": "Uko umushinga umeze",
+      "startDate": "Itariki yo gutangira",
+      "targetEndDate": "Itariki yo kurangiza iteganyijwe",
+      "budget": "Ingengo y’imari"
+    },
+    "hints": {
+      "code": "Inyuguti nkuru, imibare n’udukoni, urugero AKG-012.",
+      "methodologyLocked": "Uburyo bw’imikorere ntibuhindurwa iyo umushinga umaze kwemezwa."
+    },
+    "errors": {
+      "endBeforeStart": "Itariki yo kurangiza igomba kuba nyuma y’itariki yo gutangira."
+    },
+    "filters": {
+      "allPortfolios": "Portefeuye zose",
+      "allStatuses": "Aho bigeze hose",
+      "allMethodologies": "Uburyo bwose",
+      "allHealth": "Uko byaba bimeze kose",
+      "clear": "Kuraho ibyatoranyijwe"
+    },
+    "emptyTitle": "Nta mushinga urahari",
+    "emptyMessage": "Imishinga urimo izagaragara hano.",
+    "emptyMessageManager": "Kora umushinga kugira ngo utangire.",
+    "noMatchTitle": "Nta mushinga uhuye n’ibyo washatse",
+    "noMatchMessage": "Gerageza ibindi byo gutoranya.",
+    "created": "Umushinga “{{ name }}” wakozwe.",
+    "saved": "Umushinga “{{ name }}” wabitswe.",
+    "notFoundTitle": "Umushinga ntubonetse",
+    "notFoundMessage": "Ntuhari, cyangwa ntuba mu itsinda ryawo."
+  },
+  "workspace": {
+    "tabsLabel": "Ibice by’umushinga",
+    "tabs": {
+      "overview": "Incamake",
+      "charter": "Charter",
+      "wbs": "WBS",
+      "board": "Ikibaho cy’imirimo",
+      "backlog": "Urutonde rw’imirimo",
+      "schedule": "Ingengabihe"
+    },
+    "overview": {
+      "details": "Ibisobanuro birambuye"
+    },
+    "lifecycle": {
+      "title": "Ibyiciro by’umushinga",
+      "current": "Aho bigeze ubu:",
+      "needsCharter": "Umushinga wasabwe wemezwa iyo charter yawo yemejwe:",
+      "final": "Uyu mushinga warangiye; aho ugeze ntihahinduka.",
+      "moveTo": "Jyana kuri {{ status }}",
+      "dialogTitle": "Kujyana kuri {{ status }}?",
+      "confirm": "Jyana kuri {{ status }}",
+      "reason": "Impamvu",
+      "reasonOptional": "Impamvu (si ngombwa)",
+      "moved": "Umushinga ubu uri kuri {{ status }}.",
+      "explain": {
+        "PROPOSED": "“{{ name }}” usubira ku cyifuzo.",
+        "APPROVED": "“{{ name }}” uzemezwa.",
+        "IN_PROGRESS": "Imirimo kuri “{{ name }}” iratangira cyangwa irakomeza.",
+        "ON_HOLD": "Imirimo kuri “{{ name }}” irahagarara by’agateganyo. Vuga impamvu kugira ngo itsinda n’umuterankunga babimenye.",
+        "CLOSING": "“{{ name }}” ugiye gusozwa: rangiza kandi ushyikirize.",
+        "CLOSED": "“{{ name }}” uzasozwa burundu.",
+        "CANCELLED": "“{{ name }}” uzahagarikwa burundu; vuga impamvu."
+      }
+    },
+    "health": {
+      "override": "Hindura uko umushinga umeze",
+      "clear": "Koresha ibyabazwe",
+      "dialogTitle": "Hindura uko umushinga umeze",
+      "explain": "Isuzuma ryawe risimbura iryabazwe kugeza urikuyeho. Buri wese abona impamvu yawe.",
+      "reason": "Impamvu",
+      "reasonHint": "Urugero: utanga ibikoresho w’ingenzi yatinze amezi atatu.",
+      "save": "Hindura",
+      "overridden": "Uko umushinga umeze byahinduwe.",
+      "cleared": "Uko umushinga umeze byongeye kubarwa."
+    },
+    "team": {
+      "title": "Itsinda",
+      "add": "Ongeramo umunyamuryango",
+      "addTitle": "Ongera umuntu mu itsinda",
+      "person": "Umuntu",
+      "role": "Uruhare mu mushinga",
+      "everyoneIn": "Abagize ikigo bose basanzwe mu itsinda.",
+      "changeRole": "Uruhare rwa {{ name }} mu mushinga",
+      "remove": "Kura {{ name }} mu itsinda",
+      "removeTitle": "Gukura {{ name }}?",
+      "removeMessage": "{{ name }} ntazongera kubona uyu mushinga keretse uruhare rwe mu kigo rubimwemerera.",
+      "removeConfirm": "Kuramo",
+      "removed": "{{ name }} yakuwe mu itsinda."
+    },
+    "comingSoon": {
+      "board": {
+        "title": "Ikibaho cy’imirimo kiraza vuba",
+        "message": "Imirimo n’ikibaho cya Kanban bizaza mu ivugururwa rikurikira."
+      },
+      "backlog": {
+        "title": "Urutonde rw’imirimo ruraza vuba",
+        "message": "Urutonde rw’imirimo n’ibyiciro (sprints) bizaza mu ivugururwa rikurikira."
+      },
+      "schedule": {
+        "title": "Ingengabihe iraza vuba",
+        "message": "Imirimo ishingiye ku yindi, igishushanyo cya Gantt n’inzira y’ingenzi bizaza nyuma."
+      }
+    }
+  },
+  "charter": {
+    "title": "Charter y’umushinga",
+    "submit": "Ohereza ngo yemezwe",
+    "approve": "Emeza",
+    "return": "Subiza mu nyandiko y’agateganyo",
+    "returnTitle": "Gusubiza charter",
+    "returnComment": "Ni iki gikwiye guhinduka?",
+    "print": "Capa",
+    "notSet": "Ntibyashyizweho",
+    "noSponsor": "Nta muterankunga urashyirwaho",
+    "saved": "Charter yabitswe.",
+    "submitted": "Charter yoherejwe ngo yemezwe.",
+    "approved": "Charter yemejwe: umushinga wemerewe gukorwa.",
+    "returned": "Charter yasubijwe mu nyandiko y’agateganyo.",
+    "returnedWith": "Yagaruwe hamwe n’igitekerezo:",
+    "approvedBy": "Yemejwe na {{ name }} ku wa {{ date }}.",
+    "submittedOn": "Yoherejwe ku wa {{ date }}.",
+    "awaiting": "Itegereje {{ name }}.",
+    "sections": {
+      "authorization": "Impamvu n’umuterankunga"
+    },
+    "fields": {
+      "purpose": "Impamvu y’umushinga",
+      "businessCase": "Inyungu z’umushinga",
+      "objectives": "Intego",
+      "objectiveText": "Intego ya {{ n }}",
+      "successMetric": "Igipimo cy’intsinzi {{ n }}",
+      "inScope": "Ibiri mu mbibi",
+      "outOfScope": "Ibiri hanze y’imbibi",
+      "assumptions": "Ibyitezwe",
+      "constraints": "Imbogamizi",
+      "highLevelRisks": "Ingaruka z’ingenzi",
+      "milestones": "Intambwe z’ingenzi",
+      "milestoneName": "Intambwe ya {{ n }}",
+      "targetDate": "Itariki iteganyijwe {{ n }}",
+      "summaryBudget": "Ingengo y’imari muri rusange",
+      "sponsor": "Umuterankunga"
+    },
+    "hints": {
+      "purpose": "Impamvu umushinga ubaho, mu nteruro imwe cyangwa ebyiri.",
+      "sponsor": "Yemeza charter kandi yinjira mu itsinda nk’indorerezi."
+    },
+    "editor": {
+      "save": "Bika inyandiko y’agateganyo",
+      "addObjective": "Ongeramo intego",
+      "addMilestone": "Ongeramo intambwe",
+      "addTo": "Ongera kuri {{ list }}",
+      "item": "{{ list }}, ikintu cya {{ n }}",
+      "moveUp": "Zamura ikintu cya {{ n }}",
+      "moveDown": "Manura ikintu cya {{ n }}",
+      "remove": "Kuramo ikintu cya {{ n }}",
+      "moved": "Cyimuriwe ku mwanya wa {{ position }} muri {{ total }}.",
+      "removed": "Ikintu cya {{ position }} cyakuwemo."
+    },
+    "versions": {
+      "open": "Verisiyo",
+      "title": "Verisiyo za charter",
+      "onlyOne": "Hari verisiyo imwe gusa kugeza ubu. Nyuma yo kwemezwa, impinduka zinyura mu busabe bw’impinduka kandi zigakora verisiyo nshya.",
+      "from": "Gereranya",
+      "to": "Na",
+      "label": "Verisiyo ya {{ n }}",
+      "section": "Igice",
+      "changed": "Byahindutse",
+      "added": "Byongewemo",
+      "removed": "Byakuwemo"
+    }
+  },
+  "wbs": {
+    "title": "Igabanywa ry’imirimo (WBS)",
+    "totals": "Igiteranyo cy’umushinga",
+    "expandAll": "Fungura byose",
+    "collapseAll": "Funga byose",
+    "addDeliverable": "Ongeramo igisubizo",
+    "addChild": "Ongeramo igice munsi yacyo",
+    "add": "Ongeramo",
+    "toolbar": "Ibikorwa kuri {{ code }}",
+    "moveUp": "Zamura",
+    "moveDown": "Manura",
+    "indent": "Shyira munsi",
+    "outdent": "Zamura urwego",
+    "keyboardHelp": "Koresha utwambi two kuri clavier kugira ngo ugende mu giti kandi ufungure cyangwa ufunge ibisubizo.",
+    "keyboardHelpEditor": "Utwambi turimura, dufungura kandi dufunga; Enter irahindura; Delete irasiba; Alt n’utwambi bihindura umwanya n’urwego.",
+    "emptyTitle": "Nta WBS irahari",
+    "emptyMessage": "Umuyobozi w’umushinga ntaragabanya imirimo.",
+    "emptyMessageEditor": "Ongeramo ibisubizo, hanyuma ubigabanyemo ibyiciro by’imirimo.",
+    "noOwner": "Nta nyirabyo",
+    "created": "“{{ name }}” cyongewemo.",
+    "saved": "“{{ name }}” cyabitswe.",
+    "deleted": "“{{ name }}” cyasibwe.",
+    "moved": "“{{ name }}” ubu ni {{ code }}.",
+    "deleteTitle": "Gusiba {{ code }} {{ name }}?",
+    "deleteMessage": "Ushobora kubisubiza inyuma ako kanya.",
+    "deleteMessageWithChildren": "Ibice {{ count }} biri munsi yacyo na byo bizasibwa. Ushobora kubisubiza inyuma ako kanya.",
+    "describe": "Igihe {{ effort }}, ikiguzi {{ cost }}, {{ percent }} byarangiye ({{ source }}).",
+    "source": {
+      "REPORTED": "byatangajwe",
+      "ROLLED_UP": "byateranyijwe",
+      "TASKS": "bivuye ku mirimo"
+    },
+    "fields": {
+      "name": "Izina",
+      "description": "Ibisobanuro",
+      "type": "Ubwoko",
+      "owner": "Nyirabyo",
+      "effort": "Igihe gikenewe",
+      "cost": "Ikiguzi",
+      "percent": "Byarangiye",
+      "earnedValue": "Agaciro kagezweho"
+    },
+    "hints": {
+      "type": {
+        "DELIVERABLE": "Igisubizo umushinga utanga; imibare yacyo iteranywa uhereye ku bice biri munsi yacyo.",
+        "WORK_PACKAGE": "Urwego rwo hasi: teganya igihe n’ikiguzi, hanyuma utangaze aho bigeze."
+      },
+      "typeLocked": "Gifite ibice munsi yacyo, bityo kiguma ari igisubizo.",
+      "rolledUp": "Igihe, ikiguzi n’aho bigeze biteranywa uhereye ku bice biri munsi yacyo.",
+      "percentFromTasks": "Bibarwa hakurikijwe imirimo y’iki cyiciro."
+    },
+    "errors": {
+      "effortRange": "Andika amasaha atarenze 1 000 000.",
+      "percentRange": "Andika ijanisha riri hagati ya 0 na 100."
+    },
+    "dialog": {
+      "editTitle": "Hindura {{ code }}",
+      "addUnder": "Ongera munsi ya {{ code }} {{ name }}",
+      "addTop": "Ongeramo igisubizo"
+    }
   }
 }

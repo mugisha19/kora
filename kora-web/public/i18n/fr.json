@@ -10,7 +10,9 @@
     "openMenu": "Ouvrir le menu de navigation",
     "dashboard": "Tableau de bord",
     "settings": "Paramètres",
-    "admin": "Administration"
+    "admin": "Administration",
+    "portfolios": "Portefeuilles",
+    "projects": "Projets"
   },
   "theme": {
     "label": "Thème",
@@ -35,7 +37,15 @@
     "errorTitle": "Une erreur s'est produite",
     "errorMessage": "Impossible de charger ce contenu. Vérifiez votre connexion et réessayez.",
     "dismiss": "Fermer",
-    "loadingBar": "Chargement"
+    "loadingBar": "Chargement",
+    "save": "Enregistrer",
+    "edit": "Modifier",
+    "more": "Plus",
+    "moreActions": "Plus d'actions",
+    "reload": "Recharger",
+    "optional": "Facultatif",
+    "onePerLine": "Un par ligne",
+    "undo": "Annuler"
   },
   "status": {
     "success": "Dans les temps",
@@ -46,9 +56,41 @@
   },
   "dashboard": {
     "title": "Tableau de bord",
-    "subtitle": "Quels projets demandent de l'attention, et pourquoi.",
-    "emptyTitle": "La vue d'ensemble de votre portefeuille apparaîtra ici",
-    "emptyMessage": "Santé, performance des délais et des coûts, principaux risques et décisions en attente pour les projets auxquels vous avez accès."
+    "subtitle": "Quels projets demandent de l’attention, et pourquoi.",
+    "emptyTitle": "Rien à afficher pour le moment",
+    "emptyMessage": "Les projets que vous pouvez voir seront résumés ici.",
+    "kpis": {
+      "title": "Chiffres clés",
+      "active": "Projets actifs",
+      "ofTotal": "sur {{ total }} projets",
+      "onTrack": "Dans les temps",
+      "onTrackNote": "Part des projets évalués au vert",
+      "late": "Projets en retard",
+      "lateNote": "Encore en cours après leur date de fin prévue",
+      "budget": "Budget total",
+      "planned": "{{ amount }} prévus dans la WBS",
+      "earned": "Valeur acquise",
+      "earnedNote": "Coût prévu du travail réalisé",
+      "spiCpi": "SPI / CPI",
+      "risks": "Risques critiques ouverts",
+      "changes": "Demandes de changement en attente",
+      "later": "Disponible dans une version ultérieure"
+    },
+    "charts": {
+      "title": "Répartitions",
+      "health": "Projets par santé",
+      "status": "Projets par statut",
+      "count": "Projets"
+    },
+    "attention": {
+      "title": "Demande de l'attention",
+      "subtitle": "La santé la plus mauvaise en premier. Choisissez une colonne pour trier autrement.",
+      "none": "Aucun projet ne correspond.",
+      "progress": "Achevé",
+      "nextMilestone": "Prochain jalon"
+    },
+    "spi": "Indice de performance des délais",
+    "cpi": "Indice de performance des coûts"
   },
   "settings": {
     "title": "Paramètres",
@@ -154,6 +196,31 @@
       "unknown": "Une erreur s'est produite. Veuillez réessayer.",
       "organization": {
         "currency_locked": "La devise ne peut pas changer : des projets ont déjà des budgets dans la devise actuelle."
+      },
+      "portfolios": {
+        "archived": "Ce portefeuille est archivé. Réactivez-le d'abord.",
+        "not_empty": "Seul un portefeuille vide peut être supprimé. Déplacez ou supprimez d'abord ses programmes et projets."
+      },
+      "projects": {
+        "code_taken": "Un autre projet utilise déjà ce code.",
+        "invalid_transition": "Le projet ne peut pas passer à ce statut depuis son statut actuel.",
+        "charter_approval_required": "Un projet est approuvé en approuvant sa charte.",
+        "methodology_locked": "La méthodologie ne peut changer que tant que le projet est proposé."
+      },
+      "project_members": {
+        "is_manager": "Le chef de projet ne peut pas être retiré de l'équipe."
+      },
+      "charters": {
+        "not_draft": "Seule une charte en brouillon peut être modifiée.",
+        "not_submitted": "La charte n'est pas en attente d'approbation.",
+        "incomplete": "Avant de pouvoir être soumise, la charte doit avoir :"
+      },
+      "wbs": {
+        "parent_not_deliverable": "On ne peut ajouter des éléments que sous un livrable.",
+        "too_deep": "La WBS ne peut pas dépasser 8 niveaux.",
+        "cycle": "Un élément ne peut pas être déplacé sous lui-même.",
+        "has_children": "Il contient des éléments : supprimez-les d’abord, ou supprimez le tout.",
+        "type_change_not_allowed": "Un élément qui en contient d’autres doit rester un livrable."
       }
     },
     "fields": {
@@ -170,7 +237,11 @@
       "invalid_allowed": "Doit être l'une des valeurs suivantes : {{ allowed }}.",
       "password": {
         "breached": "Ce mot de passe figure dans une fuite de données. Choisissez-en un autre."
-      }
+      },
+      "tooManyLines": "50 lignes au maximum.",
+      "lineTooLong": "Chaque ligne peut contenir au plus 500 caractères.",
+      "amount": "Saisissez un montant, par exemple 1 250 000 ou 99,90.",
+      "number": "Saisissez un nombre avec deux décimales au plus."
     }
   },
   "roles": {
@@ -332,5 +403,380 @@
     "lastPage": "Dernière page",
     "range": "{{ start }}–{{ end }} sur {{ total }}",
     "rangeEmpty": "0 sur {{ total }}"
+  },
+  "health": {
+    "GREEN": "Dans les temps",
+    "AMBER": "À risque",
+    "RED": "En difficulté",
+    "GREY": "Non évalué",
+    "overriddenLabel": "{{ health }} (forcé)"
+  },
+  "projectStatus": {
+    "PROPOSED": "Proposé",
+    "APPROVED": "Approuvé",
+    "IN_PROGRESS": "En cours",
+    "ON_HOLD": "En pause",
+    "CLOSING": "En clôture",
+    "CLOSED": "Clôturé",
+    "CANCELLED": "Annulé"
+  },
+  "methodology": {
+    "AGILE": {
+      "name": "Agile",
+      "hint": "Un backlog et des sprints sur un tableau."
+    },
+    "PREDICTIVE": {
+      "name": "Prédictive",
+      "hint": "Un planning avec des dépendances."
+    },
+    "HYBRID": {
+      "name": "Hybride",
+      "hint": "Les deux : un tableau et un planning."
+    }
+  },
+  "portfolioStatus": {
+    "ACTIVE": "Actif",
+    "ARCHIVED": "Archivé"
+  },
+  "programStatus": {
+    "ACTIVE": "Actif",
+    "CLOSED": "Clôturé"
+  },
+  "projectRole": {
+    "MANAGER": "Chef de projet",
+    "CONTRIBUTOR": "Contributeur",
+    "OBSERVER": "Observateur"
+  },
+  "projectRoleHints": {
+    "CONTRIBUTOR": "Travaille sur les tâches et peut les mettre à jour.",
+    "OBSERVER": "Peut voir le projet sans le modifier."
+  },
+  "charterStatus": {
+    "DRAFT": "Brouillon",
+    "SUBMITTED": "En attente d'approbation",
+    "APPROVED": "Approuvée",
+    "SUPERSEDED": "Remplacée"
+  },
+  "wbsType": {
+    "DELIVERABLE": "Livrable",
+    "WORK_PACKAGE": "Lot de travail"
+  },
+  "portfolios": {
+    "title": "Portefeuilles",
+    "subtitle": "Les projets regroupés par objectif stratégique.",
+    "detailTitle": "Portefeuille",
+    "create": "Nouveau portefeuille",
+    "createTitle": "Nouveau portefeuille",
+    "editTitle": "Modifier le portefeuille",
+    "search": "Rechercher un portefeuille",
+    "statusFilter": "Afficher les portefeuilles",
+    "filter": {
+      "ACTIVE": "Actifs",
+      "ARCHIVED": "Archivés",
+      "ALL": "Tous"
+    },
+    "emptyTitle": "Aucun portefeuille pour le moment",
+    "emptyMessage": "Les portefeuilles apparaîtront ici dès que votre PMO les aura créés.",
+    "emptyMessageManager": "Créez un portefeuille pour regrouper des projets autour d’un objectif stratégique.",
+    "fields": {
+      "name": "Nom",
+      "description": "Description",
+      "objectives": "Objectifs stratégiques",
+      "owner": "Responsable",
+      "programs": "Programmes",
+      "projects": "Projets",
+      "status": "Statut"
+    },
+    "backToList": "Tous les portefeuilles",
+    "summary": "Résumé",
+    "archivedNotice": "Ce portefeuille est archivé et en lecture seule. Réactivez-le pour le modifier.",
+    "programsAndProjects": "Programmes et projets",
+    "withoutProgram": "Hors programme",
+    "noProjectsTitle": "Aucun programme ni projet pour le moment",
+    "noProjectsMessage": "Ajoutez un programme ou créez un projet dans ce portefeuille.",
+    "created": "Portefeuille « {{ name }} » créé.",
+    "saved": "Portefeuille « {{ name }} » enregistré.",
+    "archive": "Archiver",
+    "archiveTitle": "Archiver « {{ name }} » ?",
+    "archiveMessage": "Un portefeuille archivé est en lecture seule : ni nouveaux programmes ou projets, ni modifications. Vous pourrez le réactiver plus tard.",
+    "archived": "Portefeuille « {{ name }} » archivé.",
+    "reactivate": "Réactiver",
+    "reactivateTitle": "Réactiver « {{ name }} » ?",
+    "reactivateMessage": "Le portefeuille pourra de nouveau être modifié.",
+    "reactivated": "Portefeuille « {{ name }} » réactivé.",
+    "deleteTitle": "Supprimer « {{ name }} » ?",
+    "deleteMessage": "Cette action est irréversible.",
+    "deleted": "Portefeuille « {{ name }} » supprimé.",
+    "deleteNotEmpty": "Supprimer (seulement si vide)",
+    "notFoundTitle": "Portefeuille introuvable",
+    "notFoundMessage": "Il n'existe pas ou a été supprimé."
+  },
+  "programs": {
+    "create": "Nouveau programme",
+    "createTitle": "Nouveau programme",
+    "editTitle": "Modifier le programme",
+    "editNamed": "Modifier le programme {{ name }}",
+    "fields": {
+      "name": "Nom",
+      "description": "Description",
+      "manager": "Responsable du programme",
+      "status": "Statut"
+    },
+    "managedBy": "Géré par {{ name }}",
+    "noProjects": "Aucun projet dans ce programme pour le moment.",
+    "created": "Programme « {{ name }} » créé.",
+    "saved": "Programme « {{ name }} » enregistré."
+  },
+  "projects": {
+    "title": "Projets",
+    "subtitle": "Tous les projets que vous pouvez voir, avec leur statut et leur santé.",
+    "search": "Rechercher par nom ou code",
+    "count": "{{ count }} projets",
+    "create": "Nouveau projet",
+    "createTitle": "Nouveau projet",
+    "createSubtitle": "Commencez par l'essentiel ; la charte vient ensuite.",
+    "editTitle": "Modifier le projet",
+    "workspaceTitle": "Projet",
+    "backToList": "Tous les projets",
+    "noProgram": "Aucun programme",
+    "fields": {
+      "code": "Code",
+      "name": "Nom",
+      "description": "Description",
+      "portfolio": "Portefeuille",
+      "program": "Programme",
+      "manager": "Chef de projet",
+      "methodology": "Méthodologie",
+      "status": "Statut",
+      "health": "Santé",
+      "startDate": "Date de début",
+      "targetEndDate": "Date de fin prévue",
+      "budget": "Budget"
+    },
+    "hints": {
+      "code": "Majuscules, chiffres et tirets, par exemple AKG-012.",
+      "methodologyLocked": "La méthodologie ne peut plus changer une fois le projet approuvé."
+    },
+    "errors": {
+      "endBeforeStart": "La date de fin prévue doit être postérieure à la date de début."
+    },
+    "filters": {
+      "allPortfolios": "Tous les portefeuilles",
+      "allStatuses": "Tous les statuts",
+      "allMethodologies": "Toutes les méthodologies",
+      "allHealth": "Toute santé",
+      "clear": "Effacer les filtres"
+    },
+    "emptyTitle": "Aucun projet pour le moment",
+    "emptyMessage": "Les projets auxquels vous participez apparaîtront ici.",
+    "emptyMessageManager": "Créez un projet pour commencer.",
+    "noMatchTitle": "Aucun projet correspondant",
+    "noMatchMessage": "Essayez d'autres filtres.",
+    "created": "Projet « {{ name }} » créé.",
+    "saved": "Projet « {{ name }} » enregistré.",
+    "notFoundTitle": "Projet introuvable",
+    "notFoundMessage": "Il n'existe pas, ou vous ne faites pas partie de son équipe."
+  },
+  "workspace": {
+    "tabsLabel": "Sections du projet",
+    "tabs": {
+      "overview": "Vue d'ensemble",
+      "charter": "Charte",
+      "wbs": "WBS",
+      "board": "Tableau",
+      "backlog": "Backlog",
+      "schedule": "Planning"
+    },
+    "overview": {
+      "details": "Détails"
+    },
+    "lifecycle": {
+      "title": "Cycle de vie",
+      "current": "Statut actuel :",
+      "needsCharter": "Un projet proposé est approuvé en approuvant sa charte :",
+      "final": "Ce projet est terminé ; son statut ne peut plus changer.",
+      "moveTo": "Passer à {{ status }}",
+      "dialogTitle": "Passer à {{ status }} ?",
+      "confirm": "Passer à {{ status }}",
+      "reason": "Motif",
+      "reasonOptional": "Motif (facultatif)",
+      "moved": "Le projet est maintenant {{ status }}.",
+      "explain": {
+        "PROPOSED": "« {{ name }} » redevient proposé.",
+        "APPROVED": "« {{ name }} » sera approuvé.",
+        "IN_PROGRESS": "Le travail sur « {{ name }} » commence ou reprend.",
+        "ON_HOLD": "Le travail sur « {{ name }} » est suspendu. Indiquez pourquoi, pour informer l'équipe et le sponsor.",
+        "CLOSING": "« {{ name }} » passe en clôture : finalisez et transmettez.",
+        "CLOSED": "« {{ name }} » sera clôturé. C’est définitif.",
+        "CANCELLED": "« {{ name }} » sera annulé. C’est définitif ; indiquez pourquoi."
+      }
+    },
+    "health": {
+      "override": "Forcer la santé",
+      "clear": "Revenir à la santé calculée",
+      "dialogTitle": "Forcer la santé",
+      "explain": "Votre appréciation remplace la santé calculée jusqu'à ce que vous l'effaciez. Tout le monde voit votre motif.",
+      "reason": "Motif",
+      "reasonHint": "Par exemple : le fournisseur principal a trois mois de retard.",
+      "save": "Forcer",
+      "overridden": "Santé forcée.",
+      "cleared": "La santé est de nouveau calculée."
+    },
+    "team": {
+      "title": "Équipe",
+      "add": "Ajouter un membre",
+      "addTitle": "Ajouter un membre à l'équipe",
+      "person": "Personne",
+      "role": "Rôle dans le projet",
+      "everyoneIn": "Tous les membres de l'organisation font déjà partie de l'équipe.",
+      "changeRole": "Rôle de {{ name }} dans le projet",
+      "remove": "Retirer {{ name }} de l'équipe",
+      "removeTitle": "Retirer {{ name }} ?",
+      "removeMessage": "{{ name }} ne verra plus ce projet, sauf si son rôle dans l'organisation le permet.",
+      "removeConfirm": "Retirer",
+      "removed": "{{ name }} a été retiré de l'équipe."
+    },
+    "comingSoon": {
+      "board": {
+        "title": "Le tableau arrive bientôt",
+        "message": "Les tâches et le tableau Kanban arrivent dans la prochaine version."
+      },
+      "backlog": {
+        "title": "Le backlog arrive bientôt",
+        "message": "Le backlog et les sprints arrivent dans la prochaine version."
+      },
+      "schedule": {
+        "title": "Le planning arrive bientôt",
+        "message": "Les dépendances, le diagramme de Gantt et le chemin critique arrivent dans une version ultérieure."
+      }
+    }
+  },
+  "charter": {
+    "title": "Charte du projet",
+    "submit": "Soumettre pour approbation",
+    "approve": "Approuver",
+    "return": "Renvoyer en brouillon",
+    "returnTitle": "Renvoyer la charte",
+    "returnComment": "Que faut-il changer ?",
+    "print": "Imprimer",
+    "notSet": "Non renseigné",
+    "noSponsor": "Pas encore de sponsor",
+    "saved": "Charte enregistrée.",
+    "submitted": "Charte soumise pour approbation.",
+    "approved": "Charte approuvée : le projet est autorisé.",
+    "returned": "Charte renvoyée en brouillon.",
+    "returnedWith": "Renvoyée avec un commentaire :",
+    "approvedBy": "Approuvée par {{ name }} le {{ date }}.",
+    "submittedOn": "Soumise le {{ date }}.",
+    "awaiting": "En attente de {{ name }}.",
+    "sections": {
+      "authorization": "Objet et sponsor"
+    },
+    "fields": {
+      "purpose": "Objet",
+      "businessCase": "Justification (business case)",
+      "objectives": "Objectifs",
+      "objectiveText": "Objectif {{ n }}",
+      "successMetric": "Mesure de réussite {{ n }}",
+      "inScope": "Dans le périmètre",
+      "outOfScope": "Hors périmètre",
+      "assumptions": "Hypothèses",
+      "constraints": "Contraintes",
+      "highLevelRisks": "Risques majeurs",
+      "milestones": "Jalons",
+      "milestoneName": "Jalon {{ n }}",
+      "targetDate": "Date prévue {{ n }}",
+      "summaryBudget": "Budget global",
+      "sponsor": "Sponsor"
+    },
+    "hints": {
+      "purpose": "Pourquoi le projet existe, en une ou deux phrases.",
+      "sponsor": "Approuve la charte et rejoint l'équipe comme observateur."
+    },
+    "editor": {
+      "save": "Enregistrer le brouillon",
+      "addObjective": "Ajouter un objectif",
+      "addMilestone": "Ajouter un jalon",
+      "addTo": "Ajouter à « {{ list }} »",
+      "item": "{{ list }}, élément {{ n }}",
+      "moveUp": "Monter l'élément {{ n }}",
+      "moveDown": "Descendre l'élément {{ n }}",
+      "remove": "Supprimer l'élément {{ n }}",
+      "moved": "Déplacé en position {{ position }} sur {{ total }}.",
+      "removed": "Élément {{ position }} supprimé."
+    },
+    "versions": {
+      "open": "Versions",
+      "title": "Versions de la charte",
+      "onlyOne": "Il n'y a qu'une version pour le moment. Après approbation, les modifications passent par des demandes de changement et créent de nouvelles versions.",
+      "from": "Comparer",
+      "to": "Avec",
+      "label": "Version {{ n }}",
+      "section": "Section",
+      "changed": "Modifié",
+      "added": "Ajouté",
+      "removed": "Supprimé"
+    }
+  },
+  "wbs": {
+    "title": "Structure de découpage du projet (WBS)",
+    "totals": "Totaux du projet",
+    "expandAll": "Tout déplier",
+    "collapseAll": "Tout replier",
+    "addDeliverable": "Ajouter un livrable",
+    "addChild": "Ajouter un élément dessous",
+    "add": "Ajouter",
+    "toolbar": "Actions pour {{ code }}",
+    "moveUp": "Monter",
+    "moveDown": "Descendre",
+    "indent": "Décaler à droite",
+    "outdent": "Décaler à gauche",
+    "keyboardHelp": "Utilisez les flèches pour parcourir l'arborescence et ouvrir ou fermer les livrables.",
+    "keyboardHelpEditor": "Les flèches déplacent, ouvrent et ferment ; Entrée modifie ; Suppr supprime ; Alt avec les flèches réordonne et change de niveau.",
+    "emptyTitle": "Pas encore de WBS",
+    "emptyMessage": "Le chef de projet n'a pas encore découpé le travail.",
+    "emptyMessageEditor": "Ajoutez des livrables, puis découpez-les en lots de travail.",
+    "noOwner": "Aucun responsable",
+    "created": "« {{ name }} » ajouté.",
+    "saved": "« {{ name }} » enregistré.",
+    "deleted": "« {{ name }} » supprimé.",
+    "moved": "« {{ name }} » est maintenant {{ code }}.",
+    "deleteTitle": "Supprimer {{ code }} {{ name }} ?",
+    "deleteMessage": "Vous pourrez annuler juste après.",
+    "deleteMessageWithChildren": "Ses {{ count }} éléments sous-jacents seront aussi supprimés. Vous pourrez annuler juste après.",
+    "describe": "Effort {{ effort }}, coût {{ cost }}, {{ percent }} achevé ({{ source }}).",
+    "source": {
+      "REPORTED": "déclaré",
+      "ROLLED_UP": "agrégé",
+      "TASKS": "selon les tâches"
+    },
+    "fields": {
+      "name": "Nom",
+      "description": "Description",
+      "type": "Type",
+      "owner": "Responsable",
+      "effort": "Effort",
+      "cost": "Coût",
+      "percent": "Achevé",
+      "earnedValue": "Valeur acquise"
+    },
+    "hints": {
+      "type": {
+        "DELIVERABLE": "Un résultat livré par le projet ; ses chiffres sont la somme des éléments en dessous.",
+        "WORK_PACKAGE": "Le niveau le plus bas : estimez son effort et son coût, puis indiquez son avancement."
+      },
+      "typeLocked": "Il contient des éléments, il reste donc un livrable.",
+      "rolledUp": "L'effort, le coût et l'avancement sont la somme des éléments en dessous.",
+      "percentFromTasks": "Calculé à partir des tâches de ce lot de travail."
+    },
+    "errors": {
+      "effortRange": "Saisissez au plus 1 000 000 heures.",
+      "percentRange": "Saisissez un pourcentage entre 0 et 100."
+    },
+    "dialog": {
+      "editTitle": "Modifier {{ code }}",
+      "addUnder": "Ajouter sous {{ code }} {{ name }}",
+      "addTop": "Ajouter un livrable"
+    }
   }
 }

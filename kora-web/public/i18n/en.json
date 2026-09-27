@@ -10,7 +10,9 @@
     "openMenu": "Open navigation menu",
     "dashboard": "Dashboard",
     "settings": "Settings",
-    "admin": "Administration"
+    "admin": "Administration",
+    "portfolios": "Portfolios",
+    "projects": "Projects"
   },
   "theme": {
     "label": "Theme",
@@ -35,7 +37,15 @@
     "errorTitle": "Something went wrong",
     "errorMessage": "We couldn't load this. Check your connection and try again.",
     "dismiss": "Dismiss",
-    "loadingBar": "Loading"
+    "loadingBar": "Loading",
+    "save": "Save",
+    "edit": "Edit",
+    "more": "More",
+    "moreActions": "More actions",
+    "reload": "Reload",
+    "optional": "Optional",
+    "onePerLine": "One per line",
+    "undo": "Undo"
   },
   "status": {
     "success": "On track",
@@ -47,8 +57,40 @@
   "dashboard": {
     "title": "Dashboard",
     "subtitle": "Which projects need attention, and why.",
-    "emptyTitle": "Your portfolio overview will appear here",
-    "emptyMessage": "Health, schedule and cost performance, top risks and pending decisions for the projects you can access."
+    "emptyTitle": "Nothing to show yet",
+    "emptyMessage": "The projects you can see will be summarized here.",
+    "kpis": {
+      "title": "Key figures",
+      "active": "Active projects",
+      "ofTotal": "of {{ total }} projects",
+      "onTrack": "On track",
+      "onTrackNote": "Share of rated projects that are green",
+      "late": "Late projects",
+      "lateNote": "Running past their target end date",
+      "budget": "Total budget",
+      "planned": "{{ amount }} planned in the WBS",
+      "earned": "Earned value",
+      "earnedNote": "Planned cost of the work done",
+      "spiCpi": "SPI / CPI",
+      "risks": "Open critical risks",
+      "changes": "Pending change requests",
+      "later": "Available in a later release"
+    },
+    "charts": {
+      "title": "Distributions",
+      "health": "Projects by health",
+      "status": "Projects by status",
+      "count": "Projects"
+    },
+    "attention": {
+      "title": "Needs attention",
+      "subtitle": "Worst health first. Choose a column to sort differently.",
+      "none": "No projects match.",
+      "progress": "Complete",
+      "nextMilestone": "Next milestone"
+    },
+    "spi": "Schedule performance index",
+    "cpi": "Cost performance index"
   },
   "settings": {
     "title": "Settings",
@@ -154,6 +196,31 @@
       "unknown": "Something went wrong. Please try again.",
       "organization": {
         "currency_locked": "The currency can't change: projects already have budgets in the current one."
+      },
+      "portfolios": {
+        "archived": "This portfolio is archived. Reactivate it first.",
+        "not_empty": "Only an empty portfolio can be deleted. Move or delete its programs and projects first."
+      },
+      "projects": {
+        "code_taken": "Another project already uses this code.",
+        "invalid_transition": "The project can't move to that status from its current one.",
+        "charter_approval_required": "A project is approved by approving its charter.",
+        "methodology_locked": "The methodology can only change while the project is proposed."
+      },
+      "project_members": {
+        "is_manager": "The project manager can't be removed from the team."
+      },
+      "charters": {
+        "not_draft": "Only a draft charter can be changed.",
+        "not_submitted": "The charter isn't waiting for approval.",
+        "incomplete": "Before it can be submitted, the charter needs:"
+      },
+      "wbs": {
+        "parent_not_deliverable": "Items can only be added under a deliverable.",
+        "too_deep": "The WBS can be at most 8 levels deep.",
+        "cycle": "An item can't be moved under itself.",
+        "has_children": "It has items under it: delete them first, or delete everything together.",
+        "type_change_not_allowed": "An item with items under it must stay a deliverable."
       }
     },
     "fields": {
@@ -170,7 +237,11 @@
       "invalid_allowed": "Must be one of: {{ allowed }}.",
       "password": {
         "breached": "This password has appeared in a data breach. Choose a different one."
-      }
+      },
+      "tooManyLines": "At most 50 lines.",
+      "lineTooLong": "Each line can have at most 500 characters.",
+      "amount": "Enter an amount, for example 1 250 000 or 99.90.",
+      "number": "Enter a number with at most two decimals."
     }
   },
   "roles": {
@@ -332,5 +403,380 @@
     "lastPage": "Last page",
     "range": "{{ start }}–{{ end }} of {{ total }}",
     "rangeEmpty": "0 of {{ total }}"
+  },
+  "health": {
+    "GREEN": "On track",
+    "AMBER": "At risk",
+    "RED": "Off track",
+    "GREY": "Not rated",
+    "overriddenLabel": "{{ health }} (overridden)"
+  },
+  "projectStatus": {
+    "PROPOSED": "Proposed",
+    "APPROVED": "Approved",
+    "IN_PROGRESS": "In progress",
+    "ON_HOLD": "On hold",
+    "CLOSING": "Closing",
+    "CLOSED": "Closed",
+    "CANCELLED": "Cancelled"
+  },
+  "methodology": {
+    "AGILE": {
+      "name": "Agile",
+      "hint": "A backlog and sprints on a board."
+    },
+    "PREDICTIVE": {
+      "name": "Predictive",
+      "hint": "A planned schedule with dependencies."
+    },
+    "HYBRID": {
+      "name": "Hybrid",
+      "hint": "Both: a board and a schedule."
+    }
+  },
+  "portfolioStatus": {
+    "ACTIVE": "Active",
+    "ARCHIVED": "Archived"
+  },
+  "programStatus": {
+    "ACTIVE": "Active",
+    "CLOSED": "Closed"
+  },
+  "projectRole": {
+    "MANAGER": "Manager",
+    "CONTRIBUTOR": "Contributor",
+    "OBSERVER": "Observer"
+  },
+  "projectRoleHints": {
+    "CONTRIBUTOR": "Works on tasks and can update them.",
+    "OBSERVER": "Can see the project but not change it."
+  },
+  "charterStatus": {
+    "DRAFT": "Draft",
+    "SUBMITTED": "Awaiting approval",
+    "APPROVED": "Approved",
+    "SUPERSEDED": "Superseded"
+  },
+  "wbsType": {
+    "DELIVERABLE": "Deliverable",
+    "WORK_PACKAGE": "Work package"
+  },
+  "portfolios": {
+    "title": "Portfolios",
+    "subtitle": "Projects grouped by strategic objective.",
+    "detailTitle": "Portfolio",
+    "create": "New portfolio",
+    "createTitle": "New portfolio",
+    "editTitle": "Edit portfolio",
+    "search": "Search portfolios",
+    "statusFilter": "Show portfolios",
+    "filter": {
+      "ACTIVE": "Active",
+      "ARCHIVED": "Archived",
+      "ALL": "All"
+    },
+    "emptyTitle": "No portfolios yet",
+    "emptyMessage": "Portfolios appear here once your PMO creates them.",
+    "emptyMessageManager": "Create a portfolio to group projects around a strategic objective.",
+    "fields": {
+      "name": "Name",
+      "description": "Description",
+      "objectives": "Strategic objectives",
+      "owner": "Owner",
+      "programs": "Programs",
+      "projects": "Projects",
+      "status": "Status"
+    },
+    "backToList": "All portfolios",
+    "summary": "Summary",
+    "archivedNotice": "This portfolio is archived and read-only. Reactivate it to make changes.",
+    "programsAndProjects": "Programs and projects",
+    "withoutProgram": "Not in a program",
+    "noProjectsTitle": "No programs or projects yet",
+    "noProjectsMessage": "Add a program or create a project in this portfolio.",
+    "created": "Portfolio “{{ name }}” created.",
+    "saved": "Portfolio “{{ name }}” saved.",
+    "archive": "Archive",
+    "archiveTitle": "Archive “{{ name }}”?",
+    "archiveMessage": "An archived portfolio is read-only: no new programs or projects and no changes. You can reactivate it later.",
+    "archived": "Portfolio “{{ name }}” archived.",
+    "reactivate": "Reactivate",
+    "reactivateTitle": "Reactivate “{{ name }}”?",
+    "reactivateMessage": "The portfolio can be changed again.",
+    "reactivated": "Portfolio “{{ name }}” reactivated.",
+    "deleteTitle": "Delete “{{ name }}”?",
+    "deleteMessage": "This can't be undone.",
+    "deleted": "Portfolio “{{ name }}” deleted.",
+    "deleteNotEmpty": "Delete (only when empty)",
+    "notFoundTitle": "Portfolio not found",
+    "notFoundMessage": "It doesn't exist or was deleted."
+  },
+  "programs": {
+    "create": "New program",
+    "createTitle": "New program",
+    "editTitle": "Edit program",
+    "editNamed": "Edit program {{ name }}",
+    "fields": {
+      "name": "Name",
+      "description": "Description",
+      "manager": "Program manager",
+      "status": "Status"
+    },
+    "managedBy": "Managed by {{ name }}",
+    "noProjects": "No projects in this program yet.",
+    "created": "Program “{{ name }}” created.",
+    "saved": "Program “{{ name }}” saved."
+  },
+  "projects": {
+    "title": "Projects",
+    "subtitle": "Every project you can see, with its status and health.",
+    "search": "Search by name or code",
+    "count": "{{ count }} projects",
+    "create": "New project",
+    "createTitle": "New project",
+    "createSubtitle": "Start with the basics; the charter comes next.",
+    "editTitle": "Edit project",
+    "workspaceTitle": "Project",
+    "backToList": "All projects",
+    "noProgram": "No program",
+    "fields": {
+      "code": "Code",
+      "name": "Name",
+      "description": "Description",
+      "portfolio": "Portfolio",
+      "program": "Program",
+      "manager": "Project manager",
+      "methodology": "Methodology",
+      "status": "Status",
+      "health": "Health",
+      "startDate": "Start date",
+      "targetEndDate": "Target end date",
+      "budget": "Budget"
+    },
+    "hints": {
+      "code": "Capital letters, digits and dashes, for example AKG-012.",
+      "methodologyLocked": "The methodology can't change once the project is approved."
+    },
+    "errors": {
+      "endBeforeStart": "The target end date must be after the start date."
+    },
+    "filters": {
+      "allPortfolios": "All portfolios",
+      "allStatuses": "All statuses",
+      "allMethodologies": "All methodologies",
+      "allHealth": "Any health",
+      "clear": "Clear filters"
+    },
+    "emptyTitle": "No projects yet",
+    "emptyMessage": "Projects you're part of will appear here.",
+    "emptyMessageManager": "Create a project to get started.",
+    "noMatchTitle": "No matching projects",
+    "noMatchMessage": "Try other filters.",
+    "created": "Project “{{ name }}” created.",
+    "saved": "Project “{{ name }}” saved.",
+    "notFoundTitle": "Project not found",
+    "notFoundMessage": "It doesn't exist, or you're not on its team."
+  },
+  "workspace": {
+    "tabsLabel": "Project sections",
+    "tabs": {
+      "overview": "Overview",
+      "charter": "Charter",
+      "wbs": "WBS",
+      "board": "Board",
+      "backlog": "Backlog",
+      "schedule": "Schedule"
+    },
+    "overview": {
+      "details": "Details"
+    },
+    "lifecycle": {
+      "title": "Lifecycle",
+      "current": "Current status:",
+      "needsCharter": "A proposed project is approved by approving its charter:",
+      "final": "This project is finished; its status can't change.",
+      "moveTo": "Move to {{ status }}",
+      "dialogTitle": "Move to {{ status }}?",
+      "confirm": "Move to {{ status }}",
+      "reason": "Reason",
+      "reasonOptional": "Reason (optional)",
+      "moved": "The project is now {{ status }}.",
+      "explain": {
+        "PROPOSED": "“{{ name }}” goes back to proposed.",
+        "APPROVED": "“{{ name }}” will be approved.",
+        "IN_PROGRESS": "Work on “{{ name }}” starts or resumes.",
+        "ON_HOLD": "Work on “{{ name }}” pauses. Say why, so the team and the sponsor know.",
+        "CLOSING": "“{{ name }}” moves to closing: wrap up and hand over.",
+        "CLOSED": "“{{ name }}” will be closed. This is final.",
+        "CANCELLED": "“{{ name }}” will be cancelled. This is final; say why."
+      }
+    },
+    "health": {
+      "override": "Override health",
+      "clear": "Use computed health",
+      "dialogTitle": "Override health",
+      "explain": "Your judgement replaces the computed health until you clear it. Everyone sees your reason.",
+      "reason": "Reason",
+      "reasonHint": "For example: the main supplier is three months late.",
+      "save": "Override",
+      "overridden": "Health overridden.",
+      "cleared": "Health is computed again."
+    },
+    "team": {
+      "title": "Team",
+      "add": "Add member",
+      "addTitle": "Add a team member",
+      "person": "Person",
+      "role": "Project role",
+      "everyoneIn": "Everyone in the organization is already on the team.",
+      "changeRole": "Project role of {{ name }}",
+      "remove": "Remove {{ name }} from the team",
+      "removeTitle": "Remove {{ name }}?",
+      "removeMessage": "{{ name }} will no longer see this project unless their organization role allows it.",
+      "removeConfirm": "Remove",
+      "removed": "{{ name }} removed from the team."
+    },
+    "comingSoon": {
+      "board": {
+        "title": "The board is coming",
+        "message": "Tasks and the Kanban board arrive in the next release."
+      },
+      "backlog": {
+        "title": "The backlog is coming",
+        "message": "The backlog and sprints arrive in the next release."
+      },
+      "schedule": {
+        "title": "The schedule is coming",
+        "message": "Dependencies, the Gantt chart and the critical path arrive in a later release."
+      }
+    }
+  },
+  "charter": {
+    "title": "Project charter",
+    "submit": "Submit for approval",
+    "approve": "Approve",
+    "return": "Return to draft",
+    "returnTitle": "Return the charter",
+    "returnComment": "What should change?",
+    "print": "Print",
+    "notSet": "Not set",
+    "noSponsor": "No sponsor yet",
+    "saved": "Charter saved.",
+    "submitted": "Charter submitted for approval.",
+    "approved": "Charter approved: the project is authorized.",
+    "returned": "Charter returned to draft.",
+    "returnedWith": "Returned with a comment:",
+    "approvedBy": "Approved by {{ name }} on {{ date }}.",
+    "submittedOn": "Submitted on {{ date }}.",
+    "awaiting": "Waiting for {{ name }}.",
+    "sections": {
+      "authorization": "Purpose and sponsor"
+    },
+    "fields": {
+      "purpose": "Purpose",
+      "businessCase": "Business case",
+      "objectives": "Objectives",
+      "objectiveText": "Objective {{ n }}",
+      "successMetric": "Success measure {{ n }}",
+      "inScope": "In scope",
+      "outOfScope": "Out of scope",
+      "assumptions": "Assumptions",
+      "constraints": "Constraints",
+      "highLevelRisks": "High-level risks",
+      "milestones": "Milestones",
+      "milestoneName": "Milestone {{ n }}",
+      "targetDate": "Target date {{ n }}",
+      "summaryBudget": "Summary budget",
+      "sponsor": "Sponsor"
+    },
+    "hints": {
+      "purpose": "Why the project exists, in a sentence or two.",
+      "sponsor": "Approves the charter and joins the team as an observer."
+    },
+    "editor": {
+      "save": "Save draft",
+      "addObjective": "Add objective",
+      "addMilestone": "Add milestone",
+      "addTo": "Add to {{ list }}",
+      "item": "{{ list }}, item {{ n }}",
+      "moveUp": "Move item {{ n }} up",
+      "moveDown": "Move item {{ n }} down",
+      "remove": "Remove item {{ n }}",
+      "moved": "Moved to position {{ position }} of {{ total }}.",
+      "removed": "Item {{ position }} removed."
+    },
+    "versions": {
+      "open": "Versions",
+      "title": "Charter versions",
+      "onlyOne": "There is only one version so far. After approval, changes go through change requests and create new versions.",
+      "from": "Compare",
+      "to": "With",
+      "label": "Version {{ n }}",
+      "section": "Section",
+      "changed": "Changed",
+      "added": "Added",
+      "removed": "Removed"
+    }
+  },
+  "wbs": {
+    "title": "Work breakdown structure",
+    "totals": "Project totals",
+    "expandAll": "Expand all",
+    "collapseAll": "Collapse all",
+    "addDeliverable": "Add deliverable",
+    "addChild": "Add item under it",
+    "add": "Add",
+    "toolbar": "Actions for {{ code }}",
+    "moveUp": "Move up",
+    "moveDown": "Move down",
+    "indent": "Indent",
+    "outdent": "Outdent",
+    "keyboardHelp": "Use the arrow keys to move through the tree and to open or close deliverables.",
+    "keyboardHelpEditor": "Arrow keys move, open and close; Enter edits; Delete removes; Alt with the arrow keys reorders, indents and outdents.",
+    "emptyTitle": "No WBS yet",
+    "emptyMessage": "The project manager hasn't broken the work down yet.",
+    "emptyMessageEditor": "Add deliverables, then break them down into work packages.",
+    "noOwner": "No owner",
+    "created": "“{{ name }}” added.",
+    "saved": "“{{ name }}” saved.",
+    "deleted": "“{{ name }}” deleted.",
+    "moved": "“{{ name }}” is now {{ code }}.",
+    "deleteTitle": "Delete {{ code }} {{ name }}?",
+    "deleteMessage": "You can undo this right after.",
+    "deleteMessageWithChildren": "Its {{ count }} items underneath are deleted too. You can undo this right after.",
+    "describe": "Effort {{ effort }}, cost {{ cost }}, {{ percent }} complete ({{ source }}).",
+    "source": {
+      "REPORTED": "reported",
+      "ROLLED_UP": "rolled up",
+      "TASKS": "from tasks"
+    },
+    "fields": {
+      "name": "Name",
+      "description": "Description",
+      "type": "Type",
+      "owner": "Owner",
+      "effort": "Effort",
+      "cost": "Cost",
+      "percent": "Complete",
+      "earnedValue": "Earned value"
+    },
+    "hints": {
+      "type": {
+        "DELIVERABLE": "A result the project delivers; its figures add up from the items under it.",
+        "WORK_PACKAGE": "The lowest level: estimate its effort and cost, then report progress."
+      },
+      "typeLocked": "It has items under it, so it stays a deliverable.",
+      "rolledUp": "Effort, cost and progress add up from the items under it.",
+      "percentFromTasks": "Calculated from the tasks of this work package."
+    },
+    "errors": {
+      "effortRange": "Enter at most 1,000,000 hours.",
+      "percentRange": "Enter a percentage from 0 to 100."
+    },
+    "dialog": {
+      "editTitle": "Edit {{ code }}",
+      "addUnder": "Add under {{ code }} {{ name }}",
+      "addTop": "Add a deliverable"
+    }
   }
 }
