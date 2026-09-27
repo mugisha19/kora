@@ -2,14 +2,14 @@
 
 ## Current status
 
-Phase 3 complete (tag `web-v0.3.0`). Waiting for "continue".
+Phase 4 complete (tag `web-v0.4.0`). Waiting for "continue".
 
 ## Next step
 
-Phase 4 — portfolio dashboard, portfolios/programs/projects (list, create, workspace with
-methodology-driven tabs, lifecycle transitions), project charter (form arrays, versions), WBS tree.
-Contract 0.2.0 (32 operations) is committed; the API implements them in API Phase 3, so Phase 4
-starts on MSW.
+Phase 5 — tasks, Kanban board (WIP limits, drag and drop via `/move`), backlog, sprints, burndown
+and velocity. Contract 0.3.0 (21 operations) is live on the real API since `api-v0.4.0`; see the
+backend notes in memory (all invalid input there is 400 `validation.failed`, not 422). The WBS
+`percentCompleteSource: TASKS` case (read-only percent) arrives with tasks.
 
 ## Checklist
 
@@ -17,13 +17,58 @@ starts on MSW.
 - [x] 1. Design system and app shell
 - [x] 2. API client, mock layer (MSW), interceptors, error handling, dev proxy
 - [x] 3. Auth, org switcher, guards, admin users/roles/invitations, settings profile
-- [ ] 4. Portfolio dashboard, projects, charter, WBS tree
+- [x] 4. Portfolio dashboard, projects, charter, WBS tree
 - [ ] 5. Kanban, backlog, sprints
 - [ ] 6. Gantt with dependencies and critical path
 - [ ] 7. Risks + heat map, issues, stakeholders, change requests
 - [ ] 8. Timesheets, resource heat map, EVM dashboard
 - [ ] 9. Real-time notifications, activity feed, attachments, report exports
 - [ ] 10. E2E flows, performance, Nginx Docker image, final README; tag v1.0.0
+
+## Phase 4 — what exists
+
+- Mock API for all 32 contract 0.2.0 operations with the backend's rules (visibility 404s, edit
+  rights, lifecycle map with 422 on a missing reason, health rule, charter approval authorizing
+  the project, effort-weighted WBS roll-ups with exact decimal money, dashboard read model) —
+  `src/app/mocks/projects-domain.ts`, `src/app/mocks/handlers/{portfolio,project,charter,wbs,dashboard}.handlers.ts`,
+  demo data in `src/app/mocks/data-projects.ts`
+- API clients: `src/app/core/api/{portfolios,projects,charter,wbs,dashboard}.api.ts`;
+  permissions (UI only) in `src/app/core/auth/permissions.ts`; people and currency for pickers in
+  `src/app/core/people/org-directory.ts`
+- `/dashboard`: KPIs, health donut (lazy ECharts) and status bars with table alternatives, "needs
+  attention" table worst-first; portfolio and health filters, sort and page in the URL —
+  `src/app/features/dashboard/`
+- `/portfolios`, `/portfolios/:id`: cards with objectives and counts; detail with projects grouped
+  by program; create/edit/archive/reactivate/delete (empty only) portfolios, create/edit programs
+  (PMO/admin) — `src/app/features/portfolios/`
+- `/projects`: server-side filters (portfolio, status, methodology, health, search), sort and
+  paging in the URL; `/projects/new` and `/projects/:id/edit` (methodology picker, end after
+  start, budget in the org currency, 412 reload) — `src/app/features/projects/`
+- Workspace `/projects/:id/*` with methodology-driven tabs: overview (details, lifecycle moves the
+  API allows with reasons, health override, team), charter (read/print, edit with keyboard-operable
+  form arrays, submit with missing-section list, approve/return by sponsor/PMO/admin, versions
+  diff), WBS (accessible tree, roll-ups, add/edit/delete/move with keyboard and toolbar, undo);
+  board/backlog/schedule say they come later — `src/app/features/projects/workspace/`
+- Shared: health/status chips, money/percent/hours formatting and parsing, undo toasts,
+  `QueryParams`, `uuidParam()` matcher, list styles (`shared/ui/data-table.scss`)
+- Tests: 328 unit tests (≈ 93% statements), 80 e2e tests (desktop and 375 px, axe in light and dark)
+
+## Feature acceptance criteria covered (Phase 4)
+
+- 04: a PM creates an Agile project in a portfolio and sees it in the list (unit + e2e); illegal
+  transitions impossible (only `allowedTransitions` offered; closed project shows none — unit +
+  e2e; the mock enforces the map); viewer sees projects but no create/edit (unit + e2e); tabs
+  depend on methodology (unit + e2e)
+- 05: health follows the API's rule and the override is visible ("Off track (overridden)" with the
+  reason — unit + e2e); charts have table alternatives; axe clean in both themes (e2e). "Loads
+  under 1 s with 200 projects" is the API's read model; the UI makes two requests.
+- 06: an approved charter can't be edited (no Edit; mock returns `charters.not_draft`); approving
+  moves the project to APPROVED and records who/when (unit + e2e); form arrays keyboard-operable
+  (unit + e2e)
+- 07: moving a node renumbers the tree; moving under its own descendant can't be expressed in the
+  UI (indent only targets the previous sibling deliverable) and the mock returns `wbs.cycle`;
+  keyboard-usable tree announcing level and position (unit + e2e). Task-driven progress arrives
+  with tasks (Phase 5).
 
 ## Phase 3 — what exists
 
@@ -61,11 +106,15 @@ starts on MSW.
   `/invitations/demo-invite-expired-account-0003` (expired).
 - Reset links and new invitation links are printed to the browser console (they stand in for email).
 - `window.koraMock.reset()` in the console restores the demo data.
+- Phase 4 demo: PMO (`pmo@kora.demo`, French profile) is the sponsor of the "Data warehouse"
+  charter awaiting approval; "Customer self-service portal" is late (amber); "ERP rollout" has an
+  overridden red health; the portal and mobile app have WBS trees with progress.
 
 ## Contract with kora-api
 
-Contract 0.2.0 at `kora-api/docs/openapi.yaml` (0.1.1 operations live on the real API; 0.2.0 in API
-Phase 3). `npm run start:api` runs the app against the real API (needs Docker; it starts empty:
+Web types are generated from contract 0.5.0 (`kora-api/docs/openapi.yaml`); this build uses the
+0.1.1 and 0.2.0 operations, all live on the real API (0.3.0 since `api-v0.4.0`, 0.4.0 since
+`api-v0.5.0`). `npm run start:api` runs the app against the real API (needs Docker; it starts empty:
 register an organization first; emails in Mailpit at http://localhost:8025). Mock mode stays the
 default. Change requests go in `kora-api/docs/contract-requests.md` or to the API session directly.
 
@@ -78,3 +127,4 @@ default. Change requests go in `kora-api/docs/contract-requests.md` or to the AP
 - ADR 0004 — design system: Material 3 with `light-dark()` tokens, Transloco runtime i18n
 - ADR 0005 — API layer: generated types, thin services, interceptor chain, MSW mock API
 - ADR 0006 — sign-in, session lifecycle and administration screens
+- ADR 0007 — portfolios, projects, dashboard, charter and WBS screens

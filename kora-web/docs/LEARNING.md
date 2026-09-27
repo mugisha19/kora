@@ -229,3 +229,45 @@ Component tests provide `MockApiBackend`, an `HttpBackend` that hands each reque
 handlers (`getResponse`) after it has gone through the real interceptor chain. A test that types a
 taken email into the register form therefore gets the same 409 with `errors[{field:"email"}]` the
 API would send, and checks that the message appears on the email field.
+
+## Don't recompute what the server decides (Phase 4)
+
+Health, allowed transitions, WBS codes and rolled-up progress are business rules. If the UI
+recomputed them, the two would drift the first time a rule changed. The screens show what the API
+sends and refetch after a change; the mock API implements the rules so the screens can be built
+before the backend exists.
+
+## Money without floats (Phase 4)
+
+`0.1 + 0.2 !== 0.3`. Amounts travel as decimal strings (`"150000000"` RWF, `"99.90"` USD),
+`parseAmount()` turns user input into that form (accepting spaces, commas, apostrophes), and
+`Intl.NumberFormat.format()` accepts strings, so formatting is exact too. Arithmetic (roll-ups,
+earned value) happens on the server; the mock uses BigInt.
+
+## An accessible tree (Phase 4)
+
+The WAI-ARIA tree pattern: one tab stop (roving `tabindex`), arrows to move, Right/Left to open,
+close or go to parent, Home/End, `aria-level`, `aria-setsize`, `aria-posinset`, `aria-expanded`.
+The accessible name must be short (`aria-labelledby` on the code and title) — by default a
+treeitem's name includes every descendant's text. Every keyboard command also has a visible
+button, and moves are announced.
+
+## Filters in the URL, and focus (Phase 4)
+
+A filter kept in component state is lost on reload and can't be shared. Kept in the URL it is
+both, and Back works. The catch: a router navigation normally moves focus to the new page's
+heading — correct for a new page, wrong when only the query changed while someone types in a
+search box. The shell compares paths and leaves focus alone for query-only navigations.
+
+## Effects that call stores (Phase 4)
+
+`effect(() => store.load(id()))` looks harmless, but everything the store reads synchronously
+while loading becomes a dependency of the effect; when the store updates that state, the effect
+runs again — an endless reload. Pass the signal itself (`store.load(this.projectId)`) to an
+`rxMethod`, or read the input and call the store in `untracked()`.
+
+## Charts that don't depend on colour (Phase 4)
+
+A chart is an image: assistive technology gets a table with the same numbers, the canvas is
+`aria-hidden`, segments carry patterns (ECharts decals) and text labels, and the chart library is
+loaded only when the chart scrolls into view.

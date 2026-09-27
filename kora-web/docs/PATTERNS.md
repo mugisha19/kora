@@ -65,3 +65,22 @@ proxy, a network failure) into a single `ApiError` shape, so later layers never 
   with `withHooks.onInit` connecting the query signal to an `rxMethod` loader.
 - **One submit path.** `submitWithApi()` is the shared algorithm every form follows; pages only
   supply the action and, optionally, a handler for a special error (412, expired link).
+
+## Phase 4
+
+- **State (server-side), rendered.** The lifecycle State pattern lives in the API; the UI offers
+  exactly `project.allowedTransitions` and asks for a reason where the contract needs one, so it
+  can't express an illegal move.
+- **Strategy.** `METHODOLOGY_STRATEGIES` maps a methodology to its workspace tabs; nothing else
+  branches on the methodology.
+- **Composite.** `WbsTreeNode` renders a node and, recursively, its children — the screen mirrors
+  the API's `WbsComponent`. Roll-ups stay on the server.
+- **Facade.** `PortfolioFacade` opens the dialogs, calls the API and announces results for the
+  portfolio pages; stores (`ProjectStore`, `CharterStore`, `WbsStore`) are the facades of the
+  workspace tabs.
+- **Command with undo.** WBS moves and deletes run, then offer "Undo" (`Notifier.undoable`); undo
+  is the inverse command (move back, re-create the subtree).
+- **URL as state.** List filters, sort and page are query parameters bound to inputs and changed
+  through `QueryParams`; the store just reacts to the resulting query signal.
+- **Progressive enhancement for charts.** Data first (a table), chart second (lazy, decorative,
+  patterned).
