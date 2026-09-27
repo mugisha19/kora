@@ -82,6 +82,9 @@ const ICONS = [
   'link',
   'link_off',
   'table_rows',
+  'approval',
+  'thumb_up',
+  'thumb_down',
 ];
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
