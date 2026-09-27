@@ -233,6 +233,11 @@
         "not_planned": "Seul un sprint planifié peut démarrer.",
         "not_active": "Le sprint n'est pas en cours.",
         "closed": "Un sprint clôturé ne peut plus changer."
+      },
+      "schedule": {
+        "cycle": "Ces dépendances formeraient une boucle.",
+        "not_predictive": "Les dépendances et références sont réservées aux projets prédictifs et hybrides.",
+        "dependency_exists": "Ces deux tâches sont déjà liées."
       }
     },
     "fields": {
@@ -353,7 +358,8 @@
       "label": "Sections de l'administration",
       "members": "Membres",
       "invitations": "Invitations",
-      "organization": "Organisation"
+      "organization": "Organisation",
+      "calendar": "Calendrier ouvré"
     },
     "members": {
       "search": "Rechercher par nom ou e-mail",
@@ -405,6 +411,24 @@
       "saved": "Paramètres de l'organisation enregistrés.",
       "stale": "Quelqu'un d'autre a enregistré ces paramètres pendant votre modification. Rechargez pour voir sa version, puis refaites votre modification.",
       "reload": "Recharger la dernière version"
+    },
+    "calendar": {
+      "intro": "Les plannings comptent les durées en jours ouvrés : les jours travaillés, moins les jours fériés.",
+      "stale": "Quelqu’un d’autre a enregistré le calendrier pendant votre modification. Rechargez pour voir sa version, puis refaites votre modification.",
+      "workingDays": "Jours travaillés",
+      "holidays": "Jours fériés",
+      "removeHoliday": "Supprimer {{ name }}",
+      "noHolidays": "Aucun jour férié pour l’instant.",
+      "date": "Date",
+      "name": "Nom",
+      "addHoliday": "Ajouter un jour férié",
+      "unsaved": "Vous avez des modifications non enregistrées.",
+      "save": "Enregistrer le calendrier",
+      "saved": "Calendrier ouvré enregistré.",
+      "errors": {
+        "noDays": "Choisissez au moins un jour travaillé.",
+        "duplicate": "Cette date est déjà un jour férié."
+      }
     }
   },
   "paginator": {
@@ -647,12 +671,6 @@
       "removeMessage": "{{ name }} ne verra plus ce projet, sauf si son rôle dans l'organisation le permet.",
       "removeConfirm": "Retirer",
       "removed": "{{ name }} a été retiré de l'équipe."
-    },
-    "comingSoon": {
-      "schedule": {
-        "title": "Le planning arrive bientôt",
-        "message": "Les dépendances, le diagramme de Gantt et le chemin critique arrivent dans une version ultérieure."
-      }
     }
   },
   "charter": {
@@ -854,8 +872,10 @@
       "points": "Saisissez un nombre entier de 0 à 100.",
       "hours": "Saisissez des heures entre 0 et 10 000.",
       "label": "Les étiquettes contiennent lettres, chiffres, espaces, _ et -, 30 caractères au plus.",
-      "tooManyLabels": "10 étiquettes au maximum."
-    }
+      "tooManyLabels": "10 étiquettes au maximum.",
+      "duration": "Saisissez un nombre entier de jours entre 0 et 1000."
+    },
+    "scheduleLegend": "Planning"
   },
   "board": {
     "sprint": "Sprint",
@@ -958,5 +978,135 @@
       "recent": "vélocité récente {{ average }} ({{ low }}–{{ high }})",
       "none": "La vélocité apparaît dès qu’un sprint est clôturé."
     }
+  },
+  "schedule": {
+    "columns": {
+      "task": "Tâche",
+      "duration": "Durée",
+      "start": "Début",
+      "finish": "Fin",
+      "totalFloat": "Marge totale (j)",
+      "freeFloat": "Marge libre (j)",
+      "critical": "Chemin critique",
+      "baseline": "Fin de référence",
+      "predecessors": "Prédécesseurs",
+      "actions": "Actions"
+    },
+    "critical": "Critique",
+    "notCritical": "A de la marge",
+    "today": "Aujourd’hui",
+    "milestone": "Jalon",
+    "days": "{{ count }} j",
+    "daysSuffix": "j",
+    "legend": {
+      "task": "Tâche",
+      "critical": "Tâche critique (sans marge)",
+      "baseline": "Référence",
+      "milestone": "Jalon",
+      "nonWorking": "Jour non ouvré"
+    },
+    "dragHelp": "Faites glisser une barre pour la déplacer, son bord droit pour changer sa durée, ou son point sur une autre barre pour les lier. La vue tableau offre les mêmes modifications au clavier.",
+    "linkRemoved": "Lien {{ from }} → {{ to }} supprimé.",
+    "baselineSaved": "Référence {{ number }} enregistrée.",
+    "editTitle": "Planning de {{ key }}",
+    "fields": {
+      "duration": "Durée (jours ouvrés)",
+      "constraint": "Début",
+      "constraintDate": "Pas avant le",
+      "predecessor": "Prédécesseur (vient d’abord)",
+      "successor": "Successeur (en dépend)",
+      "type": "Type de lien",
+      "lag": "Décalage"
+    },
+    "hints": {
+      "duration": "0 en fait un jalon.",
+      "lag": "Jours ouvrés ; négatif pour une avance (chevauchement)."
+    },
+    "errors": {
+      "duration": "Saisissez un nombre entier de jours entre 0 et 1000.",
+      "lag": "Saisissez un nombre entier entre −365 et 365.",
+      "self": "Une tâche ne peut pas dépendre d’elle-même."
+    },
+    "addLinkTitle": "Ajouter une dépendance",
+    "addLink": "Ajouter une dépendance",
+    "addPredecessor": "Prédécesseur",
+    "loop": "Ce lien ferait attendre les tâches les unes les autres en boucle :",
+    "loopStored": "Le planning ne peut pas être calculé : ces dépendances forment une boucle. Supprimez un des liens de cette chaîne :",
+    "rule": {
+      "lag": "{{ days }} jours ouvrés plus tard.",
+      "lead": "{{ days }} jours ouvrés plus tôt (une avance)."
+    },
+    "tableLabel": "Tableau du planning",
+    "tableCaption": "Tâches dans l’ordre du planning avec leurs dates, marges, chemin critique et dépendances",
+    "variance": {
+      "late": "{{ days }} j de retard",
+      "early": "{{ days }} j d’avance",
+      "onPlan": "Conforme"
+    },
+    "notInBaseline": "Absente de la référence",
+    "removeLink": "Supprimer le lien {{ from }} → {{ to }}",
+    "editFor": "Modifier le planning de {{ key }}",
+    "addLinkFor": "Ajouter un prédécesseur à {{ key }}",
+    "chartLabel": "Diagramme de Gantt de {{ count }} tâches, du {{ start }} au {{ finish }}, dont {{ critical }} sur le chemin critique. La vue tableau présente les mêmes données.",
+    "baselineTitle": "Enregistrer la référence {{ number }} ?",
+    "baselineFirst": "Enregistre les dates actuelles de chaque tâche, pour voir ensuite de combien le planning a bougé.",
+    "baselineReplace": "Les écarts seront mesurés par rapport à la nouvelle référence. Les références précédentes sont conservées.",
+    "saveBaseline": "Enregistrer la référence",
+    "movedTo": "{{ key }} commence désormais au plus tôt le {{ date }}.",
+    "resizedTo": "{{ key }} dure désormais {{ count }} jours ouvrés.",
+    "linked": "Lien {{ from }} → {{ to }} ajouté.",
+    "viewLabel": "Affichage",
+    "views": {
+      "chart": "Gantt",
+      "table": "Tableau"
+    },
+    "zoomLabel": "Zoom",
+    "zoom": {
+      "day": "Jours",
+      "week": "Semaines",
+      "month": "Mois"
+    },
+    "emptyTitle": "Rien à planifier pour l’instant",
+    "emptyMessage": "Ajoutez des tâches au projet ; elles apparaîtront ici avec leurs dates et le chemin critique.",
+    "start": "Début",
+    "finish": "Fin",
+    "criticalPath": "Chemin critique",
+    "taskCount": "{{ count }} tâches",
+    "baseline": "Référence",
+    "baselineInfo": "N° {{ number }}, enregistrée le {{ date }} par {{ name }}",
+    "noBaseline": "Aucune pour l’instant",
+    "startsNoEarlier": "Pas avant le {{ date }}",
+    "timelineLabel": "Chronologie"
+  },
+  "scheduleConstraint": {
+    "ASAP": "Dès que possible",
+    "START_NO_EARLIER_THAN": "Début au plus tôt le"
+  },
+  "dependencyType": {
+    "FS": "Fin à début",
+    "SS": "Début à début",
+    "FF": "Fin à fin",
+    "SF": "Début à fin"
+  },
+  "dependencyTypeHint": {
+    "FS": "commence après sa fin",
+    "SS": "commence après son début",
+    "FF": "finit après sa fin",
+    "SF": "finit après son début"
+  },
+  "dependencyRule": {
+    "FS": "{{ to }} peut commencer une fois {{ from }} terminée.",
+    "SS": "{{ to }} peut commencer une fois {{ from }} commencée.",
+    "FF": "{{ to }} peut finir une fois {{ from }} terminée.",
+    "SF": "{{ to }} peut finir une fois {{ from }} commencée."
+  },
+  "dayOfWeek": {
+    "MONDAY": "Lundi",
+    "TUESDAY": "Mardi",
+    "WEDNESDAY": "Mercredi",
+    "THURSDAY": "Jeudi",
+    "FRIDAY": "Vendredi",
+    "SATURDAY": "Samedi",
+    "SUNDAY": "Dimanche"
   }
 }

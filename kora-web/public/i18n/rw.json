@@ -233,6 +233,11 @@
         "not_planned": "Icyiciro cyateganyijwe ni cyo gishobora gutangira.",
         "not_active": "Icyiciro ntikirimo gukorwa.",
         "closed": "Icyiciro cyarangiye ntigihinduka."
+      },
+      "schedule": {
+        "cycle": "Aya masano yakora uruziga.",
+        "not_predictive": "Amasano n’igenamigambi fatizo ni iby’imishinga iteganyijwe n’ivanze.",
+        "dependency_exists": "Ibi bikorwa byombi bisanzwe bihujwe."
       }
     },
     "fields": {
@@ -353,7 +358,8 @@
       "label": "Ibice by'ubuyobozi",
       "members": "Abanyamuryango",
       "invitations": "Ubutumire",
-      "organization": "Umuryango"
+      "organization": "Umuryango",
+      "calendar": "Ingengabihe y’akazi"
     },
     "members": {
       "search": "Shakisha ukoresheje izina cyangwa imeyili",
@@ -405,6 +411,24 @@
       "saved": "Igenamiterere ry'umuryango ryabitswe.",
       "stale": "Undi muntu yabitse iri genamiterere mu gihe warimo uhindura. Ongera ufungure urebe ibyo yakoze, maze wongere ukore impinduka yawe.",
       "reload": "Fungura ibigezweho"
+    },
+    "calendar": {
+      "intro": "Igenamigambi ribara igihe mu minsi y’akazi: iminsi abantu bakora, ukuyemo iminsi mikuru.",
+      "stale": "Undi muntu yabitse ingengabihe mu gihe wayihinduraga. Ongera ufungure urebe iye, hanyuma wongere ukore impinduka yawe.",
+      "workingDays": "Iminsi y’akazi",
+      "holidays": "Iminsi mikuru",
+      "removeHoliday": "Kuraho {{ name }}",
+      "noHolidays": "Nta minsi mikuru irashyirwamo.",
+      "date": "Itariki",
+      "name": "Izina",
+      "addHoliday": "Ongeraho umunsi mukuru",
+      "unsaved": "Ufite impinduka zitabitswe.",
+      "save": "Bika ingengabihe",
+      "saved": "Ingengabihe y’akazi yabitswe.",
+      "errors": {
+        "noDays": "Hitamo nibura umunsi umwe w’akazi.",
+        "duplicate": "Iyo tariki isanzwe ari umunsi mukuru."
+      }
     }
   },
   "paginator": {
@@ -647,12 +671,6 @@
       "removeMessage": "{{ name }} ntazongera kubona uyu mushinga keretse uruhare rwe mu kigo rubimwemerera.",
       "removeConfirm": "Kuramo",
       "removed": "{{ name }} yakuwe mu itsinda."
-    },
-    "comingSoon": {
-      "schedule": {
-        "title": "Ingengabihe iraza vuba",
-        "message": "Imirimo ishingiye ku yindi, igishushanyo cya Gantt n’inzira y’ingenzi bizaza nyuma."
-      }
     }
   },
   "charter": {
@@ -854,8 +872,10 @@
       "points": "Andika umubare wuzuye kuva kuri 0 kugeza kuri 100.",
       "hours": "Andika amasaha kuva kuri 0 kugeza ku 10 000.",
       "label": "Ibirango bikoresha inyuguti, imibare, imyanya, _ na -, bitarenze inyuguti 30.",
-      "tooManyLabels": "Ibirango 10 ntarengwa."
-    }
+      "tooManyLabels": "Ibirango 10 ntarengwa.",
+      "duration": "Andika umubare w’iminsi uri hagati ya 0 na 1000."
+    },
+    "scheduleLegend": "Igenamigambi"
   },
   "board": {
     "sprint": "Icyiciro",
@@ -958,5 +978,135 @@
       "recent": "umuvuduko uheruka {{ average }} ({{ low }}–{{ high }})",
       "none": "Umuvuduko ugaragara iyo icyiciro kimaze gusozwa."
     }
+  },
+  "schedule": {
+    "columns": {
+      "task": "Igikorwa",
+      "duration": "Igihe kimara",
+      "start": "Gutangira",
+      "finish": "Kurangira",
+      "totalFloat": "Igihe cyo gutinda cyose (i)",
+      "freeFloat": "Igihe cyo gutinda cyigenga (i)",
+      "critical": "Inzira y’ingenzi",
+      "baseline": "Irangira ryateganyijwe",
+      "predecessors": "Ibibanziriza",
+      "actions": "Ibikorwa"
+    },
+    "critical": "Ingenzi",
+    "notCritical": "Gifite igihe cyo gutinda",
+    "today": "Uyu munsi",
+    "milestone": "Intambwe ikomeye",
+    "days": "iminsi {{ count }}",
+    "daysSuffix": "i",
+    "legend": {
+      "task": "Igikorwa",
+      "critical": "Igikorwa cy’ingenzi (nta gutinda)",
+      "baseline": "Igenamigambi fatizo",
+      "milestone": "Intambwe ikomeye",
+      "nonWorking": "Umunsi w’ikiruhuko"
+    },
+    "dragHelp": "Kurura umurongo kugira ngo uwimure, impera yawo y’iburyo kugira ngo uhindure igihe kimara, cyangwa akadomo kawo ukajyane ku wundi murongo kugira ngo ubihuze. Imbonerahamwe itanga izo mpinduka zose ukoresheje mudasobwa.",
+    "linkRemoved": "Isano {{ from }} → {{ to }} ryakuweho.",
+    "baselineSaved": "Igenamigambi fatizo {{ number }} ryabitswe.",
+    "editTitle": "Igenamigambi rya {{ key }}",
+    "fields": {
+      "duration": "Igihe kimara (iminsi y’akazi)",
+      "constraint": "Gutangira",
+      "constraintDate": "Ntibibe mbere ya",
+      "predecessor": "Kibanziriza (kiza mbere)",
+      "successor": "Gikurikira (kigishingiyeho)",
+      "type": "Ubwoko bw’isano",
+      "lag": "Gutinda"
+    },
+    "hints": {
+      "duration": "0 bituma kiba intambwe ikomeye.",
+      "lag": "Iminsi y’akazi; umubare uri munsi ya 0 ni ukubanziriza (guhurirana)."
+    },
+    "errors": {
+      "duration": "Andika umubare w’iminsi uri hagati ya 0 na 1000.",
+      "lag": "Andika umubare wuzuye uri hagati ya −365 na 365.",
+      "self": "Igikorwa ntigishobora kwishingikiriza ubwacyo."
+    },
+    "addLinkTitle": "Ongeraho isano",
+    "addLink": "Ongeraho isano",
+    "addPredecessor": "Kibanziriza",
+    "loop": "Iri sano ryatuma ibikorwa bitegerezanya mu ruziga:",
+    "loopStored": "Igenamigambi ntirishobora kubarwa: aya masano akora uruziga. Kuraho rimwe mu masano y’uru ruhererekane:",
+    "rule": {
+      "lag": "Nyuma y’iminsi y’akazi {{ days }}.",
+      "lead": "Mbere y’iminsi y’akazi {{ days }} (kubanziriza)."
+    },
+    "tableLabel": "Imbonerahamwe y’igenamigambi",
+    "tableCaption": "Ibikorwa uko bikurikirana mu igenamigambi n’amatariki yabyo, igihe cyo gutinda, inzira y’ingenzi n’amasano",
+    "variance": {
+      "late": "Byatinze iminsi {{ days }}",
+      "early": "Byabanje iminsi {{ days }}",
+      "onPlan": "Nk’uko byateganyijwe"
+    },
+    "notInBaseline": "Ntikiri mu igenamigambi fatizo",
+    "removeLink": "Kuraho isano {{ from }} → {{ to }}",
+    "editFor": "Hindura igenamigambi rya {{ key }}",
+    "addLinkFor": "Ongerera {{ key }} kibanziriza",
+    "chartLabel": "Igishushanyo cya Gantt cy’ibikorwa {{ count }}, kuva {{ start }} kugeza {{ finish }}, {{ critical }} biri ku nzira y’ingenzi. Imbonerahamwe igaragaza amakuru amwe.",
+    "baselineTitle": "Kubika igenamigambi fatizo {{ number }}?",
+    "baselineFirst": "Ibika amatariki ya buri gikorwa ubu, kugira ngo nyuma uzabone uko igenamigambi ryahindutse.",
+    "baselineReplace": "Itandukaniro rizapimwa hashingiwe ku igenamigambi fatizo rishya. Ayabanje arabikwa.",
+    "saveBaseline": "Bika igenamigambi fatizo",
+    "movedTo": "{{ key }} ubu ntigitangira mbere ya {{ date }}.",
+    "resizedTo": "{{ key }} ubu kimara iminsi y’akazi {{ count }}.",
+    "linked": "Isano {{ from }} → {{ to }} ryongeweho.",
+    "viewLabel": "Uko bigaragara",
+    "views": {
+      "chart": "Gantt",
+      "table": "Imbonerahamwe"
+    },
+    "zoomLabel": "Ingano",
+    "zoom": {
+      "day": "Iminsi",
+      "week": "Ibyumweru",
+      "month": "Amezi"
+    },
+    "emptyTitle": "Nta cyo gutegura kiraboneka",
+    "emptyMessage": "Ongeraho ibikorwa ku mushinga; bizagaragara hano n’amatariki yabyo n’inzira y’ingenzi.",
+    "start": "Bitangira",
+    "finish": "Birangira",
+    "criticalPath": "Inzira y’ingenzi",
+    "taskCount": "Ibikorwa {{ count }}",
+    "baseline": "Igenamigambi fatizo",
+    "baselineInfo": "No {{ number }}, ryabitswe ku ya {{ date }} na {{ name }}",
+    "noBaseline": "Nta na rimwe ryabitswe",
+    "startsNoEarlier": "Ntibibe mbere ya {{ date }}",
+    "timelineLabel": "Ingengabihe"
+  },
+  "scheduleConstraint": {
+    "ASAP": "Vuba bishoboka",
+    "START_NO_EARLIER_THAN": "Gutangira bitabaye mbere ya"
+  },
+  "dependencyType": {
+    "FS": "Kurangira-gutangira",
+    "SS": "Gutangira-gutangira",
+    "FF": "Kurangira-kurangira",
+    "SF": "Gutangira-kurangira"
+  },
+  "dependencyTypeHint": {
+    "FS": "gitangira nyuma y’uko kirangiye",
+    "SS": "gitangira nyuma y’uko gitangiye",
+    "FF": "kirangira nyuma y’uko kirangiye",
+    "SF": "kirangira nyuma y’uko gitangiye"
+  },
+  "dependencyRule": {
+    "FS": "{{ to }} gishobora gutangira {{ from }} kimaze kurangira.",
+    "SS": "{{ to }} gishobora gutangira {{ from }} kimaze gutangira.",
+    "FF": "{{ to }} gishobora kurangira {{ from }} kimaze kurangira.",
+    "SF": "{{ to }} gishobora kurangira {{ from }} kimaze gutangira."
+  },
+  "dayOfWeek": {
+    "MONDAY": "Kuwa mbere",
+    "TUESDAY": "Kuwa kabiri",
+    "WEDNESDAY": "Kuwa gatatu",
+    "THURSDAY": "Kuwa kane",
+    "FRIDAY": "Kuwa gatanu",
+    "SATURDAY": "Kuwa gatandatu",
+    "SUNDAY": "Ku cyumweru"
   }
 }

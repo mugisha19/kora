@@ -233,6 +233,11 @@
         "not_planned": "Only a planned sprint can start.",
         "not_active": "The sprint isn't running.",
         "closed": "A closed sprint can't change."
+      },
+      "schedule": {
+        "cycle": "These dependencies would form a loop.",
+        "not_predictive": "Dependencies and baselines are for Predictive and Hybrid projects.",
+        "dependency_exists": "These two tasks are already linked."
       }
     },
     "fields": {
@@ -353,7 +358,8 @@
       "label": "Administration sections",
       "members": "Members",
       "invitations": "Invitations",
-      "organization": "Organization"
+      "organization": "Organization",
+      "calendar": "Working calendar"
     },
     "members": {
       "search": "Search by name or email",
@@ -405,6 +411,24 @@
       "saved": "Organization settings saved.",
       "stale": "Someone else saved these settings while you were editing. Reload to see their version, then make your change again.",
       "reload": "Reload latest"
+    },
+    "calendar": {
+      "intro": "Schedules count durations in working days: the days people work, minus holidays.",
+      "stale": "Someone else saved the calendar while you were editing. Reload to see their version, then make your change again.",
+      "workingDays": "Working days",
+      "holidays": "Holidays",
+      "removeHoliday": "Remove {{ name }}",
+      "noHolidays": "No holidays yet.",
+      "date": "Date",
+      "name": "Name",
+      "addHoliday": "Add holiday",
+      "unsaved": "You have unsaved changes.",
+      "save": "Save calendar",
+      "saved": "Working calendar saved.",
+      "errors": {
+        "noDays": "Choose at least one working day.",
+        "duplicate": "That date is already a holiday."
+      }
     }
   },
   "paginator": {
@@ -647,12 +671,6 @@
       "removeMessage": "{{ name }} will no longer see this project unless their organization role allows it.",
       "removeConfirm": "Remove",
       "removed": "{{ name }} removed from the team."
-    },
-    "comingSoon": {
-      "schedule": {
-        "title": "The schedule is coming",
-        "message": "Dependencies, the Gantt chart and the critical path arrive in a later release."
-      }
     }
   },
   "charter": {
@@ -854,8 +872,10 @@
       "points": "Enter a whole number from 0 to 100.",
       "hours": "Enter hours from 0 to 10,000.",
       "label": "Labels use letters, digits, spaces, _ and -, at most 30 characters.",
-      "tooManyLabels": "At most 10 labels."
-    }
+      "tooManyLabels": "At most 10 labels.",
+      "duration": "Enter a whole number of days from 0 to 1000."
+    },
+    "scheduleLegend": "Schedule"
   },
   "board": {
     "sprint": "Sprint",
@@ -958,5 +978,135 @@
       "recent": "recent velocity {{ average }} ({{ low }}–{{ high }})",
       "none": "Velocity appears once a sprint has been closed."
     }
+  },
+  "schedule": {
+    "columns": {
+      "task": "Task",
+      "duration": "Duration",
+      "start": "Start",
+      "finish": "Finish",
+      "totalFloat": "Total float (d)",
+      "freeFloat": "Free float (d)",
+      "critical": "Critical path",
+      "baseline": "Baseline finish",
+      "predecessors": "Predecessors",
+      "actions": "Actions"
+    },
+    "critical": "Critical",
+    "notCritical": "Has float",
+    "today": "Today",
+    "milestone": "Milestone",
+    "days": "{{ count }} d",
+    "daysSuffix": "d",
+    "legend": {
+      "task": "Task",
+      "critical": "Critical task (no float)",
+      "baseline": "Baseline",
+      "milestone": "Milestone",
+      "nonWorking": "Non-working day"
+    },
+    "dragHelp": "Drag a bar to move it, its right edge to change its duration, or its dot onto another bar to link them. The table view offers the same edits with the keyboard.",
+    "linkRemoved": "Removed the link {{ from }} → {{ to }}.",
+    "baselineSaved": "Baseline {{ number }} saved.",
+    "editTitle": "Schedule of {{ key }}",
+    "fields": {
+      "duration": "Duration (working days)",
+      "constraint": "Start",
+      "constraintDate": "Not before",
+      "predecessor": "Predecessor (comes first)",
+      "successor": "Successor (depends on it)",
+      "type": "Link type",
+      "lag": "Lag"
+    },
+    "hints": {
+      "duration": "0 makes it a milestone.",
+      "lag": "Working days; negative for a lead (overlap)."
+    },
+    "errors": {
+      "duration": "Enter a whole number of days from 0 to 1000.",
+      "lag": "Enter a whole number from −365 to 365.",
+      "self": "A task can’t depend on itself."
+    },
+    "addLinkTitle": "Add a dependency",
+    "addLink": "Add dependency",
+    "addPredecessor": "Predecessor",
+    "loop": "This link would make the tasks wait for each other in a loop:",
+    "loopStored": "The schedule can’t be computed: these dependencies form a loop. Remove one of the links in this chain:",
+    "rule": {
+      "lag": "{{ days }} working days later.",
+      "lead": "{{ days }} working days earlier (a lead)."
+    },
+    "tableLabel": "Schedule table",
+    "tableCaption": "Tasks in schedule order with their dates, float, critical path and dependencies",
+    "variance": {
+      "late": "{{ days }} d late",
+      "early": "{{ days }} d early",
+      "onPlan": "On plan"
+    },
+    "notInBaseline": "Not in the baseline",
+    "removeLink": "Remove the link {{ from }} → {{ to }}",
+    "editFor": "Edit the schedule of {{ key }}",
+    "addLinkFor": "Add a predecessor to {{ key }}",
+    "chartLabel": "Gantt chart of {{ count }} tasks, from {{ start }} to {{ finish }}, with {{ critical }} on the critical path. The table view lists the same data.",
+    "baselineTitle": "Save baseline {{ number }}?",
+    "baselineFirst": "Records every task’s current dates, so later changes show how far the schedule has moved.",
+    "baselineReplace": "Variances will be measured against the new baseline instead of the current one. Earlier baselines are kept.",
+    "saveBaseline": "Save baseline",
+    "movedTo": "{{ key }} now starts no earlier than {{ date }}.",
+    "resizedTo": "{{ key }} now lasts {{ count }} working days.",
+    "linked": "Linked {{ from }} → {{ to }}.",
+    "viewLabel": "View",
+    "views": {
+      "chart": "Gantt",
+      "table": "Table"
+    },
+    "zoomLabel": "Zoom",
+    "zoom": {
+      "day": "Days",
+      "week": "Weeks",
+      "month": "Months"
+    },
+    "emptyTitle": "Nothing to schedule yet",
+    "emptyMessage": "Add tasks to the project; they appear here with their dates and the critical path.",
+    "start": "Starts",
+    "finish": "Finishes",
+    "criticalPath": "Critical path",
+    "taskCount": "{{ count }} tasks",
+    "baseline": "Baseline",
+    "baselineInfo": "No. {{ number }}, saved {{ date }} by {{ name }}",
+    "noBaseline": "None saved yet",
+    "startsNoEarlier": "No earlier than {{ date }}",
+    "timelineLabel": "Timeline"
+  },
+  "scheduleConstraint": {
+    "ASAP": "As soon as possible",
+    "START_NO_EARLIER_THAN": "Start no earlier than"
+  },
+  "dependencyType": {
+    "FS": "Finish to start",
+    "SS": "Start to start",
+    "FF": "Finish to finish",
+    "SF": "Start to finish"
+  },
+  "dependencyTypeHint": {
+    "FS": "starts after it finishes",
+    "SS": "starts after it starts",
+    "FF": "finishes after it finishes",
+    "SF": "finishes after it starts"
+  },
+  "dependencyRule": {
+    "FS": "{{ to }} can start once {{ from }} has finished.",
+    "SS": "{{ to }} can start once {{ from }} has started.",
+    "FF": "{{ to }} can finish once {{ from }} has finished.",
+    "SF": "{{ to }} can finish once {{ from }} has started."
+  },
+  "dayOfWeek": {
+    "MONDAY": "Monday",
+    "TUESDAY": "Tuesday",
+    "WEDNESDAY": "Wednesday",
+    "THURSDAY": "Thursday",
+    "FRIDAY": "Friday",
+    "SATURDAY": "Saturday",
+    "SUNDAY": "Sunday"
   }
 }
