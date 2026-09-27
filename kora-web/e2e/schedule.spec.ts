@@ -15,6 +15,13 @@ const bar = (page: Page, n: number) => page.locator(`[data-task="${task(n)}"] .s
 const summary = (page: Page, term: string) =>
   page.locator('.summary div', { hasText: term }).locator('dd');
 
+/** The schedule's finish date as shown once it has loaded. */
+async function finishDate(page: Page): Promise<string> {
+  const finish = summary(page, 'Finishes');
+  await expect(finish).toHaveText(/\d{4}/);
+  return (await finish.textContent())?.trim() ?? '';
+}
+
 /** Presses on `from` and releases at `to`, in small steps like a hand would. */
 async function drag(page: Page, from: Locator, to: { x: number; y: number }): Promise<void> {
   const box = await from.boundingBox();
@@ -44,7 +51,8 @@ test.describe('schedule', () => {
     await page.goto(`/projects/${WAREHOUSE}/schedule`);
 
     await expect(page.getByRole('img', { name: /Gantt chart of 8 tasks/ })).toBeVisible();
-    await expect(summary(page, 'Finishes')).toHaveText('Dec 29, 2026');
+    // Demo dates are relative to today: check the shape, not the day.
+    await expect(summary(page, 'Finishes')).toHaveText(/^[A-Z][a-z]{2} \d{1,2}, \d{4}$/);
     await expect(page.locator('.names').getByText('Critical', { exact: true })).toHaveCount(7);
     await expectNoA11yViolations(page);
 
@@ -60,6 +68,7 @@ test.describe('schedule', () => {
     await signInAs(page, 'Project manager');
     await page.goto(`/projects/${WAREHOUSE}/schedule?zoom=day`);
     const finance = bar(page, 4);
+    const before = await finishDate(page);
     await finance.scrollIntoViewIfNeeded();
     const box = await finance.boundingBox();
     if (!box) throw new Error('No bar');
@@ -67,7 +76,7 @@ test.describe('schedule', () => {
     // Ten days at 28 px a day: past its four days of float.
     await drag(page, finance, { x: box.x + box.width / 2 + 280, y: box.y + box.height / 2 });
 
-    await expect(summary(page, 'Finishes')).not.toHaveText('Dec 29, 2026');
+    await expect(summary(page, 'Finishes')).not.toHaveText(before);
     await expect(page.locator(`[data-task="${task(4)}"]`)).toHaveClass(/critical/);
   });
 
@@ -92,6 +101,7 @@ test.describe('schedule', () => {
     await signInAs(page, 'Project manager');
     await page.goto(`/projects/${WAREHOUSE}/schedule?view=table`);
 
+    const before = await finishDate(page);
     await page.getByRole('button', { name: 'Add a predecessor to AKG-005-7' }).click();
     const dialog = page.getByRole('dialog', { name: 'Add a dependency' });
     await choose(
@@ -109,7 +119,7 @@ test.describe('schedule', () => {
     await edit.getByRole('textbox', { name: 'Duration (working days)' }).fill('7');
     await edit.getByRole('button', { name: 'Save' }).click();
     await expect(page.getByRole('row', { name: /^AKG-005-1 / })).toContainText('7 d');
-    await expect(summary(page, 'Finishes')).not.toHaveText('Dec 29, 2026');
+    await expect(summary(page, 'Finishes')).not.toHaveText(before);
   });
 });
 

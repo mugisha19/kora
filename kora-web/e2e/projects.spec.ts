@@ -48,7 +48,17 @@ test.describe('portfolios and projects', () => {
     await expect(
       page.getByRole('heading', { level: 1, name: 'Agent banking pilot' }),
     ).toBeVisible();
-    await expect(tabs(page)).toHaveText(['Overview', 'Charter', 'WBS', 'Board', 'Backlog']);
+    await expect(tabs(page)).toHaveText([
+      'Overview',
+      'Charter',
+      'WBS',
+      'Board',
+      'Backlog',
+      'Risks',
+      'Issues',
+      'Stakeholders',
+      'Changes',
+    ]);
 
     await page.goto('/projects?q=AKG-020');
     await expect(page.getByRole('row', { name: /AKG-020 Agent banking pilot/ })).toBeVisible();
@@ -76,7 +86,16 @@ test.describe('portfolios and projects', () => {
     await signInAs(page, 'PMO');
 
     await page.goto(`/projects/${PROJECT.warehouse}`);
-    await expect(tabs(page)).toHaveText(['Overview', 'Charter', 'WBS', 'Schedule']);
+    await expect(tabs(page)).toHaveText([
+      'Overview',
+      'Charter',
+      'WBS',
+      'Schedule',
+      'Risks',
+      'Issues',
+      'Stakeholders',
+      'Changes',
+    ]);
 
     await page.goto(`/projects/${PROJECT.crm}/overview`);
     const lifecycle = page.getByRole('region', { name: 'Lifecycle' });
