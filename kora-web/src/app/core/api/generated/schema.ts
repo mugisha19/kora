@@ -755,6 +755,300 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/projects/{projectId}/tasks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List a project's tasks
+         * @description Ordered by rank by default. Sortable by `rank`, `key`, `priority`, `dueDate`, `createdAt`.
+         */
+        get: operations["listTasks"];
+        put?: never;
+        /**
+         * Create a task
+         * @description The project manager, `PMO`, `ORG_ADMIN` or a project contributor. Starts in `BACKLOG` unless `status` is `TODO`; its key is the project code plus a number (`AKG-012-34`).
+         */
+        post: operations["createTask"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/tasks/{taskId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a task */
+        get: operations["getTask"];
+        put?: never;
+        post?: never;
+        /**
+         * Delete a task
+         * @description The project manager, `PMO` or `ORG_ADMIN`.
+         */
+        delete: operations["deleteTask"];
+        options?: never;
+        head?: never;
+        /**
+         * Update a task''s details
+         * @description Managers edit any task; contributors edit tasks assigned to them or unassigned. The status changes through `POST /tasks/{taskId}/move`.
+         */
+        patch: operations["updateTask"];
+        trace?: never;
+    };
+    "/tasks/{taskId}/move": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Change a task''s status and/or position in one call
+         * @description Places the task between `afterTaskId` (above it) and `beforeTaskId` (below it) in the target status, or last when both are omitted. Moving into a column at its WIP limit needs `override: true`. `BLOCKED` needs a reason; reopening a `DONE` task is for managers only.
+         */
+        post: operations["moveTask"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/tasks/{taskId}/comments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The task''s comments, oldest first */
+        get: operations["listTaskComments"];
+        put?: never;
+        /**
+         * Comment on a task
+         * @description The project manager, `PMO`, `ORG_ADMIN` or a project contributor.
+         */
+        post: operations["addTaskComment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/board": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The Kanban board: columns with ordered cards and WIP counts
+         * @description Every task that isn't in the backlog, or only one sprint's tasks with `sprintId`.
+         */
+        get: operations["getBoard"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/board/columns/{status}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Rename a column or set its WIP limit
+         * @description The project manager, `PMO` or `ORG_ADMIN`. Omit `wipLimit` for no limit.
+         */
+        put: operations["configureBoardColumn"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/backlog": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The product backlog: unfinished tasks in no sprint, in rank order */
+        get: operations["getBacklog"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/sprints": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The project''s sprints, newest first */
+        get: operations["listSprints"];
+        put?: never;
+        /**
+         * Plan a sprint
+         * @description The project manager, `PMO` or `ORG_ADMIN`; Agile and Hybrid projects only.
+         */
+        post: operations["createSprint"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/sprints/{sprintId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a sprint */
+        get: operations["getSprint"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Change a sprint''s name, goal or dates */
+        patch: operations["updateSprint"];
+        trace?: never;
+    };
+    "/sprints/{sprintId}/start": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Start a planned sprint; its committed points are frozen */
+        post: operations["startSprint"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/sprints/{sprintId}/close": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Close the active sprint and carry unfinished tasks over
+         * @description Completed points are recorded; unfinished tasks move to `carryOverTo` (a planned sprint of the same project) or back to the backlog.
+         */
+        post: operations["closeSprint"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/sprints/{sprintId}/tasks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Add tasks to a sprint
+         * @description The project manager, `PMO` or `ORG_ADMIN`. Tasks already in another sprint move here.
+         */
+        post: operations["addTasksToSprint"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/sprints/{sprintId}/tasks/{taskId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Put a task back in the backlog */
+        delete: operations["removeTaskFromSprint"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/sprints/{sprintId}/burndown": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Remaining story points per day against the ideal line */
+        get: operations["getBurndown"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{projectId}/velocity": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Completed points of the last closed sprints, with a forecast range */
+        get: operations["getVelocity"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -816,7 +1110,7 @@ export interface components {
          *     back to a generic message for unknown codes.
          * @enum {string}
          */
-        ErrorCode: "validation.failed" | "auth.unauthenticated" | "auth.invalid_credentials" | "auth.refresh_invalid" | "auth.email_taken" | "auth.reset_token_invalid" | "tenant.forbidden" | "tenant.header_invalid" | "access.denied" | "resource.not_found" | "method.not_allowed" | "media_type.unsupported" | "concurrency.stale_version" | "concurrency.if_match_required" | "members.last_admin" | "members.self_removal" | "invitations.already_member" | "invitations.already_pending" | "invitations.not_pending" | "invitations.not_found" | "invitations.expired" | "invitations.revoked" | "invitations.already_accepted" | "rate_limited" | "organization.currency_locked" | "portfolios.archived" | "portfolios.not_empty" | "projects.code_taken" | "projects.invalid_transition" | "projects.charter_approval_required" | "projects.methodology_locked" | "project_members.is_manager" | "charters.not_draft" | "charters.not_submitted" | "charters.incomplete" | "wbs.parent_not_deliverable" | "wbs.too_deep" | "wbs.cycle" | "wbs.has_children" | "wbs.type_change_not_allowed" | "internal.error";
+        ErrorCode: "validation.failed" | "auth.unauthenticated" | "auth.invalid_credentials" | "auth.refresh_invalid" | "auth.email_taken" | "auth.reset_token_invalid" | "tenant.forbidden" | "tenant.header_invalid" | "access.denied" | "resource.not_found" | "method.not_allowed" | "media_type.unsupported" | "concurrency.stale_version" | "concurrency.if_match_required" | "members.last_admin" | "members.self_removal" | "invitations.already_member" | "invitations.already_pending" | "invitations.not_pending" | "invitations.not_found" | "invitations.expired" | "invitations.revoked" | "invitations.already_accepted" | "rate_limited" | "organization.currency_locked" | "portfolios.archived" | "portfolios.not_empty" | "projects.code_taken" | "projects.invalid_transition" | "projects.charter_approval_required" | "projects.methodology_locked" | "project_members.is_manager" | "charters.not_draft" | "charters.not_submitted" | "charters.incomplete" | "wbs.parent_not_deliverable" | "wbs.too_deep" | "wbs.cycle" | "wbs.has_children" | "wbs.type_change_not_allowed" | "tasks.invalid_transition" | "tasks.wip_limit_reached" | "tasks.remaining_work" | "sprints.not_agile" | "sprints.already_active" | "sprints.not_planned" | "sprints.not_active" | "sprints.closed" | "internal.error";
         /** @enum {string} */
         Role: "ORG_ADMIN" | "PMO" | "PROJECT_MANAGER" | "MEMBER" | "VIEWER";
         /** @enum {string} */
@@ -1299,6 +1593,11 @@ export interface components {
             plannedCost: components["schemas"]["Money"];
             /** @description A work package's reported progress, or the effort-weighted average over a subtree */
             percentComplete: number;
+            /**
+             * @description REPORTED: entered on the work package; TASKS: derived from its tasks (read-only); ROLLED_UP: a deliverable's average of its children
+             * @enum {string}
+             */
+            percentCompleteSource: "REPORTED" | "TASKS" | "ROLLED_UP";
             earnedValue: components["schemas"]["Money"];
             /** Format: int64 */
             version: number;
@@ -1418,6 +1717,273 @@ export interface components {
         };
         DashboardProjectPage: components["schemas"]["PageMetadata"] & {
             content: components["schemas"]["DashboardProject"][];
+        };
+        /**
+         * @description BACKLOG → TODO → IN_PROGRESS → IN_REVIEW → DONE; BLOCKED from TODO or IN_PROGRESS (with a reason)
+         * @enum {string}
+         */
+        TaskStatus: "BACKLOG" | "TODO" | "IN_PROGRESS" | "BLOCKED" | "IN_REVIEW" | "DONE";
+        /** @enum {string} */
+        TaskType: "STORY" | "TASK" | "BUG" | "CHORE";
+        /** @enum {string} */
+        TaskPriority: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
+        Labels: string[];
+        Task: {
+            /** Format: uuid */
+            id: string;
+            /**
+             * @description Project code and task number
+             * @example AKG-012-34
+             */
+            key: string;
+            /** Format: uuid */
+            projectId: string;
+            title: string;
+            /** @description Markdown. Render it as Markdown only: raw HTML is not allowed and must not be rendered. */
+            description?: string;
+            type: components["schemas"]["TaskType"];
+            priority: components["schemas"]["TaskPriority"];
+            status: components["schemas"]["TaskStatus"];
+            blockedReason?: string;
+            assignee?: components["schemas"]["UserRef"];
+            /**
+             * Format: uuid
+             * @description The work package this task belongs to
+             */
+            wbsNodeId?: string;
+            /** Format: uuid */
+            sprintId?: string;
+            /** Format: int32 */
+            storyPoints?: number;
+            estimateHours?: number;
+            remainingHours?: number;
+            /** Format: date */
+            startDate?: string;
+            /** Format: date */
+            dueDate?: string;
+            labels: components["schemas"]["Labels"];
+            /** @description Opaque sort key (lexorank); order tasks by it, never parse it */
+            rank: string;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            completedAt?: string;
+            /** Format: int64 */
+            version: number;
+        };
+        TaskPage: components["schemas"]["PageMetadata"] & {
+            content: components["schemas"]["Task"][];
+        };
+        CreateTaskRequest: {
+            title: string;
+            description?: string;
+            type: components["schemas"]["TaskType"];
+            priority?: components["schemas"]["TaskPriority"];
+            /**
+             * @default BACKLOG
+             * @enum {string}
+             */
+            status?: "BACKLOG" | "TODO";
+            /** Format: uuid */
+            assigneeId?: string;
+            /** Format: uuid */
+            wbsNodeId?: string;
+            /** Format: uuid */
+            sprintId?: string;
+            /** Format: int32 */
+            storyPoints?: number;
+            estimateHours?: number;
+            remainingHours?: number;
+            /** Format: date */
+            startDate?: string;
+            /** Format: date */
+            dueDate?: string;
+            labels?: components["schemas"]["Labels"];
+        };
+        UpdateTaskRequest: {
+            title?: string;
+            description?: string;
+            type?: components["schemas"]["TaskType"];
+            priority?: components["schemas"]["TaskPriority"];
+            /** Format: uuid */
+            assigneeId?: string;
+            /** Format: uuid */
+            wbsNodeId?: string;
+            /** Format: int32 */
+            storyPoints?: number;
+            estimateHours?: number;
+            remainingHours?: number;
+            /** Format: date */
+            startDate?: string;
+            /** Format: date */
+            dueDate?: string;
+            labels?: components["schemas"]["Labels"];
+        };
+        MoveTaskRequest: {
+            status: components["schemas"]["TaskStatus"];
+            /**
+             * Format: uuid
+             * @description The task that will be directly above
+             */
+            afterTaskId?: string;
+            /**
+             * Format: uuid
+             * @description The task that will be directly below
+             */
+            beforeTaskId?: string;
+            /**
+             * @description Move into a column at its WIP limit anyway
+             * @default false
+             */
+            override?: boolean;
+            /** @description Required when moving to BLOCKED */
+            reason?: string;
+        };
+        TaskComment: {
+            /** Format: uuid */
+            id: string;
+            author: components["schemas"]["UserRef"];
+            /** @description Markdown, rendered like a task description */
+            body: string;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        CreateTaskCommentRequest: {
+            body: string;
+        };
+        BoardColumnSettings: {
+            /** @enum {string} */
+            status: "TODO" | "IN_PROGRESS" | "BLOCKED" | "IN_REVIEW" | "DONE";
+            name: string;
+            /** Format: int32 */
+            wipLimit?: number;
+        };
+        BoardColumn: {
+            status: components["schemas"]["TaskStatus"];
+            name: string;
+            /** Format: int32 */
+            wipLimit?: number;
+            /** Format: int32 */
+            taskCount: number;
+            /** @description The column holds as many tasks as its WIP limit, or more */
+            atLimit: boolean;
+            tasks: components["schemas"]["Task"][];
+        };
+        Board: {
+            /** Format: uuid */
+            projectId: string;
+            /** Format: uuid */
+            sprintId?: string;
+            columns: components["schemas"]["BoardColumn"][];
+        };
+        /** @enum {string} */
+        SprintStatus: "PLANNED" | "ACTIVE" | "CLOSED";
+        Sprint: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            projectId: string;
+            /** @example Sprint 4 */
+            name: string;
+            goal?: string;
+            /** Format: date */
+            startDate: string;
+            /** Format: date */
+            endDate: string;
+            status: components["schemas"]["SprintStatus"];
+            /** Format: int32 */
+            taskCount: number;
+            /**
+             * Format: int32
+             * @description Story points of the tasks in the sprint now
+             */
+            totalPoints: number;
+            /**
+             * Format: int32
+             * @description Frozen when the sprint starts
+             */
+            committedPoints?: number;
+            /**
+             * Format: int32
+             * @description Recorded when the sprint closes
+             */
+            completedPoints?: number;
+            /** Format: int64 */
+            version: number;
+        };
+        CreateSprintRequest: {
+            name: string;
+            goal?: string;
+            /** Format: date */
+            startDate: string;
+            /** Format: date */
+            endDate: string;
+        };
+        UpdateSprintRequest: {
+            name?: string;
+            goal?: string;
+            /** Format: date */
+            startDate?: string;
+            /** Format: date */
+            endDate?: string;
+        };
+        CloseSprintRequest: {
+            /**
+             * @description A planned sprint's id, or `BACKLOG`
+             * @example BACKLOG
+             */
+            carryOverTo: string;
+        };
+        SprintTasksRequest: {
+            taskIds: string[];
+        };
+        BurndownDay: {
+            /** Format: date */
+            date: string;
+            idealRemaining: number;
+            /**
+             * Format: int32
+             * @description Absent for days that haven't happened yet
+             */
+            actualRemaining?: number;
+        };
+        Burndown: {
+            /** Format: uuid */
+            sprintId: string;
+            /** Format: date */
+            startDate: string;
+            /** Format: date */
+            endDate: string;
+            /** Format: int32 */
+            committedPoints: number;
+            days: components["schemas"]["BurndownDay"][];
+        };
+        VelocitySprint: {
+            /** Format: uuid */
+            sprintId: string;
+            name: string;
+            /** Format: date */
+            endDate: string;
+            /** Format: int32 */
+            committedPoints: number;
+            /** Format: int32 */
+            completedPoints: number;
+        };
+        Velocity: {
+            /** @description Oldest first */
+            sprints: components["schemas"]["VelocitySprint"][];
+            /** @description Average completed points; absent before the first closed sprint */
+            average?: number;
+            /**
+             * Format: int32
+             * @description Lowest completed points in the window (forecast range)
+             */
+            low?: number;
+            /**
+             * Format: int32
+             * @description Highest completed points in the window (forecast range)
+             */
+            high?: number;
         };
     };
     responses: {
@@ -1557,6 +2123,10 @@ export interface components {
         NodeId: string;
         /** @description The person's user id (as in `Member.userId`) */
         UserId: string;
+        TaskId: string;
+        SprintId: string;
+        /** @description A board column (every task status except BACKLOG) */
+        BoardStatus: "TODO" | "IN_PROGRESS" | "BLOCKED" | "IN_REVIEW" | "DONE";
     };
     requestBodies: never;
     headers: {
@@ -3579,6 +4149,861 @@ export interface operations {
             400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthenticated"];
             403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listTasks: {
+        parameters: {
+            query?: {
+                status?: components["schemas"]["TaskStatus"];
+                assigneeId?: string;
+                sprintId?: string;
+                type?: components["schemas"]["TaskType"];
+                label?: string;
+                /** @description Case-insensitive match on name (and code for projects) */
+                q?: string;
+                /** @description 0-based page index */
+                page?: components["parameters"]["Page"];
+                /** @description Page size (values above 100 are capped at 100) */
+                size?: components["parameters"]["Size"];
+                /** @description `field,asc` or `field,desc`; repeat for secondary sorts */
+                sort?: components["parameters"]["Sort"];
+            };
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                projectId: components["parameters"]["ProjectId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description One page of tasks */
+            200: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TaskPage"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    createTask: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                projectId: components["parameters"]["ProjectId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateTaskRequest"];
+            };
+        };
+        responses: {
+            /** @description Task created */
+            201: {
+                headers: {
+                    ETag: components["headers"]["ETag"];
+                    /** @description URL of the new resource */
+                    Location?: string;
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Task"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            /** @description The project's portfolio is archived. Code: `portfolios.archived`. */
+            409: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getTask: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                taskId: components["parameters"]["TaskId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The task */
+            200: {
+                headers: {
+                    ETag: components["headers"]["ETag"];
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Task"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    deleteTask: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                taskId: components["parameters"]["TaskId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deleted */
+            204: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    updateTask: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description The `ETag` of the version being updated, e.g. `"3"` */
+                "If-Match": components["parameters"]["IfMatch"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                taskId: components["parameters"]["TaskId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateTaskRequest"];
+            };
+        };
+        responses: {
+            /** @description The updated task */
+            200: {
+                headers: {
+                    ETag: components["headers"]["ETag"];
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Task"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    moveTask: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                taskId: components["parameters"]["TaskId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MoveTaskRequest"];
+            };
+        };
+        responses: {
+            /** @description The moved task */
+            200: {
+                headers: {
+                    ETag: components["headers"]["ETag"];
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Task"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            /** @description `tasks.invalid_transition`, `tasks.wip_limit_reached` or `tasks.remaining_work` (remaining hours must be 0 to finish). */
+            409: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listTaskComments: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                taskId: components["parameters"]["TaskId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The comments */
+            200: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TaskComment"][];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    addTaskComment: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                taskId: components["parameters"]["TaskId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateTaskCommentRequest"];
+            };
+        };
+        responses: {
+            /** @description The new comment */
+            201: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TaskComment"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getBoard: {
+        parameters: {
+            query?: {
+                sprintId?: string;
+            };
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                projectId: components["parameters"]["ProjectId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The board */
+            200: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Board"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    configureBoardColumn: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                projectId: components["parameters"]["ProjectId"];
+                /** @description A board column (every task status except BACKLOG) */
+                status: components["parameters"]["BoardStatus"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BoardColumnSettings"];
+            };
+        };
+        responses: {
+            /** @description The column settings */
+            200: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BoardColumnSettings"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getBacklog: {
+        parameters: {
+            query?: {
+                /** @description 0-based page index */
+                page?: components["parameters"]["Page"];
+                /** @description Page size (values above 100 are capped at 100) */
+                size?: components["parameters"]["Size"];
+                /** @description `field,asc` or `field,desc`; repeat for secondary sorts */
+                sort?: components["parameters"]["Sort"];
+            };
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                projectId: components["parameters"]["ProjectId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description One page of the backlog */
+            200: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TaskPage"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listSprints: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                projectId: components["parameters"]["ProjectId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The sprints */
+            200: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Sprint"][];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    createSprint: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                projectId: components["parameters"]["ProjectId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateSprintRequest"];
+            };
+        };
+        responses: {
+            /** @description Sprint planned */
+            201: {
+                headers: {
+                    ETag: components["headers"]["ETag"];
+                    /** @description URL of the new resource */
+                    Location?: string;
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Sprint"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            /** @description The project is Predictive. Code: `sprints.not_agile`. */
+            409: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getSprint: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                sprintId: components["parameters"]["SprintId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The sprint */
+            200: {
+                headers: {
+                    ETag: components["headers"]["ETag"];
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Sprint"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    updateSprint: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description The `ETag` of the version being updated, e.g. `"3"` */
+                "If-Match": components["parameters"]["IfMatch"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                sprintId: components["parameters"]["SprintId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateSprintRequest"];
+            };
+        };
+        responses: {
+            /** @description The updated sprint */
+            200: {
+                headers: {
+                    ETag: components["headers"]["ETag"];
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Sprint"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            /** @description The sprint is closed. Code: `sprints.closed`. */
+            409: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    startSprint: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                sprintId: components["parameters"]["SprintId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The active sprint */
+            200: {
+                headers: {
+                    ETag: components["headers"]["ETag"];
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Sprint"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            /** @description `sprints.already_active` (another sprint runs) or `sprints.not_planned`. */
+            409: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            500: components["responses"]["InternalError"];
+        };
+    };
+    closeSprint: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                sprintId: components["parameters"]["SprintId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CloseSprintRequest"];
+            };
+        };
+        responses: {
+            /** @description The closed sprint */
+            200: {
+                headers: {
+                    ETag: components["headers"]["ETag"];
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Sprint"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            /** @description The sprint is not active. Code: `sprints.not_active`. */
+            409: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            500: components["responses"]["InternalError"];
+        };
+    };
+    addTasksToSprint: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                sprintId: components["parameters"]["SprintId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SprintTasksRequest"];
+            };
+        };
+        responses: {
+            /** @description The sprint */
+            200: {
+                headers: {
+                    ETag: components["headers"]["ETag"];
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Sprint"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            /** @description The sprint is closed. Code: `sprints.closed`. */
+            409: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            500: components["responses"]["InternalError"];
+        };
+    };
+    removeTaskFromSprint: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                sprintId: components["parameters"]["SprintId"];
+                taskId: components["parameters"]["TaskId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Removed from the sprint */
+            204: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            /** @description The sprint is closed. Code: `sprints.closed`. */
+            409: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getBurndown: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                sprintId: components["parameters"]["SprintId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The burndown */
+            200: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Burndown"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getVelocity: {
+        parameters: {
+            query?: {
+                last?: number;
+            };
+            header: {
+                /** @description The active organization; must be one of the caller's memberships */
+                "X-Organization-Id": components["parameters"]["OrganizationId"];
+                /** @description Optional client-generated id echoed in the response and logs */
+                "X-Correlation-Id"?: components["parameters"]["CorrelationId"];
+            };
+            path: {
+                projectId: components["parameters"]["ProjectId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The velocity */
+            200: {
+                headers: {
+                    "X-Correlation-Id": components["headers"]["CorrelationId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Velocity"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
             500: components["responses"]["InternalError"];
         };
     };

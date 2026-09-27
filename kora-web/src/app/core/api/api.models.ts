@@ -67,3 +67,83 @@ export const INVITATION_STATUSES = [
 /** Sort fields the API accepts (anything else is `400 validation.failed` on `sort`). */
 export const MEMBER_SORT_FIELDS = ['fullName', 'email', 'role', 'joinedAt'] as const;
 export const INVITATION_SORT_FIELDS = ['createdAt', 'expiresAt', 'email'] as const;
+
+// ---------- Contract 0.2.0: portfolios, projects, charter, WBS, dashboard ----------
+
+export type Money = Schemas['Money'];
+export type UserRef = Schemas['UserRef'];
+export type Health = Schemas['Health'];
+
+export type PortfolioStatus = Schemas['PortfolioStatus'];
+export type Portfolio = Schemas['Portfolio'];
+export type PortfolioPage = Schemas['PortfolioPage'];
+export type CreatePortfolioRequest = Schemas['CreatePortfolioRequest'];
+export type UpdatePortfolioRequest = Schemas['UpdatePortfolioRequest'];
+export type ProgramStatus = Schemas['ProgramStatus'];
+export type Program = Schemas['Program'];
+export type CreateProgramRequest = Schemas['CreateProgramRequest'];
+export type UpdateProgramRequest = Schemas['UpdateProgramRequest'];
+
+export type Methodology = Schemas['Methodology'];
+export type ProjectStatus = Schemas['ProjectStatus'];
+export type Project = Schemas['Project'];
+export type ProjectPage = Schemas['ProjectPage'];
+export type CreateProjectRequest = Schemas['CreateProjectRequest'];
+export type UpdateProjectRequest = Schemas['UpdateProjectRequest'];
+export type TransitionRequest = Schemas['TransitionRequest'];
+export type HealthOverrideRequest = Schemas['HealthOverrideRequest'];
+export type ProjectRole = Schemas['ProjectRole'];
+export type ProjectMember = Schemas['ProjectMember'];
+export type PutProjectMemberRequest = Schemas['PutProjectMemberRequest'];
+
+export type CharterStatus = Schemas['CharterStatus'];
+export type CharterObjective = Schemas['CharterObjective'];
+export type CharterMilestone = Schemas['CharterMilestone'];
+export type CharterContent = Schemas['CharterContent'];
+export type Charter = Schemas['Charter'];
+
+export type WbsNodeType = Schemas['WbsNodeType'];
+export type WbsNode = Schemas['WbsNode'];
+export type WbsTree = Schemas['WbsTree'];
+export type CreateWbsNodeRequest = Schemas['CreateWbsNodeRequest'];
+export type UpdateWbsNodeRequest = Schemas['UpdateWbsNodeRequest'];
+export type MoveWbsNodeRequest = Schemas['MoveWbsNodeRequest'];
+
+export type DashboardSummary = Schemas['DashboardSummary'];
+export type DashboardProject = Schemas['DashboardProject'];
+export type DashboardProjectPage = Schemas['DashboardProjectPage'];
+
+export type ListPortfoliosQuery = NonNullable<operations['listPortfolios']['parameters']['query']>;
+export type ListProjectsQuery = NonNullable<operations['listProjects']['parameters']['query']>;
+export type ListDashboardProjectsQuery = NonNullable<
+  operations['listDashboardProjects']['parameters']['query']
+>;
+
+export const HEALTHS = ['RED', 'AMBER', 'GREEN', 'GREY'] as const satisfies readonly Health[];
+export const METHODOLOGIES = [
+  'AGILE',
+  'PREDICTIVE',
+  'HYBRID',
+] as const satisfies readonly Methodology[];
+export const PROJECT_STATUSES = [
+  'PROPOSED',
+  'APPROVED',
+  'IN_PROGRESS',
+  'ON_HOLD',
+  'CLOSING',
+  'CLOSED',
+  'CANCELLED',
+] as const satisfies readonly ProjectStatus[];
+export const PORTFOLIO_SORT_FIELDS = ['name', 'createdAt'] as const;
+export const PROJECT_SORT_FIELDS = [
+  'code',
+  'name',
+  'status',
+  'startDate',
+  'targetEndDate',
+] as const;
+export const DASHBOARD_SORT_FIELDS = ['code', 'name', 'percentComplete', 'targetEndDate'] as const;
+/** Transitions that need a reason (400 on `reason` otherwise). */
+export const TRANSITIONS_NEEDING_REASON: readonly ProjectStatus[] = ['ON_HOLD', 'CANCELLED'];
+/** The WBS is at most this many levels deep (409 `wbs.too_deep`). */
+export const WBS_MAX_DEPTH = 8;
