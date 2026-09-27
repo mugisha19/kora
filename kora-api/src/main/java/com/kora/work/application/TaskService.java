@@ -17,6 +17,7 @@ import com.kora.work.TaskChanged;
 import com.kora.work.WorkErrorCodes;
 import com.kora.work.domain.BoardColumn;
 import com.kora.work.domain.Rank;
+import com.kora.work.domain.ScheduleConstraint;
 import com.kora.work.domain.Sprint;
 import com.kora.work.domain.Task;
 import com.kora.work.domain.TaskComment;
@@ -98,7 +99,10 @@ public class TaskService {
             BigDecimal remainingHours,
             LocalDate startDate,
             LocalDate dueDate,
-            List<String> labels) {}
+            List<String> labels,
+            Integer durationDays,
+            ScheduleConstraint scheduleConstraint,
+            LocalDate constraintDate) {}
 
     /** Null fields stay as they are. */
     public record TaskChanges(
@@ -113,7 +117,10 @@ public class TaskService {
             BigDecimal remainingHours,
             LocalDate startDate,
             LocalDate dueDate,
-            List<String> labels) {}
+            List<String> labels,
+            Integer durationDays,
+            ScheduleConstraint scheduleConstraint,
+            LocalDate constraintDate) {}
 
     /**
      * @param afterTaskId the task that ends up directly above
@@ -171,6 +178,7 @@ public class TaskService {
         }
         task.estimate(command.storyPoints(), command.estimateHours(), command.remainingHours());
         task.schedule(command.startDate(), command.dueDate());
+        task.planSchedule(command.durationDays(), command.scheduleConstraint(), command.constraintDate());
         if (command.labels() != null) {
             task.label(command.labels());
         }
@@ -206,6 +214,7 @@ public class TaskService {
         }
         task.estimate(changes.storyPoints(), changes.estimateHours(), changes.remainingHours());
         task.schedule(changes.startDate(), changes.dueDate());
+        task.planSchedule(changes.durationDays(), changes.scheduleConstraint(), changes.constraintDate());
         if (changes.labels() != null) {
             task.label(changes.labels());
         }

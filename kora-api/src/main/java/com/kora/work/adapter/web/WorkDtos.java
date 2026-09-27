@@ -1,6 +1,7 @@
 package com.kora.work.adapter.web;
 
 import com.kora.platform.web.UserRefJson;
+import com.kora.work.domain.ScheduleConstraint;
 import com.kora.work.domain.SprintStatus;
 import com.kora.work.domain.TaskPriority;
 import com.kora.work.domain.TaskStatus;
@@ -49,6 +50,9 @@ final class WorkDtos {
             LocalDate startDate,
             LocalDate dueDate,
             List<String> labels,
+            Integer durationDays,
+            ScheduleConstraint scheduleConstraint,
+            LocalDate constraintDate,
             String rank,
             Instant createdAt,
             Instant completedAt,
@@ -68,7 +72,10 @@ final class WorkDtos {
             @DecimalMin("0") @DecimalMax("10000") BigDecimal remainingHours,
             LocalDate startDate,
             LocalDate dueDate,
-            @Size(max = 10) List<@NotNull @Pattern(regexp = LABEL) String> labels) {}
+            @Size(max = 10) List<@NotNull @Pattern(regexp = LABEL) String> labels,
+            @Min(0) @Max(1000) Integer durationDays,
+            ScheduleConstraint scheduleConstraint,
+            LocalDate constraintDate) {}
 
     record UpdateTaskRequest(
             @Size(min = 1, max = 200) String title,
@@ -82,7 +89,10 @@ final class WorkDtos {
             @DecimalMin("0") @DecimalMax("10000") BigDecimal remainingHours,
             LocalDate startDate,
             LocalDate dueDate,
-            @Size(max = 10) List<@NotNull @Pattern(regexp = LABEL) String> labels) {}
+            @Size(max = 10) List<@NotNull @Pattern(regexp = LABEL) String> labels,
+            @Min(0) @Max(1000) Integer durationDays,
+            ScheduleConstraint scheduleConstraint,
+            LocalDate constraintDate) {}
 
     record MoveTaskRequest(
             @NotNull TaskStatus status,

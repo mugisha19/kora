@@ -101,6 +101,17 @@ public class Task {
     @Column(name = "due_date")
     private LocalDate dueDate;
 
+    /** Working days, for the schedule (feature 10); 0 is a milestone. */
+    @Column(name = "duration_days")
+    private Integer durationDays;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "schedule_constraint", nullable = false)
+    private ScheduleConstraint scheduleConstraint;
+
+    @Column(name = "constraint_date")
+    private LocalDate constraintDate;
+
     @Convert(converter = StringListConverter.class)
     @Column(nullable = false)
     private List<String> labels;
@@ -150,6 +161,7 @@ public class Task {
         task.priority = TaskPriority.MEDIUM;
         task.status = status;
         task.labels = List.of();
+        task.scheduleConstraint = ScheduleConstraint.ASAP;
         task.rank = Objects.requireNonNull(rank);
         task.createdAt = Objects.requireNonNull(now);
         return task;
@@ -192,6 +204,29 @@ public class Task {
         if (remaining != null) {
             this.remainingHours = remaining.setScale(2, RoundingMode.HALF_EVEN);
         }
+    }
+
+    /**
+     * Planning for the schedule; null parameters leave the value as it is. Switching to {@code ASAP} forgets the date;
+     * {@code START_NO_EARLIER_THAN} needs one, given now or kept from before.
+     */
+    public void planSchedule(Integer duration, ScheduleConstraint constraint, LocalDate date) {
+        if (duration != null) {
+            this.durationDays = duration;
+        }
+        ScheduleConstraint newConstraint = constraint != null ? constraint : scheduleConstraint;
+        if (newConstraint == ScheduleConstraint.ASAP) {
+            this.scheduleConstraint = ScheduleConstraint.ASAP;
+            this.constraintDate = null;
+            return;
+        }
+        LocalDate newDate = date != null ? date : constraintDate;
+        if (newDate == null) {
+            throw new InvalidInputException(FieldViolation.of(
+                    "constraintDate", PlatformErrorCodes.Field.REQUIRED, "START_NO_EARLIER_THAN needs a date"));
+        }
+        this.scheduleConstraint = newConstraint;
+        this.constraintDate = newDate;
     }
 
     public void schedule(LocalDate start, LocalDate due) {
@@ -348,6 +383,18 @@ public class Task {
 
     public LocalDate getDueDate() {
         return dueDate;
+    }
+
+    public Integer getDurationDays() {
+        return durationDays;
+    }
+
+    public ScheduleConstraint getScheduleConstraint() {
+        return scheduleConstraint;
+    }
+
+    public LocalDate getConstraintDate() {
+        return constraintDate;
     }
 
     public List<String> getLabels() {

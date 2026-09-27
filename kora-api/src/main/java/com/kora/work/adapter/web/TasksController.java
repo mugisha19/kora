@@ -94,7 +94,10 @@ class TasksController {
                         body.remainingHours(),
                         body.startDate(),
                         body.dueDate(),
-                        body.labels()));
+                        body.labels(),
+                        body.durationDays(),
+                        body.scheduleConstraint(),
+                        body.constraintDate()));
         return ResponseEntity.created(URI.create("/api/v1/tasks/" + task.getId()))
                 .eTag(EntityTags.of(task.getVersion()))
                 .body(responses.task(task));
@@ -125,7 +128,10 @@ class TasksController {
                         body.remainingHours(),
                         body.startDate(),
                         body.dueDate(),
-                        body.labels())));
+                        body.labels(),
+                        body.durationDays(),
+                        body.scheduleConstraint(),
+                        body.constraintDate())));
     }
 
     @DeleteMapping("/api/v1/tasks/{taskId}")
