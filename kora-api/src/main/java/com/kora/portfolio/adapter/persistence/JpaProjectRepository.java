@@ -40,4 +40,8 @@ interface JpaProjectRepository
     @Override
     @Query("select p.id from Project p where p.managerId = :managerId")
     Set<UUID> findIdsByManagerId(@Param("managerId") UUID managerId);
+
+    @Override
+    @Query("select p.id from Project p where p.portfolioId = :portfolioId")
+    Set<UUID> findIdsByPortfolioId(@Param("portfolioId") UUID portfolioId);
 }

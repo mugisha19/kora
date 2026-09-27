@@ -9,6 +9,7 @@ import com.kora.portfolio.application.PortfolioRepositories.ProjectRepository;
 import com.kora.portfolio.domain.CharterStatus;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -55,6 +56,12 @@ class ProjectQueriesService implements ProjectQueries {
         return projects.findAll().stream()
                 .map(project -> new ProjectKey(project.getOrganizationId(), project.getId()))
                 .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Set<UUID> projectIdsOfPortfolio(UUID portfolioId) {
+        return projects.findIdsByPortfolioId(portfolioId);
     }
 
     @Override

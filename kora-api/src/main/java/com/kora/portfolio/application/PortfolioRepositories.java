@@ -87,6 +87,8 @@ public final class PortfolioRepositories {
         /** Project ids the user manages (for visibility). */
         Set<UUID> findIdsByManagerId(UUID managerId);
 
+        Set<UUID> findIdsByPortfolioId(UUID portfolioId);
+
         /** Every project in scope; with the system scope, every project of every organization. */
         List<Project> findAll();
 

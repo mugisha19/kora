@@ -2,6 +2,7 @@ package com.kora.portfolio;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -20,6 +21,9 @@ public interface ProjectQueries {
      * health changes, i.e. not while an override hides the computed value.
      */
     void recordComputedHealth(UUID projectId, Health health, String reason);
+
+    /** The ids of the portfolio's projects, for portfolio-wide views that apply their own visibility filter. */
+    Set<UUID> projectIdsOfPortfolio(UUID portfolioId);
 
     record ProjectKey(UUID organizationId, UUID projectId) {}
 }
