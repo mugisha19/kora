@@ -1,6 +1,6 @@
 import { Schedule, ScheduledTask, WorkingCalendar } from '../core/api/api.models';
 import { ProjectRecord } from './data-projects';
-import { CalendarRecord, WEEKDAYS } from './data-schedule';
+import { BaselineRecord, CalendarRecord, WEEKDAYS } from './data-schedule';
 import { TaskRecord } from './data-work';
 import { Activity, Link, WorkingDays, criticalPath } from './cpm';
 import { db } from './db';
@@ -119,6 +119,29 @@ export function scheduleOf(project: ProjectRecord): Schedule {
     criticalPath: rows.filter((r) => r.critical).map((r) => r.taskId),
     tasks: rows,
   };
+}
+
+/**
+ * Records every task's early dates as the project's next baseline. Throws `CycleError` when a
+ * loop stops the schedule from being computed.
+ */
+export function saveBaseline(project: ProjectRecord, userId: string): BaselineRecord {
+  const schedule = scheduleOf(project);
+  const previous = db.state.baselines.filter((b) => b.projectId === project.id);
+  const record: BaselineRecord = {
+    id: crypto.randomUUID(),
+    projectId: project.id,
+    number: Math.max(0, ...previous.map((b) => b.number)) + 1,
+    savedAt: new Date().toISOString(),
+    savedById: userId,
+    tasks: schedule.tasks.map((t) => ({
+      taskId: t.taskId,
+      start: t.earlyStart,
+      finish: t.earlyFinish,
+    })),
+  };
+  db.state.baselines.push(record);
+  return record;
 }
 
 /** Task ids → keys, for naming a loop. */

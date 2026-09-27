@@ -100,6 +100,13 @@ export function health(
           : 'Not started';
     return { health: 'GREY', healthReason: reason, healthOverridden: false };
   }
+  if (criticalRiskOverdue(project, now)) {
+    return {
+      health: 'RED',
+      healthReason: 'A critical risk is open past its response date',
+      healthOverridden: false,
+    };
+  }
   if (isLate(project, now)) {
     return {
       health: 'AMBER',
@@ -108,6 +115,22 @@ export function health(
     };
   }
   return { health: 'GREEN', healthReason: 'On track', healthOverridden: false };
+}
+
+/**
+ * An open critical risk (score 15+) past its review date, or still without a response plan a week
+ * after it was raised (contract 0.5.0).
+ */
+export function criticalRiskOverdue(project: ProjectRecord, now = Date.now()): boolean {
+  const today = orgToday(project.organizationId, now);
+  return (db.state.risks ?? []).some(
+    (r) =>
+      r.projectId === project.id &&
+      r.status !== 'CLOSED' &&
+      r.probability * r.impact >= 15 &&
+      ((!!r.reviewDate && r.reviewDate < today) ||
+        (!r.responsePlan && Date.parse(r.createdAt) <= now - 7 * 86_400_000)),
+  );
 }
 
 // ---------- Visibility and rights ----------

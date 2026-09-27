@@ -9,6 +9,10 @@ import { membersHandlers } from './members.handlers';
 import { portfolioHandlers } from './portfolio.handlers';
 import { projectHandlers } from './project.handlers';
 import { scheduleHandlers } from './schedule.handlers';
+import { riskHandlers } from './risk.handlers';
+import { issueHandlers } from './issue.handlers';
+import { stakeholderHandlers } from './stakeholder.handlers';
+import { changeRequestHandlers } from './change-request.handlers';
 import { sprintHandlers } from './sprint.handlers';
 import { taskHandlers } from './task.handlers';
 import { wbsHandlers } from './wbs.handlers';
@@ -30,6 +34,10 @@ export const handlers = [
   ...taskHandlers,
   ...sprintHandlers,
   ...scheduleHandlers,
+  ...riskHandlers,
+  ...issueHandlers,
+  ...stakeholderHandlers,
+  ...changeRequestHandlers,
   http.all(`${API}/*`, ({ request }) => {
     const r = reply(request);
     const userId = authenticate(request, r);

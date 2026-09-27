@@ -19,7 +19,14 @@ import {
   requireRole,
 } from '../http';
 import { canSee } from '../projects-domain';
-import { calendarOf, keysOf, linksOf, scheduleOf, toCalendar } from '../schedule-domain';
+import {
+  calendarOf,
+  keysOf,
+  linksOf,
+  saveBaseline,
+  scheduleOf,
+  toCalendar,
+} from '../schedule-domain';
 import { manages, tasksOf } from '../work-domain';
 import { caller } from './portfolio.handlers';
 import { visibleProject } from './project.handlers';
@@ -175,27 +182,13 @@ export const scheduleHandlers = [
     if (!manages(project, membership)) return r.problem(403, 'access.denied');
     const agile = notPredictive(r, project);
     if (agile) return agile;
-    let schedule;
+    let record: BaselineRecord;
     try {
-      schedule = scheduleOf(project);
+      record = saveBaseline(project, membership.userId);
     } catch (error: unknown) {
       if (error instanceof CycleError) return cycle(r, error.cycle, 'dependencies');
       throw error;
     }
-    const previous = db.state.baselines.filter((b) => b.projectId === project.id);
-    const record: BaselineRecord = {
-      id: crypto.randomUUID(),
-      projectId: project.id,
-      number: Math.max(0, ...previous.map((b) => b.number)) + 1,
-      savedAt: new Date().toISOString(),
-      savedById: membership.userId,
-      tasks: schedule.tasks.map((t) => ({
-        taskId: t.taskId,
-        start: t.earlyStart,
-        finish: t.earlyFinish,
-      })),
-    };
-    db.state.baselines.push(record);
     db.save();
     return r.json(
       {
