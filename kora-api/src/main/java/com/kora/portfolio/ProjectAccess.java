@@ -19,5 +19,14 @@ public interface ProjectAccess {
     /** The project manager, {@code PMO} or {@code ORG_ADMIN}, and only while its portfolio is active. */
     ProjectRef manageable(UUID projectId);
 
+    /**
+     * Managers as in {@link #manageable}, plus the team's contributors (unless the organization only lets them read,
+     * {@code VIEWER}), and only while its portfolio is active. Observers get {@code 403}.
+     */
+    ProjectParticipation participating(UUID projectId);
+
+    /** Whether the user could be given work on the project: its manager or a contributor on its team. */
+    boolean canWorkOn(UUID projectId, UUID userId);
+
     ProjectVisibility visibility();
 }

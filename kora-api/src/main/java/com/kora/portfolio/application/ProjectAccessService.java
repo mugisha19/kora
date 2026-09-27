@@ -6,12 +6,14 @@ import com.kora.organization.Role;
 import com.kora.platform.error.ForbiddenException;
 import com.kora.platform.error.NotFoundException;
 import com.kora.portfolio.ProjectAccess;
+import com.kora.portfolio.ProjectParticipation;
 import com.kora.portfolio.ProjectRef;
 import com.kora.portfolio.ProjectVisibility;
 import com.kora.portfolio.application.PortfolioRepositories.PortfolioRepository;
 import com.kora.portfolio.application.PortfolioRepositories.ProjectMemberRepository;
 import com.kora.portfolio.application.PortfolioRepositories.ProjectRepository;
 import com.kora.portfolio.domain.Project;
+import com.kora.portfolio.domain.ProjectRole;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -20,7 +22,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Who may see and change a project (feature 04): {@code PMO} and {@code ORG_ADMIN} see and change every project; a
- * project's manager changes it; its team members see it; nobody else knows it exists (404).
+ * project's manager changes it; its team members see it and its contributors work on it;
+ * nobody else knows it exists (404).
  */
 @Service
 public class ProjectAccessService implements ProjectAccess {
@@ -49,6 +52,33 @@ public class ProjectAccessService implements ProjectAccess {
     @Transactional(readOnly = true)
     public ProjectRef manageable(UUID projectId) {
         return ref(loadManageable(projectId));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ProjectParticipation participating(UUID projectId) {
+        Project project = loadVisible(projectId);
+        ActiveMember member = CurrentMember.get();
+        boolean manages = seesEverything(member) || project.getManagerId().equals(member.userId());
+        if (!manages && (member.role() == Role.VIEWER || !isContributor(projectId, member.userId()))) {
+            throw new ForbiddenException("Only the project's managers and contributors can work on this project");
+        }
+        ensurePortfolioActive(project.getPortfolioId());
+        return new ProjectParticipation(ref(project), manages);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean canWorkOn(UUID projectId, UUID userId) {
+        return projects.findById(projectId)
+                .map(project -> project.getManagerId().equals(userId) || isContributor(projectId, userId))
+                .orElse(false);
+    }
+
+    private boolean isContributor(UUID projectId, UUID userId) {
+        return members.findByProjectIdAndUserId(projectId, userId)
+                .filter(teamMember -> teamMember.getProjectRole() == ProjectRole.CONTRIBUTOR)
+                .isPresent();
     }
 
     @Override
