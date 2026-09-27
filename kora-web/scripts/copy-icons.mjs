@@ -78,6 +78,10 @@ const ICONS = [
   'keyboard_arrow_up',
   'keyboard_double_arrow_up',
   'do_not_disturb_on',
+  'flag',
+  'link',
+  'link_off',
+  'table_rows',
 ];
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
