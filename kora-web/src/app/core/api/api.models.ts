@@ -142,6 +142,54 @@ export type Holiday = Schemas['Holiday'];
 export type WorkingCalendar = Schemas['WorkingCalendar'];
 export type UpdateWorkingCalendarRequest = Schemas['UpdateWorkingCalendarRequest'];
 
+export type RiskKind = Schemas['RiskKind'];
+export type RiskCategory = Schemas['RiskCategory'];
+export type RiskProximity = Schemas['RiskProximity'];
+export type RiskStatus = Schemas['RiskStatus'];
+export type ResponseStrategy = Schemas['ResponseStrategy'];
+export type Severity = Schemas['Severity'];
+export type RiskClosure = Schemas['RiskClosure'];
+export type Risk = Schemas['Risk'];
+export type RiskPage = Schemas['RiskPage'];
+export type CreateRiskRequest = Schemas['CreateRiskRequest'];
+export type UpdateRiskRequest = Schemas['UpdateRiskRequest'];
+export type RiskAssessment = Schemas['RiskAssessment'];
+export type AssessRiskRequest = Schemas['AssessRiskRequest'];
+export type MaterializeRiskRequest = Schemas['MaterializeRiskRequest'];
+export type RiskHeatmapCell = Schemas['RiskHeatmapCell'];
+export type RiskHeatmap = Schemas['RiskHeatmap'];
+
+export type IssueType = Schemas['IssueType'];
+export type IssuePriority = Schemas['IssuePriority'];
+export type IssueStatus = Schemas['IssueStatus'];
+export type Issue = Schemas['Issue'];
+export type IssuePage = Schemas['IssuePage'];
+export type CreateIssueRequest = Schemas['CreateIssueRequest'];
+export type UpdateIssueRequest = Schemas['UpdateIssueRequest'];
+
+export type Engagement = Schemas['Engagement'];
+export type StakeholderQuadrant = Schemas['StakeholderQuadrant'];
+export type Stakeholder = Schemas['Stakeholder'];
+export type StakeholderPage = Schemas['StakeholderPage'];
+export type CreateStakeholderRequest = Schemas['CreateStakeholderRequest'];
+export type UpdateStakeholderRequest = Schemas['UpdateStakeholderRequest'];
+export type StakeholderGridEntry = Schemas['StakeholderGridEntry'];
+export type StakeholderGrid = Schemas['StakeholderGrid'];
+
+export type ChangeRequestType = Schemas['ChangeRequestType'];
+export type ChangeRequestStatus = Schemas['ChangeRequestStatus'];
+export type ChangeImpact = Schemas['ChangeImpact'];
+export type ApprovalLevel = Schemas['ApprovalLevel'];
+export type ApprovalStep = Schemas['ApprovalStep'];
+export type Decision = Schemas['Decision'];
+export type ChangeRequest = Schemas['ChangeRequest'];
+export type ChangeRequestPage = Schemas['ChangeRequestPage'];
+export type CreateChangeRequestRequest = Schemas['CreateChangeRequestRequest'];
+export type UpdateChangeRequestRequest = Schemas['UpdateChangeRequestRequest'];
+export type DecisionRequest = Schemas['DecisionRequest'];
+export type ChangeControlSettings = Schemas['ChangeControlSettings'];
+export type UpdateChangeControlSettingsRequest = Schemas['UpdateChangeControlSettingsRequest'];
+
 export type DashboardSummary = Schemas['DashboardSummary'];
 export type DashboardProject = Schemas['DashboardProject'];
 export type DashboardProjectPage = Schemas['DashboardProjectPage'];
@@ -149,6 +197,18 @@ export type DashboardProjectPage = Schemas['DashboardProjectPage'];
 export type ListPortfoliosQuery = NonNullable<operations['listPortfolios']['parameters']['query']>;
 export type ListProjectsQuery = NonNullable<operations['listProjects']['parameters']['query']>;
 export type ListTasksQuery = NonNullable<operations['listTasks']['parameters']['query']>;
+export type ListRisksQuery = NonNullable<operations['listRisks']['parameters']['query']>;
+export type RiskHeatmapQuery = NonNullable<operations['getRiskHeatmap']['parameters']['query']>;
+export type ListPortfolioRisksQuery = NonNullable<
+  operations['listPortfolioRisks']['parameters']['query']
+>;
+export type ListIssuesQuery = NonNullable<operations['listIssues']['parameters']['query']>;
+export type ListStakeholdersQuery = NonNullable<
+  operations['listStakeholders']['parameters']['query']
+>;
+export type ListChangeRequestsQuery = NonNullable<
+  operations['listChangeRequests']['parameters']['query']
+>;
 export type BacklogQuery = NonNullable<operations['getBacklog']['parameters']['query']>;
 export type ListDashboardProjectsQuery = NonNullable<
   operations['listDashboardProjects']['parameters']['query']
@@ -225,3 +285,96 @@ export const DAYS_OF_WEEK = [
   'SATURDAY',
   'SUNDAY',
 ] as const satisfies readonly DayOfWeek[];
+
+export const RISK_KINDS = ['THREAT', 'OPPORTUNITY'] as const satisfies readonly RiskKind[];
+export const RISK_CATEGORIES = [
+  'TECHNICAL',
+  'EXTERNAL',
+  'ORGANIZATIONAL',
+  'PROJECT_MANAGEMENT',
+  'FINANCIAL',
+  'OTHER',
+] as const satisfies readonly RiskCategory[];
+export const RISK_PROXIMITIES = [
+  'IMMEDIATE',
+  'WEEKS',
+  'MONTHS',
+  'LATER',
+] as const satisfies readonly RiskProximity[];
+export const RISK_STATUSES = [
+  'IDENTIFIED',
+  'ANALYZED',
+  'RESPONSE_PLANNED',
+  'MONITORING',
+  'CLOSED',
+] as const satisfies readonly RiskStatus[];
+/** The strategies each kind of risk allows (another kind's strategy is refused on responseStrategy). */
+export const RESPONSE_STRATEGIES: Record<RiskKind, readonly ResponseStrategy[]> = {
+  THREAT: ['AVOID', 'MITIGATE', 'TRANSFER', 'ACCEPT', 'ESCALATE'],
+  OPPORTUNITY: ['EXPLOIT', 'ENHANCE', 'SHARE', 'ACCEPT', 'ESCALATE'],
+};
+/** Statuses that need a response strategy and plan. */
+export const RISK_STATUSES_NEEDING_RESPONSE: readonly RiskStatus[] = [
+  'RESPONSE_PLANNED',
+  'MONITORING',
+];
+export const RISK_SORT_FIELDS = ['score', 'key', 'reviewDate', 'createdAt'] as const;
+export const SEVERITIES = [
+  'LOW',
+  'MEDIUM',
+  'HIGH',
+  'CRITICAL',
+] as const satisfies readonly Severity[];
+
+export const ISSUE_TYPES = [
+  'TECHNICAL',
+  'RESOURCE',
+  'SCOPE',
+  'VENDOR',
+  'OTHER',
+] as const satisfies readonly IssueType[];
+export const ISSUE_PRIORITIES = [
+  'CRITICAL',
+  'HIGH',
+  'MEDIUM',
+  'LOW',
+] as const satisfies readonly IssuePriority[];
+export const ISSUE_STATUSES = [
+  'OPEN',
+  'IN_PROGRESS',
+  'RESOLVED',
+  'CLOSED',
+] as const satisfies readonly IssueStatus[];
+export const ISSUE_SORT_FIELDS = ['priority', 'dueDate', 'key', 'createdAt'] as const;
+
+/** Least to most engaged. */
+export const ENGAGEMENTS = [
+  'UNAWARE',
+  'RESISTANT',
+  'NEUTRAL',
+  'SUPPORTIVE',
+  'LEADING',
+] as const satisfies readonly Engagement[];
+export const STAKEHOLDER_QUADRANTS = [
+  'MANAGE_CLOSELY',
+  'KEEP_SATISFIED',
+  'KEEP_INFORMED',
+  'MONITOR',
+] as const satisfies readonly StakeholderQuadrant[];
+
+export const CHANGE_REQUEST_TYPES = [
+  'SCOPE',
+  'SCHEDULE',
+  'COST',
+  'QUALITY',
+  'OTHER',
+] as const satisfies readonly ChangeRequestType[];
+export const CHANGE_REQUEST_STATUSES = [
+  'DRAFT',
+  'SUBMITTED',
+  'IN_REVIEW',
+  'APPROVED',
+  'REJECTED',
+  'WITHDRAWN',
+  'IMPLEMENTED',
+] as const satisfies readonly ChangeRequestStatus[];
