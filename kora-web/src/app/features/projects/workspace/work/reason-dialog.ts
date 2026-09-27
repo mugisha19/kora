@@ -18,9 +18,16 @@ export interface ReasonDialogData {
   title: string;
   label: string;
   confirm: string;
+  /** Longest reason accepted (500 by default). */
+  maxLength?: number;
+  /** Optional: the reason may be left empty. */
+  optional?: boolean;
 }
 
-/** Asks for a short reason (blocking a task); resolves with it, or nothing when cancelled. */
+/**
+ * Asks for a short text (why a task is blocked, how an issue was resolved); resolves with it, or
+ * nothing when cancelled. An optional text resolves with '' when left empty.
+ */
 @Component({
   selector: 'kora-reason-dialog',
   imports: [
@@ -64,8 +71,8 @@ export class ReasonDialog {
   private readonly dialogRef = inject(MatDialogRef<ReasonDialog, string>);
   protected readonly model = signal({ reason: '' });
   protected readonly form = form(this.model, (path) => {
-    required(path.reason);
-    maxLength(path.reason, 500);
+    if (!this.data.optional) required(path.reason);
+    maxLength(path.reason, this.data.maxLength ?? 500);
   });
 
   protected async save(event: Event): Promise<void> {

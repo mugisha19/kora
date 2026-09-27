@@ -1,0 +1,61 @@
+// Tables of the governance tabs (risks, issues, changes): a row header that opens the item.
+:host {
+  display: block;
+  min-inline-size: 0;
+}
+
+table {
+  border-collapse: collapse;
+  font: var(--mat-sys-body-medium);
+
+  th,
+  td {
+    padding: var(--kora-space-2);
+    border-block-end: 1px solid var(--mat-sys-outline-variant);
+    text-align: start;
+    vertical-align: middle;
+  }
+  thead th {
+    background: var(--mat-sys-surface-container-low);
+    font: var(--mat-sys-label-large);
+    white-space: nowrap;
+  }
+  tbody th {
+    font-weight: normal;
+    min-inline-size: 220px;
+  }
+  tr.closed,
+  tr.done {
+    color: var(--mat-sys-on-surface-variant);
+  }
+}
+
+.open {
+  display: inline;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--mat-sys-primary);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+
+  &:hover .title {
+    text-decoration: underline;
+  }
+  &:focus-visible {
+    outline: 2px solid var(--mat-sys-primary);
+    outline-offset: 2px;
+  }
+}
+
+.key {
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-label-medium);
+  white-space: nowrap;
+}
+
+.num {
+  text-align: end;
+  white-space: nowrap;
+}
