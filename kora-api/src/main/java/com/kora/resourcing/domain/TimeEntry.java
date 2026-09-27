@@ -1,5 +1,6 @@
 package com.kora.resourcing.domain;
 
+import com.kora.platform.audit.NotAudited;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -14,7 +15,10 @@ import org.hibernate.annotations.TenantId;
 /**
  * Hours on one task on one day. The task's key and title are copied, so the time (and what it cost) stays readable
  * after the task is deleted; the entry only loses the link.
+ *
+ * <p>Not audited: replaced as a week is saved; the timesheet and its decisions are audited.
  */
+@NotAudited
 @Entity
 @Table(name = "time_entries")
 public class TimeEntry {

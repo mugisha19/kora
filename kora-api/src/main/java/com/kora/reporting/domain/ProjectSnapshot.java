@@ -1,5 +1,6 @@
 package com.kora.reporting.domain;
 
+import com.kora.platform.audit.NotAudited;
 import com.kora.platform.money.Money;
 import com.kora.portfolio.Health;
 import jakarta.persistence.Column;
@@ -17,7 +18,10 @@ import org.hibernate.annotations.TenantId;
 /**
  * The dashboard's read model: everything a portfolio dashboard shows about one project, in one row. It is derived
  * data (rebuilt from the owning modules on every change), so it has no invariants and no optimistic locking.
+ *
+ * <p>Not audited: a read model rebuilt from audited sources.
  */
+@NotAudited
 @Entity
 @Table(name = "project_snapshots")
 public class ProjectSnapshot {

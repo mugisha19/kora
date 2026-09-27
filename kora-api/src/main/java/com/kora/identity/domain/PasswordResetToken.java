@@ -1,5 +1,6 @@
 package com.kora.identity.domain;
 
+import com.kora.platform.audit.NotAudited;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -12,7 +13,10 @@ import java.util.UUID;
 /**
  * A single-use, expiring password reset link. Identified by the SHA-256 of the emailed token, so the table alone
  * can't be used to reset anyone's password.
+ *
+ * <p>Not audited: holds a secret; resets are audited as security events.
  */
+@NotAudited
 @Entity
 @Table(name = "password_reset_tokens")
 public class PasswordResetToken {

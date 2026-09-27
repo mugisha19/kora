@@ -1,5 +1,6 @@
 package com.kora.performance.domain;
 
+import com.kora.platform.audit.NotAudited;
 import com.kora.platform.money.Money;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,7 +16,10 @@ import org.hibernate.annotations.TenantId;
 /**
  * A project's cumulative PV, EV and AC as last recorded in a week (feature 17). Kept, so the S-curve shows what was
  * reported at the time even after percentages change, and trends are one indexed read.
+ *
+ * <p>Not audited: recomputed hourly from audited sources.
  */
+@NotAudited
 @Entity
 @Table(name = "evm_snapshots")
 public class EvmSnapshot {

@@ -1,5 +1,6 @@
 package com.kora.schedule.domain;
 
+import com.kora.platform.audit.NotAudited;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -9,7 +10,12 @@ import java.util.Objects;
 import java.util.UUID;
 import org.hibernate.annotations.TenantId;
 
-/** One task's planned dates in a baseline. */
+/**
+ * One task's planned dates in a baseline.
+ *
+ * <p>Not audited: part of a baseline, which is audited as a whole.
+ */
+@NotAudited
 @Entity
 @Table(name = "baseline_tasks")
 public class BaselineTask {

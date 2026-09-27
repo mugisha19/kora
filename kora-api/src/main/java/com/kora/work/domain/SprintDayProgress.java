@@ -1,5 +1,6 @@
 package com.kora.work.domain;
 
+import com.kora.platform.audit.NotAudited;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -9,7 +10,10 @@ import java.util.Objects;
 import java.util.UUID;
 import org.hibernate.annotations.TenantId;
 
-/** The story points left in a sprint on one day; the burndown's "actual" line is made of these. */
+/** The story points left in a sprint on one day; the burndown's "actual" line is made of these. *
+ * <p>Not audited: recomputed from task changes, which are audited.
+ */
+@NotAudited
 @Entity
 @Table(name = "sprint_day_progress")
 public class SprintDayProgress {

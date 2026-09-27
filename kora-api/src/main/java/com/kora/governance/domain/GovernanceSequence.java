@@ -1,5 +1,6 @@
 package com.kora.governance.domain;
 
+import com.kora.platform.audit.NotAudited;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -12,7 +13,10 @@ import org.hibernate.annotations.TenantId;
 /**
  * The last number handed out per project and kind (risks, issues, change requests), read under a row lock so two
  * items raised at the same moment never share a key.
+ *
+ * <p>Not audited: a counter; the records it numbers are audited.
  */
+@NotAudited
 @Entity
 @Table(name = "governance_sequences")
 @IdClass(GovernanceSequence.Key.class)

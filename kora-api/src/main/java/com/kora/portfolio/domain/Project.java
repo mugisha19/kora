@@ -1,5 +1,6 @@
 package com.kora.portfolio.domain;
 
+import com.kora.platform.audit.NotAudited;
 import com.kora.platform.error.ConflictException;
 import com.kora.platform.error.FieldViolation;
 import com.kora.platform.error.InvalidInputException;
@@ -87,10 +88,12 @@ public class Project {
     @Enumerated(EnumType.STRING)
     @OptimisticLock(excluded = true)
     @Column(name = "computed_health", nullable = false)
+    @NotAudited
     private Health computedHealth;
 
     @OptimisticLock(excluded = true)
     @Column(name = "computed_health_reason")
+    @NotAudited
     private String computedHealthReason;
 
     @Enumerated(EnumType.STRING)
