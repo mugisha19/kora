@@ -1,0 +1,193 @@
+<div class="head">
+  <h2 mat-dialog-title>
+    @if (risk.value(); as r) {
+      <span class="key">{{ r.key }}</span>
+      {{ r.title }}
+    } @else {
+      {{ 'risks.sheetTitle' | transloco }}
+    }
+  </h2>
+  <button mat-button type="button" class="close" (click)="close()">
+    <mat-icon svgIcon="close" aria-hidden="true" />
+    {{ 'common.close' | transloco }}
+  </button>
+</div>
+
+<!-- Focusable so its long content scrolls with the keyboard. -->
+<mat-dialog-content tabindex="0">
+  @if (notFound()) {
+    <p>{{ 'risks.notFound' | transloco }}</p>
+  } @else if (risk.error()) {
+    <kora-error-state (retry)="risk.reload()" />
+  } @else if (risk.value(); as r) {
+    <div class="chips">
+      <kora-severity-chip [severity]="r.severity" [score]="r.score" />
+      <kora-status-chip
+        [tone]="r.status === 'CLOSED' ? 'neutral' : 'info'"
+        [icon]="r.status === 'CLOSED' ? 'check' : 'schedule'"
+        [label]="'riskStatus.' + r.status | transloco"
+      />
+      @if (r.reviewOverdue) {
+        <kora-status-chip
+          tone="warning"
+          icon="warning"
+          [label]="'risks.reviewOverdue' | transloco"
+        />
+      }
+    </div>
+
+    <dl class="facts">
+      <div>
+        <dt>{{ 'risks.fields.kind' | transloco }}</dt>
+        <dd>{{ 'riskKind.' + r.kind | transloco }}</dd>
+      </div>
+      <div>
+        <dt>{{ 'risks.fields.category' | transloco }}</dt>
+        <dd>{{ 'riskCategory.' + r.category | transloco }}</dd>
+      </div>
+      <div>
+        <dt>{{ 'risks.fields.probability' | transloco }}</dt>
+        <dd>{{ 'riskProbability.' + r.probability | transloco }}</dd>
+      </div>
+      <div>
+        <dt>{{ 'risks.fields.impact' | transloco }}</dt>
+        <dd>{{ 'riskImpact.' + r.impact | transloco }}</dd>
+      </div>
+      <div>
+        <dt>{{ 'risks.fields.residualScore' | transloco }}</dt>
+        <dd>
+          @if (r.residualScore !== undefined) {
+            <kora-severity-chip [severity]="band(r.residualScore)" [score]="r.residualScore" />
+          } @else {
+            —
+          }
+        </dd>
+      </div>
+      <div>
+        <dt>{{ 'risks.fields.proximity' | transloco }}</dt>
+        <dd>{{ r.proximity ? ('riskProximity.' + r.proximity | transloco) : '—' }}</dd>
+      </div>
+      <div>
+        <dt>{{ 'risks.fields.owner' | transloco }}</dt>
+        <dd>{{ r.owner?.fullName ?? ('risks.noOwner' | transloco) }}</dd>
+      </div>
+      <div>
+        <dt>{{ 'risks.fields.reviewDate' | transloco }}</dt>
+        <dd>{{ (r.reviewDate | localizedDate: language.current()) || '—' }}</dd>
+      </div>
+      <div>
+        <dt>{{ 'risks.fields.identifiedBy' | transloco }}</dt>
+        <dd>
+          {{ r.identifiedBy.fullName }},
+          {{ r.createdAt | localizedDate: language.current() }}
+        </dd>
+      </div>
+    </dl>
+
+    @if (r.description) {
+      <h3>{{ 'risks.fields.description' | transloco }}</h3>
+      <p class="text">{{ r.description }}</p>
+    }
+
+    <h3>{{ 'risks.response' | transloco }}</h3>
+    @if (r.responseStrategy || r.responsePlan) {
+      @if (r.responseStrategy) {
+        <p>
+          <strong>{{ 'responseStrategy.' + r.responseStrategy | transloco }}</strong>
+          — {{ 'responseStrategyHint.' + r.responseStrategy | transloco }}
+        </p>
+      }
+      @if (r.responsePlan) {
+        <p class="text">{{ r.responsePlan }}</p>
+      }
+    } @else {
+      <p class="kora-muted">{{ 'risks.noResponse' | transloco }}</p>
+    }
+    @if (r.triggerConditions) {
+      <p>
+        <strong>{{ 'risks.fields.triggers' | transloco }}:</strong> {{ r.triggerConditions }}
+      </p>
+    }
+
+    @if (r.status === 'CLOSED') {
+      <div class="kora-notice" role="note">
+        <mat-icon svgIcon="info" aria-hidden="true" />
+        <div>
+          <p>
+            <strong>{{ 'riskClosure.' + (r.closure ?? 'EXPIRED') | transloco }}</strong>
+            @if (r.closureNote) {
+              — {{ r.closureNote }}
+            }
+          </p>
+          @if (r.issueId) {
+            <p>
+              <a [routerLink]="['/projects', r.projectId, 'issues', r.issueId]">
+                {{ 'risks.openIssue' | transloco }}
+              </a>
+            </p>
+          }
+        </div>
+      </div>
+    }
+
+    <section class="history" aria-labelledby="history-title">
+      <h3 id="history-title">{{ 'risks.history' | transloco }}</h3>
+      @if (history.hasValue()) {
+        @if (scores().length > 1) {
+          <kora-score-sparkline
+            [scores]="scores()"
+            [label]="'risks.historyLabel' | transloco: { scores: scores().join(', ') }"
+          />
+        }
+        <ol>
+          @for (a of history.value(); track a.id) {
+            <li>
+              <span class="when">{{ a.assessedAt | localizedDate: language.current() }}</span>
+              <kora-severity-chip [severity]="band(a.score)" [score]="a.score" />
+              <span>
+                {{
+                  'risks.assessedAs' | transloco: { probability: a.probability, impact: a.impact }
+                }}
+                @if (residual(a) !== undefined) {
+                  · {{ 'risks.residualAs' | transloco: { score: residual(a) } }}
+                }
+              </span>
+              <span class="who">
+                {{ a.assessedBy.fullName }}
+                @if (a.note) {
+                  — {{ a.note }}
+                }
+              </span>
+            </li>
+          }
+        </ol>
+      } @else if (history.isLoading()) {
+        <kora-loading-state />
+      }
+    </section>
+  } @else {
+    <kora-loading-state />
+  }
+</mat-dialog-content>
+
+@if (risk.value(); as r) {
+  @if (facade.canManage(r)) {
+    <mat-dialog-actions align="end">
+      <button mat-button type="button" (click)="facade.materialize(r)">
+        <mat-icon svgIcon="error" aria-hidden="true" />
+        {{ 'risks.materialize' | transloco }}
+      </button>
+      <button mat-button type="button" (click)="facade.close(r)">
+        <mat-icon svgIcon="check" aria-hidden="true" />
+        {{ 'risks.close' | transloco }}
+      </button>
+      <button mat-stroked-button type="button" (click)="facade.assess(r)">
+        {{ 'risks.assess' | transloco }}
+      </button>
+      <button mat-flat-button type="button" (click)="facade.edit(r)">
+        <mat-icon svgIcon="edit" aria-hidden="true" />
+        {{ 'common.edit' | transloco }}
+      </button>
+    </mat-dialog-actions>
+  }
+}

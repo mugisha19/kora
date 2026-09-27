@@ -1,0 +1,197 @@
+<div class="filters">
+  <mat-form-field class="search" subscriptSizing="dynamic">
+    <mat-label>{{ 'risks.search' | transloco }}</mat-label>
+    <mat-icon matPrefix svgIcon="search" aria-hidden="true" />
+    <input matInput type="search" [value]="q() ?? ''" (input)="onSearch($event)" />
+  </mat-form-field>
+  <mat-form-field class="filter" subscriptSizing="dynamic">
+    <mat-label>{{ 'risks.fields.kind' | transloco }}</mat-label>
+    <mat-select [value]="query().kind ?? null" (selectionChange)="filter('kind', $event.value)">
+      <mat-select-trigger>{{ 'riskKind.' + query().kind | transloco }}</mat-select-trigger>
+      <mat-option [value]="null">{{ 'risks.filters.anyKind' | transloco }}</mat-option>
+      @for (value of kinds; track value) {
+        <mat-option [value]="value">{{ 'riskKind.' + value | transloco }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field class="filter" subscriptSizing="dynamic">
+    <mat-label>{{ 'risks.fields.category' | transloco }}</mat-label>
+    <mat-select
+      [value]="query().category ?? null"
+      (selectionChange)="filter('category', $event.value)"
+    >
+      <mat-select-trigger>{{ 'riskCategory.' + query().category | transloco }}</mat-select-trigger>
+      <mat-option [value]="null">{{ 'risks.filters.anyCategory' | transloco }}</mat-option>
+      @for (value of categories; track value) {
+        <mat-option [value]="value">{{ 'riskCategory.' + value | transloco }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field class="filter" subscriptSizing="dynamic">
+    <mat-label>{{ 'risks.fields.owner' | transloco }}</mat-label>
+    <mat-select [value]="query().ownerId ?? null" (selectionChange)="filter('owner', $event.value)">
+      <mat-option [value]="null">{{ 'risks.filters.anyOwner' | transloco }}</mat-option>
+      @for (person of project.members() ?? []; track person.userId) {
+        <mat-option [value]="person.userId">{{ person.fullName }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field class="filter" subscriptSizing="dynamic">
+    <mat-label>{{ 'risks.fields.status' | transloco }}</mat-label>
+    <mat-select [value]="query().status ?? null" (selectionChange)="filter('status', $event.value)">
+      <mat-select-trigger>{{ 'riskStatus.' + query().status | transloco }}</mat-select-trigger>
+      <mat-option [value]="null">{{ 'risks.filters.anyStatus' | transloco }}</mat-option>
+      @for (value of statuses; track value) {
+        <mat-option [value]="value">{{ 'riskStatus.' + value | transloco }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+  @if (filtered()) {
+    <button mat-button type="button" (click)="clearFilters()">
+      <mat-icon svgIcon="close" aria-hidden="true" />
+      {{ 'projects.filters.clear' | transloco }}
+    </button>
+  }
+  <span class="spacer"></span>
+  @if (facade.canRaise()) {
+    <button mat-flat-button type="button" (click)="raise()">
+      <mat-icon svgIcon="add" aria-hidden="true" />
+      {{ 'risks.raise' | transloco }}
+    </button>
+  }
+</div>
+
+<div class="layout">
+  <section class="map" aria-labelledby="heatmap-title">
+    <h2 id="heatmap-title" class="visually-hidden">{{ 'risks.heatmap.title' | transloco }}</h2>
+    @if (heatmap.hasValue()) {
+      <kora-risk-heatmap
+        [cells]="heatmap.value().cells"
+        [selected]="cell() ?? null"
+        (picked)="filter('cell', $event)"
+      />
+      <p class="kora-muted legend">{{ 'risks.heatmap.help' | transloco }}</p>
+    } @else if (heatmap.error()) {
+      <kora-error-state (retry)="heatmap.reload()" />
+    } @else {
+      <kora-loading-state />
+    }
+  </section>
+
+  <section class="register" aria-labelledby="register-title">
+    <div class="register-head">
+      <h2 id="register-title">{{ 'risks.register' | transloco }}</h2>
+      <mat-form-field subscriptSizing="dynamic" class="sort">
+        <mat-label>{{ 'risks.sortBy' | transloco }}</mat-label>
+        <mat-select
+          [value]="sortField()"
+          (selectionChange)="filter('sort', $event.value === 'score' ? null : $event.value)"
+        >
+          <mat-select-trigger>{{ 'risks.sort.' + sortField() | transloco }}</mat-select-trigger>
+          @for (value of sortFields; track value) {
+            <mat-option [value]="value">{{ 'risks.sort.' + value | transloco }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+    @if (cell(); as chosen) {
+      <p class="cell-filter">
+        {{
+          'risks.heatmap.filtered'
+            | transloco: { probability: chosen.split('-')[0], impact: chosen.split('-')[1] }
+        }}
+        <button mat-button type="button" (click)="filter('cell', null)">
+          {{ 'risks.heatmap.clear' | transloco }}
+        </button>
+      </p>
+    }
+    <p class="count" role="status">
+      @if (register.hasValue()) {
+        {{ 'risks.count' | transloco: { count: total() } }}
+      }
+    </p>
+
+    @if (register.isLoading() && !register.hasValue()) {
+      <kora-loading-state />
+    } @else if (register.error()) {
+      <kora-error-state (retry)="register.reload()" />
+    } @else if (!risks().length) {
+      <kora-empty-state
+        icon="warning"
+        [heading]="(filtered() ? 'risks.noMatchTitle' : 'risks.emptyTitle') | transloco"
+        [message]="(filtered() ? 'risks.noMatchMessage' : 'risks.emptyMessage') | transloco"
+      />
+    } @else {
+      <div class="table-wrap">
+        <table [attr.aria-busy]="register.isLoading()">
+          <caption class="visually-hidden">
+            {{
+              'risks.register' | transloco
+            }}
+          </caption>
+          <thead>
+            <tr>
+              <th scope="col">{{ 'risks.fields.risk' | transloco }}</th>
+              <th scope="col">{{ 'risks.fields.score' | transloco }}</th>
+              <th scope="col">{{ 'risks.fields.status' | transloco }}</th>
+              <th scope="col">{{ 'risks.fields.owner' | transloco }}</th>
+              <th scope="col">{{ 'risks.fields.reviewDate' | transloco }}</th>
+              <th scope="col">{{ 'risks.fields.strategy' | transloco }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (risk of risks(); track risk.id) {
+              <tr [class.closed]="risk.status === 'CLOSED'">
+                <th scope="row">
+                  <button type="button" class="open" (click)="open(risk)">
+                    <span class="key">{{ risk.key }}</span
+                    >&ngsp;<span class="title">{{ risk.title }}</span>
+                  </button>
+                  <span class="secondary">
+                    {{ 'riskKind.' + risk.kind | transloco }} ·
+                    {{ 'riskCategory.' + risk.category | transloco }}
+                  </span>
+                </th>
+                <td><kora-severity-chip [severity]="risk.severity" [score]="risk.score" /></td>
+                <td>{{ 'riskStatus.' + risk.status | transloco }}</td>
+                <td>{{ risk.owner?.fullName ?? '—' }}</td>
+                <td>
+                  @if (risk.reviewDate) {
+                    {{ risk.reviewDate | localizedDate: language.current() }}
+                    @if (risk.reviewOverdue) {
+                      <kora-status-chip
+                        tone="warning"
+                        icon="warning"
+                        [label]="'risks.reviewOverdue' | transloco"
+                      />
+                    }
+                  } @else {
+                    —
+                  }
+                </td>
+                <td>
+                  {{
+                    risk.responseStrategy
+                      ? ('responseStrategy.' + risk.responseStrategy | transloco)
+                      : '—'
+                  }}
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      @if (!cell()) {
+        <mat-paginator
+          [length]="total()"
+          [pageIndex]="query().page ?? 0"
+          [pageSize]="query().size ?? 20"
+          [pageSizeOptions]="pageSizes"
+          (page)="onPage($event)"
+        />
+      }
+    }
+  </section>
+</div>
+
+<router-outlet />
