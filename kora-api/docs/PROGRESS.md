@@ -2,18 +2,17 @@
 
 ## Current status
 
-Phase 6 complete (tag `api-v0.6.0`). Waiting for "continue".
+Phase 7 complete (tag `api-v0.7.0`). Waiting for "continue".
 
-Contract 0.5.0 is implemented: the risk register (assessments history, heat map, materializing into issues, the
-PMO's cross-project view, health turning red on overdue critical risks), the issue log, the stakeholder register
-(power/interest grid, engagement gap, anonymizing removal), and change requests with a Chain of Responsibility
-approval chain that applies approved changes to budget, target end date, charter and schedule baseline atomically.
-232 unit and 528 integration tests, 94.2% line coverage.
+Contract 0.6.0 is implemented: weekly timesheets per project with approval and cost rates, capacity, leave,
+allocations and the resource heat map (with Rwanda's public holidays), earned value management (four percent-complete
+and three EAC methods, weekly snapshots, S-curve series), dashboard trends, and SPI/CPI and the schedule forecast in
+project health. 247 unit and 664 integration tests, 94.5% line coverage.
 
 ## Next step
 
-Phase 7 — timesheets, resource capacity and earned value management (features 15–17); the schedule
-performance index and the forecast finish feed project health. Contract 0.6.0 first.
+Phase 8 — transactional outbox, notifications with live updates (WebSocket), the activity feed, the audit trail
+and attachments (features 18–20). Contract 0.7.0 first.
 
 ## Checklist
 
@@ -24,7 +23,7 @@ performance index and the forecast finish feed project health. Contract 0.6.0 fi
 - [x] 4. Tasks, board, lexorank, backlog, sprints, burndown, velocity (08–09)
 - [x] 5. Dependencies, critical path, baselines, working calendar (10)
 - [x] 6. Risks, issues, stakeholders, change requests with approval chain (11–14)
-- [ ] 7. Timesheets, capacity, EVM (15–17)
+- [x] 7. Timesheets, capacity, EVM (15–17)
 - [ ] 8. Outbox, notifications, WebSocket, audit trail, attachments (18–20)
 - [ ] 9. Report exports, demo data (21–22)
 - [ ] 10. Tracing, performance, Docker image, full-stack compose, final README; tag v1.0.0
@@ -43,3 +42,4 @@ performance index and the forecast finish feed project health. Contract 0.6.0 fi
 - ADR 0010 — schedule module: CPM as a Strategy on working-day numbers, computed on read, baselines, org calendar
 - ADR 0011 — governance module: registers, health from overdue critical risks, approval Chain of Responsibility,
   atomic application of approved changes
+- ADR 0012 — per-project timesheets, dated cost rates, capacity, EVM strategies and snapshots, SPI/CPI in health

@@ -6,7 +6,7 @@ lands in code; a pattern that doesn't earn its place is rejected in an ADR.
 | Pattern                        | Problem it solves in Kora                                                                 | Status             | Where |
 | ------------------------------ | ----------------------------------------------------------------------------------------- | ------------------ | ----- |
 | Ports and adapters (Adapter)   | Email, token store, file storage, clock behind interfaces; in-memory fakes in tests        | Done — Phase 2     | `platform/mail/EmailSender`, `identity/application/RefreshTokenStore` + `adapter/redis`, `*Repository` ports + `adapter/persistence` |
-| Strategy                       | Password hashing; CPM scheduling; EAC and percent-complete methods; methodology rules     | Hashing, CPM done — 2, 5; 7 planned | `identity/application/PasswordHasher`, `schedule/domain/SchedulingStrategy` + `CriticalPathMethod` |
+| Strategy                       | Password hashing; CPM scheduling; EAC and percent-complete methods; methodology rules     | Done — Phases 2, 5, 7 | `PasswordHasher`, `schedule/domain/SchedulingStrategy`, `performance/domain/PercentCompleteMethod`, `EacMethod` |
 | State                          | Lifecycles where illegal moves must be impossible: invitation, project, charter, task, issue, change request | Done — Phases 2–6 | `InvitationStatus`, `ProjectStatus`, `CharterStatus`, `TaskStatus`, `governance/domain/IssueStatus`, `ChangeRequestStatus` |
 | Specification                  | Composable, tenant-safe filters for list endpoints (members, projects, tasks, risks)      | Done — Phases 2–4  | `MemberSpecifications`, `portfolio/adapter/persistence/PortfolioSpecifications` (incl. project visibility), `work/adapter/persistence/TaskSpecifications` |
 | Builder                        | Readable test fixtures and the demo data seeder                                           | Planned — Phase 2  | —     |
@@ -80,3 +80,13 @@ Still plumbing rather than domain patterns, but two structural ideas landed in t
   keeps the row, so references and history survive.
 - **Ports for cross-module writes**: `portfolio.ProjectChangeControl` and `schedule.SchedulePlanning` let an approved
   change reach other modules' baselines in one transaction without handing out manager rights.
+
+## Phase 7
+
+- **Strategy** twice in EVM: `PercentCompleteMethod` (physical, 0/100, 50/50, story points) and `EacMethod` (typical,
+  atypical, composite), chosen per project in `EvmSettings`. Enum-based strategies: a closed, documented set,
+  each with its own behaviour.
+- **Snapshot** for history that can't be recomputed: `EvmSnapshot` keeps each week's EV, as `SprintDayProgress` keeps a
+  day's remaining points.
+- **Derived aggregate status**: `TimesheetWeek` summarizes several per-project timesheets into the one week a person
+  sees, without storing a second status that could disagree.

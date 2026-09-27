@@ -52,3 +52,10 @@ Template:
 - Requested by: api, 2026-09-27 (start of API Phase 6, for web Phase 7)
 - Endpoints: 35 new operations (tags Risks, Issues, Stakeholders, ChangeRequests); 6 new error codes
 - Status: accepted in 0.5.0; issue comments, configurable severity bands and notifications deferred (Phase 8)
+
+### 0.6.0: timesheets, resources, earned value, trends
+- Requested by: api, 2026-09-27 (start of API Phase 7, for web Phase 8)
+- Endpoints: 21 new operations (tags Timesheets, Resources, EarnedValue, plus public holidays and dashboard
+  trends); DashboardSummary gains `totalActualCost` and fills SPI/CPI and the governance counts; 4 new error codes
+- Follow-up: `TimesheetEntry.taskId` optional (time outlives a deleted task)
+- Status: accepted in 0.6.0

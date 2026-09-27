@@ -279,3 +279,41 @@ decides whether it applies and passes the request on."
 Separation of duties: the person asking for money or time must not be the one granting it. When the requester is
 the designated approver, the step goes to the next authority (PM → PMO, sponsor → administrator) instead of being
 skipped.
+
+## Earned value management (Phase 7)
+
+Three numbers at a date:
+- **PV**, planned value: the budget of the work that should be done by now.
+- **EV**, earned value: the budget of the work actually done.
+- **AC**, actual cost: what that work cost.
+
+Compare them:
+- **SV** = EV − PV and **SPI** = EV ÷ PV say whether you are ahead or behind.
+- **CV** = EV − AC and **CPI** = EV ÷ AC say whether you are under or over budget.
+- Below 1 is bad for both indices. Read them together: SPI 0.8 with CPI 1.2 means slow but cheap (under-staffed?).
+
+**EAC** forecasts the final cost:
+- BAC ÷ CPI if today's efficiency continues;
+- AC + (BAC − EV) if the overrun was a one-off;
+- the composite formula if schedule pressure will also cost money.
+
+**TCPI** is the efficiency needed from now on to finish on budget; above 1.1 it is rarely achievable.
+**Interview line:** "EVM turns 'are we on track?' into two ratios: SPI for time, CPI for money, both against the
+same baseline."
+
+## Percent-complete methods (Phase 7)
+
+Physical % trusts the team's measurement. 0/100 earns nothing until done: the most conservative, fine for tasks of
+a week or two. 50/50 credits half when started. Story points fit Agile, where value is delivered in points. The
+method changes EV, so it must be stated next to the numbers, as the API does.
+
+## Timesheets and actual cost (Phase 7)
+
+Only approved hours count as actual cost, costed at the rate valid on the day worked, so a later raise doesn't
+rewrite history. Separation of duties again: nobody approves their own time.
+
+## Capacity vs allocation (Phase 7)
+
+Capacity is what a person can give in a week (their hours, less holidays and leave); allocation is what projects have
+planned for them. Utilization = allocation ÷ capacity. Over 100% means someone will slip. Under 70% means people are
+waiting. Plan by the week, because "40 hours" is fiction in a week with a public holiday.
