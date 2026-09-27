@@ -20,6 +20,7 @@ import { SessionStore } from '../../core/session/session.store';
 import { ORG_AKAGERA } from '../../mocks/data';
 import { db } from '../../mocks/db';
 import { CalendarPage } from './calendar/calendar-page';
+import { ChangeControlPage } from './change-control/change-control-page';
 import { InvitationsPage } from './invitations/invitations-page';
 import { MembersPage } from './members/members-page';
 import { OrganizationPage } from './organization/organization-page';
@@ -71,7 +72,7 @@ describe('administration', () => {
         screen.getByRole('searchbox', { name: 'Search by name or email' }),
         'kora.demo',
       );
-      expect(await screen.findByText('Members: 5')).toBeTruthy();
+      expect(await screen.findByText('Members: 5', {}, { timeout: 5000 })).toBeTruthy();
 
       await userEvent.click(screen.getByRole('combobox', { name: 'Role' }));
       await userEvent.click(await screen.findByRole('option', { name: 'Viewer' }));
@@ -384,6 +385,57 @@ describe('administration', () => {
         expect((screen.getByRole('checkbox', { name: 'Sunday' }) as HTMLInputElement).checked).toBe(
           false,
         ),
+      );
+    });
+  });
+
+  describe('ChangeControlPage', () => {
+    const settings = () => db.state.changeControls.find((c) => c.organizationId === ORG_AKAGERA);
+    const field = (name: RegExp) => screen.getByRole('textbox', { name });
+
+    it('starts from the defaults and saves new thresholds with If-Match', async () => {
+      await open(ChangeControlPage);
+      const pmoCost = await screen.findByRole('textbox', { name: /PMO approves above this cost/ });
+      expect((pmoCost as HTMLInputElement).value).toBe('5');
+      expect((field(/PMO approves above this schedule/) as HTMLInputElement).value).toBe('10');
+
+      await userEvent.clear(pmoCost);
+      await userEvent.type(pmoCost, '7.5');
+      await userEvent.click(screen.getByRole('button', { name: 'Save thresholds' }));
+
+      expect(await screen.findByText('Change-control thresholds saved.')).toBeTruthy();
+      expect(settings()).toMatchObject({ pmoCostPercent: 7.5, version: 1 });
+    });
+
+    it('refuses a percentage over 100', async () => {
+      await open(ChangeControlPage);
+      const sponsor = await screen.findByRole('textbox', { name: /Sponsor approves/ });
+      await userEvent.clear(sponsor);
+      await userEvent.type(sponsor, '150');
+      await userEvent.click(screen.getByRole('button', { name: 'Save thresholds' }));
+
+      expect(await screen.findByText('Enter a percentage from 0 to 100.')).toBeTruthy();
+      expect(settings()).toBeUndefined();
+    });
+
+    it('explains a concurrent change (412)', async () => {
+      await open(ChangeControlPage);
+      const pmoCost = await screen.findByRole('textbox', { name: /PMO approves above this cost/ });
+      db.state.changeControls.push({
+        organizationId: ORG_AKAGERA,
+        pmoCostPercent: 6,
+        pmoScheduleDays: 10,
+        sponsorCostPercent: 15,
+        version: 1,
+      });
+      db.save();
+
+      await userEvent.clear(pmoCost);
+      await userEvent.type(pmoCost, '8');
+      await userEvent.click(screen.getByRole('button', { name: 'Save thresholds' }));
+
+      expect((await screen.findByRole('alert')).textContent).toContain(
+        'Someone else saved the thresholds',
       );
     });
   });

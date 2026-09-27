@@ -35,6 +35,12 @@ export const ADMIN_ROUTES: Routes = [
         title: 'admin.tabs.calendar',
         loadComponent: () => import('./calendar/calendar-page').then((m) => m.CalendarPage),
       },
+      {
+        path: 'change-control',
+        title: 'admin.tabs.changeControl',
+        loadComponent: () =>
+          import('./change-control/change-control-page').then((m) => m.ChangeControlPage),
+      },
     ],
   },
 ];

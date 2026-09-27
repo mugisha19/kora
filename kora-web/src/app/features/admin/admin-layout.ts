@@ -57,5 +57,6 @@ export class AdminLayout {
     { path: 'invitations', label: 'admin.tabs.invitations' },
     { path: 'organization', label: 'admin.tabs.organization' },
     { path: 'calendar', label: 'admin.tabs.calendar' },
+    { path: 'change-control', label: 'admin.tabs.changeControl' },
   ] as const;
 }
