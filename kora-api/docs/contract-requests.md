@@ -47,3 +47,8 @@ Template:
 - Endpoints: 7 new operations (tag Schedule); Task gains `durationDays`, `scheduleConstraint`, `constraintDate`;
   3 new error codes; seven summaries with doubled apostrophes fixed
 - Status: accepted in 0.4.0
+
+### 0.5.0: risks, issues, stakeholders, change requests
+- Requested by: api, 2026-09-27 (start of API Phase 6, for web Phase 7)
+- Endpoints: 35 new operations (tags Risks, Issues, Stakeholders, ChangeRequests); 6 new error codes
+- Status: accepted in 0.5.0; issue comments, configurable severity bands and notifications deferred (Phase 8)

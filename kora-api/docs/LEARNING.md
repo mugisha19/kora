@@ -251,3 +251,31 @@ breadth-first search answers it and returns the shortest such loop to show the u
 A **baseline** is a frozen copy of the approved schedule. Progress is judged against it: a task finishing 3 working
 days after its baseline finish has a finish variance of +3. Re-planning creates a new baseline rather than
 overwriting the old one, so repeated re-planning stays visible.
+
+## Risks vs issues (Phase 6)
+
+A **risk** is uncertain: it *might* happen (the vendor *may* deliver late). An **issue** is certain: it *is*
+happening (the vendor *is* late). Risks are scored by **probability × impact** on 1–5 scales. The response depends on
+the kind: threats are avoided, mitigated, transferred, accepted or escalated; opportunities are exploited, enhanced,
+shared, accepted or escalated. **Inherent** risk is the score before the response; **residual** risk is what is left
+once it works. When a risk happens, it *materializes* into an issue.
+
+## The power/interest grid (Phase 6)
+
+Stakeholders are placed by how much power they have over the project and how interested they are in it:
+**manage closely** (high, high), **keep satisfied** (high power), **keep informed** (high interest), **monitor**
+(low, low). The engagement gap (current UNAWARE…LEADING vs desired) shows who needs attention.
+
+## Integrated change control (Phase 6)
+
+Once baselines are approved, nobody changes scope, schedule or budget directly. A **change request** states the
+impact, and the right people approve it depending on its size: the PM always, the PMO above set thresholds, the
+sponsor for large or scope-changing ones. Only after the last approval are the baselines updated, all at once.
+**Interview line:** "Chain of Responsibility instead of a growing if/else: each approval level is a handler that
+decides whether it applies and passes the request on."
+
+## Why nobody approves their own request (Phase 6)
+
+Separation of duties: the person asking for money or time must not be the one granting it. When the requester is
+the designated approver, the step goes to the next authority (PM → PMO, sponsor → administrator) instead of being
+skipped.

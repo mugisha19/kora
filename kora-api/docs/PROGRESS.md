@@ -2,16 +2,18 @@
 
 ## Current status
 
-Phase 5 complete (tag `api-v0.5.0`). Waiting for "continue".
+Phase 6 complete (tag `api-v0.6.0`). Waiting for "continue".
 
-Contract 0.4.0 is implemented: task dependencies (FS/SS/FF/SF with lag), the critical path schedule on the
-organization's working calendar (early/late dates, total and free float), numbered baselines with variances, and
-task durations and start-no-earlier-than constraints. 201 unit and 333 integration tests, 93.6% line coverage.
+Contract 0.5.0 is implemented: the risk register (assessments history, heat map, materializing into issues, the
+PMO's cross-project view, health turning red on overdue critical risks), the issue log, the stakeholder register
+(power/interest grid, engagement gap, anonymizing removal), and change requests with a Chain of Responsibility
+approval chain that applies approved changes to budget, target end date, charter and schedule baseline atomically.
+232 unit and 528 integration tests, 94.2% line coverage.
 
 ## Next step
 
-Phase 6 — risk register, issue log, stakeholder register, and change requests with an approval chain
-(features 11–14). Contract 0.5.0 first.
+Phase 7 — timesheets, resource capacity and earned value management (features 15–17); the schedule
+performance index and the forecast finish feed project health. Contract 0.6.0 first.
 
 ## Checklist
 
@@ -21,7 +23,7 @@ Phase 6 — risk register, issue log, stakeholder register, and change requests 
 - [x] 3. Portfolios, programs, projects, charter, WBS, dashboard read model (04–07)
 - [x] 4. Tasks, board, lexorank, backlog, sprints, burndown, velocity (08–09)
 - [x] 5. Dependencies, critical path, baselines, working calendar (10)
-- [ ] 6. Risks, issues, stakeholders, change requests with approval chain (11–14)
+- [x] 6. Risks, issues, stakeholders, change requests with approval chain (11–14)
 - [ ] 7. Timesheets, capacity, EVM (15–17)
 - [ ] 8. Outbox, notifications, WebSocket, audit trail, attachments (18–20)
 - [ ] 9. Report exports, demo data (21–22)
@@ -39,3 +41,5 @@ Phase 6 — risk register, issue log, stakeholder register, and change requests 
 - ADR 0008 — project access policy, charter versions, WBS as a Composite, money, synchronous dashboard read model
 - ADR 0009 — work module: task lifecycle, lexorank, WIP limits, sprints, burndown snapshots, task-based WBS progress
 - ADR 0010 — schedule module: CPM as a Strategy on working-day numbers, computed on read, baselines, org calendar
+- ADR 0011 — governance module: registers, health from overdue critical risks, approval Chain of Responsibility,
+  atomic application of approved changes

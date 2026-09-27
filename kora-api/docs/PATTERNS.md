@@ -7,12 +7,12 @@ lands in code; a pattern that doesn't earn its place is rejected in an ADR.
 | ------------------------------ | ----------------------------------------------------------------------------------------- | ------------------ | ----- |
 | Ports and adapters (Adapter)   | Email, token store, file storage, clock behind interfaces; in-memory fakes in tests        | Done — Phase 2     | `platform/mail/EmailSender`, `identity/application/RefreshTokenStore` + `adapter/redis`, `*Repository` ports + `adapter/persistence` |
 | Strategy                       | Password hashing; CPM scheduling; EAC and percent-complete methods; methodology rules     | Hashing, CPM done — 2, 5; 7 planned | `identity/application/PasswordHasher`, `schedule/domain/SchedulingStrategy` + `CriticalPathMethod` |
-| State                          | Lifecycles where illegal moves must be impossible: invitation, project, charter, task, issue, change request | Invitation, project, charter, task done — 2–4; 6 planned | `organization/domain/InvitationStatus`, `portfolio/domain/ProjectStatus`, `portfolio/domain/CharterStatus`, `work/domain/TaskStatus` |
+| State                          | Lifecycles where illegal moves must be impossible: invitation, project, charter, task, issue, change request | Done — Phases 2–6 | `InvitationStatus`, `ProjectStatus`, `CharterStatus`, `TaskStatus`, `governance/domain/IssueStatus`, `ChangeRequestStatus` |
 | Specification                  | Composable, tenant-safe filters for list endpoints (members, projects, tasks, risks)      | Done — Phases 2–4  | `MemberSpecifications`, `portfolio/adapter/persistence/PortfolioSpecifications` (incl. project visibility), `work/adapter/persistence/TaskSpecifications` |
 | Builder                        | Readable test fixtures and the demo data seeder                                           | Planned — Phase 2  | —     |
 | Composite                      | WBS roll-up: a work package and a whole subtree compute effort, cost and progress the same way | Done — Phase 3 | `scope/domain/WbsComponent`, `scope/domain/WbsTree` |
 | Observer (domain events)       | Snapshot read models, WBS roll-up, notifications react to changes without coupling modules | Done — Phases 2–4 | `UserProfileChanged` → `OrganizationEventListeners`; `ProjectChanged`/`WbsChanged`/`TaskChanged` → `reporting/application/SnapshotRefresher`; `TaskChanged` → `work/application/BurndownRecorder` |
-| Chain of Responsibility        | Change-request approval levels (PM → PMO → Sponsor) decided by configurable rules         | Planned — Phase 6  | —     |
+| Chain of Responsibility        | Change-request approval levels (PM → PMO → Sponsor) decided by configurable rules         | Done — Phase 6     | `governance/domain/ApprovalHandler` |
 | Transactional outbox           | Events are never lost or sent for a rolled-back change (Modulith publication registry)    | Planned — Phase 8  | —     |
 | Template Method + Factory      | Report exporters share load → build → render → store; a new format is one new class       | Planned — Phase 9  | —     |
 
@@ -70,3 +70,13 @@ Still plumbing rather than domain patterns, but two structural ideas landed in t
   dates at the edges. The algorithm stays textbook-simple and the calendar rules stay in one class.
 - **Graph algorithms**: Kahn's topological sort (order and loop detection) and breadth-first search (the shortest
   loop a new link would close) in `schedule/domain/DependencyGraph`.
+
+## Phase 6
+
+- **Chain of Responsibility**: `governance/domain/ApprovalHandler` with `ProjectManagerApproval`, `PmoApproval` and
+  `SponsorApproval`. Each handler decides whether its level must approve; adding a level is one class linked into the
+  chain.
+- **Anonymization over deletion** for personal data: `Stakeholder.remove()` erases what identifies the person and
+  keeps the row, so references and history survive.
+- **Ports for cross-module writes**: `portfolio.ProjectChangeControl` and `schedule.SchedulePlanning` let an approved
+  change reach other modules' baselines in one transaction without handing out manager rights.
