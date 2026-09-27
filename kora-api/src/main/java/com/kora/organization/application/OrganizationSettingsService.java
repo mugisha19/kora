@@ -1,6 +1,7 @@
 package com.kora.organization.application;
 
 import com.kora.organization.OrganizationCurrency;
+import com.kora.organization.OrganizationName;
 import com.kora.organization.OrganizationTimeZone;
 import com.kora.organization.domain.Organization;
 import com.kora.platform.error.NotFoundException;
@@ -12,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 /** The active organization's settings as other modules read them. */
-class OrganizationSettingsService implements OrganizationCurrency, OrganizationTimeZone {
+class OrganizationSettingsService implements OrganizationCurrency, OrganizationTimeZone, OrganizationName {
 
     private final OrganizationRepository organizations;
 
@@ -24,6 +25,12 @@ class OrganizationSettingsService implements OrganizationCurrency, OrganizationT
     @Transactional(readOnly = true)
     public String current() {
         return organization().getCurrency();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public String name() {
+        return organization().getName();
     }
 
     @Override

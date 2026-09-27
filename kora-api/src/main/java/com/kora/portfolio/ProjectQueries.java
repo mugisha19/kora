@@ -25,5 +25,8 @@ public interface ProjectQueries {
     /** The ids of the portfolio's projects, for portfolio-wide views that apply their own visibility filter. */
     Set<UUID> projectIdsOfPortfolio(UUID portfolioId);
 
+    /** A portfolio's name, e.g. for a report's title; empty when there's no such portfolio here. */
+    Optional<String> portfolioName(UUID portfolioId);
+
     record ProjectKey(UUID organizationId, UUID projectId) {}
 }

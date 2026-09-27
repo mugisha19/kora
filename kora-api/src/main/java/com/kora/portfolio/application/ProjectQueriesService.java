@@ -5,8 +5,10 @@ import com.kora.portfolio.ProjectHealthChanged;
 import com.kora.portfolio.ProjectQueries;
 import com.kora.portfolio.ProjectSnapshotSource;
 import com.kora.portfolio.application.PortfolioRepositories.CharterRepository;
+import com.kora.portfolio.application.PortfolioRepositories.PortfolioRepository;
 import com.kora.portfolio.application.PortfolioRepositories.ProjectRepository;
 import com.kora.portfolio.domain.CharterStatus;
+import com.kora.portfolio.domain.Portfolio;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -21,12 +23,24 @@ class ProjectQueriesService implements ProjectQueries {
 
     private final ProjectRepository projects;
     private final CharterRepository charters;
+    private final PortfolioRepository portfolios;
     private final ApplicationEventPublisher events;
 
-    ProjectQueriesService(ProjectRepository projects, CharterRepository charters, ApplicationEventPublisher events) {
+    ProjectQueriesService(
+            ProjectRepository projects,
+            CharterRepository charters,
+            PortfolioRepository portfolios,
+            ApplicationEventPublisher events) {
         this.projects = projects;
         this.charters = charters;
+        this.portfolios = portfolios;
         this.events = events;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<String> portfolioName(UUID portfolioId) {
+        return portfolios.findById(portfolioId).map(Portfolio::getName);
     }
 
     @Override

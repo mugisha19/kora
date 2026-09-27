@@ -1,6 +1,7 @@
 package com.kora.governance;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -28,4 +29,17 @@ public interface GovernanceQueries {
 
     /** The project of a risk, issue or change request of the active organization; empty when there's none. */
     Optional<UUID> projectOf(Item item, UUID id);
+
+    /** The highest-scoring open risks, for a project status report. */
+    List<RiskLine> topOpenRisks(UUID projectId, int limit);
+
+    /** Unresolved issues, most urgent first, for a project status report. */
+    List<IssueLine> openIssues(UUID projectId, int limit);
+
+    /** An open risk in a few words; enum values by name ({@code Severity}, {@code RiskStatus}). */
+    record RiskLine(
+            String key, String title, int score, String severity, String status, UUID ownerId, LocalDate reviewDate) {}
+
+    /** An open issue in a few words; enum values by name ({@code IssuePriority}, {@code IssueStatus}). */
+    record IssueLine(String key, String title, String priority, String status, UUID ownerId, LocalDate dueDate) {}
 }

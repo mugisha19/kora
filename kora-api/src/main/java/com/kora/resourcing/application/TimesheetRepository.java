@@ -18,6 +18,10 @@ public interface TimesheetRepository {
 
     Page<Timesheet> search(UUID projectId, TimesheetStatus status, LocalDate weekStart, Pageable pageable);
 
+    /** The project's timesheets of the weeks starting in the range, by week then person (the timesheet report). */
+    List<Timesheet> findByProjectIdAndWeekStartBetweenOrderByWeekStartAscUserIdAsc(
+            UUID projectId, LocalDate firstWeekStart, LocalDate lastWeekStart);
+
     Timesheet saveAndFlush(Timesheet timesheet);
 
     void delete(Timesheet timesheet);
