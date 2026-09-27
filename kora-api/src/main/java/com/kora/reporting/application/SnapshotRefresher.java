@@ -14,6 +14,7 @@ import com.kora.reporting.domain.ProjectSnapshot;
 import com.kora.scope.WbsChanged;
 import com.kora.scope.WbsQueries;
 import com.kora.scope.WbsTotals;
+import com.kora.work.TaskChanged;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.Comparator;
@@ -68,6 +69,12 @@ class SnapshotRefresher {
 
     @EventListener
     void on(WbsChanged event) {
+        refresh(event.projectId());
+    }
+
+    /** Task progress moves the WBS percent complete (feature 08). */
+    @EventListener
+    void on(TaskChanged event) {
         refresh(event.projectId());
     }
 
