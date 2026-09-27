@@ -1,6 +1,7 @@
 package com.kora.organization;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -12,4 +13,7 @@ public interface MemberDirectory {
 
     /** One query for many people, e.g. every manager on a page of projects. Unknown ids are simply absent. */
     Map<UUID, MemberSummary> findAll(Collection<UUID> userIds);
+
+    /** Everyone in the organization, by name (capacity planning looks at the whole workforce). */
+    List<MemberSummary> everyone();
 }

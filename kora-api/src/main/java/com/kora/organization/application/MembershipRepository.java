@@ -22,6 +22,8 @@ public interface MembershipRepository {
 
     List<Membership> findByUserIdIn(Collection<UUID> userIds);
 
+    List<Membership> findAllByOrderByMemberNameAsc();
+
     boolean existsByUserId(UUID userId);
 
     /** @param memberEmail already normalized */

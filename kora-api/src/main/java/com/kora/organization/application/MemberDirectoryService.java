@@ -4,6 +4,7 @@ import com.kora.organization.MemberDirectory;
 import com.kora.organization.MemberSummary;
 import com.kora.organization.domain.Membership;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -36,6 +37,14 @@ class MemberDirectoryService implements MemberDirectory {
         return memberships.findByUserIdIn(userIds).stream()
                 .map(MemberDirectoryService::summary)
                 .collect(Collectors.toMap(MemberSummary::userId, Function.identity()));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<MemberSummary> everyone() {
+        return memberships.findAllByOrderByMemberNameAsc().stream()
+                .map(MemberDirectoryService::summary)
+                .toList();
     }
 
     private static MemberSummary summary(Membership membership) {
