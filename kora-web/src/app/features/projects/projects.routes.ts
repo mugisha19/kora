@@ -79,6 +79,58 @@ export const PROJECT_ROUTES: Routes = [
             loadComponent: () =>
               import('./workspace/schedule/schedule-tab').then((m) => m.ScheduleTab),
           },
+          {
+            path: 'risks',
+            title: 'workspace.tabs.risks',
+            loadComponent: () => import('./workspace/risks/risks-tab').then((m) => m.RisksTab),
+            // A risk opens in a side sheet over the register: /risks/<id> (notification links).
+            children: [
+              { path: '', children: [] },
+              {
+                matcher: uuidParam('riskId'),
+                loadComponent: () =>
+                  import('./workspace/risks/risk-sheet').then((m) => m.RiskSheetRoute),
+              },
+            ],
+          },
+          {
+            path: 'issues',
+            title: 'workspace.tabs.issues',
+            loadComponent: () => import('./workspace/issues/issues-tab').then((m) => m.IssuesTab),
+            children: [
+              { path: '', children: [] },
+              {
+                matcher: uuidParam('issueId'),
+                loadComponent: () =>
+                  import('./workspace/issues/issue-sheet').then((m) => m.IssueSheetRoute),
+              },
+            ],
+          },
+          {
+            path: 'stakeholders',
+            title: 'workspace.tabs.stakeholders',
+            loadComponent: () =>
+              import('./workspace/stakeholders/stakeholders-tab').then((m) => m.StakeholdersTab),
+          },
+          {
+            path: 'change-requests',
+            title: 'workspace.tabs.change-requests',
+            loadComponent: () =>
+              import('./workspace/changes/changes-tab').then((m) => m.ChangesTab),
+          },
+          {
+            path: 'change-requests',
+            children: [
+              {
+                matcher: uuidParam('changeRequestId'),
+                title: 'changes.detailTitle',
+                loadComponent: () =>
+                  import('./workspace/changes/change-request-page').then(
+                    (m) => m.ChangeRequestPage,
+                  ),
+              },
+            ],
+          },
         ],
       },
     ],

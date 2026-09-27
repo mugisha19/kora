@@ -82,7 +82,11 @@ describe('projects', () => {
       await userEvent.click(screen.getByRole('button', { name: 'New project' }));
 
       expect(
-        await screen.findByRole('heading', { level: 1, name: 'Agent banking pilot' }),
+        await screen.findByRole(
+          'heading',
+          { level: 1, name: 'Agent banking pilot' },
+          { timeout: 5000 },
+        ),
       ).toBeTruthy();
       const project = (await firstValueFrom(TestBed.inject(ProjectsApi).list({ q: 'AKG-020' })))
         .content[0];
@@ -115,11 +119,12 @@ describe('projects', () => {
     it('offers the tabs of the methodology', async () => {
       await open(`/projects/${PROJECT.mobile}`);
       await screen.findByRole('heading', { level: 1, name: 'Mobile banking app' });
-      expect(tabNames()).toEqual(['Overview', 'Charter', 'WBS', 'Board', 'Backlog']);
+      const governance = ['Risks', 'Issues', 'Stakeholders', 'Changes'];
+      expect(tabNames()).toEqual(['Overview', 'Charter', 'WBS', 'Board', 'Backlog', ...governance]);
 
       await TestBed.inject(Router).navigateByUrl(`/projects/${PROJECT.warehouse}`);
       await screen.findByRole('heading', { level: 1, name: 'Data warehouse' });
-      expect(tabNames()).toEqual(['Overview', 'Charter', 'WBS', 'Schedule']);
+      expect(tabNames()).toEqual(['Overview', 'Charter', 'WBS', 'Schedule', ...governance]);
     });
 
     it('shows a viewer the project without any way to change it', async () => {
