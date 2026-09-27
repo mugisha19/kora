@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Kora API
-  version: 0.2.0
+  version: 0.3.0
   description: |
     Multi-tenant project and portfolio management built on PMI practices.
 
@@ -52,6 +52,10 @@ tags:
     description: Work breakdown structure with rolled-up effort, cost and progress (feature 07)
   - name: Dashboard
     description: Portfolio dashboard read model (feature 05)
+  - name: Tasks
+    description: Tasks and the Kanban board (feature 08)
+  - name: Sprints
+    description: Backlog, sprints, burndown and velocity (feature 09)
 
 security:
   - bearerAuth: []
@@ -2007,6 +2011,831 @@ paths:
         '500':
           $ref: '#/components/responses/InternalError'
 
+  /projects/{projectId}/tasks:
+    get:
+      tags: [Tasks]
+      operationId: listTasks
+      summary: List a project's tasks
+      description: 'Ordered by rank by default. Sortable by `rank`, `key`, `priority`, `dueDate`, `createdAt`.'
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/TaskStatus'
+        - name: assigneeId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: sprintId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: type
+          in: query
+          schema:
+            $ref: '#/components/schemas/TaskType'
+        - name: label
+          in: query
+          schema:
+            type: string
+            maxLength: 30
+        - name: q
+          in: query
+          description: 'Case-insensitive match on name (and code for projects)'
+          schema:
+            type: string
+            maxLength: 100
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+        - $ref: '#/components/parameters/Sort'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: One page of tasks
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskPage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      tags: [Tasks]
+      operationId: createTask
+      summary: Create a task
+      description: 'The project manager, `PMO`, `ORG_ADMIN` or a project contributor. Starts in `BACKLOG` unless `status` is `TODO`; its key is the project code plus a number (`AKG-012-34`).'
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTaskRequest'
+      responses:
+        '201':
+          description: Task created
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            Location:
+              description: URL of the new resource
+              schema:
+                type: string
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'The project''s portfolio is archived. Code: `portfolios.archived`.'
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /tasks/{taskId}:
+    get:
+      tags: [Tasks]
+      operationId: getTask
+      summary: Get a task
+      parameters:
+        - $ref: '#/components/parameters/TaskId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: The task
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    patch:
+      tags: [Tasks]
+      operationId: updateTask
+      summary: Update a task''s details
+      description: 'Managers edit any task; contributors edit tasks assigned to them or unassigned. The status changes through `POST /tasks/{taskId}/move`.'
+      parameters:
+        - $ref: '#/components/parameters/TaskId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/IfMatch'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTaskRequest'
+      responses:
+        '200':
+          description: The updated task
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '412':
+          $ref: '#/components/responses/PreconditionFailed'
+        '428':
+          $ref: '#/components/responses/PreconditionRequired'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    delete:
+      tags: [Tasks]
+      operationId: deleteTask
+      summary: Delete a task
+      description: 'The project manager, `PMO` or `ORG_ADMIN`.'
+      parameters:
+        - $ref: '#/components/parameters/TaskId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '204':
+          description: Deleted
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /tasks/{taskId}/move:
+    post:
+      tags: [Tasks]
+      operationId: moveTask
+      summary: Change a task''s status and/or position in one call
+      description: 'Places the task between `afterTaskId` (above it) and `beforeTaskId` (below it) in the target status, or last when both are omitted. Moving into a column at its WIP limit needs `override: true`. `BLOCKED` needs a reason; reopening a `DONE` task is for managers only.'
+      parameters:
+        - $ref: '#/components/parameters/TaskId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MoveTaskRequest'
+      responses:
+        '200':
+          description: The moved task
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: '`tasks.invalid_transition`, `tasks.wip_limit_reached` or `tasks.remaining_work` (remaining hours must be 0 to finish).'
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /tasks/{taskId}/comments:
+    get:
+      tags: [Tasks]
+      operationId: listTaskComments
+      summary: The task''s comments, oldest first
+      parameters:
+        - $ref: '#/components/parameters/TaskId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: The comments
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TaskComment'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      tags: [Tasks]
+      operationId: addTaskComment
+      summary: Comment on a task
+      description: 'The project manager, `PMO`, `ORG_ADMIN` or a project contributor.'
+      parameters:
+        - $ref: '#/components/parameters/TaskId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTaskCommentRequest'
+      responses:
+        '201':
+          description: The new comment
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskComment'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /projects/{projectId}/board:
+    get:
+      tags: [Tasks]
+      operationId: getBoard
+      summary: 'The Kanban board: columns with ordered cards and WIP counts'
+      description: 'Every task that isn''t in the backlog, or only one sprint''s tasks with `sprintId`.'
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - name: sprintId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: The board
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Board'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /projects/{projectId}/board/columns/{status}:
+    put:
+      tags: [Tasks]
+      operationId: configureBoardColumn
+      summary: Rename a column or set its WIP limit
+      description: 'The project manager, `PMO` or `ORG_ADMIN`. Omit `wipLimit` for no limit.'
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/BoardStatus'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BoardColumnSettings'
+      responses:
+        '200':
+          description: The column settings
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BoardColumnSettings'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /projects/{projectId}/backlog:
+    get:
+      tags: [Sprints]
+      operationId: getBacklog
+      summary: 'The product backlog: unfinished tasks in no sprint, in rank order'
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+        - $ref: '#/components/parameters/Sort'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: One page of the backlog
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskPage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /projects/{projectId}/sprints:
+    get:
+      tags: [Sprints]
+      operationId: listSprints
+      summary: The project''s sprints, newest first
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: The sprints
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Sprint'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      tags: [Sprints]
+      operationId: createSprint
+      summary: Plan a sprint
+      description: 'The project manager, `PMO` or `ORG_ADMIN`; Agile and Hybrid projects only.'
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSprintRequest'
+      responses:
+        '201':
+          description: Sprint planned
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            Location:
+              description: URL of the new resource
+              schema:
+                type: string
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sprint'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'The project is Predictive. Code: `sprints.not_agile`.'
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /sprints/{sprintId}:
+    get:
+      tags: [Sprints]
+      operationId: getSprint
+      summary: Get a sprint
+      parameters:
+        - $ref: '#/components/parameters/SprintId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: The sprint
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sprint'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    patch:
+      tags: [Sprints]
+      operationId: updateSprint
+      summary: Change a sprint''s name, goal or dates
+      parameters:
+        - $ref: '#/components/parameters/SprintId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/IfMatch'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSprintRequest'
+      responses:
+        '200':
+          description: The updated sprint
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sprint'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'The sprint is closed. Code: `sprints.closed`.'
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '412':
+          $ref: '#/components/responses/PreconditionFailed'
+        '428':
+          $ref: '#/components/responses/PreconditionRequired'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /sprints/{sprintId}/start:
+    post:
+      tags: [Sprints]
+      operationId: startSprint
+      summary: Start a planned sprint; its committed points are frozen
+      parameters:
+        - $ref: '#/components/parameters/SprintId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: The active sprint
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sprint'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: '`sprints.already_active` (another sprint runs) or `sprints.not_planned`.'
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /sprints/{sprintId}/close:
+    post:
+      tags: [Sprints]
+      operationId: closeSprint
+      summary: Close the active sprint and carry unfinished tasks over
+      description: 'Completed points are recorded; unfinished tasks move to `carryOverTo` (a planned sprint of the same project) or back to the backlog.'
+      parameters:
+        - $ref: '#/components/parameters/SprintId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CloseSprintRequest'
+      responses:
+        '200':
+          description: The closed sprint
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sprint'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'The sprint is not active. Code: `sprints.not_active`.'
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /sprints/{sprintId}/tasks:
+    post:
+      tags: [Sprints]
+      operationId: addTasksToSprint
+      summary: Add tasks to a sprint
+      description: 'The project manager, `PMO` or `ORG_ADMIN`. Tasks already in another sprint move here.'
+      parameters:
+        - $ref: '#/components/parameters/SprintId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SprintTasksRequest'
+      responses:
+        '200':
+          description: The sprint
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sprint'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'The sprint is closed. Code: `sprints.closed`.'
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /sprints/{sprintId}/tasks/{taskId}:
+    delete:
+      tags: [Sprints]
+      operationId: removeTaskFromSprint
+      summary: Put a task back in the backlog
+      parameters:
+        - $ref: '#/components/parameters/SprintId'
+        - $ref: '#/components/parameters/TaskId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '204':
+          description: Removed from the sprint
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'The sprint is closed. Code: `sprints.closed`.'
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /sprints/{sprintId}/burndown:
+    get:
+      tags: [Sprints]
+      operationId: getBurndown
+      summary: Remaining story points per day against the ideal line
+      parameters:
+        - $ref: '#/components/parameters/SprintId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: The burndown
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Burndown'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /projects/{projectId}/velocity:
+    get:
+      tags: [Sprints]
+      operationId: getVelocity
+      summary: Completed points of the last closed sprints, with a forecast range
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - name: last
+          in: query
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 20
+            default: 6
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: The velocity
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Velocity'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -2136,6 +2965,29 @@ components:
       schema:
         type: string
         format: uuid
+
+    TaskId:
+      name: taskId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    SprintId:
+      name: sprintId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    BoardStatus:
+      name: status
+      in: path
+      required: true
+      description: A board column (every task status except BACKLOG)
+      schema:
+        type: string
+        enum: [TODO, IN_PROGRESS, BLOCKED, IN_REVIEW, DONE]
 
   headers:
     CorrelationId:
@@ -2366,6 +3218,14 @@ components:
         - wbs.cycle
         - wbs.has_children
         - wbs.type_change_not_allowed
+        - tasks.invalid_transition
+        - tasks.wip_limit_reached
+        - tasks.remaining_work
+        - sprints.not_agile
+        - sprints.already_active
+        - sprints.not_planned
+        - sprints.not_active
+        - sprints.closed
         - internal.error
 
     # ---------- Shared ----------
@@ -3185,8 +4045,8 @@ components:
       enum: [DELIVERABLE, WORK_PACKAGE]
     WbsNode:
       type: object
-      required: [id, code, name, type, plannedEffortHours, plannedCost, percentComplete, earnedValue, version,
-                 children]
+      required: [id, code, name, type, plannedEffortHours, plannedCost, percentComplete, percentCompleteSource,
+                 earnedValue, version, children]
       properties:
         id:
           type: string
@@ -3216,6 +4076,11 @@ components:
           minimum: 0
           maximum: 100
           description: A work package's reported progress, or the effort-weighted average over a subtree
+        percentCompleteSource:
+          type: string
+          enum: [REPORTED, TASKS, ROLLED_UP]
+          description: 'REPORTED: entered on the work package; TASKS: derived from its tasks (read-only);
+            ROLLED_UP: a deliverable''s average of its children'
         earnedValue:
           $ref: '#/components/schemas/Money'
         version:
@@ -3424,3 +4289,451 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/DashboardProject'
+
+    # ---------- Tasks and board (0.3.0) ----------
+    TaskStatus:
+      type: string
+      description: 'BACKLOG → TODO → IN_PROGRESS → IN_REVIEW → DONE; BLOCKED from TODO or IN_PROGRESS (with a reason)'
+      enum: [BACKLOG, TODO, IN_PROGRESS, BLOCKED, IN_REVIEW, DONE]
+    TaskType:
+      type: string
+      enum: [STORY, TASK, BUG, CHORE]
+    TaskPriority:
+      type: string
+      enum: [LOW, MEDIUM, HIGH, CRITICAL]
+    Labels:
+      type: array
+      maxItems: 10
+      items:
+        type: string
+        pattern: '^[\p{L}\p{N}][\p{L}\p{N} _-]{0,29}$'
+    Task:
+      type: object
+      required: [id, key, projectId, title, type, priority, status, labels, rank, createdAt, version]
+      properties:
+        id:
+          type: string
+          format: uuid
+        key:
+          type: string
+          description: Project code and task number
+          example: AKG-012-34
+        projectId:
+          type: string
+          format: uuid
+        title:
+          type: string
+        description:
+          type: string
+          description: 'Markdown. Render it as Markdown only: raw HTML is not allowed and must not be rendered.'
+        type:
+          $ref: '#/components/schemas/TaskType'
+        priority:
+          $ref: '#/components/schemas/TaskPriority'
+        status:
+          $ref: '#/components/schemas/TaskStatus'
+        blockedReason:
+          type: string
+        assignee:
+          $ref: '#/components/schemas/UserRef'
+        wbsNodeId:
+          type: string
+          format: uuid
+          description: The work package this task belongs to
+        sprintId:
+          type: string
+          format: uuid
+        storyPoints:
+          type: integer
+          format: int32
+        estimateHours:
+          type: number
+        remainingHours:
+          type: number
+        startDate:
+          type: string
+          format: date
+        dueDate:
+          type: string
+          format: date
+        labels:
+          $ref: '#/components/schemas/Labels'
+        rank:
+          type: string
+          description: Opaque sort key (lexorank); order tasks by it, never parse it
+        createdAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+          format: int64
+    TaskPage:
+      allOf:
+        - $ref: '#/components/schemas/PageMetadata'
+        - type: object
+          required: [content]
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/Task'
+    CreateTaskRequest:
+      type: object
+      required: [title, type]
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+        description:
+          type: string
+          maxLength: 10000
+        type:
+          $ref: '#/components/schemas/TaskType'
+        priority:
+          $ref: '#/components/schemas/TaskPriority'
+        status:
+          type: string
+          enum: [BACKLOG, TODO]
+          default: BACKLOG
+        assigneeId:
+          type: string
+          format: uuid
+        wbsNodeId:
+          type: string
+          format: uuid
+        sprintId:
+          type: string
+          format: uuid
+        storyPoints:
+          type: integer
+          format: int32
+          minimum: 0
+          maximum: 100
+        estimateHours:
+          type: number
+          minimum: 0
+          maximum: 10000
+        remainingHours:
+          type: number
+          minimum: 0
+          maximum: 10000
+        startDate:
+          type: string
+          format: date
+        dueDate:
+          type: string
+          format: date
+        labels:
+          $ref: '#/components/schemas/Labels'
+    UpdateTaskRequest:
+      type: object
+      minProperties: 1
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+        description:
+          type: string
+          maxLength: 10000
+        type:
+          $ref: '#/components/schemas/TaskType'
+        priority:
+          $ref: '#/components/schemas/TaskPriority'
+        assigneeId:
+          type: string
+          format: uuid
+        wbsNodeId:
+          type: string
+          format: uuid
+        storyPoints:
+          type: integer
+          format: int32
+          minimum: 0
+          maximum: 100
+        estimateHours:
+          type: number
+          minimum: 0
+          maximum: 10000
+        remainingHours:
+          type: number
+          minimum: 0
+          maximum: 10000
+        startDate:
+          type: string
+          format: date
+        dueDate:
+          type: string
+          format: date
+        labels:
+          $ref: '#/components/schemas/Labels'
+    MoveTaskRequest:
+      type: object
+      required: [status]
+      properties:
+        status:
+          $ref: '#/components/schemas/TaskStatus'
+        afterTaskId:
+          type: string
+          format: uuid
+          description: The task that will be directly above
+        beforeTaskId:
+          type: string
+          format: uuid
+          description: The task that will be directly below
+        override:
+          type: boolean
+          default: false
+          description: Move into a column at its WIP limit anyway
+        reason:
+          type: string
+          maxLength: 500
+          description: Required when moving to BLOCKED
+    TaskComment:
+      type: object
+      required: [id, author, body, createdAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        author:
+          $ref: '#/components/schemas/UserRef'
+        body:
+          type: string
+          description: Markdown, rendered like a task description
+        createdAt:
+          type: string
+          format: date-time
+    CreateTaskCommentRequest:
+      type: object
+      required: [body]
+      properties:
+        body:
+          type: string
+          minLength: 1
+          maxLength: 5000
+    BoardColumnSettings:
+      type: object
+      required: [status, name]
+      properties:
+        status:
+          type: string
+          enum: [TODO, IN_PROGRESS, BLOCKED, IN_REVIEW, DONE]
+        name:
+          type: string
+          minLength: 1
+          maxLength: 40
+        wipLimit:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 100
+    BoardColumn:
+      type: object
+      required: [status, name, taskCount, atLimit, tasks]
+      properties:
+        status:
+          $ref: '#/components/schemas/TaskStatus'
+        name:
+          type: string
+        wipLimit:
+          type: integer
+          format: int32
+        taskCount:
+          type: integer
+          format: int32
+        atLimit:
+          type: boolean
+          description: The column holds as many tasks as its WIP limit, or more
+        tasks:
+          type: array
+          items:
+            $ref: '#/components/schemas/Task'
+    Board:
+      type: object
+      required: [projectId, columns]
+      properties:
+        projectId:
+          type: string
+          format: uuid
+        sprintId:
+          type: string
+          format: uuid
+        columns:
+          type: array
+          items:
+            $ref: '#/components/schemas/BoardColumn'
+
+    # ---------- Sprints ----------
+    SprintStatus:
+      type: string
+      enum: [PLANNED, ACTIVE, CLOSED]
+    Sprint:
+      type: object
+      required: [id, projectId, name, startDate, endDate, status, taskCount, totalPoints, version]
+      properties:
+        id:
+          type: string
+          format: uuid
+        projectId:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: Sprint 4
+        goal:
+          type: string
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        status:
+          $ref: '#/components/schemas/SprintStatus'
+        taskCount:
+          type: integer
+          format: int32
+        totalPoints:
+          type: integer
+          format: int32
+          description: Story points of the tasks in the sprint now
+        committedPoints:
+          type: integer
+          format: int32
+          description: Frozen when the sprint starts
+        completedPoints:
+          type: integer
+          format: int32
+          description: Recorded when the sprint closes
+        version:
+          type: integer
+          format: int64
+    CreateSprintRequest:
+      type: object
+      required: [name, startDate, endDate]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        goal:
+          type: string
+          maxLength: 500
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+    UpdateSprintRequest:
+      type: object
+      minProperties: 1
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        goal:
+          type: string
+          maxLength: 500
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+    CloseSprintRequest:
+      type: object
+      required: [carryOverTo]
+      properties:
+        carryOverTo:
+          type: string
+          description: A planned sprint's id, or `BACKLOG`
+          example: BACKLOG
+    SprintTasksRequest:
+      type: object
+      required: [taskIds]
+      properties:
+        taskIds:
+          type: array
+          minItems: 1
+          maxItems: 200
+          items:
+            type: string
+            format: uuid
+    BurndownDay:
+      type: object
+      required: [date, idealRemaining]
+      properties:
+        date:
+          type: string
+          format: date
+        idealRemaining:
+          type: number
+        actualRemaining:
+          type: integer
+          format: int32
+          description: Absent for days that haven't happened yet
+    Burndown:
+      type: object
+      required: [sprintId, startDate, endDate, committedPoints, days]
+      properties:
+        sprintId:
+          type: string
+          format: uuid
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        committedPoints:
+          type: integer
+          format: int32
+        days:
+          type: array
+          items:
+            $ref: '#/components/schemas/BurndownDay'
+    VelocitySprint:
+      type: object
+      required: [sprintId, name, endDate, committedPoints, completedPoints]
+      properties:
+        sprintId:
+          type: string
+          format: uuid
+        name:
+          type: string
+        endDate:
+          type: string
+          format: date
+        committedPoints:
+          type: integer
+          format: int32
+        completedPoints:
+          type: integer
+          format: int32
+    Velocity:
+      type: object
+      required: [sprints]
+      properties:
+        sprints:
+          type: array
+          description: Oldest first
+          items:
+            $ref: '#/components/schemas/VelocitySprint'
+        average:
+          type: number
+          description: Average completed points; absent before the first closed sprint
+        low:
+          type: integer
+          format: int32
+          description: Lowest completed points in the window (forecast range)
+        high:
+          type: integer
+          format: int32
+          description: Highest completed points in the window (forecast range)
