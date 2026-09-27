@@ -10,13 +10,6 @@ import { uuidParam } from '../../shared/routing/uuid-matcher';
 /** `/projects/new` only for roles that can create projects; others fall through to "not found". */
 const canCreate: CanMatchFn = () => canCreateProject(inject(SessionStore).activeRole());
 
-const comingSoon = (tab: 'schedule') => ({
-  path: tab,
-  title: `workspace.tabs.${tab}`,
-  data: { tab },
-  loadComponent: () => import('./workspace/coming-soon-tab').then((m) => m.ComingSoonTab),
-});
-
 /** `/projects/*` (features 04, 06, 07), lazy-loaded. */
 export const PROJECT_ROUTES: Routes = [
   {
@@ -80,7 +73,12 @@ export const PROJECT_ROUTES: Routes = [
             loadComponent: () =>
               import('./workspace/backlog/backlog-tab').then((m) => m.BacklogTab),
           },
-          comingSoon('schedule'),
+          {
+            path: 'schedule',
+            title: 'workspace.tabs.schedule',
+            loadComponent: () =>
+              import('./workspace/schedule/schedule-tab').then((m) => m.ScheduleTab),
+          },
         ],
       },
     ],

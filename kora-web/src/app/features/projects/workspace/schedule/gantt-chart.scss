@@ -1,0 +1,225 @@
+// Row heights come from the component (ROW_HEIGHT, HEADER_HEIGHT) so the task list lines up with
+// the chart's rows.
+:host {
+  display: block;
+  min-inline-size: 0;
+}
+
+.gantt {
+  display: grid;
+  grid-template-columns: minmax(140px, 260px) minmax(0, 1fr);
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: var(--kora-radius, 8px);
+  overflow: hidden;
+  background: var(--mat-sys-surface);
+}
+
+.names {
+  border-inline-end: 1px solid var(--mat-sys-outline-variant);
+  min-inline-size: 0;
+
+  ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  li {
+    display: flex;
+    align-items: center;
+    gap: var(--kora-space-1);
+    block-size: var(--row-height);
+    padding-inline: var(--kora-space-2);
+    border-block-end: 1px solid var(--mat-sys-outline-variant);
+    box-sizing: border-box;
+  }
+}
+
+.names-head {
+  display: flex;
+  align-items: flex-end;
+  block-size: var(--header-height);
+  padding: 0 var(--kora-space-2) var(--kora-space-1);
+  box-sizing: border-box;
+  border-block-end: 1px solid var(--mat-sys-outline-variant);
+  background: var(--mat-sys-surface-container-low);
+  font: var(--mat-sys-label-large);
+}
+
+.name {
+  display: flex;
+  gap: var(--kora-space-1);
+  align-items: baseline;
+  min-inline-size: 0;
+  flex: 1;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: var(--mat-sys-body-medium);
+  text-align: start;
+  cursor: pointer;
+
+  &:hover .title {
+    text-decoration: underline;
+  }
+  &:focus-visible {
+    outline: 2px solid var(--mat-sys-primary);
+    outline-offset: 2px;
+  }
+}
+
+.key {
+  flex: none;
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-label-medium);
+}
+
+.title {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.tag {
+  flex: none;
+  padding: 0 6px;
+  border: 1px solid var(--mat-sys-error);
+  border-radius: 4px;
+  color: var(--mat-sys-error);
+  font: var(--mat-sys-label-small);
+}
+
+.scroller {
+  overflow-x: auto;
+  min-inline-size: 0;
+
+  &:focus-visible {
+    outline: 2px solid var(--mat-sys-primary);
+    outline-offset: -2px;
+  }
+}
+
+svg {
+  display: block;
+  touch-action: pan-y;
+  user-select: none;
+  font: var(--mat-sys-label-small);
+
+  &.dragging {
+    cursor: grabbing;
+  }
+}
+
+.off {
+  fill: var(--mat-sys-surface-container-high);
+}
+.head-bg {
+  fill: var(--mat-sys-surface-container-low);
+}
+.tick-major {
+  stroke: var(--mat-sys-outline-variant);
+}
+.tick-top {
+  fill: var(--mat-sys-on-surface);
+  font: var(--mat-sys-label-medium);
+}
+.tick-bottom {
+  fill: var(--mat-sys-on-surface-variant);
+}
+.row-line {
+  stroke: var(--mat-sys-outline-variant);
+}
+
+.today {
+  stroke: var(--mat-sys-tertiary);
+  stroke-width: 2;
+  stroke-dasharray: 4 3;
+}
+.today-label {
+  fill: var(--mat-sys-tertiary);
+  font-weight: 600;
+}
+
+.arrow {
+  fill: none;
+  stroke: var(--mat-sys-on-surface-variant);
+  stroke-width: 1.25;
+
+  &.critical {
+    stroke: var(--mat-sys-error);
+    stroke-width: 1.75;
+  }
+}
+.arrow-head {
+  fill: var(--mat-sys-on-surface-variant);
+}
+
+.hatch-fill {
+  fill: var(--mat-sys-error);
+}
+.hatch-line {
+  stroke: var(--mat-sys-on-error);
+  stroke-width: 2.5;
+}
+
+.bar {
+  .shape {
+    fill: var(--mat-sys-primary);
+  }
+  &.critical .shape {
+    fill: var(--hatch);
+    stroke: var(--mat-sys-error);
+    stroke-width: 1.5;
+  }
+  &.editable .shape {
+    cursor: grab;
+  }
+  &.target .shape {
+    stroke: var(--mat-sys-tertiary);
+    stroke-width: 3;
+  }
+}
+
+.resize {
+  fill: transparent;
+  cursor: ew-resize;
+}
+
+.connector {
+  fill: var(--mat-sys-surface);
+  stroke: var(--mat-sys-primary);
+  stroke-width: 2;
+  cursor: crosshair;
+}
+
+.bar-label {
+  fill: var(--mat-sys-on-surface);
+  pointer-events: none;
+}
+
+.baseline {
+  fill: var(--mat-sys-outline);
+}
+
+.preview {
+  fill: none;
+  stroke: var(--mat-sys-tertiary);
+  stroke-width: 2;
+  stroke-dasharray: 4 3;
+  pointer-events: none;
+}
+
+.link-line {
+  stroke: var(--mat-sys-tertiary);
+  stroke-width: 2;
+  pointer-events: none;
+}
+
+@media (max-width: 599px) {
+  .gantt {
+    grid-template-columns: minmax(96px, 40%) minmax(0, 1fr);
+  }
+  .name .title {
+    display: none;
+  }
+}

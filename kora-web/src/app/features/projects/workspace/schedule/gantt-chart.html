@@ -1,0 +1,217 @@
+<div class="gantt">
+  <div class="names">
+    <div class="names-head">{{ 'schedule.columns.task' | transloco }}</div>
+    <ol>
+      @for (row of rows(); track row.task.taskId) {
+        <li [class.critical]="row.task.critical">
+          <button type="button" class="name" (click)="opened.emit(row.task)">
+            <span class="key">{{ row.task.key }}</span
+            >&ngsp;<span class="title">{{ row.task.title }}</span>
+          </button>
+          @if (row.task.critical) {
+            <span class="tag">{{ 'schedule.critical' | transloco }}</span>
+          }
+        </li>
+      }
+    </ol>
+  </div>
+
+  <!-- Focusable so the timeline scrolls sideways with the arrow keys. -->
+  <div
+    class="scroller"
+    #scroller
+    role="region"
+    tabindex="0"
+    [attr.aria-label]="'schedule.timelineLabel' | transloco"
+  >
+    <svg
+      #svg
+      role="img"
+      [attr.aria-label]="label()"
+      [attr.width]="line().width"
+      [attr.height]="height()"
+      [class.dragging]="drag() !== null"
+      (pointermove)="move($event)"
+      (pointerup)="end()"
+      (pointercancel)="cancel()"
+      (lostpointercapture)="end()"
+    >
+      <defs>
+        <pattern
+          [attr.id]="id + '-hatch'"
+          patternUnits="userSpaceOnUse"
+          width="6"
+          height="6"
+          patternTransform="rotate(45)"
+        >
+          <rect class="hatch-fill" width="6" height="6" />
+          <line class="hatch-line" x1="0" y1="0" x2="0" y2="6" />
+        </pattern>
+        <marker
+          [attr.id]="id + '-arrow'"
+          viewBox="0 0 8 8"
+          refX="7"
+          refY="4"
+          markerWidth="7"
+          markerHeight="7"
+          orient="auto-start-reverse"
+        >
+          <path class="arrow-head" d="M0,0 L8,4 L0,8 z" />
+        </marker>
+      </defs>
+
+      <!-- Non-working days, then the header. -->
+      @for (x of offDays(); track x) {
+        <rect
+          class="off"
+          [attr.x]="x"
+          [attr.y]="headerHeight"
+          [attr.width]="line().dayWidth"
+          [attr.height]="height() - headerHeight"
+        />
+      }
+      <rect class="head-bg" x="0" y="0" [attr.width]="line().width" [attr.height]="headerHeight" />
+      @for (tick of header().top; track tick.x) {
+        <line
+          class="tick-major"
+          [attr.x1]="tick.x"
+          [attr.x2]="tick.x"
+          y1="0"
+          [attr.y2]="height()"
+        />
+        <text class="tick-top" [attr.x]="tick.x + 4" y="16">{{ tick.label }}</text>
+      }
+      @for (tick of header().bottom; track tick.x) {
+        <text class="tick-bottom" [attr.x]="tick.x + 2" y="36">{{ tick.label }}</text>
+      }
+      @for (row of rows(); track row.task.taskId) {
+        <line
+          class="row-line"
+          x1="0"
+          [attr.x2]="line().width"
+          [attr.y1]="headerHeight + (row.index + 1) * rowHeight"
+          [attr.y2]="headerHeight + (row.index + 1) * rowHeight"
+        />
+      }
+
+      @if (todayX(); as x) {
+        <line
+          class="today"
+          [attr.x1]="x"
+          [attr.x2]="x"
+          [attr.y1]="headerHeight - 4"
+          [attr.y2]="height()"
+        />
+        <text class="today-label" [attr.x]="x + 4" [attr.y]="headerHeight - 4">
+          {{ 'schedule.today' | transloco }}
+        </text>
+      }
+
+      @for (arrow of arrows(); track arrow.id) {
+        <path
+          class="arrow"
+          [class.critical]="arrow.critical"
+          [attr.d]="arrow.path"
+          [attr.marker-end]="'url(#' + id + '-arrow)'"
+        />
+      }
+
+      @for (row of rows(); track row.task.taskId) {
+        @let y = centerY(row.index);
+        @if (row.baseline; as base) {
+          @if (base.milestone) {
+            <polygon
+              class="baseline"
+              [attr.points]="milestonePoints(base, row.index, 5)"
+              [attr.transform]="'translate(0,' + (barHeight / 2 + 4) + ')'"
+            />
+          } @else {
+            <rect
+              class="baseline"
+              [attr.x]="base.x"
+              [attr.y]="y + barHeight / 2 + 1"
+              [attr.width]="base.width"
+              height="4"
+              rx="1"
+            />
+          }
+        }
+        <g
+          class="bar"
+          [class.critical]="row.task.critical"
+          [class.editable]="editable()"
+          [class.target]="linkTarget() === row.index"
+          [attr.data-task]="row.task.taskId"
+          (pointerdown)="start($event, 'move', row)"
+          (dblclick)="opened.emit(row.task)"
+        >
+          @if (row.bar.milestone) {
+            <polygon class="shape" [attr.points]="milestonePoints(row.bar, row.index)" />
+          } @else {
+            <rect
+              class="shape"
+              [attr.x]="row.bar.x"
+              [attr.y]="y - barHeight / 2"
+              [attr.width]="row.bar.width"
+              [attr.height]="barHeight"
+              rx="3"
+            />
+            @if (editable()) {
+              <rect
+                class="resize"
+                [attr.x]="row.bar.x + row.bar.width - 5"
+                [attr.y]="y - barHeight / 2"
+                width="8"
+                [attr.height]="barHeight"
+                (pointerdown)="start($event, 'resize', row)"
+              />
+            }
+          }
+          @if (editable()) {
+            <circle
+              class="connector"
+              [attr.cx]="
+                row.bar.x + (row.bar.milestone ? line().dayWidth / 2 + 12 : row.bar.width + 9)
+              "
+              [attr.cy]="y"
+              r="4"
+              (pointerdown)="start($event, 'link', row)"
+            />
+          }
+          <text
+            class="bar-label"
+            [attr.x]="
+              row.bar.x + (row.bar.milestone ? line().dayWidth / 2 + 20 : row.bar.width + 18)
+            "
+            [attr.y]="y + 4"
+          >
+            {{ row.task.key }}
+          </text>
+        </g>
+      }
+
+      @if (preview(); as p) {
+        <rect
+          class="preview"
+          [attr.x]="p.x"
+          [attr.y]="centerY(p.index) - barHeight / 2 - 3"
+          [attr.width]="p.milestone ? line().dayWidth : p.width"
+          [attr.height]="barHeight + 6"
+          rx="4"
+        />
+      }
+      @if (linkLine(); as l) {
+        <line
+          class="link-line"
+          [attr.x1]="l.x1"
+          [attr.y1]="l.y1"
+          [attr.x2]="l.x2"
+          [attr.y2]="l.y2"
+          [attr.marker-end]="'url(#' + id + '-arrow)'"
+        />
+      }
+    </svg>
+  </div>
+</div>
+
+<kora-gantt-legend [editable]="editable()" />

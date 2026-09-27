@@ -1,0 +1,135 @@
+<div class="toolbar">
+  <mat-button-toggle-group
+    [value]="shownView()"
+    [attr.aria-label]="'schedule.viewLabel' | transloco"
+    (change)="query.set({ view: $event.value === 'table' ? 'table' : null })"
+  >
+    <mat-button-toggle value="chart">
+      <mat-icon svgIcon="timeline" aria-hidden="true" />
+      {{ 'schedule.views.chart' | transloco }}
+    </mat-button-toggle>
+    <mat-button-toggle value="table">
+      <mat-icon svgIcon="table_rows" aria-hidden="true" />
+      {{ 'schedule.views.table' | transloco }}
+    </mat-button-toggle>
+  </mat-button-toggle-group>
+  @if (shownView() === 'chart') {
+    <mat-button-toggle-group
+      [value]="shownZoom()"
+      [attr.aria-label]="'schedule.zoomLabel' | transloco"
+      (change)="query.set({ zoom: $event.value === 'week' ? null : $event.value })"
+    >
+      @for (z of zooms; track z) {
+        <mat-button-toggle [value]="z">{{ 'schedule.zoom.' + z | transloco }}</mat-button-toggle>
+      }
+    </mat-button-toggle-group>
+  }
+  <span class="spacer"></span>
+  @if (editable() && store.rows().length > 1) {
+    <button mat-stroked-button type="button" (click)="addLink()">
+      <mat-icon svgIcon="link" aria-hidden="true" />
+      {{ 'schedule.addLink' | transloco }}
+    </button>
+  }
+  @if (editable() && store.rows().length) {
+    <button mat-flat-button type="button" (click)="saveBaseline()">
+      <mat-icon svgIcon="bookmark" aria-hidden="true" />
+      {{ 'schedule.saveBaseline' | transloco }}
+    </button>
+  }
+</div>
+
+@if (store.status() === 'loading' && !store.schedule()) {
+  <kora-loading-state />
+} @else if (store.status() === 'error') {
+  <kora-error-state [correlationId]="store.error()?.correlationId" (retry)="store.load()" />
+} @else if (store.loop(); as chain) {
+  <div class="kora-notice error" role="alert">
+    <mat-icon svgIcon="error" aria-hidden="true" />
+    <div>
+      <p>{{ 'schedule.loopStored' | transloco }}</p>
+      <p class="chain">{{ chain.join(' → ') }}</p>
+    </div>
+  </div>
+} @else if (store.schedule(); as schedule) {
+  @if (!store.rows().length) {
+    <kora-empty-state
+      icon="timeline"
+      [heading]="'schedule.emptyTitle' | transloco"
+      [message]="'schedule.emptyMessage' | transloco"
+    />
+  } @else {
+    <dl class="summary">
+      <div>
+        <dt>{{ 'schedule.start' | transloco }}</dt>
+        <dd>{{ schedule.projectStart | localizedDate: language.current() }}</dd>
+      </div>
+      <div>
+        <dt>{{ 'schedule.finish' | transloco }}</dt>
+        <dd>{{ schedule.projectFinish | localizedDate: language.current() }}</dd>
+      </div>
+      <div>
+        <dt>{{ 'schedule.criticalPath' | transloco }}</dt>
+        <dd>{{ 'schedule.taskCount' | transloco: { count: store.criticalCount() } }}</dd>
+      </div>
+      <div>
+        <dt>{{ 'schedule.baseline' | transloco }}</dt>
+        <dd>
+          @if (schedule.baseline; as baseline) {
+            {{
+              'schedule.baselineInfo'
+                | transloco
+                  : {
+                      number: baseline.number,
+                      date: (baseline.savedAt | localizedDate: language.current()),
+                      name: baseline.savedBy.fullName,
+                    }
+            }}
+          } @else {
+            {{ 'schedule.noBaseline' | transloco }}
+          }
+        </dd>
+      </div>
+    </dl>
+
+    @if (chartLoop(); as chain) {
+      <div class="kora-notice error" role="alert">
+        <mat-icon svgIcon="error" aria-hidden="true" />
+        <div>
+          <p>{{ 'schedule.loop' | transloco }}</p>
+          <p class="chain">{{ chain.join(' → ') }}</p>
+        </div>
+      </div>
+    }
+
+    @if (shownView() === 'chart') {
+      <kora-gantt-chart
+        [tasks]="store.rows()"
+        [dependencies]="store.dependencies()"
+        [zoom]="shownZoom()"
+        [rule]="rule()"
+        [today]="today"
+        [projectStart]="schedule.projectStart"
+        [locale]="language.current()"
+        [editable]="editable()"
+        [label]="chartLabel()"
+        (opened)="open($event)"
+        (moved)="moved($event)"
+        (resized)="resized($event)"
+        (linked)="linked($event)"
+      />
+    } @else {
+      <kora-schedule-table
+        [tasks]="store.rows()"
+        [predecessors]="store.predecessors()"
+        [hasBaseline]="!!schedule.baseline"
+        [editable]="editable()"
+        [locale]="language.current()"
+        (opened)="open($event)"
+        (edited)="edit($event)"
+        (linked)="addLink($event)"
+        (removed)="removeLink($event)"
+      />
+    }
+  }
+}
