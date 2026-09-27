@@ -10,6 +10,7 @@ import com.kora.platform.error.PlatformErrorCodes;
 import com.kora.portfolio.ProjectAccess;
 import com.kora.resourcing.ActualCostRecorded;
 import com.kora.resourcing.ResourcingErrorCodes;
+import com.kora.resourcing.TimesheetDecided;
 import com.kora.resourcing.domain.IsoWeek;
 import com.kora.resourcing.domain.TimeEntry;
 import com.kora.resourcing.domain.Timesheet;
@@ -194,6 +195,7 @@ public class TimesheetService {
         sheet.approve(me(), clock.instant());
         Timesheet saved = timesheets.saveAndFlush(sheet);
         events.publishEvent(new ActualCostRecorded(sheet.getProjectId()));
+        announceDecision(saved);
         return saved;
     }
 
@@ -202,7 +204,22 @@ public class TimesheetService {
         Timesheet sheet = find(timesheetId);
         projects.manageable(sheet.getProjectId());
         sheet.reject(me(), comment, clock.instant());
-        return timesheets.saveAndFlush(sheet);
+        Timesheet saved = timesheets.saveAndFlush(sheet);
+        announceDecision(saved);
+        return saved;
+    }
+
+    private void announceDecision(Timesheet sheet) {
+        events.publishEvent(new TimesheetDecided(
+                sheet.getId() + ":" + sheet.getDecidedAt(),
+                CurrentMember.get().organizationId(),
+                sheet.getProjectId(),
+                sheet.getId(),
+                sheet.getUserId(),
+                new IsoWeek(sheet.getWeekStart()).toString(),
+                sheet.getStatus() == TimesheetStatus.APPROVED,
+                sheet.getComment(),
+                me()));
     }
 
     private TimesheetWeek weekOf(UUID userId, IsoWeek week) {

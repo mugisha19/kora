@@ -1,7 +1,9 @@
 package com.kora.governance.application;
 
+import com.kora.governance.ApprovalRequested;
 import com.kora.governance.ChangeRequestApproved;
 import com.kora.governance.ChangeRequestChanged;
+import com.kora.governance.ChangeRequestDecided;
 import com.kora.governance.domain.ApprovalHandler;
 import com.kora.governance.domain.ApprovalHandler.ChangeContext;
 import com.kora.governance.domain.ChangeRequest;
@@ -162,6 +164,7 @@ public class ChangeRequestService {
         request.submit(chain.chainFor(context), clock.instant());
         ChangeRequest saved = requests.saveAndFlush(request);
         events.publishEvent(new ChangeRequestChanged(saved.getProjectId()));
+        announceNextStep(saved);
         return saved;
     }
 
@@ -181,7 +184,42 @@ public class ChangeRequestService {
             apply(saved, me.userId());
         }
         events.publishEvent(new ChangeRequestChanged(saved.getProjectId()));
+        // The last approval applies the change at once, so an approved request is already IMPLEMENTED here.
+        boolean decided = saved.getStatus() == ChangeRequestStatus.APPROVED
+                || saved.getStatus() == ChangeRequestStatus.IMPLEMENTED
+                || saved.getStatus() == ChangeRequestStatus.REJECTED;
+        if (decided) {
+            events.publishEvent(new ChangeRequestDecided(
+                    UUID.randomUUID().toString(),
+                    me.organizationId(),
+                    saved.getProjectId(),
+                    saved.getId(),
+                    saved.getKey(),
+                    saved.getTitle(),
+                    saved.getRequestedBy(),
+                    saved.getStatus() != ChangeRequestStatus.REJECTED,
+                    me.userId()));
+        } else {
+            announceNextStep(saved);
+        }
         return saved;
+    }
+
+    /** Whoever decides the step now waiting is asked (through the outbox, after commit). */
+    private void announceNextStep(ChangeRequest request) {
+        request.pendingStep()
+                .ifPresent(step -> events.publishEvent(new ApprovalRequested(
+                        request.getId() + ":step:" + step.getPosition(),
+                        CurrentMember.get().organizationId(),
+                        request.getProjectId(),
+                        request.getId(),
+                        request.getKey(),
+                        request.getTitle(),
+                        step.getApproverId(),
+                        step.getApproverRole() == null
+                                ? null
+                                : step.getApproverRole().name(),
+                        request.getRequestedBy())));
     }
 
     @Transactional

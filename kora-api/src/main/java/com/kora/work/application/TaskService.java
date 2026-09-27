@@ -13,6 +13,7 @@ import com.kora.portfolio.ProjectAccess;
 import com.kora.portfolio.ProjectParticipation;
 import com.kora.portfolio.ProjectRef;
 import com.kora.scope.WbsQueries;
+import com.kora.work.TaskAssigned;
 import com.kora.work.TaskChanged;
 import com.kora.work.WorkErrorCodes;
 import com.kora.work.domain.BoardColumn;
@@ -184,6 +185,7 @@ public class TaskService {
         }
         Task saved = tasks.saveAndFlush(task);
         events.publishEvent(new TaskChanged(projectId));
+        announceAssignment(saved, null);
         return saved;
     }
 
@@ -192,6 +194,7 @@ public class TaskService {
         Task task = find(taskId);
         requireCanChange(task);
         OptimisticLock.check(expectedVersion, task.getVersion());
+        UUID previousAssignee = task.getAssigneeId();
         if (changes.assigneeId() != null) {
             requireAssignee(task.getProjectId(), changes.assigneeId());
             task.assign(changes.assigneeId());
@@ -220,7 +223,26 @@ public class TaskService {
         }
         Task saved = tasks.saveAndFlush(task);
         events.publishEvent(new TaskChanged(task.getProjectId()));
+        announceAssignment(saved, previousAssignee);
         return saved;
+    }
+
+    /** Someone else gave the task to its new assignee: they are told (through the outbox, after commit). */
+    private void announceAssignment(Task task, UUID previousAssignee) {
+        UUID assignee = task.getAssigneeId();
+        UUID actor = CurrentMember.get().userId();
+        if (assignee == null || assignee.equals(previousAssignee) || assignee.equals(actor)) {
+            return;
+        }
+        events.publishEvent(new TaskAssigned(
+                UUID.randomUUID().toString(),
+                CurrentMember.get().organizationId(),
+                task.getProjectId(),
+                task.getId(),
+                task.getKey(),
+                task.getTitle(),
+                assignee,
+                actor));
     }
 
     @Transactional
