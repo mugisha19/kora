@@ -63,6 +63,9 @@ class SecurityConfiguration {
                         .permitAll()
                         .requestMatchers("/error")
                         .permitAll()
+                        // The WebSocket handshake: STOMP CONNECT carries the token instead (notifications module).
+                        .requestMatchers("/ws", "/ws/**")
+                        .permitAll()
                         .anyRequest()
                         .authenticated())
                 .oauth2ResourceServer(resourceServer -> resourceServer

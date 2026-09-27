@@ -29,6 +29,8 @@ import org.springframework.context.annotation.Import;
 @Documented
 @ExtendWith(RequiresDockerCondition.class)
 @SpringBootTest(
+        // A real server port as well as MockMvc: the WebSocket tests need one, and one shared context is cheaper.
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         properties = {
             "kora.rate-limits.login-ip=10000/1m",
             "kora.rate-limits.register-organization-ip=10000/1m",
