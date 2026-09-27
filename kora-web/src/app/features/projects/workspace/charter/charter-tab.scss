@@ -1,0 +1,105 @@
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--kora-space-3);
+  margin-block-end: var(--kora-space-2);
+}
+
+.status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--kora-space-3);
+}
+
+.title {
+  font: var(--mat-sys-title-large);
+}
+
+.version {
+  margin-inline-start: var(--kora-space-2);
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-title-small);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--kora-space-2);
+}
+
+.meta {
+  min-block-size: 1.5em;
+  margin: 0 0 var(--kora-space-4);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.missing {
+  margin: var(--kora-space-1) 0 0;
+  padding-inline-start: var(--kora-space-6);
+}
+
+.document {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr));
+  gap: var(--kora-space-4) var(--kora-space-8);
+  max-inline-size: 1100px;
+}
+
+.section {
+  break-inside: avoid;
+
+  h3 {
+    margin-block-end: var(--kora-space-2);
+    font: var(--mat-sys-title-medium);
+  }
+
+  p,
+  ul {
+    margin: 0;
+  }
+
+  ul {
+    padding-inline-start: var(--kora-space-6);
+  }
+
+  li + li {
+    margin-block-start: var(--kora-space-1);
+  }
+}
+
+.text {
+  white-space: pre-line;
+}
+
+.print-only {
+  display: none;
+}
+
+// The charter prints as a clean document: one column, no buttons, black on white.
+@media print {
+  .print-only {
+    display: block;
+  }
+
+  .print-title {
+    margin-block-end: var(--kora-space-4);
+    font: var(--mat-sys-headline-small);
+  }
+
+  .document {
+    display: block;
+    max-inline-size: none;
+    color: #000;
+  }
+
+  .section {
+    margin-block-end: 1.25rem;
+  }
+
+  .kora-muted {
+    color: #444;
+  }
+}

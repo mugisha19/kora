@@ -1,0 +1,204 @@
+<form class="kora-form editor" novalidate (submit)="save($event)">
+  @if (stale()) {
+    <div class="kora-notice error" role="alert">
+      <mat-icon svgIcon="error" aria-hidden="true" />
+      <p>{{ 'errors.status.412' | transloco }}</p>
+      <button mat-button type="button" (click)="reload()">{{ 'common.reload' | transloco }}</button>
+    </div>
+  } @else if (formError()) {
+    <div class="kora-notice error" role="alert">
+      <mat-icon svgIcon="error" aria-hidden="true" />
+      <p>{{ formError() }}</p>
+    </div>
+  }
+
+  <section class="block">
+    <h3>{{ 'charter.sections.authorization' | transloco }}</h3>
+    <mat-form-field>
+      <mat-label>{{ 'charter.fields.purpose' | transloco }}</mat-label>
+      <textarea matInput rows="3" [formField]="form.purpose"></textarea>
+      <mat-hint>{{ 'charter.hints.purpose' | transloco }}</mat-hint>
+      <mat-error><kora-field-error [field]="form.purpose" /></mat-error>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>{{ 'charter.fields.businessCase' | transloco }}</mat-label>
+      <textarea matInput rows="4" [formField]="form.businessCase"></textarea>
+      <mat-error><kora-field-error [field]="form.businessCase" /></mat-error>
+    </mat-form-field>
+    <div class="row">
+      <mat-form-field>
+        <mat-label>{{ 'charter.fields.sponsor' | transloco }}</mat-label>
+        <mat-select [formField]="form.sponsorId">
+          <mat-option value="">{{ 'charter.noSponsor' | transloco }}</mat-option>
+          @for (person of people(); track person.userId) {
+            <mat-option [value]="person.userId">{{ person.fullName }}</mat-option>
+          }
+        </mat-select>
+        <mat-hint>{{ 'charter.hints.sponsor' | transloco }}</mat-hint>
+        <mat-error><kora-field-error [field]="form.sponsorId" /></mat-error>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>{{ 'charter.fields.summaryBudget' | transloco }}</mat-label>
+        <input matInput inputmode="decimal" autocomplete="off" [formField]="form.summaryBudget" />
+        <span matTextSuffix>{{ currency() }}</span>
+        <mat-error><kora-field-error [field]="form.summaryBudget" /></mat-error>
+      </mat-form-field>
+    </div>
+  </section>
+
+  <!-- Objectives: SMART text + success metric -->
+  <section class="block" aria-labelledby="charter-objectives-title">
+    <h3 id="charter-objectives-title">{{ 'charter.fields.objectives' | transloco }}</h3>
+    <ol class="items">
+      @for (objective of form.objectives; track $index; let i = $index, count = $count) {
+        <li class="item">
+          <span class="position" aria-hidden="true">{{ i + 1 }}</span>
+          <div class="fields">
+            <mat-form-field>
+              <mat-label>{{ 'charter.fields.objectiveText' | transloco: { n: i + 1 } }}</mat-label>
+              <input matInput [id]="itemId('objectives', i)" [formField]="objective.text" />
+              <mat-error><kora-field-error [field]="objective.text" /></mat-error>
+            </mat-form-field>
+            <mat-form-field>
+              <mat-label>{{ 'charter.fields.successMetric' | transloco: { n: i + 1 } }}</mat-label>
+              <input matInput [formField]="objective.successMetric" />
+              <mat-error><kora-field-error [field]="objective.successMetric" /></mat-error>
+            </mat-form-field>
+          </div>
+          <ng-container
+            *ngTemplateOutlet="itemActions; context: { key: 'objectives', index: i, count: count }"
+          />
+        </li>
+      }
+    </ol>
+    <button
+      mat-button
+      type="button"
+      id="charter-add-objectives"
+      [disabled]="model().objectives.length >= limits.objectives"
+      (click)="add('objectives')"
+    >
+      <mat-icon svgIcon="add" aria-hidden="true" />
+      {{ 'charter.editor.addObjective' | transloco }}
+    </button>
+  </section>
+
+  <!-- Plain text lists: scope, assumptions, constraints, risks -->
+  @for (key of textLists; track key) {
+    <section class="block" [attr.aria-labelledby]="'charter-' + key + '-title'">
+      <h3 [id]="'charter-' + key + '-title'">{{ 'charter.fields.' + key | transloco }}</h3>
+      <ol class="items">
+        @for (entry of form[key]; track $index; let i = $index, count = $count) {
+          <li class="item">
+            <span class="position" aria-hidden="true">{{ i + 1 }}</span>
+            <div class="fields">
+              <mat-form-field>
+                <mat-label>
+                  {{
+                    'charter.editor.item'
+                      | transloco: { list: ('charter.fields.' + key | transloco), n: i + 1 }
+                  }}
+                </mat-label>
+                <input matInput [id]="itemId(key, i)" [formField]="entry" />
+                <mat-error><kora-field-error [field]="entry" /></mat-error>
+              </mat-form-field>
+            </div>
+            <ng-container
+              *ngTemplateOutlet="itemActions; context: { key: key, index: i, count: count }"
+            />
+          </li>
+        }
+      </ol>
+      <button
+        mat-button
+        type="button"
+        [id]="'charter-add-' + key"
+        [disabled]="model()[key].length >= limits[key]"
+        (click)="add(key)"
+      >
+        <mat-icon svgIcon="add" aria-hidden="true" />
+        {{ 'charter.editor.addTo' | transloco: { list: ('charter.fields.' + key | transloco) } }}
+      </button>
+    </section>
+  }
+
+  <!-- Milestones -->
+  <section class="block" aria-labelledby="charter-milestones-title">
+    <h3 id="charter-milestones-title">{{ 'charter.fields.milestones' | transloco }}</h3>
+    <ol class="items">
+      @for (milestone of form.milestones; track $index; let i = $index, count = $count) {
+        <li class="item">
+          <span class="position" aria-hidden="true">{{ i + 1 }}</span>
+          <div class="fields">
+            <mat-form-field>
+              <mat-label>{{ 'charter.fields.milestoneName' | transloco: { n: i + 1 } }}</mat-label>
+              <input matInput [id]="itemId('milestones', i)" [formField]="milestone.name" />
+              <mat-error><kora-field-error [field]="milestone.name" /></mat-error>
+            </mat-form-field>
+            <mat-form-field class="date">
+              <mat-label>{{ 'charter.fields.targetDate' | transloco: { n: i + 1 } }}</mat-label>
+              <input matInput type="date" [formField]="milestone.targetDate" />
+              <mat-error><kora-field-error [field]="milestone.targetDate" /></mat-error>
+            </mat-form-field>
+          </div>
+          <ng-container
+            *ngTemplateOutlet="itemActions; context: { key: 'milestones', index: i, count: count }"
+          />
+        </li>
+      }
+    </ol>
+    <button
+      mat-button
+      type="button"
+      id="charter-add-milestones"
+      [disabled]="model().milestones.length >= limits.milestones"
+      (click)="add('milestones')"
+    >
+      <mat-icon svgIcon="add" aria-hidden="true" />
+      {{ 'charter.editor.addMilestone' | transloco }}
+    </button>
+  </section>
+
+  <div class="kora-form-actions sticky">
+    <button mat-button type="button" (click)="done.emit()">
+      {{ 'common.cancel' | transloco }}
+    </button>
+    <button mat-flat-button type="submit" [disabled]="form().submitting()">
+      {{ 'charter.editor.save' | transloco }}
+    </button>
+  </div>
+</form>
+
+<ng-template #itemActions let-key="key" let-index="index" let-count="count">
+  <div class="item-actions">
+    <button
+      mat-icon-button
+      type="button"
+      [disabled]="index === 0"
+      [attr.aria-label]="'charter.editor.moveUp' | transloco: { n: index + 1 }"
+      [matTooltip]="'charter.editor.moveUp' | transloco: { n: index + 1 }"
+      (click)="move(key, index, -1)"
+    >
+      <mat-icon svgIcon="arrow_upward" aria-hidden="true" />
+    </button>
+    <button
+      mat-icon-button
+      type="button"
+      [disabled]="index === count - 1"
+      [attr.aria-label]="'charter.editor.moveDown' | transloco: { n: index + 1 }"
+      [matTooltip]="'charter.editor.moveDown' | transloco: { n: index + 1 }"
+      (click)="move(key, index, 1)"
+    >
+      <mat-icon svgIcon="arrow_downward" aria-hidden="true" />
+    </button>
+    <button
+      mat-icon-button
+      type="button"
+      [attr.aria-label]="'charter.editor.remove' | transloco: { n: index + 1 }"
+      [matTooltip]="'charter.editor.remove' | transloco: { n: index + 1 }"
+      (click)="remove(key, index)"
+    >
+      <mat-icon svgIcon="delete" aria-hidden="true" />
+    </button>
+  </div>
+</ng-template>

@@ -1,0 +1,133 @@
+@if (store.charter(); as charter) {
+  <div class="head">
+    <div class="status">
+      <h2 class="title">
+        {{ 'charter.title' | transloco }}
+        <span class="version">{{
+          'charter.versions.label' | transloco: { n: charter.versionNumber }
+        }}</span>
+      </h2>
+      <kora-status-chip
+        [tone]="statusLook[charter.status].tone"
+        [icon]="statusLook[charter.status].icon"
+        [label]="'charterStatus.' + charter.status | transloco"
+      />
+    </div>
+    @if (!editing()) {
+      <div class="actions no-print">
+        @if (store.canEdit()) {
+          <button mat-stroked-button type="button" (click)="edit()">
+            <mat-icon svgIcon="edit" aria-hidden="true" />
+            {{ 'common.edit' | transloco }}
+          </button>
+        }
+        @if (store.canSubmit()) {
+          <button mat-flat-button type="button" [disabled]="store.busy()" (click)="submit()">
+            <mat-icon svgIcon="send" aria-hidden="true" />
+            {{ 'charter.submit' | transloco }}
+          </button>
+        }
+        @if (store.canDecide()) {
+          <button mat-flat-button type="button" [disabled]="store.busy()" (click)="approve()">
+            <mat-icon svgIcon="check_circle" aria-hidden="true" />
+            {{ 'charter.approve' | transloco }}
+          </button>
+          <button
+            mat-stroked-button
+            type="button"
+            [disabled]="store.busy()"
+            (click)="returnToDraft()"
+          >
+            <mat-icon svgIcon="undo" aria-hidden="true" />
+            {{ 'charter.return' | transloco }}
+          </button>
+        }
+        <button mat-button type="button" (click)="showVersions()">
+          <mat-icon svgIcon="history" aria-hidden="true" />
+          {{ 'charter.versions.open' | transloco }}
+        </button>
+        <button mat-button type="button" (click)="print()">
+          <mat-icon svgIcon="print" aria-hidden="true" />
+          {{ 'charter.print' | transloco }}
+        </button>
+      </div>
+    }
+  </div>
+
+  <p class="meta">
+    @if (charter.approvedAt) {
+      {{
+        'charter.approvedBy'
+          | transloco
+            : {
+                name: charter.approvedBy?.fullName ?? '',
+                date: (charter.approvedAt | localizedDate: language.current()),
+              }
+      }}
+    } @else if (charter.submittedAt) {
+      {{
+        'charter.submittedOn'
+          | transloco: { date: (charter.submittedAt | localizedDate: language.current()) }
+      }}
+      @if (charter.sponsor) {
+        {{ 'charter.awaiting' | transloco: { name: charter.sponsor.fullName } }}
+      }
+    }
+  </p>
+
+  @if (charter.status === 'DRAFT' && charter.returnComment) {
+    <div class="kora-notice info" role="note">
+      <mat-icon svgIcon="undo" aria-hidden="true" />
+      <p>
+        <strong>{{ 'charter.returnedWith' | transloco }}</strong>
+        {{ charter.returnComment }}
+      </p>
+    </div>
+  }
+
+  @if (store.actionError()) {
+    <div class="kora-notice error" role="alert">
+      <mat-icon svgIcon="error" aria-hidden="true" />
+      <div>
+        <p>{{ store.actionError() }}</p>
+        @if (store.missing().length) {
+          <ul class="missing">
+            @for (field of store.missing(); track field) {
+              <li>{{ missingKey(field) | transloco }}</li>
+            }
+          </ul>
+        }
+      </div>
+    </div>
+  }
+
+  @if (editing()) {
+    <kora-charter-editor [charter]="charter" (done)="editing.set(false)" />
+  } @else {
+    <article class="document">
+      <p class="print-only print-title">
+        {{ project.project()?.code }} · {{ project.project()?.name }}
+      </p>
+      @for (section of sections(); track section.key) {
+        <section class="section">
+          <h3>{{ 'charter.fields.' + section.key | transloco }}</h3>
+          @if (section.items.length === 0) {
+            <p class="kora-muted">{{ 'charter.notSet' | transloco }}</p>
+          } @else if (section.list) {
+            <ul>
+              @for (item of section.items; track $index) {
+                <li>{{ item }}</li>
+              }
+            </ul>
+          } @else {
+            <p class="text">{{ section.items[0] }}</p>
+          }
+        </section>
+      }
+    </article>
+  }
+} @else if (store.status() === 'error') {
+  <kora-error-state [correlationId]="store.error()?.correlationId" (retry)="store.load()" />
+} @else {
+  <kora-loading-state />
+}
