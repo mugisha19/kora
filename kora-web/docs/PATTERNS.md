@@ -97,3 +97,18 @@ proxy, a network failure) into a single `ApiError` shape, so later layers never 
   provided by both the board and the backlog.
 - **Interpreter.** The Markdown renderer parses text into blocks and inline pieces and renders them
   with templates — the data never becomes markup.
+
+## Phase 6
+
+- **Strategy (server-side).** The API's `SchedulingStrategy` computes the schedule; the UI only
+  draws it, so a different algorithm needs no UI change. The mock mirrors it in pure functions
+  (`mocks/cpm.ts`).
+- **Pure core, thin component.** `gantt-geometry.ts` holds every calculation (positions, ticks,
+  bars, arrows, working days) as pure functions; `GanttChart` maps them to SVG and turns pointer
+  gestures into three outputs (moved, resized, linked).
+- **Two views, one store.** The Gantt and the table read the same `ScheduleStore`; the tab turns
+  both views' outputs into the same commands.
+- **Parameter object for errors.** A `schedule.cycle` error carries its chain in
+  `errors[0].params`; `loopOf()` adapts it for every place that shows it.
+- **Local edit, one save.** The working calendar edits days and holidays locally, then saves them
+  together with `If-Match` (412 → reload the other version).

@@ -303,3 +303,38 @@ number invites treating velocity as a performance target.
 `innerHTML` plus a sanitizer is one bug away from script injection. Parsing a small Markdown
 subset into data and rendering it with templates means the text can only ever become text, bold,
 lists and vetted links.
+
+## The critical path method (Phase 6)
+
+Tasks are nodes and dependencies are edges. A topological sort (Kahn's algorithm: repeatedly take
+a task with no unscheduled predecessors) gives an order where every predecessor comes first; if
+tasks are left over, they sit on a loop, and a breadth-first search from the new link's successor
+back to its predecessor names the shortest loop. The **forward pass** walks that order and gives
+each task its earliest start: the latest of what its links allow (finish-to-start: after the
+predecessor ends plus the lag; start-to-start: after it starts; finish-to-finish and
+start-to-finish constrain the successor's end instead). The **backward pass** walks it in reverse
+from the project finish and gives the latest start that doesn't delay the finish. **Total float**
+= late start − early start: how far a task can slip without moving the finish. **Free float** is
+how far it can slip without moving any successor. Tasks with no total float form the critical
+path. It's O(tasks + links).
+
+## Working days, not calendar days (Phase 6)
+
+Durations and lags count working days on the organization's calendar, so the schedule numbers
+days from the project start (day 0 = first working day) and converts to dates at the end. A
+five-day task that starts on a Thursday finishes the next Wednesday. The chart, though, is drawn
+on calendar days so weekends and holidays show as shaded gaps in a bar's path.
+
+## Accessible charts you can edit (Phase 6)
+
+A Gantt chart is a picture made for a mouse. The accessible design is two views of one model:
+the chart (one labelled image, plus task names as buttons) for people who can drag, and a table
+with the same numbers and a dialog for every edit — duration, constraint, links with type and lag —
+for keyboards and screen readers. Critical tasks are hatched and labelled "Critical", never just
+red.
+
+## Baselines and variance (Phase 6)
+
+A baseline freezes every task's planned dates. After that, the schedule reports variance in
+working days (positive = late), so "the legal review took four more days" shows up on every
+task after it. Saving a new baseline resets the comparison; old baselines are kept for history.

@@ -2,13 +2,13 @@
 
 ## Current status
 
-Phase 5 complete (tag `web-v0.5.0`). Waiting for "continue".
+Phase 6 complete (tag `web-v0.6.0`). Waiting for "continue".
 
 ## Next step
 
-Phase 6 — dependencies, the critical-path schedule (Gantt) with baselines and the working calendar
-(feature 10). Contract 0.4.0 is live since `api-v0.5.0`; see the backend notes in memory
-(working days, critical = total float 0 shown with colour and pattern, `schedule.cycle` chain).
+Phase 7 — risks with the heat map, issues, stakeholders and change requests (features 11–14).
+Contract 0.5.0 is live since `api-v0.6.0`; see the backend notes in memory (risk scoring,
+escalation, the change-request approval chain).
 
 ## Checklist
 
@@ -18,11 +18,38 @@ Phase 6 — dependencies, the critical-path schedule (Gantt) with baselines and 
 - [x] 3. Auth, org switcher, guards, admin users/roles/invitations, settings profile
 - [x] 4. Portfolio dashboard, projects, charter, WBS tree
 - [x] 5. Kanban, backlog, sprints
-- [ ] 6. Gantt with dependencies and critical path
+- [x] 6. Gantt with dependencies and critical path
 - [ ] 7. Risks + heat map, issues, stakeholders, change requests
 - [ ] 8. Timesheets, resource heat map, EVM dashboard
 - [ ] 9. Real-time notifications, activity feed, attachments, report exports
 - [ ] 10. E2E flows, performance, Nginx Docker image, final README; tag v1.0.0
+
+## Phase 6 — what exists
+
+- Mock API for the 7 contract 0.4.0 operations: dependencies (same project, no self-links, no
+  duplicates, loops refused with the chain), the CPM schedule on working days (four link types,
+  lags and leads, start-no-earlier-than, total and free float, baseline variance), baselines, and
+  the working calendar with `If-Match` — `src/app/mocks/cpm.ts` (pure CPM),
+  `schedule-domain.ts`, `handlers/schedule.handlers.ts`, demo network in `data-schedule.ts`
+  (Data warehouse, AKG-005: 8 tasks, 10 links, baseline 1 with a 4-day slip)
+- API client: `src/app/core/api/schedule.api.ts`; types regenerated for contract 0.7.0
+- Schedule tab (Predictive and Hybrid): custom SVG Gantt (bars, milestones, dependency arrows,
+  hatched and labelled critical path, baseline bars, today line, shaded non-working days,
+  day/week/month zoom), drag to move (start-no-earlier-than), resize (duration) and link (FS),
+  loop chain shown; table view with every figure and every edit (duration and constraint dialog,
+  add predecessor with type and lag, remove link); save baseline — ADR 0009,
+  `src/app/features/projects/workspace/schedule/`
+- Task side sheet: duration and constraint on Predictive and Hybrid projects
+- Admin → Working calendar: working days, holidays, `If-Match` and 412 —
+  `src/app/features/admin/calendar/`
+- Tests: 408 unit tests (≈ 91.5% statements), 102 e2e tests (desktop and 375 px, axe), including
+  the Gantt (drag and link on desktop), table edits and the working calendar
+
+## Feature acceptance criteria covered (Phase 6)
+
+- 10: CPM matches a textbook network (mock unit test with known ES/EF/LS/LF and floats); a cycle
+  is refused with the tasks named (mock, unit and e2e); the critical path is hatched and labelled,
+  not only coloured, and the table view offers every edit (unit + e2e)
 
 ## Phase 5 — what exists
 
