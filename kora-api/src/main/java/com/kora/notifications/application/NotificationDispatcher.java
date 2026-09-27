@@ -9,6 +9,8 @@ import com.kora.organization.MemberDirectory;
 import com.kora.organization.MemberSummary;
 import com.kora.organization.Role;
 import com.kora.platform.tenancy.TenantTransactions;
+import com.kora.reports.ReportFailed;
+import com.kora.reports.ReportReady;
 import com.kora.resourcing.TimesheetDecided;
 import com.kora.work.TaskAssigned;
 import java.time.LocalDate;
@@ -128,6 +130,44 @@ class NotificationDispatcher {
                 NotificationType.ISSUE_ESCALATED,
                 params("key", event.key(), "title", event.title()),
                 "/projects/" + event.projectId() + "/issues/" + event.issueId(),
+                event.eventKey());
+    }
+
+    @Async
+    @TransactionalEventListener
+    void on(ReportReady event) {
+        send(
+                event.organizationId(),
+                () -> List.of(event.requestedBy()),
+                NotificationType.REPORT_READY,
+                params(
+                        "reportId",
+                        event.reportId(),
+                        "type",
+                        event.type().name(),
+                        "format",
+                        event.format().name(),
+                        "fileName",
+                        event.fileName()),
+                "/reports",
+                event.eventKey());
+    }
+
+    @Async
+    @TransactionalEventListener
+    void on(ReportFailed event) {
+        send(
+                event.organizationId(),
+                () -> List.of(event.requestedBy()),
+                NotificationType.REPORT_FAILED,
+                params(
+                        "reportId",
+                        event.reportId(),
+                        "type",
+                        event.type().name(),
+                        "format",
+                        event.format().name()),
+                "/reports",
                 event.eventKey());
     }
 

@@ -159,7 +159,7 @@ class NotificationIT {
         assertThat(conforms(get("/api/v1/me/notification-preferences", contributor)))
                 .bodyJson()
                 .extractingPath("$.preferences[*].email")
-                .isEqualTo(List.of(true, true, false, false, false, false));
+                .isEqualTo(List.of(true, true, false, false, false, false, false, false));
 
         assertThat(conforms(mvc.put()
                         .uri("/api/v1/me/notification-preferences")

@@ -9,7 +9,9 @@ public enum NotificationType {
     CHANGE_REQUEST_DECIDED(false),
     TIMESHEET_DECIDED(false),
     RISK_REVIEW_OVERDUE(false),
-    ISSUE_ESCALATED(false);
+    ISSUE_ESCALATED(false),
+    REPORT_READY(false),
+    REPORT_FAILED(false);
 
     private final boolean emailByDefault;
 
