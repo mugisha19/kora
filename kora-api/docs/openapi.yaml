@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Kora API
-  version: 0.7.0
+  version: 0.8.0
   description: |
     Multi-tenant project and portfolio management built on PMI practices.
 
@@ -84,6 +84,8 @@ tags:
     description: The append-only audit trail and item history (feature 19)
   - name: Attachments
     description: Files on projects, tasks, risks, issues and change requests (feature 20)
+  - name: Reports
+    description: PDF and Excel exports generated in the background (feature 21)
 
 security:
   - bearerAuth: []
@@ -5883,6 +5885,113 @@ paths:
         '500':
           $ref: '#/components/responses/InternalError'
 
+  /reports:
+    post:
+      tags: [Reports]
+      operationId: createReport
+      summary: 'Request a report export'
+      description: 'Generated in the background, in my language and the organization''s currency and time zone, showing exactly what I can see on screen. Poll the job or wait for the REPORT_READY notification. Which params each type uses: PROJECT_STATUS, EVM and TIMESHEETS need projectId (TIMESHEETS also takes from/to and is for the project''s managers); RISK_REGISTER takes projectId or portfolioId, or neither for every project I can see; PORTFOLIO_SUMMARY takes portfolioId or nothing.'
+      parameters:
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateReportRequest'
+      responses:
+        '202':
+          description: The queued job
+          headers:
+            Location:
+              description: URL of the new resource
+              schema:
+                type: string
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportJob'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'Too many of my reports are still waiting. Code: `reports.too_many_pending`.'
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    get:
+      tags: [Reports]
+      operationId: listReports
+      summary: 'My report jobs, newest first'
+      description: 'The last 50; files are kept 7 days.'
+      parameters:
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: My report jobs
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReportJob'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /reports/{reportId}:
+    get:
+      tags: [Reports]
+      operationId: getReport
+      summary: 'One of my report jobs'
+      description: 'When READY it carries a short-lived download link; ask again for a fresh one.'
+      parameters:
+        - $ref: '#/components/parameters/ReportId'
+        - $ref: '#/components/parameters/OrganizationId'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: The job
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportJob'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -6125,6 +6234,14 @@ components:
         type: string
         pattern: '^[a-z][a-z-]{1,40}$'
         example: task
+
+    ReportId:
+      name: reportId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
 
   headers:
     CorrelationId:
@@ -6379,6 +6496,7 @@ components:
         - attachments.not_uploaded
         - attachments.content_mismatch
         - attachments.already_completed
+        - reports.too_many_pending
         - internal.error
 
     # ---------- Shared ----------
@@ -9605,7 +9723,7 @@ components:
     NotificationType:
       type: string
       enum: [TASK_ASSIGNED, APPROVAL_REQUESTED, CHANGE_REQUEST_DECIDED, TIMESHEET_DECIDED, RISK_REVIEW_OVERDUE,
-             ISSUE_ESCALATED]
+             ISSUE_ESCALATED, REPORT_READY, REPORT_FAILED]
     Notification:
       type: object
       required: [id, type, titleKey, params, createdAt]
@@ -9878,3 +9996,84 @@ components:
         expiresAt:
           type: string
           format: date-time
+
+    # ---------- Reports (0.8.0) ----------
+    ReportType:
+      type: string
+      enum: [PROJECT_STATUS, PORTFOLIO_SUMMARY, RISK_REGISTER, EVM, TIMESHEETS]
+    ReportFormat:
+      type: string
+      description: 'PDF for reading, XLSX for analysis'
+      enum: [PDF, XLSX]
+    ReportStatus:
+      type: string
+      enum: [QUEUED, RUNNING, READY, FAILED]
+    ReportParams:
+      type: object
+      description: 'What the report covers; see createReport for which type uses which'
+      properties:
+        projectId:
+          type: string
+          format: uuid
+        portfolioId:
+          type: string
+          format: uuid
+        from:
+          type: string
+          format: date
+          description: TIMESHEETS, first day (default four weeks back)
+        to:
+          type: string
+          format: date
+          description: TIMESHEETS, last day (default today); at most 26 weeks
+    CreateReportRequest:
+      type: object
+      required: [type, format]
+      properties:
+        type:
+          $ref: '#/components/schemas/ReportType'
+        format:
+          $ref: '#/components/schemas/ReportFormat'
+        params:
+          $ref: '#/components/schemas/ReportParams'
+    ReportJob:
+      type: object
+      required: [id, type, format, params, status, createdAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          $ref: '#/components/schemas/ReportType'
+        format:
+          $ref: '#/components/schemas/ReportFormat'
+        params:
+          $ref: '#/components/schemas/ReportParams'
+        status:
+          $ref: '#/components/schemas/ReportStatus'
+        fileName:
+          type: string
+          description: Once READY
+          example: project-status-AKG-MB-2026-09-27.pdf
+        sizeBytes:
+          type: integer
+          format: int64
+        createdAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+          description: When the file is deleted (7 days after it was made)
+        downloadUrl:
+          type: string
+          description: Only when READY; valid 5 minutes, always downloads
+        downloadExpiresAt:
+          type: string
+          format: date-time
+        failureReason:
+          type: string
+          description: Only when FAILED
