@@ -1,0 +1,9 @@
+# Only the sources the image build needs; the build compiles its own target/.
+target/
+.m2/
+docs/
+*.md
+compose.yaml
+.gitlab-ci.yml
+.idea/
+.vscode/

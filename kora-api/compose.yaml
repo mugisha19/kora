@@ -47,6 +47,40 @@ services:
       - ./config/seaweedfs-s3.json:/etc/seaweedfs/s3.json:ro
       - seaweedfs-data:/data
 
+  api:
+    # The API itself, built from this folder, for a stack that runs without a JDK:
+    #   docker compose --profile demo up --build
+    # With the demo profile it creates the demo organizations on first start (feature 22); sign in on port 8080.
+    # The web app's Nginx proxies /api and /ws to this service by its name, `api`.
+    profiles: ['demo']
+    build: .
+    image: kora-api:local
+    environment:
+      SPRING_PROFILES_ACTIVE: demo
+      SPRING_DOCKER_COMPOSE_ENABLED: 'false'
+      # Local-only credentials of the containers above.
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/kora
+      SPRING_DATASOURCE_USERNAME: kora
+      SPRING_DATASOURCE_PASSWORD: kora
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_MAIL_HOST: mailpit
+      SPRING_MAIL_PORT: '1025'
+      KORA_STORAGE_ENDPOINT: http://seaweedfs:8333
+      # Browsers upload and download through the port published on the host.
+      KORA_STORAGE_PUBLIC_ENDPOINT: http://localhost:8333
+      KORA_WEB_BASE_URL: http://localhost:4200
+    ports:
+      - '127.0.0.1:8080:8080'
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      seaweedfs:
+        condition: service_started
+      mailpit:
+        condition: service_started
+
 volumes:
   postgres-data:
   seaweedfs-data:

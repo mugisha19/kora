@@ -17,3 +17,9 @@ kora:
     access-key: ${KORA_STORAGE_ACCESS_KEY}
     secret-key: ${KORA_STORAGE_SECRET_KEY}
     create-bucket: false
+
+management:
+  server:
+    # The actuator (health probes, Prometheus metrics) on its own port, reachable inside the cluster only; the public
+    # port serves the API alone (feature 24: actuator locked down).
+    port: 8081
