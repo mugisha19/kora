@@ -1,6 +1,6 @@
 import { Methodology } from '../../core/api/api.models';
 
-/** Workspace tabs, in display order. Later phases add time and EVM. */
+/** Workspace tabs, in display order. */
 export type WorkspaceTab =
   | 'overview'
   | 'charter'
@@ -11,10 +11,22 @@ export type WorkspaceTab =
   | 'risks'
   | 'issues'
   | 'stakeholders'
-  | 'change-requests';
+  | 'change-requests'
+  | 'time'
+  | 'evm';
 
-/** Every project, whatever its methodology, governs risks, issues, stakeholders and changes. */
-const GOVERNANCE: readonly WorkspaceTab[] = ['risks', 'issues', 'stakeholders', 'change-requests'];
+/**
+ * Every project, whatever its methodology, governs risks, issues, stakeholders and changes, and
+ * tracks time and earned value.
+ */
+const GOVERNANCE: readonly WorkspaceTab[] = [
+  'risks',
+  'issues',
+  'stakeholders',
+  'change-requests',
+  'time',
+  'evm',
+];
 
 export interface MethodologyStrategy {
   readonly tabs: readonly WorkspaceTab[];

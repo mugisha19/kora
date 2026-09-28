@@ -119,6 +119,22 @@ export const PROJECT_ROUTES: Routes = [
               import('./workspace/changes/changes-tab').then((m) => m.ChangesTab),
           },
           {
+            path: 'time',
+            title: 'workspace.tabs.time',
+            loadComponent: () => import('./workspace/time/time-tab').then((m) => m.TimeTab),
+          },
+          {
+            path: 'evm',
+            title: 'workspace.tabs.evm',
+            // The S-curve: ECharts loads only when the chart is on screen.
+            providers: [
+              provideEchartsCore({
+                echarts: () => import('./workspace/backlog/echarts-sprint').then((m) => m.echarts),
+              }),
+            ],
+            loadComponent: () => import('./workspace/evm/evm-tab').then((m) => m.EvmTab),
+          },
+          {
             path: 'change-requests',
             children: [
               {

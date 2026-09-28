@@ -1,0 +1,164 @@
+@if (report.error()) {
+  <kora-error-state (retry)="report.reload()" />
+} @else if (report.value(); as r) {
+  <p class="as-of">
+    {{
+      'evm.asOf'
+        | transloco
+          : {
+              date: (r.asOf | localizedDate: language.current()),
+              method: ('percentCompleteMethod.' + r.percentCompleteMethod + '.name' | transloco),
+              eac: ('eacMethod.' + r.eacMethod + '.name' | transloco),
+            }
+    }}
+  </p>
+
+  @if (missing().get('bac')) {
+    <kora-empty-state
+      icon="account_tree"
+      [heading]="'evm.noBudgetTitle' | transloco"
+      [message]="'evm.noBudgetMessage' | transloco"
+    />
+  } @else {
+    @if (r.unratedHours > 0) {
+      <div class="kora-notice" role="note">
+        <mat-icon svgIcon="warning" aria-hidden="true" />
+        <p>{{ 'evm.unrated' | transloco: { hours: r.unratedHours } }}</p>
+      </div>
+    }
+
+    <section class="gauges" aria-labelledby="indices-title">
+      <h2 id="indices-title" class="visually-hidden">{{ 'evm.indices' | transloco }}</h2>
+      <div class="gauge">
+        <kora-index-gauge [label]="'evm.metrics.spi.name' | transloco" [value]="r.spi" />
+        <p>
+          @if (r.spi !== undefined) {
+            {{ 'evm.metrics.spi.hint' | transloco: { spi: r.spi.toFixed(2) } }}
+          } @else {
+            {{ missing().get('spi') }}
+          }
+        </p>
+      </div>
+      <div class="gauge">
+        <kora-index-gauge [label]="'evm.metrics.cpi.name' | transloco" [value]="r.cpi" />
+        <p>
+          @if (r.cpi !== undefined) {
+            {{ 'evm.metrics.cpi.hint' | transloco: { one: currencyOne(r), cpi: r.cpi.toFixed(2) } }}
+          } @else {
+            {{ missing().get('cpi') }}
+          }
+        </p>
+      </div>
+      <div class="gauge tcpi">
+        <p class="name">{{ 'evm.metrics.tcpi.name' | transloco }}</p>
+        <p class="value">{{ r.tcpi !== undefined ? r.tcpi.toFixed(2) : '—' }}</p>
+        <p>
+          @if (r.tcpi !== undefined) {
+            {{
+              'evm.metrics.tcpi.hint' | transloco: { one: currencyOne(r), tcpi: r.tcpi.toFixed(2) }
+            }}
+          } @else {
+            {{ missing().get('tcpi') }}
+          }
+        </p>
+      </div>
+    </section>
+
+    <section aria-labelledby="figures-title">
+      <h2 id="figures-title">{{ 'evm.figures' | transloco }}</h2>
+      <ul class="cards">
+        @for (metric of moneyCards; track metric) {
+          <li [class.bad]="isBad(r, metric)">
+            <span class="name">
+              {{ 'evm.metrics.' + metric + '.name' | transloco }}
+              <abbr>({{ 'evm.metrics.' + metric + '.short' | transloco }})</abbr>
+            </span>
+            @if (value(r, metric); as amount) {
+              <span class="value">
+                @if (isBad(r, metric)) {
+                  <mat-icon svgIcon="warning" aria-hidden="true" />
+                }
+                {{ amount | money: language.current() }}
+              </span>
+              <span class="hint">{{ hint(r, metric) }}</span>
+            } @else {
+              <span class="value">—</span>
+              <span class="hint">{{ missing().get(metric) }}</span>
+            }
+          </li>
+        }
+      </ul>
+    </section>
+
+    <section aria-labelledby="curve-title" class="curve">
+      <h2 id="curve-title" class="visually-hidden">{{ 'evm.curve.title' | transloco }}</h2>
+      @if (series.value(); as s) {
+        <kora-s-curve [series]="s" [eac]="r.eac" />
+      } @else if (series.error()) {
+        <kora-error-state (retry)="series.reload()" />
+      } @else {
+        <kora-loading-state />
+      }
+    </section>
+  }
+
+  <section aria-labelledby="settings-title" class="settings">
+    <h2 id="settings-title">{{ 'evm.settings.title' | transloco }}</h2>
+    @if (settingsError(); as message) {
+      <div class="kora-notice error" role="alert">
+        <mat-icon svgIcon="error" aria-hidden="true" />
+        <p>{{ message }}</p>
+      </div>
+    }
+    <div class="row">
+      <mat-form-field>
+        <mat-label>{{ 'evm.settings.percentComplete' | transloco }}</mat-label>
+        <mat-select
+          [value]="choice().percentCompleteMethod"
+          [disabled]="!project.canEdit()"
+          (selectionChange)="choose('percentCompleteMethod', $event.value)"
+        >
+          <mat-select-trigger>{{
+            'percentCompleteMethod.' + choice().percentCompleteMethod + '.name' | transloco
+          }}</mat-select-trigger>
+          @for (m of percentMethods; track m) {
+            <mat-option [value]="m">{{
+              'percentCompleteMethod.' + m + '.name' | transloco
+            }}</mat-option>
+          }
+        </mat-select>
+        <mat-hint>{{
+          'percentCompleteMethod.' + choice().percentCompleteMethod + '.hint' | transloco
+        }}</mat-hint>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>{{ 'evm.settings.eac' | transloco }}</mat-label>
+        <mat-select
+          [value]="choice().eacMethod"
+          [disabled]="!project.canEdit()"
+          (selectionChange)="choose('eacMethod', $event.value)"
+        >
+          <mat-select-trigger>{{
+            'eacMethod.' + choice().eacMethod + '.name' | transloco
+          }}</mat-select-trigger>
+          @for (m of eacMethods; track m) {
+            <mat-option [value]="m">{{ 'eacMethod.' + m + '.name' | transloco }}</mat-option>
+          }
+        </mat-select>
+        <mat-hint>{{ 'eacMethod.' + choice().eacMethod + '.hint' | transloco }}</mat-hint>
+      </mat-form-field>
+    </div>
+    @if (project.canEdit()) {
+      <button
+        mat-flat-button
+        type="button"
+        [disabled]="!changed() || saving()"
+        (click)="saveSettings()"
+      >
+        {{ 'evm.settings.save' | transloco }}
+      </button>
+    }
+  </section>
+} @else {
+  <kora-loading-state />
+}

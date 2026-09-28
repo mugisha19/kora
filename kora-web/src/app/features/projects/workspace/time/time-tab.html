@@ -1,0 +1,201 @@
+@if (project.canEdit()) {
+  <section aria-labelledby="approvals-title">
+    <div class="head">
+      <h2 id="approvals-title">{{ 'time.approvals' | transloco }}</h2>
+      <mat-form-field subscriptSizing="dynamic" class="filter">
+        <mat-label>{{ 'time.status' | transloco }}</mat-label>
+        <mat-select
+          [value]="statusFilter() ?? 'all'"
+          (selectionChange)="
+            query.set({ status: $event.value === 'SUBMITTED' ? null : $event.value })
+          "
+        >
+          <mat-select-trigger>
+            {{
+              statusFilter()
+                ? ('timesheetStatus.' + statusFilter() | transloco)
+                : ('time.anyStatus' | transloco)
+            }}
+          </mat-select-trigger>
+          @for (value of statuses; track value) {
+            <mat-option [value]="value">{{ 'timesheetStatus.' + value | transloco }}</mat-option>
+          }
+          <mat-option value="all">{{ 'time.anyStatus' | transloco }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    @if (sheets.error()) {
+      <kora-error-state (retry)="sheets.reload()" />
+    } @else if (sheets.value(); as page) {
+      @if (page.content.length) {
+        <ul class="sheets">
+          @for (sheet of page.content; track sheet.id) {
+            <li>
+              <div class="who">
+                <strong>{{ sheet.user.fullName }}</strong>
+                <span class="kora-muted">
+                  {{ 'timesheets.weekLabel' | transloco: { number: weekNumber(sheet.weekStart) } }}
+                </span>
+              </div>
+              <div class="figures">
+                <span>{{ 'time.hours' | transloco: { hours: hours(sheet.totalHours) } }}</span>
+                @if (sheet.totalHours > longWeek) {
+                  <kora-status-chip
+                    tone="warning"
+                    icon="warning"
+                    [label]="'time.longWeek' | transloco: { hours: longWeek }"
+                  />
+                }
+                <kora-status-chip
+                  [tone]="look[sheet.status].tone"
+                  [icon]="look[sheet.status].icon"
+                  [label]="'timesheetStatus.' + sheet.status | transloco"
+                />
+              </div>
+              @if (sheet.comment) {
+                <p class="comment">
+                  <q>{{ sheet.comment }}</q>
+                </p>
+              }
+              <div class="actions">
+                <button
+                  mat-button
+                  type="button"
+                  [attr.aria-label]="'time.viewFor' | transloco: { name: sheet.user.fullName }"
+                  (click)="facade.view(sheet)"
+                >
+                  {{ 'time.view' | transloco }}
+                </button>
+                @if (facade.canDecide(sheet)) {
+                  <button
+                    mat-stroked-button
+                    type="button"
+                    [attr.aria-label]="'time.rejectFor' | transloco: { name: sheet.user.fullName }"
+                    (click)="facade.reject(sheet)"
+                  >
+                    {{ 'time.reject' | transloco }}
+                  </button>
+                  <button
+                    mat-flat-button
+                    type="button"
+                    [attr.aria-label]="'time.approveFor' | transloco: { name: sheet.user.fullName }"
+                    (click)="facade.approve(sheet)"
+                  >
+                    {{ 'time.approve' | transloco }}
+                  </button>
+                } @else if (sheet.status === 'SUBMITTED') {
+                  <span class="kora-muted">{{ 'time.ownTime' | transloco }}</span>
+                }
+              </div>
+            </li>
+          }
+        </ul>
+      } @else {
+        <kora-empty-state
+          icon="check_circle"
+          [heading]="'time.noneTitle' | transloco"
+          [message]="'time.noneMessage' | transloco"
+        />
+      }
+    } @else {
+      <kora-loading-state />
+    }
+  </section>
+} @else {
+  <p class="kora-muted">
+    {{ 'time.logYours' | transloco }}
+    <a routerLink="/timesheets">{{ 'nav.timesheets' | transloco }}</a>
+  </p>
+}
+
+<section aria-labelledby="plan-title">
+  <h2 id="plan-title">{{ 'time.plan' | transloco }}</h2>
+  <p class="kora-muted">{{ 'time.planHelp' | transloco }}</p>
+  @if (planError(); as message) {
+    <div class="kora-notice error" role="alert">
+      <mat-icon svgIcon="error" aria-hidden="true" />
+      <p>{{ message }}</p>
+    </div>
+  }
+  @if (allocations.error() || heatmap.error()) {
+    <kora-error-state (retry)="allocations.reload(); heatmap.reload()" />
+  } @else if (allocations.hasValue() && heatmap.hasValue()) {
+    <div class="wrap" role="region" tabindex="0" [attr.aria-label]="'time.plan' | transloco">
+      <table>
+        <caption class="visually-hidden">
+          {{
+            'time.planCaption' | transloco
+          }}
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col">{{ 'resources.person' | transloco }}</th>
+            @for (label of weekLabels(); track $index) {
+              <th scope="col" class="num">{{ label }}</th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (member of team(); track member.userId) {
+            <tr>
+              <th scope="row">{{ member.fullName }}</th>
+              @for (week of weeks(); track week; let w = $index) {
+                <td class="num">
+                  @if (project.canEdit()) {
+                    <input
+                      type="text"
+                      inputmode="decimal"
+                      autocomplete="off"
+                      class="cell"
+                      [value]="cell(member.userId, week)"
+                      [attr.aria-label]="
+                        'time.cellLabel'
+                          | transloco: { name: member.fullName, week: weekLabels()[w] }
+                      "
+                      [attr.aria-invalid]="invalid(member.userId, week)"
+                      (input)="setCell(member.userId, week, $event)"
+                    />
+                  } @else {
+                    {{ cell(member.userId, week) || '—' }}
+                  }
+                  @if (preview(member.userId, week); as p) {
+                    <span [class]="'band band-' + p.band.toLowerCase()" [class.changed]="p.changed">
+                      <mat-icon [svgIcon]="bandIcons[p.band]" aria-hidden="true" />
+                      {{ p.percent }}
+                      <span class="visually-hidden">{{
+                        'utilizationBand.' + p.band | transloco
+                      }}</span>
+                    </span>
+                  }
+                </td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    @if (project.canEdit()) {
+      <div class="plan-actions" aria-live="polite">
+        @if (edited().length) {
+          <span class="kora-muted">{{
+            'time.whatIf' | transloco: { count: edited().length }
+          }}</span>
+          <button mat-button type="button" (click)="discard()">
+            {{ 'time.discard' | transloco }}
+          </button>
+        }
+        <button
+          mat-flat-button
+          type="button"
+          [disabled]="!edited().length || planSaving()"
+          (click)="savePlan()"
+        >
+          {{ 'time.savePlan' | transloco }}
+        </button>
+      </div>
+    }
+  } @else {
+    <kora-loading-state />
+  }
+</section>
