@@ -48,6 +48,8 @@ describe('signed-in layout pieces', () => {
         'nav.dashboard',
         'nav.portfolios',
         'nav.projects',
+        'nav.timesheets',
+        'nav.resources',
         'nav.settings',
       ]);
     });

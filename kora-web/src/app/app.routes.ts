@@ -77,6 +77,17 @@ export const routes: Routes = [
           import('./features/projects/projects.routes').then((m) => m.PROJECT_ROUTES),
       },
       {
+        path: 'timesheets',
+        loadChildren: () =>
+          import('./features/timesheets/timesheets.routes').then((m) => m.TIMESHEET_ROUTES),
+      },
+      {
+        path: 'resources',
+        title: 'nav.resources',
+        loadComponent: () =>
+          import('./features/resources/resources-page').then((m) => m.ResourcesPage),
+      },
+      {
         path: 'approvals',
         title: 'approvals.title',
         loadComponent: () =>

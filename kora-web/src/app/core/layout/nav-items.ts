@@ -11,11 +11,13 @@ export interface NavItem {
   readonly roles?: readonly Role[];
 }
 
-/** Primary navigation. Later phases add timesheets and resources. */
+/** Primary navigation. */
 export const NAV_ITEMS: readonly NavItem[] = [
   { path: '/dashboard', label: 'nav.dashboard', icon: 'dashboard' },
   { path: '/portfolios', label: 'nav.portfolios', icon: 'folder_open' },
   { path: '/projects', label: 'nav.projects', icon: 'assignment' },
+  { path: '/timesheets', label: 'nav.timesheets', icon: 'schedule' },
+  { path: '/resources', label: 'nav.resources', icon: 'group' },
   { path: '/admin', label: 'nav.admin', icon: 'admin_panel_settings', roles: ['ORG_ADMIN'] },
   { path: '/settings', label: 'nav.settings', icon: 'settings' },
 ];
