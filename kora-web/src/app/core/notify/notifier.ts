@@ -37,6 +37,20 @@ export class Notifier {
   }
 
   /**
+   * Information with one action (e.g. "Download" when a report is ready). Resolves `true` if the
+   * user chose it; stays 15 seconds, like "Undo", so there's time to reach the button.
+   */
+  withAction(message: string, action: string): Promise<boolean> {
+    const ref = this.snackBar.open(message, action, { duration: 15_000, politeness: 'polite' });
+    return new Promise((resolve) => {
+      ref.onAction().subscribe(() => resolve(true));
+      ref.afterDismissed().subscribe(({ dismissedByAction }) => {
+        if (!dismissedByAction) resolve(false);
+      });
+    });
+  }
+
+  /**
    * A confirmation with an "Undo" action. Resolves `true` if the user chose to undo. It stays
    * 15 seconds (longer than confirmations, so there's time to reach the button with a keyboard).
    */

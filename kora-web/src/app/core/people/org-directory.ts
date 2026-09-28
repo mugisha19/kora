@@ -49,6 +49,13 @@ export class OrgDirectory {
     return this.people().filter((m) => !roles || roles.includes(m.role));
   }
 
+  /** A member's name by user id (notifications carry ids, not names); undefined if unknown. */
+  nameOf(userId: unknown): string | undefined {
+    return typeof userId === 'string'
+      ? this.people().find((m) => m.userId === userId)?.fullName
+      : undefined;
+  }
+
   refresh(): void {
     this.members.reload();
   }

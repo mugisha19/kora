@@ -1,13 +1,14 @@
 import { Injectable, computed, effect, inject, signal, untracked } from '@angular/core';
-import { firstValueFrom } from 'rxjs';
+import { filter, firstValueFrom } from 'rxjs';
 import { ChangeRequest } from '../api/api.models';
 import { ChangeRequestsApi } from '../api/change-requests.api';
+import { LiveUpdates } from '../live/live-updates';
 import { SessionStore } from '../session/session.store';
 
 /**
  * "My approvals" (feature 14): change requests waiting for the signed-in person's decision, for
  * the toolbar badge and the approvals page. Reloads when the active organization changes and
- * after every decision; live updates arrive with notifications (Phase 9).
+ * after every decision, and when an approval request or a decision arrives live.
  */
 @Injectable({ providedIn: 'root' })
 export class ApprovalsInbox {
@@ -28,6 +29,11 @@ export class ApprovalsInbox {
         if (organizationId) void this.refresh();
       });
     });
+    const live = inject(LiveUpdates);
+    live.notifications$
+      .pipe(filter((n) => n.type === 'APPROVAL_REQUESTED' || n.type === 'CHANGE_REQUEST_DECIDED'))
+      .subscribe(() => void this.refresh());
+    live.reconnected$.subscribe(() => void this.refresh());
   }
 
   async refresh(): Promise<void> {

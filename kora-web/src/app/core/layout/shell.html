@@ -20,6 +20,7 @@
     <span class="brand-name">Kora</span>
   </a>
   <span class="spacer"></span>
+  <kora-notifications-button />
   <kora-approvals-button />
   <kora-org-switcher />
   <kora-language-menu />
@@ -33,6 +34,13 @@
     />
   }
 </mat-toolbar>
+
+@if (live.offline()) {
+  <div class="offline no-print" role="status">
+    <mat-icon svgIcon="wifi_off" aria-hidden="true" />
+    {{ 'live.offline' | transloco }}
+  </div>
+}
 
 <mat-sidenav-container class="container">
   <mat-sidenav

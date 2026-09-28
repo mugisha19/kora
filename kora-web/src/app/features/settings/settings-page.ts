@@ -15,6 +15,7 @@ import { LANGUAGE_NAMES, LanguageService } from '../../core/i18n/language.servic
 import { THEME_ICONS, THEME_MODES, ThemeMode, ThemeService } from '../../core/theme/theme.service';
 import { PageHeader } from '../../shared/ui/page-header';
 import { StatusChip } from '../../shared/ui/status-chip';
+import { NotificationPreferencesCard } from './notification-preferences-card';
 import { ProfileCard } from './profile-card';
 
 /**
@@ -33,6 +34,7 @@ import { ProfileCard } from './profile-card';
     MatCardTitle,
     MatIcon,
     PageHeader,
+    NotificationPreferencesCard,
     ProfileCard,
     StatusChip,
     TranslocoPipe,

@@ -19,10 +19,12 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { map } from 'rxjs';
 import { LoadingService } from '../http/loading.service';
+import { LiveUpdates } from '../live/live-updates';
 import { SessionStore } from '../session/session.store';
 import { focusHeadingOnNavigation, focusMainHeading } from './focus';
 import { ApprovalsButton } from './approvals-button';
 import { LanguageMenu } from './language-menu';
+import { NotificationsButton } from './notifications-button';
 import { visibleNavItems } from './nav-items';
 import { OrgSwitcher } from './org-switcher';
 import { ThemeMenu } from './theme-menu';
@@ -32,8 +34,9 @@ import { UserMenu } from './user-menu';
 export const HANDSET_QUERY = '(max-width: 959.98px)';
 
 /**
- * Frame of the signed-in app: skip link, toolbar (organization, language, theme, account),
- * responsive side navigation filtered by role, and the routed page. After each navigation, focus
+ * Frame of the signed-in app: skip link, toolbar (organization, language, theme, account,
+ * notifications), responsive side navigation filtered by role, and the routed page; a banner when
+ * live updates are interrupted. After each navigation, focus
  * moves to the new page's heading so keyboard and screen-reader users start at the new content.
  */
 @Component({
@@ -52,6 +55,7 @@ export const HANDSET_QUERY = '(max-width: 959.98px)';
     MatSidenavContainer,
     MatSidenavContent,
     MatToolbar,
+    NotificationsButton,
     OrgSwitcher,
     RouterLink,
     RouterLinkActive,
@@ -70,6 +74,8 @@ export class Shell {
   private readonly store = inject(SessionStore);
 
   protected readonly loading = inject(LoadingService);
+  /** Starts live updates for the signed-in organization; the banner shows when they stop. */
+  protected readonly live = inject(LiveUpdates);
   protected readonly navItems = computed(() => visibleNavItems(this.store.activeRole()));
   protected readonly isHandset = toSignal(
     inject(BreakpointObserver)

@@ -104,4 +104,20 @@
   .toolbar {
     padding-inline: var(--kora-space-1);
   }
+
+  // Eight buttons don't fit in 375 px: the theme is also in Settings → Appearance.
+  kora-theme-menu {
+    display: none;
+  }
+}
+
+// Live updates interrupted: reconnecting in the background; lists catch up when it is back.
+.offline {
+  display: flex;
+  align-items: center;
+  gap: var(--kora-space-2);
+  padding: var(--kora-space-1) var(--kora-space-4);
+  background: var(--kora-warning-bg);
+  color: var(--kora-warning-fg);
+  font: var(--mat-sys-body-medium);
 }
