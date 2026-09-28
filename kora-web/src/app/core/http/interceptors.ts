@@ -39,10 +39,31 @@ import { LoadingService } from './loading.service';
 export const CORRELATION_HEADER = 'X-Correlation-Id';
 export const TENANT_HEADER = 'X-Organization-Id';
 
-/** Tags every API request with an id the API echoes in its logs and in Problem Details. */
+export const TRACEPARENT_HEADER = 'traceparent';
+
+/** `bytes` random bytes as lower-case hex (W3C trace ids are 16 bytes, span ids 8). */
+function randomHex(bytes: number): string {
+  return Array.from(crypto.getRandomValues(new Uint8Array(bytes)), (b) =>
+    b.toString(16).padStart(2, '0'),
+  ).join('');
+}
+
+/**
+ * Tags every API request with an id the API echoes in its logs and in Problem Details. The id is a
+ * W3C trace id, also sent as `traceparent`, so the API's trace for the request carries the same id
+ * a user reads from an error message (feature 24: correlation ids end to end).
+ */
 export const correlationIdInterceptor: HttpInterceptorFn = (req, next) => {
   if (!isApiRequest(req) || req.headers.has(CORRELATION_HEADER)) return next(req);
-  return next(req.clone({ setHeaders: { [CORRELATION_HEADER]: crypto.randomUUID() } }));
+  const traceId = randomHex(16);
+  return next(
+    req.clone({
+      setHeaders: {
+        [CORRELATION_HEADER]: traceId,
+        [TRACEPARENT_HEADER]: `00-${traceId}-${randomHex(8)}-01`,
+      },
+    }),
+  );
 };
 
 /** Drives the global progress bar. */

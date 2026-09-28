@@ -64,12 +64,16 @@ describe('API interceptor chain', () => {
   const silent = () => new HttpContext().set(SILENT_ERRORS, true);
 
   describe('correlation id', () => {
-    it('tags API requests with a UUID and keeps one the caller set', () => {
+    it('tags API requests with a trace id (also as traceparent) and keeps one the caller set', () => {
       http.get('/api/v1/me').subscribe();
       http.get('/api/v1/me', { headers: { 'X-Correlation-Id': 'mine' } }).subscribe();
 
       const [generated, explicit] = backend.match('/api/v1/me');
-      expect(generated.request.headers.get('X-Correlation-Id')).toMatch(/^[0-9a-f-]{36}$/);
+      const id = generated.request.headers.get('X-Correlation-Id') ?? '';
+      expect(id).toMatch(/^[0-9a-f]{32}$/);
+      expect(generated.request.headers.get('traceparent')).toMatch(
+        new RegExp(`^00-${id}-[0-9a-f]{16}-01$`),
+      );
       expect(explicit.request.headers.get('X-Correlation-Id')).toBe('mine');
       generated.flush({});
       explicit.flush({});
