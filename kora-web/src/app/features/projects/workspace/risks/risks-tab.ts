@@ -28,6 +28,8 @@ import { SeverityChip } from '../governance-look';
 import { ProjectStore } from '../project.store';
 import { RiskFacade } from './risk.facade';
 import { RiskHeatmap, cellId } from './risk-heatmap';
+import { refreshOnActivity } from '../live-refresh';
+import { ExportMenu } from '../../../reports/export-menu';
 
 type SortField = (typeof RISK_SORT_FIELDS)[number];
 const PAGE_SIZES = [10, 20, 50];
@@ -46,6 +48,7 @@ const SORTS: Record<SortField, string> = {
 @Component({
   selector: 'kora-risks-tab',
   imports: [
+    ExportMenu,
     EmptyState,
     ErrorState,
     LoadingState,
@@ -88,6 +91,11 @@ export class RisksTab {
 
   protected readonly project = inject(ProjectStore);
   protected readonly facade = inject(RiskFacade);
+
+  constructor() {
+    refreshOnActivity(['risk'], () => this.facade.version.update((v) => v + 1));
+  }
+
   protected readonly language = inject(LanguageService);
   protected readonly queryParams = inject(QueryParams);
   private readonly api = inject(RisksApi);

@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { TranslocoService } from '@jsverse/transloco';
 import { firstValueFrom } from 'rxjs';
@@ -35,6 +35,14 @@ export class TaskFacade {
   private readonly notifier = inject(Notifier);
   private readonly messages = inject(ErrorMessages);
   private readonly transloco = inject(TranslocoService);
+  private readonly changes = signal(0);
+
+  /** Bumped when a task opened from its link (`TaskSheetRoute`) was saved or deleted. */
+  readonly changed = this.changes.asReadonly();
+
+  notifyChanged(): void {
+    this.changes.update((n) => n + 1);
+  }
 
   canChange(task: Task): boolean {
     return canChangeTask(task, this.project.myUserId(), {

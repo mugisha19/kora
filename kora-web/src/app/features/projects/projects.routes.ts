@@ -60,6 +60,15 @@ export const PROJECT_ROUTES: Routes = [
             path: 'board',
             title: 'workspace.tabs.board',
             loadComponent: () => import('./workspace/board/board-tab').then((m) => m.BoardTab),
+            // A task opens in its sheet over the board: /board/<taskId>.
+            children: [
+              { path: '', children: [] },
+              {
+                matcher: uuidParam('taskId'),
+                loadComponent: () =>
+                  import('./workspace/work/task-routes').then((m) => m.TaskSheetRoute),
+              },
+            ],
           },
           {
             path: 'backlog',
@@ -78,6 +87,15 @@ export const PROJECT_ROUTES: Routes = [
             title: 'workspace.tabs.schedule',
             loadComponent: () =>
               import('./workspace/schedule/schedule-tab').then((m) => m.ScheduleTab),
+            // A task opens in its sheet over the schedule: /schedule/<taskId>.
+            children: [
+              { path: '', children: [] },
+              {
+                matcher: uuidParam('taskId'),
+                loadComponent: () =>
+                  import('./workspace/work/task-routes').then((m) => m.TaskSheetRoute),
+              },
+            ],
           },
           {
             path: 'risks',
@@ -133,6 +151,23 @@ export const PROJECT_ROUTES: Routes = [
               }),
             ],
             loadComponent: () => import('./workspace/evm/evm-tab').then((m) => m.EvmTab),
+          },
+          {
+            path: 'activity',
+            title: 'workspace.tabs.activity',
+            loadComponent: () =>
+              import('./workspace/activity/activity-tab').then((m) => m.ActivityTab),
+          },
+          {
+            // Notification and activity links: /tasks/<taskId> opens it over the board or schedule.
+            path: 'tasks',
+            children: [
+              {
+                matcher: uuidParam('taskId'),
+                loadComponent: () =>
+                  import('./workspace/work/task-routes').then((m) => m.TaskLinkRoute),
+              },
+            ],
           },
           {
             path: 'change-requests',

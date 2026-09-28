@@ -23,6 +23,7 @@ import { formatHours, parseWeeklyHours } from '../../../../shared/format/hours';
 import { BAND_ICON, SHEET_LOOK } from '../../../../shared/ui/time-look';
 import { ProjectStore } from '../project.store';
 import { TimeFacade } from './time.facade';
+import { ExportMenu } from '../../../reports/export-menu';
 
 /** A week above this many hours on one project is flagged for the approver. */
 export const LONG_WEEK_HOURS = 50;
@@ -36,6 +37,7 @@ const PLAN_WEEKS = 8;
 @Component({
   selector: 'kora-time-tab',
   imports: [
+    ExportMenu,
     EmptyState,
     ErrorState,
     LoadingState,
@@ -75,7 +77,7 @@ export class TimeTab {
   protected readonly statusFilter = computed<TimesheetStatus | null>(() =>
     this.status() === 'all' ? null : (oneOfParam(this.status(), TIMESHEET_STATUSES) ?? 'SUBMITTED'),
   );
-  private readonly projectId = computed(() => this.project.projectId() ?? '');
+  protected readonly projectId = computed(() => this.project.projectId() ?? '');
 
   protected readonly sheets = resource({
     params: () =>

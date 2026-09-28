@@ -1,17 +1,20 @@
 @if (report.error()) {
   <kora-error-state (retry)="report.reload()" />
 } @else if (report.value(); as r) {
-  <p class="as-of">
-    {{
-      'evm.asOf'
-        | transloco
-          : {
-              date: (r.asOf | localizedDate: language.current()),
-              method: ('percentCompleteMethod.' + r.percentCompleteMethod + '.name' | transloco),
-              eac: ('eacMethod.' + r.eacMethod + '.name' | transloco),
-            }
-    }}
-  </p>
+  <div class="evm-head">
+    <p class="as-of">
+      {{
+        'evm.asOf'
+          | transloco
+            : {
+                date: (r.asOf | localizedDate: language.current()),
+                method: ('percentCompleteMethod.' + r.percentCompleteMethod + '.name' | transloco),
+                eac: ('eacMethod.' + r.eacMethod + '.name' | transloco),
+              }
+      }}
+    </p>
+    <kora-export-menu type="EVM" [params]="{ projectId: projectId() }" />
+  </div>
 
   @if (missing().get('bac')) {
     <kora-empty-state

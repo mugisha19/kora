@@ -1,5 +1,5 @@
 import { LiveAnnouncer } from '@angular/cdk/a11y';
-import { Component, computed, inject, input, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
 import { MatButton } from '@angular/material/button';
 import { MatButtonToggle, MatButtonToggleGroup } from '@angular/material/button-toggle';
 import { MatDialog } from '@angular/material/dialog';
@@ -32,6 +32,8 @@ import {
 } from './schedule-dialogs';
 import { LinkRemoval, ScheduleTable } from './schedule-table';
 import { ScheduleStore, loopOf } from './schedule.store';
+import { refreshOnActivity } from '../live-refresh';
+import { RouterOutlet } from '@angular/router';
 
 /**
  * Schedule tab (feature 10) for Predictive and Hybrid projects: the critical-path schedule as a
@@ -41,6 +43,7 @@ import { ScheduleStore, loopOf } from './schedule.store';
 @Component({
   selector: 'kora-schedule-tab',
   imports: [
+    RouterOutlet,
     EmptyState,
     ErrorState,
     GanttChart,
@@ -100,6 +103,10 @@ export class ScheduleTab {
 
   constructor() {
     void this.store.load();
+    refreshOnActivity(['task', 'dependency', 'baseline'], () => void this.store.reload());
+    effect(() => {
+      if (this.tasks.changed()) untracked(() => void this.store.reload());
+    });
   }
 
   // ---------- Table and chart commands ----------

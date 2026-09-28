@@ -23,6 +23,9 @@ import { SeverityChip } from '../governance-look';
 import { routeSheet } from '../route-sheet';
 import { RiskFacade } from './risk.facade';
 import { severityOf } from './risk-scoring';
+import { AttachmentsPanel } from '../attachments/attachments-panel';
+import { HistorySection } from '../history/history-section';
+import { ProjectStore } from '../project.store';
 
 /** Score history as a small line: one point per assessment, oldest on the left. */
 @Component({
@@ -95,6 +98,8 @@ export interface RiskSheetData {
 @Component({
   selector: 'kora-risk-sheet',
   imports: [
+    AttachmentsPanel,
+    HistorySection,
     ErrorState,
     LoadingState,
     LocalizedDatePipe,
@@ -117,6 +122,7 @@ export class RiskSheet {
   private readonly dialogRef = inject(MatDialogRef<RiskSheet>);
   private readonly api = inject(RisksApi);
   protected readonly facade = inject(RiskFacade);
+  protected readonly project = inject(ProjectStore);
   protected readonly language = inject(LanguageService);
 
   protected readonly risk = resource({

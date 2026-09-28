@@ -24,6 +24,9 @@ import { ISSUE_STATUS_LOOK } from '../governance-look';
 import { routeSheet } from '../route-sheet';
 import { PriorityChip } from '../work/task-look';
 import { IssueFacade, isUnresolved } from './issue.facade';
+import { AttachmentsPanel } from '../attachments/attachments-panel';
+import { HistorySection } from '../history/history-section';
+import { ProjectStore } from '../project.store';
 
 export interface IssueSheetData {
   issueId: string;
@@ -37,6 +40,8 @@ export interface IssueSheetData {
 @Component({
   selector: 'kora-issue-sheet',
   imports: [
+    AttachmentsPanel,
+    HistorySection,
     ErrorState,
     LoadingState,
     LocalizedDatePipe,
@@ -155,6 +160,14 @@ export interface IssueSheetData {
             }
           </ul>
         }
+
+        <kora-attachments-panel
+          ownerType="ISSUE"
+          [ownerId]="i.id"
+          [canUpload]="project.canContribute()"
+          [canManage]="project.canEdit()"
+        />
+        <kora-history-section entityType="issue" [entityId]="i.id" />
       } @else {
         <kora-loading-state />
       }
@@ -214,6 +227,7 @@ export class IssueSheet {
   private readonly api = inject(IssuesApi);
   protected readonly facade = inject(IssueFacade);
   protected readonly changes = inject(ChangeFacade);
+  protected readonly project = inject(ProjectStore);
   protected readonly language = inject(LanguageService);
   protected readonly statusLook = ISSUE_STATUS_LOOK;
 

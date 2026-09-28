@@ -27,6 +27,7 @@ import { ISSUE_STATUS_LOOK } from '../governance-look';
 import { ProjectStore } from '../project.store';
 import { PriorityChip } from '../work/task-look';
 import { IssueFacade } from './issue.facade';
+import { refreshOnActivity } from '../live-refresh';
 
 const PAGE_SIZES = [10, 20, 50];
 
@@ -73,6 +74,11 @@ export class IssuesTab {
 
   protected readonly project = inject(ProjectStore);
   protected readonly facade = inject(IssueFacade);
+
+  constructor() {
+    refreshOnActivity(['issue'], () => this.facade.version.update((v) => v + 1));
+  }
+
   protected readonly queryParams = inject(QueryParams);
   protected readonly language = inject(LanguageService);
   private readonly api = inject(IssuesApi);

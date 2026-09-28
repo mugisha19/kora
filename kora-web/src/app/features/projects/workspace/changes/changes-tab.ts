@@ -18,6 +18,7 @@ import { LoadingState } from '../../../../shared/ui/loading-state';
 import { ProjectStore } from '../project.store';
 import { ChangeFacade } from './change.facade';
 import { ChangeStatusChip, SignedMoneyPipe, WaitingFor } from './change-look';
+import { refreshOnActivity } from '../live-refresh';
 
 const PAGE_SIZES = [10, 20, 50];
 
@@ -167,6 +168,11 @@ export class ChangesTab {
   readonly size = input<string>();
 
   protected readonly facade = inject(ChangeFacade);
+
+  constructor() {
+    refreshOnActivity(['change-request'], () => this.facade.version.update((v) => v + 1));
+  }
+
   protected readonly queryParams = inject(QueryParams);
   protected readonly language = inject(LanguageService);
   private readonly project = inject(ProjectStore);

@@ -262,6 +262,14 @@
         </form>
       }
     </section>
+
+    <kora-attachments-panel
+      ownerType="TASK"
+      [ownerId]="t.id"
+      [canUpload]="data.canComment"
+      [canManage]="data.canDelete"
+    />
+    <kora-history-section entityType="task" [entityId]="t.id" />
   }
 </mat-dialog-content>
 

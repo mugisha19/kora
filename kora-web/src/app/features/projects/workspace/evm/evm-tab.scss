@@ -101,3 +101,15 @@ h2 {
   gap: 0 var(--kora-space-3);
   margin-block-end: var(--kora-space-3);
 }
+
+.evm-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--kora-space-2);
+
+  .as-of {
+    margin: 0;
+  }
+}

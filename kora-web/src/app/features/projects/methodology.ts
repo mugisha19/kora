@@ -13,11 +13,12 @@ export type WorkspaceTab =
   | 'stakeholders'
   | 'change-requests'
   | 'time'
-  | 'evm';
+  | 'evm'
+  | 'activity';
 
 /**
  * Every project, whatever its methodology, governs risks, issues, stakeholders and changes, and
- * tracks time and earned value.
+ * tracks time and earned value, with a feed of what happened.
  */
 const GOVERNANCE: readonly WorkspaceTab[] = [
   'risks',
@@ -26,6 +27,7 @@ const GOVERNANCE: readonly WorkspaceTab[] = [
   'change-requests',
   'time',
   'evm',
+  'activity',
 ];
 
 export interface MethodologyStrategy {

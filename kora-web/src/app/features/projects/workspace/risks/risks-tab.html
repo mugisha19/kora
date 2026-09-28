@@ -53,6 +53,10 @@
     </button>
   }
   <span class="spacer"></span>
+  <kora-export-menu
+    type="RISK_REGISTER"
+    [params]="{ projectId: project.projectId() ?? undefined }"
+  />
   @if (facade.canRaise()) {
     <button mat-flat-button type="button" (click)="raise()">
       <mat-icon svgIcon="add" aria-hidden="true" />

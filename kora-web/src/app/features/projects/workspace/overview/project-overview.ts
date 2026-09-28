@@ -26,6 +26,9 @@ import {
   TransitionDialog,
   TransitionDialogData,
 } from './project-dialogs';
+import { AttachmentsPanel } from '../attachments/attachments-panel';
+import { HistorySection } from '../history/history-section';
+import { ExportMenu } from '../../../reports/export-menu';
 
 /**
  * Overview tab: the project's facts, its lifecycle (only the moves the API allows are offered),
@@ -34,6 +37,9 @@ import {
 @Component({
   selector: 'kora-project-overview',
   imports: [
+    ExportMenu,
+    AttachmentsPanel,
+    HistorySection,
     ErrorState,
     HealthChip,
     LoadingState,
@@ -55,6 +61,8 @@ import {
         <section class="card details" aria-labelledby="details-title">
           <div class="card-head">
             <h2 id="details-title">{{ 'workspace.overview.details' | transloco }}</h2>
+            <span class="spacer"></span>
+            <kora-export-menu type="PROJECT_STATUS" [params]="{ projectId: project.id }" />
             @if (store.canEdit()) {
               <a mat-button [routerLink]="['/projects', project.id, 'edit']">
                 <mat-icon svgIcon="edit" aria-hidden="true" />
@@ -217,6 +225,17 @@ import {
             <kora-loading-state />
           }
         </section>
+
+        <!-- The panel is the region ("Files"); the card only frames it. -->
+        <div class="card files">
+          <kora-attachments-panel
+            ownerType="PROJECT"
+            [ownerId]="project.id"
+            [canUpload]="store.canContribute()"
+            [canManage]="store.canEdit()"
+          />
+          <kora-history-section entityType="project" [entityId]="project.id" />
+        </div>
       </div>
     }
   `,
@@ -240,6 +259,9 @@ import {
       align-items: center;
       justify-content: space-between;
       gap: var(--kora-space-2);
+    }
+    .card-head .spacer {
+      flex: 1;
     }
     h2 {
       font: var(--mat-sys-title-medium);

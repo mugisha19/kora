@@ -40,6 +40,7 @@ import {
   SprintDialog,
   SprintDialogData,
 } from './sprint-dialogs';
+import { refreshOnActivity } from '../live-refresh';
 
 const DAY = 86_400_000;
 const addDays = (isoDate: string, days: number) =>
@@ -112,6 +113,7 @@ export class BacklogTab {
   });
 
   constructor() {
+    refreshOnActivity(['task', 'sprint'], () => void this.store.load());
     inject(DestroyRef).onDestroy(() => (this.destroyed = true));
     void this.store.load();
   }

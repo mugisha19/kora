@@ -15,6 +15,8 @@ import { ProjectStore } from '../project.store';
 import { ApprovalTimeline } from './approval-timeline';
 import { ChangeFacade } from './change.facade';
 import { ChangeStatusChip, SignedMoneyPipe, WaitingFor } from './change-look';
+import { AttachmentsPanel } from '../attachments/attachments-panel';
+import { HistorySection } from '../history/history-section';
 
 /**
  * `/projects/:id/change-requests/:changeRequestId` (feature 14): the request, its impact, and the
@@ -24,6 +26,8 @@ import { ChangeStatusChip, SignedMoneyPipe, WaitingFor } from './change-look';
 @Component({
   selector: 'kora-change-request-page',
   imports: [
+    AttachmentsPanel,
+    HistorySection,
     ApprovalTimeline,
     ChangeStatusChip,
     EmptyState,

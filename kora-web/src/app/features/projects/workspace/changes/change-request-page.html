@@ -152,6 +152,14 @@
         <p class="kora-muted">{{ 'changes.chainLater' | transloco }}</p>
       }
     </section>
+
+    <kora-attachments-panel
+      ownerType="CHANGE_REQUEST"
+      [ownerId]="cr.id"
+      [canUpload]="project.canContribute()"
+      [canManage]="project.canEdit()"
+    />
+    <kora-history-section entityType="change-request" [entityId]="cr.id" />
   </div>
 } @else {
   <kora-loading-state />

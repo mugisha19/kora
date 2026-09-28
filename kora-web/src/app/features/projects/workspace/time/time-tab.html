@@ -23,6 +23,7 @@
           <mat-option value="all">{{ 'time.anyStatus' | transloco }}</mat-option>
         </mat-select>
       </mat-form-field>
+      <kora-export-menu type="TIMESHEETS" [params]="{ projectId: projectId() }" />
     </div>
 
     @if (sheets.error()) {

@@ -34,6 +34,8 @@ import { submitWithApi } from '../../../../shared/forms/form-helpers';
 import { LocalizedDatePipe } from '../../../../shared/forms/localized-date.pipe';
 import { Markdown } from '../../../../shared/markdown/markdown';
 import { StatusChip } from '../../../../shared/ui/status-chip';
+import { AttachmentsPanel } from '../attachments/attachments-panel';
+import { HistorySection } from '../history/history-section';
 import { PriorityChip, TaskTypeIcon } from './task-look';
 
 export interface TaskDialogData {
@@ -79,7 +81,9 @@ const LABEL = /^[\p{L}\p{N}][\p{L}\p{N} _-]{0,29}$/u;
 @Component({
   selector: 'kora-task-dialog',
   imports: [
+    AttachmentsPanel,
     FieldError,
+    HistorySection,
     FormField,
     LocalizedDatePipe,
     Markdown,

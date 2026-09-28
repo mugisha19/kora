@@ -119,7 +119,15 @@ describe('projects', () => {
     it('offers the tabs of the methodology', async () => {
       await open(`/projects/${PROJECT.mobile}`);
       await screen.findByRole('heading', { level: 1, name: 'Mobile banking app' });
-      const governance = ['Risks', 'Issues', 'Stakeholders', 'Changes', 'Time', 'Earned value'];
+      const governance = [
+        'Risks',
+        'Issues',
+        'Stakeholders',
+        'Changes',
+        'Time',
+        'Earned value',
+        'Activity',
+      ];
       expect(tabNames()).toEqual(['Overview', 'Charter', 'WBS', 'Board', 'Backlog', ...governance]);
 
       await TestBed.inject(Router).navigateByUrl(`/projects/${PROJECT.warehouse}`);

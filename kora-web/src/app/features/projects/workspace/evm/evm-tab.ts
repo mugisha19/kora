@@ -25,6 +25,7 @@ import { ErrorState } from '../../../../shared/ui/error-state';
 import { LoadingState } from '../../../../shared/ui/loading-state';
 import { ProjectStore } from '../project.store';
 import { IndexGauge, SCurveChart } from './evm-charts';
+import { ExportMenu } from '../../../reports/export-menu';
 
 type MoneyMetric = 'bac' | 'pv' | 'ev' | 'ac' | 'sv' | 'cv' | 'eac' | 'etc' | 'vac';
 
@@ -36,6 +37,7 @@ type MoneyMetric = 'bac' | 'pv' | 'ev' | 'ac' | 'sv' | 'cv' | 'eac' | 'etc' | 'v
 @Component({
   selector: 'kora-evm-tab',
   imports: [
+    ExportMenu,
     EmptyState,
     ErrorState,
     IndexGauge,
@@ -67,7 +69,7 @@ export class EvmTab {
   protected readonly percentMethods = PERCENT_COMPLETE_METHODS;
   protected readonly eacMethods = EAC_METHODS;
   private readonly version = signal(0);
-  private readonly projectId = computed(() => this.project.projectId() ?? '');
+  protected readonly projectId = computed(() => this.project.projectId() ?? '');
 
   protected readonly report = resource({
     params: () => ({ id: this.projectId(), version: this.version() }),

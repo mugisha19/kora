@@ -165,6 +165,14 @@
         <kora-loading-state />
       }
     </section>
+
+    <kora-attachments-panel
+      ownerType="RISK"
+      [ownerId]="r.id"
+      [canUpload]="project.canContribute()"
+      [canManage]="project.canEdit()"
+    />
+    <kora-history-section entityType="risk" [entityId]="r.id" />
   } @else {
     <kora-loading-state />
   }

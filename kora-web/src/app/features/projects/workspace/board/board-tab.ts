@@ -26,6 +26,7 @@ import { MatIcon } from '@angular/material/icon';
 import { MatOption, MatSelect, MatSelectTrigger } from '@angular/material/select';
 import { MatSlideToggle } from '@angular/material/slide-toggle';
 import { MatTooltip } from '@angular/material/tooltip';
+import { RouterOutlet } from '@angular/router';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { firstValueFrom } from 'rxjs';
 import {
@@ -46,6 +47,7 @@ import { DEFAULT_COLUMN_NAMES, canMoveTask } from '../work/task-look';
 import { BoardCard, CardMove } from './board-card';
 import { BoardStore, ColumnMeta } from './board.store';
 import { ColumnDialog, ColumnDialogData } from './column-dialog';
+import { refreshOnActivity } from '../live-refresh';
 
 /**
  * Board tab (feature 08): the Kanban board of the active sprint (or every task), with WIP limits,
@@ -74,6 +76,7 @@ import { ColumnDialog, ColumnDialogData } from './column-dialog';
     MatSlideToggle,
     MatTooltip,
     NgTemplateOutlet,
+    RouterOutlet,
     StatusChip,
     TranslocoPipe,
   ],
@@ -109,6 +112,11 @@ export class BoardTab {
 
   constructor() {
     inject(DestroyRef).onDestroy(() => (this.destroyed = true));
+    // Someone else moved or changed tasks: show the board as it is now.
+    refreshOnActivity(['task', 'sprint', 'board-column'], () => void this.store.reload());
+    effect(() => {
+      if (this.tasks.changed()) untracked(() => void this.store.reload());
+    });
     effect(() => {
       const filters = {
         sprint: this.sprint() ?? null,
