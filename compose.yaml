@@ -1,0 +1,7 @@
+# The whole Kora stack from one command, at the repository root:
+#   docker compose --profile demo up --build      then open http://localhost:4200
+# Without the profile, only the API's development services start (PostgreSQL, Redis, Mailpit, SeaweedFS).
+# Each app keeps its own compose file; paths in them are relative to their own folders.
+include:
+  - kora-api/compose.yaml
+  - kora-web/compose.yaml
