@@ -88,6 +88,11 @@ export const routes: Routes = [
           import('./features/resources/resources-page').then((m) => m.ResourcesPage),
       },
       {
+        path: 'reports',
+        title: 'reports.title',
+        loadComponent: () => import('./features/reports/reports-page').then((m) => m.ReportsPage),
+      },
+      {
         path: 'approvals',
         title: 'approvals.title',
         loadComponent: () =>

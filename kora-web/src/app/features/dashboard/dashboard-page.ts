@@ -38,6 +38,7 @@ import { LoadingState } from '../../shared/ui/loading-state';
 import { PageHeader } from '../../shared/ui/page-header';
 import { DistributionChart, Slice } from './distribution-chart';
 import { TrendChart } from './trend-chart';
+import { ExportMenu } from '../reports/export-menu';
 
 const PAGE_SIZE = 10;
 type SortField = (typeof DASHBOARD_SORT_FIELDS)[number];
@@ -51,6 +52,7 @@ type SortField = (typeof DASHBOARD_SORT_FIELDS)[number];
 @Component({
   selector: 'kora-dashboard-page',
   imports: [
+    ExportMenu,
     DistributionChart,
     EmptyState,
     ErrorState,
@@ -117,6 +119,10 @@ export class DashboardPage {
   ];
 
   protected readonly portfolioFilter = computed(() => this.portfolioId() || undefined);
+  protected readonly exportParams = computed(() => {
+    const portfolioId = this.portfolioFilter();
+    return portfolioId ? { portfolioId } : {};
+  });
   protected readonly healthFilter = computed(() => oneOfParam(this.health(), HEALTHS));
   /** No sort in the URL = the API's default, worst health first. */
   protected readonly sortField = computed<SortField | null>(() =>

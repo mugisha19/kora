@@ -14,6 +14,7 @@
       }
     </mat-select>
   </mat-form-field>
+  <kora-export-menu type="PORTFOLIO_SUMMARY" [params]="exportParams()" />
 </kora-page-header>
 
 @if (summary.error()) {

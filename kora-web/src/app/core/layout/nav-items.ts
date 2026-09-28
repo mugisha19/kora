@@ -18,6 +18,7 @@ export const NAV_ITEMS: readonly NavItem[] = [
   { path: '/projects', label: 'nav.projects', icon: 'assignment' },
   { path: '/timesheets', label: 'nav.timesheets', icon: 'schedule' },
   { path: '/resources', label: 'nav.resources', icon: 'group' },
+  { path: '/reports', label: 'nav.reports', icon: 'summarize' },
   { path: '/admin', label: 'nav.admin', icon: 'admin_panel_settings', roles: ['ORG_ADMIN'] },
   { path: '/settings', label: 'nav.settings', icon: 'settings' },
 ];
