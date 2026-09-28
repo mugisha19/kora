@@ -1,0 +1,217 @@
+<kora-page-header
+  [heading]="'timesheets.title' | transloco"
+  [subtitle]="'timesheets.subtitle' | transloco"
+/>
+
+<div class="week-bar">
+  <button
+    mat-icon-button
+    type="button"
+    [attr.aria-label]="'timesheets.previousWeek' | transloco"
+    [matTooltip]="'timesheets.previousWeek' | transloco"
+    (click)="go(-1)"
+  >
+    <mat-icon svgIcon="arrow_back" aria-hidden="true" />
+  </button>
+  <h2 id="week-title">
+    {{ 'timesheets.weekLabel' | transloco: { number: currentWeek().slice(6) } }}
+    <span class="range">{{ range() }}</span>
+  </h2>
+  <button
+    mat-icon-button
+    type="button"
+    [attr.aria-label]="'timesheets.nextWeek' | transloco"
+    [matTooltip]="'timesheets.nextWeek' | transloco"
+    (click)="go(1)"
+  >
+    <mat-icon svgIcon="arrow_forward" aria-hidden="true" />
+  </button>
+  @if (!isThisWeek()) {
+    <button mat-button type="button" (click)="go(0)">
+      {{ 'timesheets.thisWeek' | transloco }}
+    </button>
+  }
+  <span class="spacer"></span>
+  @if (store.data(); as week) {
+    <kora-status-chip
+      [tone]="look[week.status].tone"
+      [icon]="look[week.status].icon"
+      [label]="'timesheetStatus.' + week.status | transloco"
+    />
+  }
+</div>
+
+@if (store.status() === 'loading' && !store.data()) {
+  <kora-loading-state />
+} @else if (store.status() === 'error') {
+  <kora-error-state
+    [correlationId]="store.loadError()?.correlationId"
+    (retry)="store.load(currentWeek())"
+  />
+} @else if (store.data(); as week) {
+  @for (sheet of rejected(); track sheet.id) {
+    <div class="kora-notice error" role="note">
+      <mat-icon svgIcon="undo" aria-hidden="true" />
+      <p>
+        {{
+          'timesheets.sentBack'
+            | transloco: { project: sheet.projectCode, name: sheet.decidedBy?.fullName ?? '' }
+        }}
+        <q>{{ sheet.comment }}</q>
+      </p>
+    </div>
+  }
+  @if (week.sheets.length) {
+    <ul class="sheets" [attr.aria-label]="'timesheets.sheetsLabel' | transloco">
+      @for (sheet of week.sheets; track sheet.id) {
+        <li>
+          <strong>{{ sheet.projectCode }}</strong>
+          <kora-status-chip
+            [tone]="look[sheet.status].tone"
+            [icon]="look[sheet.status].icon"
+            [label]="'timesheetStatus.' + sheet.status | transloco"
+          />
+        </li>
+      }
+    </ul>
+  }
+
+  <p class="kora-muted help">{{ 'timesheets.keyboardHelp' | transloco }}</p>
+
+  <div
+    class="grid-wrap"
+    role="region"
+    tabindex="-1"
+    [attr.aria-labelledby]="'week-title'"
+    (keydown)="onKeydown($event)"
+  >
+    <table class="grid">
+      <caption class="visually-hidden">
+        {{
+          'timesheets.gridCaption' | transloco
+        }}
+      </caption>
+      <thead>
+        <tr>
+          <th scope="col">{{ 'timesheets.task' | transloco }}</th>
+          @for (day of dayLabels(); track $index) {
+            <th scope="col" class="num" [class.weekend]="day.weekend">
+              <abbr [attr.title]="day.long">{{ day.short }}</abbr>
+              <span class="date">{{ day.day }}</span>
+            </th>
+          }
+          <th scope="col" class="num">{{ 'timesheets.total' | transloco }}</th>
+          <th scope="col">
+            <span class="visually-hidden">{{ 'common.moreActions' | transloco }}</span>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of store.rows(); track row.taskId ?? row.taskKey; let r = $index) {
+          <tr [class.locked]="row.locked">
+            <th scope="row">
+              <span class="key">{{ row.taskKey }}</span>
+              <span class="title">{{ row.taskTitle }}</span>
+            </th>
+            @for (cell of row.cells; track d; let d = $index) {
+              <td class="num" [class.weekend]="dayLabels()[d]?.weekend">
+                @if (row.locked) {
+                  {{ cell }}
+                } @else {
+                  <input
+                    type="text"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    class="cell"
+                    [attr.data-cell]="r + '-' + d"
+                    [value]="cell"
+                    [attr.aria-label]="
+                      'timesheets.cellLabel'
+                        | transloco: { task: row.taskKey, day: dayLabels()[d]?.long }
+                    "
+                    [attr.aria-invalid]="store.parsed()[r][d] === null"
+                    (input)="onInput(r, d, $event)"
+                  />
+                }
+              </td>
+            }
+            <td class="num total">{{ hours(store.rowTotals()[r]) }}</td>
+            <td>
+              @if (!row.locked) {
+                <button
+                  mat-icon-button
+                  type="button"
+                  [attr.aria-label]="'timesheets.removeRow' | transloco: { task: row.taskKey }"
+                  [matTooltip]="'timesheets.removeRow' | transloco: { task: row.taskKey }"
+                  (click)="store.removeRow(r)"
+                >
+                  <mat-icon svgIcon="delete" aria-hidden="true" />
+                </button>
+              }
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td [attr.colspan]="10" class="empty">{{ 'timesheets.empty' | transloco }}</td>
+          </tr>
+        }
+      </tbody>
+      <tfoot>
+        <tr>
+          <th scope="row">{{ 'timesheets.dailyTotal' | transloco }}</th>
+          @for (total of store.dayTotals(); track $index; let d = $index) {
+            <td class="num" [class.over]="total > 24" [class.weekend]="dayLabels()[d]?.weekend">
+              @if (total > 24) {
+                <mat-icon svgIcon="error" aria-hidden="true" />
+              }
+              {{ hours(total) }}
+              @if (total > 24) {
+                <span class="visually-hidden">{{ 'timesheets.overDay' | transloco }}</span>
+              }
+            </td>
+          }
+          <td class="num total">{{ hours(store.weekTotal()) }}</td>
+          <td></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <div class="status-line" aria-live="polite">
+    @if (store.invalidCells().length) {
+      <p class="error">{{ 'timesheets.errors.quarters' | transloco }}</p>
+    } @else if (store.overDays().length) {
+      <p class="error">{{ 'timesheets.errors.dayOver24' | transloco }}</p>
+    } @else if (store.saveError(); as message) {
+      <p class="error" role="alert">{{ message }}</p>
+    } @else if (store.saveState() === 'saving' || store.saveState() === 'pending') {
+      <p class="kora-muted">{{ 'timesheets.saving' | transloco }}</p>
+    } @else if (store.saveState() === 'saved') {
+      <p class="kora-muted">{{ 'timesheets.saved' | transloco }}</p>
+    }
+  </div>
+
+  @if (week.editable) {
+    <div class="actions">
+      <button mat-stroked-button type="button" (click)="addTask()">
+        <mat-icon svgIcon="add" aria-hidden="true" />
+        {{ 'timesheets.addTask' | transloco }}
+      </button>
+      <button mat-button type="button" (click)="copyLastWeek()">
+        {{ 'timesheets.copyLastWeek' | transloco }}
+      </button>
+      <span class="spacer"></span>
+      <button
+        mat-flat-button
+        type="button"
+        [disabled]="!store.canSubmit() || !store.canSave() || store.submitting()"
+        (click)="submit()"
+      >
+        <mat-icon svgIcon="send" aria-hidden="true" />
+        {{ 'timesheets.submit' | transloco }}
+      </button>
+    </div>
+  } @else {
+    <p class="kora-muted">{{ 'timesheets.readOnly' | transloco }}</p>
+  }
+}
