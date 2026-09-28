@@ -58,6 +58,8 @@ test.describe('portfolios and projects', () => {
       'Issues',
       'Stakeholders',
       'Changes',
+      'Time',
+      'Earned value',
     ]);
 
     await page.goto('/projects?q=AKG-020');
@@ -95,6 +97,8 @@ test.describe('portfolios and projects', () => {
       'Issues',
       'Stakeholders',
       'Changes',
+      'Time',
+      'Earned value',
     ]);
 
     await page.goto(`/projects/${PROJECT.crm}/overview`);
