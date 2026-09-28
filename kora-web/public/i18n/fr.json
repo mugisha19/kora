@@ -14,7 +14,8 @@
     "portfolios": "Portefeuilles",
     "projects": "Projets",
     "timesheets": "Feuilles de temps",
-    "resources": "Ressources"
+    "resources": "Ressources",
+    "reports": "Rapports"
   },
   "theme": {
     "label": "Thème",
@@ -134,6 +135,17 @@
       "language": "Langue préférée",
       "save": "Enregistrer le profil",
       "saved": "Profil enregistré."
+    },
+    "notifications": {
+      "title": "Notifications",
+      "description": "Choisissez ce qui vous parvient dans l’application et par e-mail. Cela vaut dans toutes les organisations.",
+      "kind": "Quand",
+      "inApp": "Dans l’application",
+      "email": "Par e-mail",
+      "inAppFor": "{{ kind }} : dans l’application",
+      "emailFor": "{{ kind }} : par e-mail",
+      "save": "Enregistrer les réglages des notifications",
+      "saved": "Réglages des notifications enregistrés."
     }
   },
   "notFound": {
@@ -274,6 +286,14 @@
         "empty": "Il n’y a rien à soumettre cette semaine.",
         "not_submitted": "Seule une feuille de temps soumise peut être approuvée ou renvoyée.",
         "self_approval": "Personne n’approuve son propre temps."
+      },
+      "attachments": {
+        "not_uploaded": "Le fichier n’est pas arrivé au stockage. Réessayez.",
+        "content_mismatch": "Le fichier n’est pas ce que son nom indique : il a été refusé.",
+        "already_completed": "Ce fichier est déjà envoyé."
+      },
+      "reports": {
+        "too_many_pending": "Vous avez 5 rapports en attente. Réessayez quand l’un d’eux sera prêt."
       }
     },
     "fields": {
@@ -294,7 +314,8 @@
       "tooManyLines": "50 lignes au maximum.",
       "lineTooLong": "Chaque ligne peut contenir au plus 500 caractères.",
       "amount": "Saisissez un montant, par exemple 1 250 000 ou 99,90.",
-      "number": "Saisissez un nombre avec deux décimales au plus."
+      "number": "Saisissez un nombre avec deux décimales au plus.",
+      "type": "Ce type de fichier n’est pas accepté."
     }
   },
   "roles": {
@@ -396,7 +417,8 @@
       "invitations": "Invitations",
       "organization": "Organisation",
       "calendar": "Calendrier ouvré",
-      "changeControl": "Maîtrise des changements"
+      "changeControl": "Maîtrise des changements",
+      "audit": "Journal d’audit"
     },
     "members": {
       "search": "Rechercher par nom ou e-mail",
@@ -686,7 +708,8 @@
       "stakeholders": "Parties prenantes",
       "change-requests": "Changements",
       "time": "Temps",
-      "evm": "Valeur acquise"
+      "evm": "Valeur acquise",
+      "activity": "Activité"
     },
     "overview": {
       "details": "Détails"
@@ -940,7 +963,8 @@
       "tooManyLabels": "10 étiquettes au maximum.",
       "duration": "Saisissez un nombre entier de jours entre 0 et 1000."
     },
-    "scheduleLegend": "Planning"
+    "scheduleLegend": "Planning",
+    "notFound": "Cette tâche n’existe pas, ou vous ne pouvez pas la voir."
   },
   "board": {
     "sprint": "Sprint",
@@ -1881,5 +1905,321 @@
       "saved": "Méthodes de valeur acquise enregistrées.",
       "stale": "Quelqu’un d’autre a changé les méthodes pendant votre choix. Voici les siennes ; choisissez à nouveau."
     }
+  },
+  "live": {
+    "offline": "Les mises à jour en direct sont suspendues : reconnexion… Les listes se mettront à jour au retour."
+  },
+  "notifications": {
+    "title": "Notifications",
+    "button": "Notifications",
+    "buttonUnread": "Notifications : {{ count }} non lues",
+    "unreadCount": "Non lues : {{ count }}",
+    "unread": "Non lue",
+    "markRead": "Marquer comme lue : {{ text }}",
+    "markAllRead": "Tout marquer comme lu",
+    "older": "Voir les plus anciennes",
+    "settings": "Réglages des notifications",
+    "emptyTitle": "Vous êtes à jour",
+    "emptyMessage": "Les affectations, approbations et rapports qui vous concernent apparaissent ici.",
+    "today": "Aujourd’hui",
+    "yesterday": "Hier",
+    "someone": "Quelqu’un",
+    "unknown": "Quelque chose demande votre attention.",
+    "task_assigned": "{{ actor }} vous a attribué {{ key }} · {{ title }}",
+    "approval_requested": "La modification {{ key }} · {{ title }} de {{ requester }} attend votre décision",
+    "change_request_decided": {
+      "approved": "{{ actor }} a approuvé {{ key }} · {{ title }}",
+      "rejected": "{{ actor }} a rejeté {{ key }} · {{ title }}",
+      "rejectedWithComment": "{{ actor }} a rejeté {{ key }} · {{ title }}"
+    },
+    "timesheet_decided": {
+      "approved": "{{ actor }} a approuvé votre temps de la semaine {{ week }}",
+      "rejected": "{{ actor }} a renvoyé votre temps de la semaine {{ week }}",
+      "rejectedWithComment": "{{ actor }} a renvoyé votre temps de la semaine {{ week }} : « {{ comment }} »"
+    },
+    "risk_review_overdue": "La revue de {{ key }} · {{ title }} était prévue le {{ date }}",
+    "issue_escalated": "{{ key }} · {{ title }} a été remonté au PMO",
+    "report_ready": "Votre {{ type }} ({{ format }}) est prêt à télécharger",
+    "report_failed": "Votre {{ type }} ({{ format }}) n’a pas pu être produit"
+  },
+  "notificationType": {
+    "TASK_ASSIGNED": {
+      "name": "On m’attribue une tâche",
+      "hint": "Quelqu’un d’autre vous confie une tâche."
+    },
+    "APPROVAL_REQUESTED": {
+      "name": "Une modification attend ma décision",
+      "hint": "Une demande de modification arrive à votre étape d’approbation."
+    },
+    "CHANGE_REQUEST_DECIDED": {
+      "name": "Ma demande de modification est décidée",
+      "hint": "Elle a été approuvée ou rejetée."
+    },
+    "TIMESHEET_DECIDED": {
+      "name": "Ma feuille de temps est décidée",
+      "hint": "Un responsable a approuvé votre semaine ou l’a renvoyée."
+    },
+    "RISK_REVIEW_OVERDUE": {
+      "name": "Un de mes risques doit être revu",
+      "hint": "Vérifié chaque matin."
+    },
+    "ISSUE_ESCALATED": {
+      "name": "Un problème est remonté",
+      "hint": "Un problème critique a dépassé son échéance (pour le PMO)."
+    },
+    "REPORT_READY": {
+      "name": "Mon rapport est prêt",
+      "hint": "Un export demandé peut être téléchargé."
+    },
+    "REPORT_FAILED": {
+      "name": "Mon rapport a échoué",
+      "hint": "Un export demandé n’a pas pu être produit."
+    }
+  },
+  "activity": {
+    "title": "Activité",
+    "emptyTitle": "Rien ne s’est encore passé",
+    "emptyMessage": "Les changements des tâches, risques, problèmes et modifications du projet apparaissent ici en direct.",
+    "older": "Voir l’activité plus ancienne",
+    "item": "un élément",
+    "arrived": "Nouvelle activité : {{ text }}",
+    "verb": {
+      "created": "a créé",
+      "updated": "a modifié",
+      "deleted": "a supprimé"
+    }
+  },
+  "history": {
+    "title": "Historique des modifications",
+    "empty": "Aucune modification enregistrée pour l’instant.",
+    "system": "Kora",
+    "before": "Avant :",
+    "after": "Après :",
+    "removed": "retiré",
+    "verb": {
+      "created": "l’a créé",
+      "updated": "l’a modifié",
+      "deleted": "l’a supprimé"
+    }
+  },
+  "entityType": {
+    "project": "Projet",
+    "task": "Tâche",
+    "task-comment": "Commentaire de tâche",
+    "risk": "Risque",
+    "risk-assessment": "Évaluation de risque",
+    "issue": "Problème",
+    "change-request": "Demande de modification",
+    "approval-step": "Étape d’approbation",
+    "stakeholder": "Partie prenante",
+    "sprint": "Sprint",
+    "wbs-node": "Élément de l’OTP",
+    "charter": "Charte",
+    "timesheet": "Feuille de temps",
+    "attachment": "Fichier",
+    "report-job": "Rapport",
+    "allocation": "Heures prévues",
+    "evm-settings": "Méthodes de valeur acquise",
+    "dependency": "Dépendance",
+    "baseline": "Référence",
+    "board-column": "Colonne du tableau",
+    "project-member": "Membre de l’équipe",
+    "membership": "Membre",
+    "invitation": "Invitation",
+    "organization": "Organisation",
+    "portfolio": "Portefeuille",
+    "program": "Programme",
+    "working-calendar": "Calendrier de travail",
+    "change-control-settings": "Seuils de contrôle des modifications",
+    "cost-rate": "Taux horaire",
+    "capacity-period": "Capacité",
+    "leave": "Congé",
+    "user": "Profil",
+    "notification-preference": "Réglages des notifications",
+    "request": "Requête"
+  },
+  "audit": {
+    "intro": "Chaque modification dans l’organisation, qui l’a faite et d’où. Les entrées ne peuvent être ni modifiées ni supprimées.",
+    "verify": "Vérifier l’intégrité",
+    "chainValid": "Le journal est intact : {{ checked }} entrées vérifiées, aucune modifiée.",
+    "chainBroken": "Le journal a été modifié : l’entrée {{ id }} ne correspond pas. {{ checked }} entrées vérifiées. Prévenez votre contact sécurité.",
+    "person": "Personne",
+    "anyone": "Tout le monde",
+    "itemType": "Type d’élément",
+    "anyItem": "Tout élément",
+    "kind": "Nature",
+    "anyKind": "Toute nature",
+    "kinds": {
+      "created": "Création",
+      "updated": "Modification",
+      "deleted": "Suppression",
+      "denied": "Accès refusé"
+    },
+    "action": {
+      "created": "Création : {{ type }}",
+      "updated": "Modification : {{ type }}",
+      "deleted": "Suppression : {{ type }}"
+    },
+    "outcomes": {
+      "SUCCESS": "Effectué",
+      "DENIED": "Refusé"
+    },
+    "from": "Du",
+    "to": "Au",
+    "count": "Entrées affichées : {{ count }}",
+    "exportCsv": "Exporter les entrées affichées (CSV)",
+    "logLabel": "Journal d’audit",
+    "when": "Quand",
+    "who": "Qui",
+    "what": "Quoi",
+    "item": "Élément",
+    "itemId": "Identifiant de l’élément",
+    "ip": "Adresse",
+    "actionColumn": "Action",
+    "outcome": "Résultat",
+    "details": "Détails",
+    "detailsFor": "Détails : {{ what }}",
+    "changesOf": "Modifications : {{ what }}",
+    "changes": "Modifications",
+    "field": "Champ",
+    "noChanges": "Aucune modification de champ enregistrée.",
+    "reference": "Référence",
+    "browser": "Navigateur",
+    "more": "Voir les entrées plus anciennes",
+    "emptyTitle": "Aucune entrée",
+    "emptyMessage": "Essayez d’autres filtres.",
+    "someoneElse": "une personne partie",
+    "fields": {
+      "title": "Titre",
+      "name": "Nom",
+      "description": "Description",
+      "status": "Statut",
+      "priority": "Priorité",
+      "type": "Type",
+      "assigneeId": "Responsable",
+      "ownerId": "Propriétaire",
+      "managerId": "Chef de projet",
+      "sponsorId": "Sponsor",
+      "requestedById": "Demandé par",
+      "storyPoints": "Points",
+      "estimateHours": "Estimation (heures)",
+      "remainingHours": "Reste (heures)",
+      "startDate": "Date de début",
+      "dueDate": "Échéance",
+      "targetEndDate": "Date de fin visée",
+      "reviewDate": "Date de revue",
+      "probability": "Probabilité",
+      "impact": "Impact",
+      "residualProbability": "Probabilité résiduelle",
+      "residualImpact": "Impact résiduel",
+      "responseStrategy": "Stratégie de réponse",
+      "responsePlan": "Plan de réponse",
+      "category": "Catégorie",
+      "kind": "Nature",
+      "budget": "Budget",
+      "plannedCost": "Coût prévu",
+      "percentComplete": "Avancement",
+      "health": "Santé",
+      "role": "Rôle",
+      "sprintId": "Sprint",
+      "blockedReason": "Bloqué parce que",
+      "resolution": "Résolution",
+      "escalated": "Remonté",
+      "comment": "Commentaire",
+      "fileName": "Nom du fichier",
+      "hoursPerWeek": "Heures par semaine",
+      "hourlyRate": "Taux horaire",
+      "email": "E-mail",
+      "currency": "Devise",
+      "timeZone": "Fuseau horaire"
+    },
+    "before": "Avant",
+    "after": "Après"
+  },
+  "attachments": {
+    "title": "Fichiers",
+    "dropHint": "Déposez des fichiers ici, ou",
+    "choose": "Choisir des fichiers",
+    "rules": "PDF, images, texte, CSV, Word, Excel ou PowerPoint ; 25 Mo au plus chacun.",
+    "uploading": "Fichiers en cours d’envoi",
+    "progress": "Envoi de {{ name }} : {{ percent }} %",
+    "checking": "Vérification de {{ name }}…",
+    "uploaded": "{{ name }} envoyé.",
+    "cancel": "Annuler l’envoi de {{ name }}",
+    "cancelled": "Envoi annulé.",
+    "retry": "Réessayer",
+    "dismiss": "Retirer {{ name }} de la liste",
+    "empty": "Aucun fichier pour l’instant.",
+    "by": "ajouté par {{ name }} le {{ date }}",
+    "notScanned": "non analysé",
+    "infected": "Un virus a été trouvé : ce fichier ne peut pas être téléchargé.",
+    "download": "Télécharger {{ name }}",
+    "delete": "Supprimer {{ name }}",
+    "deleteTitle": "Supprimer {{ name }} ?",
+    "deleteMessage": "Plus personne ne pourra le télécharger. Un administrateur peut encore le récupérer pendant 30 jours.",
+    "deleted": "{{ name }} supprimé.",
+    "errors": {
+      "type": "Ce type de fichier n’est pas accepté.",
+      "size": "Ce fichier dépasse 25 Mo.",
+      "empty": "Ce fichier est vide.",
+      "network": "L’envoi s’est arrêté : vérifiez votre connexion et réessayez."
+    }
+  },
+  "reports": {
+    "title": "Rapports",
+    "subtitle": "PDF pour lire et partager, Excel pour analyser. Produits en arrière-plan et conservés 7 jours.",
+    "new": "Produire un rapport",
+    "type": "Rapport",
+    "project": "Projet",
+    "portfolio": "Portefeuille",
+    "allVisible": "Tout ce que je peux voir",
+    "format": "Format",
+    "formatChoice": {
+      "PDF": "PDF, pour lire",
+      "XLSX": "Excel, pour analyser"
+    },
+    "make": "Produire le rapport",
+    "pendingCount": "En attente : {{ count }} sur {{ max }}",
+    "mine": "Mes rapports",
+    "requested": "demandé {{ when }}",
+    "keptUntil": "conservé jusqu’au {{ date }}",
+    "download": "Télécharger",
+    "downloadFile": "Télécharger {{ name }}",
+    "failedGeneric": "Le rapport n’a pas pu être produit.",
+    "emptyTitle": "Aucun rapport pour l’instant",
+    "emptyMessage": "Utilisez Exporter sur une page, ou produisez-en un ci-dessus.",
+    "export": "Exporter",
+    "exportLabel": "Exporter le {{ name }}",
+    "queued": "Votre {{ name }} est en cours. Nous vous préviendrons quand il sera prêt.",
+    "view": "Mes rapports",
+    "readyToast": "Votre {{ name }} ({{ format }}) est prêt.",
+    "failedToast": "Votre {{ name }} n’a pas pu être produit. Voir Mes rapports."
+  },
+  "reportType": {
+    "PROJECT_STATUS": "rapport d’état du projet",
+    "PORTFOLIO_SUMMARY": "résumé du portefeuille",
+    "RISK_REGISTER": "registre des risques",
+    "EVM": "rapport de valeur acquise",
+    "TIMESHEETS": "résumé des feuilles de temps"
+  },
+  "reportTypeTitle": {
+    "PROJECT_STATUS": "Rapport d’état du projet",
+    "PORTFOLIO_SUMMARY": "Résumé du portefeuille",
+    "RISK_REGISTER": "Registre des risques",
+    "EVM": "Rapport de valeur acquise",
+    "TIMESHEETS": "Résumé des feuilles de temps"
+  },
+  "reportTypeHint": {
+    "PROJECT_STATUS": "Un projet : santé, avancement, jalons, risques et problèmes.",
+    "PORTFOLIO_SUMMARY": "Chaque projet d’un portefeuille, ou tout ce que vous voyez.",
+    "RISK_REGISTER": "Les risques ouverts par score, pour un portefeuille ou tout ce que vous voyez.",
+    "EVM": "Les indicateurs de valeur acquise et la courbe en S d’un projet.",
+    "TIMESHEETS": "Les heures approuvées d’un projet sur les quatre dernières semaines (responsables)."
+  },
+  "reportStatus": {
+    "QUEUED": "En attente",
+    "RUNNING": "En cours",
+    "READY": "Prêt",
+    "FAILED": "Échec"
   }
 }

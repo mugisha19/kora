@@ -14,7 +14,8 @@
     "portfolios": "Portfolios",
     "projects": "Projects",
     "timesheets": "Timesheets",
-    "resources": "Resources"
+    "resources": "Resources",
+    "reports": "Reports"
   },
   "theme": {
     "label": "Theme",
@@ -134,6 +135,17 @@
       "language": "Preferred language",
       "save": "Save profile",
       "saved": "Profile saved."
+    },
+    "notifications": {
+      "title": "Notifications",
+      "description": "Choose what reaches you in the app and by email. This applies in every organization.",
+      "kind": "When",
+      "inApp": "In the app",
+      "email": "By email",
+      "inAppFor": "{{ kind }}: in the app",
+      "emailFor": "{{ kind }}: by email",
+      "save": "Save notification settings",
+      "saved": "Notification settings saved."
     }
   },
   "notFound": {
@@ -274,6 +286,14 @@
         "empty": "There is nothing to submit this week.",
         "not_submitted": "Only a submitted timesheet can be approved or sent back.",
         "self_approval": "Nobody approves their own time."
+      },
+      "attachments": {
+        "not_uploaded": "The file didn’t reach storage. Try again.",
+        "content_mismatch": "The file isn’t what its name says, so it was refused.",
+        "already_completed": "This file is already uploaded."
+      },
+      "reports": {
+        "too_many_pending": "You have 5 reports waiting. Try again when one is ready."
       }
     },
     "fields": {
@@ -294,7 +314,8 @@
       "tooManyLines": "At most 50 lines.",
       "lineTooLong": "Each line can have at most 500 characters.",
       "amount": "Enter an amount, for example 1 250 000 or 99.90.",
-      "number": "Enter a number with at most two decimals."
+      "number": "Enter a number with at most two decimals.",
+      "type": "This type of file isn’t accepted."
     }
   },
   "roles": {
@@ -396,7 +417,8 @@
       "invitations": "Invitations",
       "organization": "Organization",
       "calendar": "Working calendar",
-      "changeControl": "Change control"
+      "changeControl": "Change control",
+      "audit": "Audit log"
     },
     "members": {
       "search": "Search by name or email",
@@ -686,7 +708,8 @@
       "stakeholders": "Stakeholders",
       "change-requests": "Changes",
       "time": "Time",
-      "evm": "Earned value"
+      "evm": "Earned value",
+      "activity": "Activity"
     },
     "overview": {
       "details": "Details"
@@ -940,7 +963,8 @@
       "tooManyLabels": "At most 10 labels.",
       "duration": "Enter a whole number of days from 0 to 1000."
     },
-    "scheduleLegend": "Schedule"
+    "scheduleLegend": "Schedule",
+    "notFound": "That task doesn’t exist, or you can’t see it."
   },
   "board": {
     "sprint": "Sprint",
@@ -1881,5 +1905,321 @@
       "saved": "Earned value methods saved.",
       "stale": "Someone else changed the methods while you were choosing. Here are theirs; choose again."
     }
+  },
+  "live": {
+    "offline": "Live updates are paused: reconnecting… Lists catch up when it’s back."
+  },
+  "notifications": {
+    "title": "Notifications",
+    "button": "Notifications",
+    "buttonUnread": "Notifications: {{ count }} unread",
+    "unreadCount": "Unread: {{ count }}",
+    "unread": "Unread",
+    "markRead": "Mark as read: {{ text }}",
+    "markAllRead": "Mark all as read",
+    "older": "Show older",
+    "settings": "Notification settings",
+    "emptyTitle": "You’re all caught up",
+    "emptyMessage": "Assignments, approvals and reports that need you show up here.",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "someone": "Someone",
+    "unknown": "Something needs your attention.",
+    "task_assigned": "{{ actor }} assigned you {{ key }} · {{ title }}",
+    "approval_requested": "{{ requester }}’s change {{ key }} · {{ title }} needs your decision",
+    "change_request_decided": {
+      "approved": "{{ actor }} approved {{ key }} · {{ title }}",
+      "rejected": "{{ actor }} rejected {{ key }} · {{ title }}",
+      "rejectedWithComment": "{{ actor }} rejected {{ key }} · {{ title }}"
+    },
+    "timesheet_decided": {
+      "approved": "{{ actor }} approved your time for week {{ week }}",
+      "rejected": "{{ actor }} sent back your time for week {{ week }}",
+      "rejectedWithComment": "{{ actor }} sent back your time for week {{ week }}: “{{ comment }}”"
+    },
+    "risk_review_overdue": "The review of {{ key }} · {{ title }} was due {{ date }}",
+    "issue_escalated": "{{ key }} · {{ title }} was escalated to the PMO",
+    "report_ready": "Your {{ type }} ({{ format }}) is ready to download",
+    "report_failed": "Your {{ type }} ({{ format }}) couldn’t be made"
+  },
+  "notificationType": {
+    "TASK_ASSIGNED": {
+      "name": "A task is assigned to me",
+      "hint": "Someone else gives you a task."
+    },
+    "APPROVAL_REQUESTED": {
+      "name": "A change waits for my decision",
+      "hint": "A change request reaches your approval step."
+    },
+    "CHANGE_REQUEST_DECIDED": {
+      "name": "My change request is decided",
+      "hint": "It was approved or rejected."
+    },
+    "TIMESHEET_DECIDED": {
+      "name": "My timesheet is decided",
+      "hint": "A manager approved your week or sent it back."
+    },
+    "RISK_REVIEW_OVERDUE": {
+      "name": "A risk I own is overdue for review",
+      "hint": "Checked every morning."
+    },
+    "ISSUE_ESCALATED": {
+      "name": "An issue is escalated",
+      "hint": "A critical issue is past its due date (for the PMO)."
+    },
+    "REPORT_READY": {
+      "name": "My report is ready",
+      "hint": "An export you asked for can be downloaded."
+    },
+    "REPORT_FAILED": {
+      "name": "My report failed",
+      "hint": "An export you asked for couldn’t be made."
+    }
+  },
+  "activity": {
+    "title": "Activity",
+    "emptyTitle": "Nothing has happened yet",
+    "emptyMessage": "Changes to this project’s tasks, risks, issues and changes appear here as they happen.",
+    "older": "Show older activity",
+    "item": "an item",
+    "arrived": "New activity: {{ text }}",
+    "verb": {
+      "created": "created",
+      "updated": "updated",
+      "deleted": "deleted"
+    }
+  },
+  "history": {
+    "title": "Change history",
+    "empty": "No changes recorded yet.",
+    "system": "Kora",
+    "before": "Before:",
+    "after": "After:",
+    "removed": "removed",
+    "verb": {
+      "created": "created it",
+      "updated": "changed it",
+      "deleted": "deleted it"
+    }
+  },
+  "entityType": {
+    "project": "Project",
+    "task": "Task",
+    "task-comment": "Task comment",
+    "risk": "Risk",
+    "risk-assessment": "Risk assessment",
+    "issue": "Issue",
+    "change-request": "Change request",
+    "approval-step": "Approval step",
+    "stakeholder": "Stakeholder",
+    "sprint": "Sprint",
+    "wbs-node": "WBS item",
+    "charter": "Charter",
+    "timesheet": "Timesheet",
+    "attachment": "File",
+    "report-job": "Report",
+    "allocation": "Planned hours",
+    "evm-settings": "Earned value methods",
+    "dependency": "Dependency",
+    "baseline": "Baseline",
+    "board-column": "Board column",
+    "project-member": "Team member",
+    "membership": "Member",
+    "invitation": "Invitation",
+    "organization": "Organization",
+    "portfolio": "Portfolio",
+    "program": "Program",
+    "working-calendar": "Working calendar",
+    "change-control-settings": "Change-control thresholds",
+    "cost-rate": "Cost rate",
+    "capacity-period": "Capacity",
+    "leave": "Leave",
+    "user": "Profile",
+    "notification-preference": "Notification settings",
+    "request": "Request"
+  },
+  "audit": {
+    "intro": "Every change in the organization, who made it and from where. Entries can’t be changed or deleted.",
+    "verify": "Check for tampering",
+    "chainValid": "The record is intact: {{ checked }} entries checked, none changed.",
+    "chainBroken": "The record was changed: entry {{ id }} doesn’t match. {{ checked }} entries checked. Tell your security contact.",
+    "person": "Person",
+    "anyone": "Anyone",
+    "itemType": "Item type",
+    "anyItem": "Any item",
+    "kind": "Kind",
+    "anyKind": "Any kind",
+    "kinds": {
+      "created": "Created",
+      "updated": "Changed",
+      "deleted": "Deleted",
+      "denied": "Access denied"
+    },
+    "action": {
+      "created": "{{ type }} created",
+      "updated": "{{ type }} changed",
+      "deleted": "{{ type }} deleted"
+    },
+    "outcomes": {
+      "SUCCESS": "Done",
+      "DENIED": "Denied"
+    },
+    "from": "From",
+    "to": "To",
+    "count": "Entries shown: {{ count }}",
+    "exportCsv": "Export the entries shown (CSV)",
+    "logLabel": "Audit log",
+    "when": "When",
+    "who": "Who",
+    "what": "What",
+    "item": "Item",
+    "itemId": "Item id",
+    "ip": "Address",
+    "actionColumn": "Action",
+    "outcome": "Outcome",
+    "details": "Details",
+    "detailsFor": "Details: {{ what }}",
+    "changesOf": "Changes: {{ what }}",
+    "changes": "Changes",
+    "field": "Field",
+    "noChanges": "No field changes recorded.",
+    "reference": "Reference",
+    "browser": "Browser",
+    "more": "Show older entries",
+    "emptyTitle": "No entries",
+    "emptyMessage": "Try other filters.",
+    "someoneElse": "someone no longer here",
+    "fields": {
+      "title": "Title",
+      "name": "Name",
+      "description": "Description",
+      "status": "Status",
+      "priority": "Priority",
+      "type": "Type",
+      "assigneeId": "Assignee",
+      "ownerId": "Owner",
+      "managerId": "Manager",
+      "sponsorId": "Sponsor",
+      "requestedById": "Requested by",
+      "storyPoints": "Story points",
+      "estimateHours": "Estimate (hours)",
+      "remainingHours": "Remaining (hours)",
+      "startDate": "Start date",
+      "dueDate": "Due date",
+      "targetEndDate": "Target end date",
+      "reviewDate": "Review date",
+      "probability": "Probability",
+      "impact": "Impact",
+      "residualProbability": "Residual probability",
+      "residualImpact": "Residual impact",
+      "responseStrategy": "Response strategy",
+      "responsePlan": "Response plan",
+      "category": "Category",
+      "kind": "Kind",
+      "budget": "Budget",
+      "plannedCost": "Planned cost",
+      "percentComplete": "Percent complete",
+      "health": "Health",
+      "role": "Role",
+      "sprintId": "Sprint",
+      "blockedReason": "Blocked because",
+      "resolution": "Resolution",
+      "escalated": "Escalated",
+      "comment": "Comment",
+      "fileName": "File name",
+      "hoursPerWeek": "Hours a week",
+      "hourlyRate": "Hourly rate",
+      "email": "Email",
+      "currency": "Currency",
+      "timeZone": "Time zone"
+    },
+    "before": "Before",
+    "after": "After"
+  },
+  "attachments": {
+    "title": "Files",
+    "dropHint": "Drop files here, or",
+    "choose": "Choose files",
+    "rules": "PDF, images, text, CSV, Word, Excel or PowerPoint; up to 25 MB each.",
+    "uploading": "Files being uploaded",
+    "progress": "Uploading {{ name }}: {{ percent }}%",
+    "checking": "Checking {{ name }}…",
+    "uploaded": "{{ name }} uploaded.",
+    "cancel": "Cancel the upload of {{ name }}",
+    "cancelled": "Upload cancelled.",
+    "retry": "Try again",
+    "dismiss": "Remove {{ name }} from the list",
+    "empty": "No files yet.",
+    "by": "added by {{ name }} on {{ date }}",
+    "notScanned": "not scanned",
+    "infected": "A virus was found: this file can’t be downloaded.",
+    "download": "Download {{ name }}",
+    "delete": "Delete {{ name }}",
+    "deleteTitle": "Delete {{ name }}?",
+    "deleteMessage": "Nobody will be able to download it. An administrator can still recover it for 30 days.",
+    "deleted": "{{ name }} deleted.",
+    "errors": {
+      "type": "This type of file isn’t accepted.",
+      "size": "This file is larger than 25 MB.",
+      "empty": "This file is empty.",
+      "network": "The upload stopped: check your connection and try again."
+    }
+  },
+  "reports": {
+    "title": "Reports",
+    "subtitle": "PDF to read and share, Excel to analyse. Made in the background and kept for 7 days.",
+    "new": "Make a report",
+    "type": "Report",
+    "project": "Project",
+    "portfolio": "Portfolio",
+    "allVisible": "Everything I can see",
+    "format": "Format",
+    "formatChoice": {
+      "PDF": "PDF, for reading",
+      "XLSX": "Excel, for analysis"
+    },
+    "make": "Make the report",
+    "pendingCount": "Waiting: {{ count }} of {{ max }}",
+    "mine": "My reports",
+    "requested": "asked for {{ when }}",
+    "keptUntil": "kept until {{ date }}",
+    "download": "Download",
+    "downloadFile": "Download {{ name }}",
+    "failedGeneric": "The report couldn’t be made.",
+    "emptyTitle": "No reports yet",
+    "emptyMessage": "Use Export on a page, or make one above.",
+    "export": "Export",
+    "exportLabel": "Export the {{ name }}",
+    "queued": "Making your {{ name }}. We’ll tell you when it’s ready.",
+    "view": "My reports",
+    "readyToast": "Your {{ name }} ({{ format }}) is ready.",
+    "failedToast": "Your {{ name }} couldn’t be made. See My reports."
+  },
+  "reportType": {
+    "PROJECT_STATUS": "project status report",
+    "PORTFOLIO_SUMMARY": "portfolio summary",
+    "RISK_REGISTER": "risk register",
+    "EVM": "earned value report",
+    "TIMESHEETS": "timesheet summary"
+  },
+  "reportTypeTitle": {
+    "PROJECT_STATUS": "Project status report",
+    "PORTFOLIO_SUMMARY": "Portfolio summary",
+    "RISK_REGISTER": "Risk register",
+    "EVM": "Earned value report",
+    "TIMESHEETS": "Timesheet summary"
+  },
+  "reportTypeHint": {
+    "PROJECT_STATUS": "One project: health, progress, milestones, risks and issues.",
+    "PORTFOLIO_SUMMARY": "Every project in a portfolio, or all you can see.",
+    "RISK_REGISTER": "Open risks by score, for a portfolio or all you can see.",
+    "EVM": "One project’s earned value figures and S-curve.",
+    "TIMESHEETS": "One project’s approved hours for the last four weeks (managers)."
+  },
+  "reportStatus": {
+    "QUEUED": "Waiting",
+    "RUNNING": "Being made",
+    "READY": "Ready",
+    "FAILED": "Failed"
   }
 }

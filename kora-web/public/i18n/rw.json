@@ -14,7 +14,8 @@
     "portfolios": "Portefeuye",
     "projects": "Imishinga",
     "timesheets": "Amasaha y’akazi",
-    "resources": "Abakozi n’ubushobozi"
+    "resources": "Abakozi n’ubushobozi",
+    "reports": "Raporo"
   },
   "theme": {
     "label": "Isura",
@@ -134,6 +135,17 @@
       "language": "Ururimi ukunda",
       "save": "Bika umwirondoro",
       "saved": "Umwirondoro wabitswe."
+    },
+    "notifications": {
+      "title": "Imenyesha",
+      "description": "Hitamo ibikugeraho muri porogaramu no kuri imeri. Bikurikizwa mu bigo byose urimo.",
+      "kind": "Igihe",
+      "inApp": "Muri porogaramu",
+      "email": "Kuri imeri",
+      "inAppFor": "{{ kind }}: muri porogaramu",
+      "emailFor": "{{ kind }}: kuri imeri",
+      "save": "Bika igenamiterere ry’imenyesha",
+      "saved": "Igenamiterere ry’imenyesha ryabitswe."
     }
   },
   "notFound": {
@@ -274,6 +286,14 @@
         "empty": "Nta cyo kohereza muri iki cyumweru.",
         "not_submitted": "Amasaha yoherejwe ni yo yonyine ashobora kwemezwa cyangwa kugarurwa.",
         "self_approval": "Nta muntu wemeza amasaha ye bwite."
+      },
+      "attachments": {
+        "not_uploaded": "Dosiye ntiyageze aho ibikwa. Ongera ugerageze.",
+        "content_mismatch": "Dosiye si iyo izina ryayo rivuga, yanzwe.",
+        "already_completed": "Iyi dosiye yamaze koherezwa."
+      },
+      "reports": {
+        "too_many_pending": "Ufite raporo 5 zitegereje. Ongera ugerageze imwe niyitegura."
       }
     },
     "fields": {
@@ -294,7 +314,8 @@
       "tooManyLines": "Imirongo 50 gusa ntarengwa.",
       "lineTooLong": "Buri murongo ntugomba kurenza inyuguti 500.",
       "amount": "Andika amafaranga, urugero 1 250 000 cyangwa 99.90.",
-      "number": "Andika umubare ufite ibice bibiri nyuma y’akadomo ntarengwa."
+      "number": "Andika umubare ufite ibice bibiri nyuma y’akadomo ntarengwa.",
+      "type": "Ubu bwoko bwa dosiye ntibwemerwa."
     }
   },
   "roles": {
@@ -396,7 +417,8 @@
       "invitations": "Ubutumire",
       "organization": "Umuryango",
       "calendar": "Ingengabihe y’akazi",
-      "changeControl": "Igenzura ry’impinduka"
+      "changeControl": "Igenzura ry’impinduka",
+      "audit": "Igitabo cy’igenzura"
     },
     "members": {
       "search": "Shakisha ukoresheje izina cyangwa imeyili",
@@ -686,7 +708,8 @@
       "stakeholders": "Abafatanyabikorwa",
       "change-requests": "Impinduka",
       "time": "Igihe",
-      "evm": "Agaciro kagezweho"
+      "evm": "Agaciro kagezweho",
+      "activity": "Ibyakozwe"
     },
     "overview": {
       "details": "Ibisobanuro birambuye"
@@ -940,7 +963,8 @@
       "tooManyLabels": "Ibirango 10 ntarengwa.",
       "duration": "Andika umubare w’iminsi uri hagati ya 0 na 1000."
     },
-    "scheduleLegend": "Igenamigambi"
+    "scheduleLegend": "Igenamigambi",
+    "notFound": "Icyo gikorwa ntikibaho, cyangwa ntushobora kukibona."
   },
   "board": {
     "sprint": "Icyiciro",
@@ -1881,5 +1905,321 @@
       "saved": "Uburyo bw’agaciro kagezweho bwabitswe.",
       "stale": "Undi muntu yahinduye uburyo mu gihe wahitagamo. Dore ubwe; ongera uhitemo."
     }
+  },
+  "live": {
+    "offline": "Amakuru mashya yahagaze: turimo kongera guhuza… Urutonde ruzivugurura nibigaruka."
+  },
+  "notifications": {
+    "title": "Imenyesha",
+    "button": "Imenyesha",
+    "buttonUnread": "Imenyesha: {{ count }} bitarasomwa",
+    "unreadCount": "Bitarasomwa: {{ count }}",
+    "unread": "Ntirisomwe",
+    "markRead": "Garagaza ko ryasomwe: {{ text }}",
+    "markAllRead": "Garagaza ko byose byasomwe",
+    "older": "Erekana aya kera",
+    "settings": "Igenamiterere ry’imenyesha",
+    "emptyTitle": "Nta gishya gihari",
+    "emptyMessage": "Imirimo uhawe, ibyo ugomba kwemeza na raporo bizagaragara hano.",
+    "today": "Uyu munsi",
+    "yesterday": "Ejo hashize",
+    "someone": "Umuntu",
+    "unknown": "Hari ikintu gikeneye ko ukireba.",
+    "task_assigned": "{{ actor }} yaguhaye {{ key }} · {{ title }}",
+    "approval_requested": "Impinduka {{ key }} · {{ title }} ya {{ requester }} itegereje icyemezo cyawe",
+    "change_request_decided": {
+      "approved": "{{ actor }} yemeje {{ key }} · {{ title }}",
+      "rejected": "{{ actor }} yanze {{ key }} · {{ title }}",
+      "rejectedWithComment": "{{ actor }} yanze {{ key }} · {{ title }}"
+    },
+    "timesheet_decided": {
+      "approved": "{{ actor }} yemeje amasaha yawe y’icyumweru {{ week }}",
+      "rejected": "{{ actor }} yagaruye amasaha yawe y’icyumweru {{ week }}",
+      "rejectedWithComment": "{{ actor }} yagaruye amasaha yawe y’icyumweru {{ week }}: “{{ comment }}”"
+    },
+    "risk_review_overdue": "Isuzuma rya {{ key }} · {{ title }} ryagombaga kuba ku wa {{ date }}",
+    "issue_escalated": "{{ key }} · {{ title }} cyashyikirijwe PMO",
+    "report_ready": "{{ type }} yawe ({{ format }}) yiteguye gukurwamo",
+    "report_failed": "{{ type }} yawe ({{ format }}) ntiyashoboye gukorwa"
+  },
+  "notificationType": {
+    "TASK_ASSIGNED": {
+      "name": "Mpawe igikorwa",
+      "hint": "Undi muntu aguhaye igikorwa."
+    },
+    "APPROVAL_REQUESTED": {
+      "name": "Impinduka itegereje icyemezo cyanjye",
+      "hint": "Gusaba impinduka kugeze ku ntambwe yawe yo kwemeza."
+    },
+    "CHANGE_REQUEST_DECIDED": {
+      "name": "Ubusabe bwanjye bw’impinduka bwafashweho icyemezo",
+      "hint": "Bwemejwe cyangwa bwanzwe."
+    },
+    "TIMESHEET_DECIDED": {
+      "name": "Amasaha yanjye yafashweho icyemezo",
+      "hint": "Umuyobozi yemeje icyumweru cyawe cyangwa yakigaruye."
+    },
+    "RISK_REVIEW_OVERDUE": {
+      "name": "Ingaruka nshinzwe igomba gusuzumwa",
+      "hint": "Bigenzurwa buri gitondo."
+    },
+    "ISSUE_ESCALATED": {
+      "name": "Ikibazo cyashyikirijwe hejuru",
+      "hint": "Ikibazo gikomeye cyarengeje igihe (kuri PMO)."
+    },
+    "REPORT_READY": {
+      "name": "Raporo yanjye yiteguye",
+      "hint": "Raporo wasabye ishobora gukurwamo."
+    },
+    "REPORT_FAILED": {
+      "name": "Raporo yanjye yanze",
+      "hint": "Raporo wasabye ntiyashoboye gukorwa."
+    }
+  },
+  "activity": {
+    "title": "Ibyakozwe",
+    "emptyTitle": "Nta cyari cyakorwa",
+    "emptyMessage": "Impinduka ku bikorwa, ingaruka, ibibazo n’impinduka z’uyu mushinga zigaragara hano zikiba.",
+    "older": "Erekana ibyakozwe kera",
+    "item": "ikintu",
+    "arrived": "Igikorwa gishya: {{ text }}",
+    "verb": {
+      "created": "yakoze",
+      "updated": "yahinduye",
+      "deleted": "yasibye"
+    }
+  },
+  "history": {
+    "title": "Amateka y’impinduka",
+    "empty": "Nta mpinduka irandikwa.",
+    "system": "Kora",
+    "before": "Mbere:",
+    "after": "Nyuma:",
+    "removed": "byakuweho",
+    "verb": {
+      "created": "yarakoze",
+      "updated": "yarahinduye",
+      "deleted": "yarasibye"
+    }
+  },
+  "entityType": {
+    "project": "Umushinga",
+    "task": "Igikorwa",
+    "task-comment": "Igitekerezo ku gikorwa",
+    "risk": "Ingaruka",
+    "risk-assessment": "Isuzuma ry’ingaruka",
+    "issue": "Ikibazo",
+    "change-request": "Gusaba impinduka",
+    "approval-step": "Intambwe yo kwemeza",
+    "stakeholder": "Ufite inyungu",
+    "sprint": "Sprint",
+    "wbs-node": "Igice cya WBS",
+    "charter": "Amasezerano y’umushinga",
+    "timesheet": "Amasaha y’akazi",
+    "attachment": "Dosiye",
+    "report-job": "Raporo",
+    "allocation": "Amasaha ateganyijwe",
+    "evm-settings": "Uburyo bw’agaciro kinjijwe",
+    "dependency": "Isano",
+    "baseline": "Igipimo fatizo",
+    "board-column": "Inkingi y’ikibaho",
+    "project-member": "Umwe mu itsinda",
+    "membership": "Umunyamuryango",
+    "invitation": "Ubutumire",
+    "organization": "Ikigo",
+    "portfolio": "Portefeuye",
+    "program": "Porogaramu",
+    "working-calendar": "Kalendari y’akazi",
+    "change-control-settings": "Imbibi z’igenzura ry’impinduka",
+    "cost-rate": "Igiciro cy’isaha",
+    "capacity-period": "Ubushobozi",
+    "leave": "Ikiruhuko",
+    "user": "Umwirondoro",
+    "notification-preference": "Igenamiterere ry’imenyesha",
+    "request": "Ubusabe"
+  },
+  "audit": {
+    "intro": "Buri mpinduka mu kigo, uwayikoze n’aho yayikoreye. Ibyanditswe ntibishobora guhindurwa cyangwa gusibwa.",
+    "verify": "Genzura ko nta cyahinduwe",
+    "chainValid": "Igitabo ni kizima: ibyanditswe {{ checked }} byagenzuwe, nta na kimwe cyahinduwe.",
+    "chainBroken": "Igitabo cyahinduwe: icyanditswe {{ id }} ntigihura. Ibyanditswe {{ checked }} byagenzuwe. Bimenyeshe ushinzwe umutekano.",
+    "person": "Umuntu",
+    "anyone": "Uwo ari we wese",
+    "itemType": "Ubwoko bw’ikintu",
+    "anyItem": "Ikintu cyose",
+    "kind": "Ubwoko",
+    "anyKind": "Ubwoko bwose",
+    "kinds": {
+      "created": "Byakozwe",
+      "updated": "Byahinduwe",
+      "deleted": "Byasibwe",
+      "denied": "Uburenganzira bwanzwe"
+    },
+    "action": {
+      "created": "Byakozwe: {{ type }}",
+      "updated": "Byahinduwe: {{ type }}",
+      "deleted": "Byasibwe: {{ type }}"
+    },
+    "outcomes": {
+      "SUCCESS": "Byakozwe",
+      "DENIED": "Byanzwe"
+    },
+    "from": "Kuva",
+    "to": "Kugeza",
+    "count": "Ibyanditswe bigaragara: {{ count }}",
+    "exportCsv": "Kuramo ibyanditswe bigaragara (CSV)",
+    "logLabel": "Igitabo cy’igenzura",
+    "when": "Igihe",
+    "who": "Nde",
+    "what": "Iki",
+    "item": "Ikintu",
+    "itemId": "Nomero y’ikintu",
+    "ip": "Aderesi",
+    "actionColumn": "Igikorwa",
+    "outcome": "Igisubizo",
+    "details": "Ibisobanuro",
+    "detailsFor": "Ibisobanuro: {{ what }}",
+    "changesOf": "Impinduka: {{ what }}",
+    "changes": "Impinduka",
+    "field": "Umwanya",
+    "noChanges": "Nta mpinduka y’umwanya yanditswe.",
+    "reference": "Indango",
+    "browser": "Mushakisha",
+    "more": "Erekana ibyanditswe kera",
+    "emptyTitle": "Nta byanditswe",
+    "emptyMessage": "Gerageza ubundi buryo bwo gushungura.",
+    "someoneElse": "umuntu utakiri hano",
+    "fields": {
+      "title": "Umutwe",
+      "name": "Izina",
+      "description": "Ibisobanuro",
+      "status": "Imiterere",
+      "priority": "Icyihutirwa",
+      "type": "Ubwoko",
+      "assigneeId": "Ushinzwe",
+      "ownerId": "Nyirabyo",
+      "managerId": "Umuyobozi",
+      "sponsorId": "Umuterankunga",
+      "requestedById": "Byasabwe na",
+      "storyPoints": "Amanota",
+      "estimateHours": "Igereranya (amasaha)",
+      "remainingHours": "Asigaye (amasaha)",
+      "startDate": "Itariki yo gutangira",
+      "dueDate": "Itariki ntarengwa",
+      "targetEndDate": "Itariki yo kurangiza iteganyijwe",
+      "reviewDate": "Itariki y’isuzuma",
+      "probability": "Amahirwe yo kubaho",
+      "impact": "Ingaruka zabyo",
+      "residualProbability": "Amahirwe asigaye",
+      "residualImpact": "Ingaruka zisigaye",
+      "responseStrategy": "Uburyo bwo guhangana",
+      "responsePlan": "Gahunda yo guhangana",
+      "category": "Icyiciro",
+      "kind": "Ubwoko",
+      "budget": "Ingengo y’imari",
+      "plannedCost": "Igiciro giteganyijwe",
+      "percentComplete": "Aho bigeze",
+      "health": "Ubuzima",
+      "role": "Uruhare",
+      "sprintId": "Sprint",
+      "blockedReason": "Byahagaritswe kubera",
+      "resolution": "Umwanzuro",
+      "escalated": "Byashyikirijwe hejuru",
+      "comment": "Igitekerezo",
+      "fileName": "Izina rya dosiye",
+      "hoursPerWeek": "Amasaha mu cyumweru",
+      "hourlyRate": "Igiciro cy’isaha",
+      "email": "Imeri",
+      "currency": "Ifaranga",
+      "timeZone": "Isaha y’akarere"
+    },
+    "before": "Mbere",
+    "after": "Nyuma"
+  },
+  "attachments": {
+    "title": "Dosiye",
+    "dropHint": "Shyira dosiye hano, cyangwa",
+    "choose": "Hitamo dosiye",
+    "rules": "PDF, amafoto, inyandiko, CSV, Word, Excel cyangwa PowerPoint; buri imwe itarenze MB 25.",
+    "uploading": "Dosiye zirimo koherezwa",
+    "progress": "Kohereza {{ name }}: {{ percent }}%",
+    "checking": "Kugenzura {{ name }}…",
+    "uploaded": "{{ name }} yoherejwe.",
+    "cancel": "Hagarika kohereza {{ name }}",
+    "cancelled": "Kohereza byahagaritswe.",
+    "retry": "Ongera ugerageze",
+    "dismiss": "Kura {{ name }} ku rutonde",
+    "empty": "Nta dosiye irahari.",
+    "by": "yongewemo na {{ name }} ku wa {{ date }}",
+    "notScanned": "ntiyasuzumwe",
+    "infected": "Habonetse virusi: iyi dosiye ntishobora gukurwamo.",
+    "download": "Kuramo {{ name }}",
+    "delete": "Siba {{ name }}",
+    "deleteTitle": "Gusiba {{ name }}?",
+    "deleteMessage": "Nta muntu uzongera kuyikuramo. Umuyobozi aracyashobora kuyigarura mu minsi 30.",
+    "deleted": "{{ name }} yasibwe.",
+    "errors": {
+      "type": "Ubu bwoko bwa dosiye ntibwemerwa.",
+      "size": "Iyi dosiye irenze MB 25.",
+      "empty": "Iyi dosiye irimo ubusa.",
+      "network": "Kohereza byahagaze: reba umuyoboro wawe wongere ugerageze."
+    }
+  },
+  "reports": {
+    "title": "Raporo",
+    "subtitle": "PDF yo gusoma no gusangiza, Excel yo gusesengura. Zikorwa inyuma kandi zibikwa iminsi 7.",
+    "new": "Kora raporo",
+    "type": "Raporo",
+    "project": "Umushinga",
+    "portfolio": "Portefeuye",
+    "allVisible": "Ibyo nshobora kubona byose",
+    "format": "Imiterere",
+    "formatChoice": {
+      "PDF": "PDF, yo gusoma",
+      "XLSX": "Excel, yo gusesengura"
+    },
+    "make": "Kora raporo",
+    "pendingCount": "Zitegereje: {{ count }} kuri {{ max }}",
+    "mine": "Raporo zanjye",
+    "requested": "yasabwe {{ when }}",
+    "keptUntil": "izabikwa kugeza ku wa {{ date }}",
+    "download": "Kuramo",
+    "downloadFile": "Kuramo {{ name }}",
+    "failedGeneric": "Raporo ntiyashoboye gukorwa.",
+    "emptyTitle": "Nta raporo irahari",
+    "emptyMessage": "Koresha Kuramo raporo ku rupapuro, cyangwa uyikore hejuru.",
+    "export": "Kuramo raporo",
+    "exportLabel": "Kuramo {{ name }}",
+    "queued": "{{ name }} yawe irimo gukorwa. Tuzakumenyesha niyitegura.",
+    "view": "Raporo zanjye",
+    "readyToast": "{{ name }} yawe ({{ format }}) yiteguye.",
+    "failedToast": "{{ name }} yawe ntiyashoboye gukorwa. Reba Raporo zanjye."
+  },
+  "reportType": {
+    "PROJECT_STATUS": "raporo y’uko umushinga uhagaze",
+    "PORTFOLIO_SUMMARY": "incamake ya portefeuye",
+    "RISK_REGISTER": "igitabo cy’ingaruka",
+    "EVM": "raporo y’agaciro kinjijwe",
+    "TIMESHEETS": "incamake y’amasaha y’akazi"
+  },
+  "reportTypeTitle": {
+    "PROJECT_STATUS": "Raporo y’uko umushinga uhagaze",
+    "PORTFOLIO_SUMMARY": "Incamake ya portefeuye",
+    "RISK_REGISTER": "Igitabo cy’ingaruka",
+    "EVM": "Raporo y’agaciro kinjijwe",
+    "TIMESHEETS": "Incamake y’amasaha y’akazi"
+  },
+  "reportTypeHint": {
+    "PROJECT_STATUS": "Umushinga umwe: ubuzima, aho ugeze, intambwe, ingaruka n’ibibazo.",
+    "PORTFOLIO_SUMMARY": "Buri mushinga wo muri portefeuye, cyangwa iyo ubona yose.",
+    "RISK_REGISTER": "Ingaruka zifunguye ukurikije amanota, kuri portefeuye cyangwa ibyo ubona byose.",
+    "EVM": "Imibare y’agaciro kinjijwe n’umurongo S by’umushinga umwe.",
+    "TIMESHEETS": "Amasaha yemejwe y’umushinga mu byumweru bine bishize (abayobozi)."
+  },
+  "reportStatus": {
+    "QUEUED": "Itegereje",
+    "RUNNING": "Irimo gukorwa",
+    "READY": "Yiteguye",
+    "FAILED": "Yanze"
   }
 }
