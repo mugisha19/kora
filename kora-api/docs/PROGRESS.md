@@ -16,6 +16,9 @@ Phase 10 added:
 
 263 unit and 854 integration tests, 94.4% line coverage.
 
+`api-v1.0.1`, a patch asked for by the web app: attachments and report jobs are named in the audit trail and
+activity feed (file name; `TYPE FORMAT` until a report's file exists).
+
 ## Next step
 
 The product release `v1.0.0` follows the web app's Phase 10. That phase adds the Nginx image and `kora-web/compose.yaml`;
