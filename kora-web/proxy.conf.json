@@ -4,5 +4,12 @@
     "secure": false,
     "changeOrigin": false,
     "logLevel": "info"
+  },
+  "/ws": {
+    "target": "http://localhost:8080",
+    "secure": false,
+    "ws": true,
+    "changeOrigin": false,
+    "logLevel": "info"
   }
 }
