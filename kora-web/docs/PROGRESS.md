@@ -2,13 +2,13 @@
 
 ## Current status
 
-Phase 8 complete (tag `web-v0.8.0`). Waiting for "continue".
+Phase 9 complete (tag `web-v0.9.0`). Waiting for "continue".
 
 ## Next step
 
-Phase 9 — real-time notifications (STOMP), activity feed, audit history, attachments and report
-exports (features 18–21). Contract 0.7.0 is live since `api-v0.8.0` and 0.8.0 (reports) since
-`api-v0.9.0`; see the backend notes in memory.
+Phase 10 — end-to-end flows, performance, the Nginx Docker image (proxying `/api` and `/ws` to
+`api:8080`, published on 4200), the root compose include and the final README; tag v1.0.0 as the
+user decides. The API is complete (`api-v1.0.0`, contract 0.8.0 final).
 
 ## Checklist
 
@@ -21,8 +21,50 @@ exports (features 18–21). Contract 0.7.0 is live since `api-v0.8.0` and 0.8.0 
 - [x] 6. Gantt with dependencies and critical path
 - [x] 7. Risks + heat map, issues, stakeholders, change requests
 - [x] 8. Timesheets, resource heat map, EVM dashboard
-- [ ] 9. Real-time notifications, activity feed, attachments, report exports
+- [x] 9. Real-time notifications, activity feed, attachments, report exports
 - [ ] 10. E2E flows, performance, Nginx Docker image, final README; tag v1.0.0
+
+## Phase 9 — what exists
+
+- Mock API for contracts 0.7.0 and 0.8.0: notifications and preferences, activity, history, the
+  audit log and its hash-chain check, attachments with a presigned-style object store that sniffs
+  content, report jobs; an outbox that records audit, activity and notifications after every
+  change (and denied requests) and an in-page STOMP-like broker — `mocks/{outbox,broker,audit-chain,respond}.ts`,
+  `handlers/{activity,attachment,report}.handlers.ts`, demo data in `data-activity.ts`
+- API clients: `core/api/{notifications,audit,attachments,reports}.api.ts`; `/me/*` sent without
+  the organization header
+- Live updates: `core/live/` (STOMP transport with backoff, mock broker transport, `LiveUpdates`),
+  offline banner in the shell, `/ws` in the dev proxy
+- Notifications: toolbar bell with unread count, notification center side sheet (by day, mark
+  read, all read, links), polite announcements, preferences in Settings — `core/notifications/`,
+  `features/settings/notification-preferences-card.ts`
+- Workspace: Activity tab (live), change history under tasks, risks, issues, change requests and
+  the project, files panel on the same items, task links `/tasks/<id>` opening over the board or
+  schedule, live refresh of board, backlog, schedule and registers — `workspace/{activity,history,attachments,work/task-routes.ts,live-refresh.ts}`
+- Reports: export menu on the dashboard, overview, risks, earned value and time tabs; `/reports`
+  with the job list, fresh download links and a ready toast — `features/reports/`, `core/reports/`
+- Admin → Audit log: filters in the URL, field-level details, chain check, CSV export —
+  `features/admin/audit/`
+- ADR 0012
+- Checked against the live API (`api-v1.0.0`): notifications and their params, STOMP delivery
+  through the dev proxy, activity and attachments. Browser uploads to SeaweedFS need the web's
+  origin in the storage CORS rule (4200 by default)
+- Tests: 567 unit tests (≈ 88% statements), 136 e2e tests (desktop and 375 px, axe), including
+  live notifications and the offline banner, uploads, report downloads and the audit log
+
+## Feature acceptance criteria covered (Phase 9)
+
+- 18: a rolled-back change produces no notification (the API's outbox; the mock records only
+  successful responses — mock tests); users can't subscribe to projects they don't belong to
+  (broker + mock tests); reconnecting after a lost network resumes updates without a reload (unit
+  - e2e)
+- 19: mutating requests produce audit events and denied requests are recorded (mock + unit +
+  e2e); rows can't be changed without breaking the chain check (mock + unit)
+- 20: a renamed .exe uploaded as .pdf is refused (mock + unit); files from another
+  organization can't be downloaded (mock); upload works from the keyboard and shows progress (unit
+  - e2e)
+- 21: reports are made in the background and downloaded through fresh links (mock + unit + e2e);
+  at most five wait at once (mock + unit); CSV exports neutralize formulas (unit)
 
 ## Phase 8 — what exists
 
@@ -256,7 +298,7 @@ exports (features 18–21). Contract 0.7.0 is live since `api-v0.8.0` and 0.8.0 
 ## Contract with kora-api
 
 Web types are generated from contract 0.8.0 (`kora-api/docs/openapi.yaml`); this build uses the
-0.1.1 to 0.6.0 operations. All of 0.1.1–0.8.0 is live on the real API (0.3.0 since `api-v0.4.0`,
+0.1.1 to 0.8.0 operations (all of them). All of 0.1.1–0.8.0 is live on the real API (0.3.0 since `api-v0.4.0`,
 0.4.0 since `api-v0.5.0`, 0.5.0 since `api-v0.6.0`, 0.6.0 since `api-v0.7.0`, 0.7.0 since
 `api-v0.8.0`, 0.8.0 since `api-v0.9.0`). `npm run start:api` runs the app against the real API (needs Docker; it starts empty:
 register an organization first; emails in Mailpit at http://localhost:8025). Mock mode stays the
@@ -276,3 +318,4 @@ default. Change requests go in `kora-api/docs/contract-requests.md` or to the AP
 - ADR 0009 — Gantt schedule and working calendar
 - ADR 0010 — risks, issues, stakeholders and change control
 - ADR 0011 — timesheets, resources and earned value
+- ADR 0012 — live updates, audit trail, attachments and report exports

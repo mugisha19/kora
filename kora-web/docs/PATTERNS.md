@@ -142,3 +142,18 @@ proxy, a network failure) into a single `ApiError` shape, so later layers never 
 - **Value object for time.** ISO weeks and org-local dates are strings with pure helpers
   (`shared/format/iso-week.ts`, `core/session/org-clock.ts`), never `Date` objects that shift
   with the browser's time zone.
+
+## Phase 9
+
+- **Observer over STOMP, as signals.** `LiveUpdates` turns the connection into observables
+  (`notifications$`, `projectActivity(id)`, `reconnected$`); stores and tabs subscribe and
+  update their signals — `core/live/`, `workspace/live-refresh.ts`.
+- **Adapter (transport).** `LiveTransport` has two adapters, STOMP for the API and an in-page
+  broker for the mock; nothing above them knows which is in use — `core/live/*-transport.ts`.
+- **Transactional outbox (server-side), mirrored.** The mock's `outbox.ts` records audit,
+  activity and notifications after each successful change, from one place, like the API's outbox
+  and listeners.
+- **Template Method + Factory (server-side), as jobs.** Reports are rendered by the API's exporter
+  per (type, format); the web only queues a job and follows its states (`core/reports/`).
+- **Hash chain.** Audit rows chain their hashes; the admin page asks the API to verify the chain
+  (`mocks/audit-chain.ts` mirrors it).

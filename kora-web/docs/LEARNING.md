@@ -397,3 +397,33 @@ all projects, and the what-if preview shows the effect of a change before it is 
 Only approved hours count: AC = Σ approved hours × the person's cost rate on the day worked.
 Approval by the project's managers (the PMO for a manager's own time) keeps AC trustworthy;
 sent-back weeks come back to the person with the reason.
+
+## The dual-write problem and the outbox (Phase 9)
+
+Saving a change and then sending a notification are two writes: if the second fails the user is
+never told, if the first rolls back they're told about something that didn't happen. The
+transactional outbox writes the event in the same database transaction as the change; a
+dispatcher then delivers it at least once to each listener (notification, activity, audit,
+email, WebSocket), which must be idempotent (same event id, same effect).
+
+## Securing WebSocket subscriptions (Phase 9)
+
+The browser authenticates once on CONNECT (access token and organization); every SUBSCRIBE is
+authorized again (a project topic only for someone who can see the project). Messages carry no
+more than the REST API would show, and a refused subscription closes the connection. After a
+reconnect the client reloads what it shows instead of trusting it missed nothing.
+
+## Presigned uploads and content checks (Phase 9)
+
+Files go straight from the browser to object storage with a short-lived URL the API signed, so
+the API never streams the bytes. The client can't be trusted about what a file is: the API
+checks size, hash and the bytes' signature on completion and deletes a file that isn't what its
+name says (a renamed .exe). Downloads are presigned too, and always download (never render
+uploaded HTML or SVG inline).
+
+## Append-only audit and CSV injection (Phase 9)
+
+An audit trail is only evidence if it can't be edited: the application may insert and read,
+never update or delete, and each row carries a hash of the previous one so a change anywhere
+breaks the chain. Exports to spreadsheets must neutralize cells that start with =, +, -, @ (or
+tab/return), or opening the file runs them as formulas.
