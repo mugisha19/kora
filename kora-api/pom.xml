@@ -12,7 +12,7 @@
 
     <groupId>com.kora</groupId>
     <artifactId>kora-api</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <name>kora-api</name>
     <description>Kora API: multi-tenant project and portfolio management built on PMI practices</description>
 
