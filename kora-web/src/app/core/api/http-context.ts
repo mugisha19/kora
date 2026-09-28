@@ -26,5 +26,11 @@ export function isApiRequest(req: HttpRequest<unknown>): boolean {
 /** Paths that must never carry `X-Organization-Id` (the contract marks them not tenant-scoped). */
 export function isTenantFreePath(url: string): boolean {
   const path = url.slice(environment.apiBaseUrl.length);
-  return path.startsWith('/auth/') || path.startsWith('/invitations/token/') || path === '/me';
+  return (
+    path.startsWith('/auth/') ||
+    path.startsWith('/invitations/token/') ||
+    path === '/me' ||
+    // Notification preferences are the person's, across organizations.
+    path.startsWith('/me/')
+  );
 }

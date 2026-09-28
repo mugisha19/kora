@@ -221,6 +221,32 @@ export type EvmSeries = Schemas['EvmSeries'];
 export type DashboardTrends = Schemas['DashboardTrends'];
 export type DashboardTrendMonth = Schemas['DashboardTrendMonth'];
 
+export type NotificationType = Schemas['NotificationType'];
+export type AppNotification = Schemas['Notification'];
+export type NotificationPage = Schemas['NotificationPage'];
+export type NotificationPreference = Schemas['NotificationPreference'];
+export type NotificationPreferences = Schemas['NotificationPreferences'];
+export type ActivityEntry = Schemas['ActivityEntry'];
+export type ActivityPage = Schemas['ActivityPage'];
+export type AuditOutcome = Schemas['AuditOutcome'];
+export type FieldChange = Schemas['FieldChange'];
+export type AuditEvent = Schemas['AuditEvent'];
+export type AuditPage = Schemas['AuditPage'];
+export type AuditVerification = Schemas['AuditVerification'];
+export type AttachmentOwnerType = Schemas['AttachmentOwnerType'];
+export type AttachmentStatus = Schemas['AttachmentStatus'];
+export type ScanStatus = Schemas['ScanStatus'];
+export type Attachment = Schemas['Attachment'];
+export type StartUploadRequest = Schemas['StartUploadRequest'];
+export type AttachmentUpload = Schemas['AttachmentUpload'];
+export type AttachmentDownload = Schemas['AttachmentDownload'];
+export type ReportType = Schemas['ReportType'];
+export type ReportFormat = Schemas['ReportFormat'];
+export type ReportStatus = Schemas['ReportStatus'];
+export type ReportParams = Schemas['ReportParams'];
+export type CreateReportRequest = Schemas['CreateReportRequest'];
+export type ReportJob = Schemas['ReportJob'];
+
 export type DashboardSummary = Schemas['DashboardSummary'];
 export type DashboardProject = Schemas['DashboardProject'];
 export type DashboardProjectPage = Schemas['DashboardProjectPage'];
@@ -242,6 +268,12 @@ export type ListChangeRequestsQuery = NonNullable<
 >;
 export type ListProjectTimesheetsQuery = NonNullable<
   operations['listProjectTimesheets']['parameters']['query']
+>;
+export type ListNotificationsQuery = NonNullable<
+  operations['listNotifications']['parameters']['query']
+>;
+export type ListAuditEventsQuery = NonNullable<
+  operations['listAuditEvents']['parameters']['query']
 >;
 export type BacklogQuery = NonNullable<operations['getBacklog']['parameters']['query']>;
 export type ListDashboardProjectsQuery = NonNullable<
@@ -432,3 +464,47 @@ export const EAC_METHODS = [
 ] as const satisfies readonly EacMethod[];
 /** The heat map covers at most this many weeks. */
 export const HEATMAP_MAX_WEEKS = 26;
+
+export const NOTIFICATION_TYPES = [
+  'TASK_ASSIGNED',
+  'APPROVAL_REQUESTED',
+  'CHANGE_REQUEST_DECIDED',
+  'TIMESHEET_DECIDED',
+  'RISK_REVIEW_OVERDUE',
+  'ISSUE_ESCALATED',
+  'REPORT_READY',
+  'REPORT_FAILED',
+] as const satisfies readonly NotificationType[];
+export const ATTACHMENT_OWNER_TYPES = [
+  'PROJECT',
+  'TASK',
+  'RISK',
+  'ISSUE',
+  'CHANGE_REQUEST',
+] as const satisfies readonly AttachmentOwnerType[];
+/** The API refuses bigger files (25 MB). */
+export const ATTACHMENT_MAX_BYTES = 26_214_400;
+/** File types the API accepts, by extension, with the content type to declare. */
+export const ATTACHMENT_TYPES: Readonly<Record<string, string>> = {
+  pdf: 'application/pdf',
+  png: 'image/png',
+  jpg: 'image/jpeg',
+  jpeg: 'image/jpeg',
+  gif: 'image/gif',
+  webp: 'image/webp',
+  txt: 'text/plain',
+  csv: 'text/csv',
+  docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+};
+export const REPORT_TYPES = [
+  'PROJECT_STATUS',
+  'PORTFOLIO_SUMMARY',
+  'RISK_REGISTER',
+  'EVM',
+  'TIMESHEETS',
+] as const satisfies readonly ReportType[];
+export const REPORT_FORMATS = ['PDF', 'XLSX'] as const satisfies readonly ReportFormat[];
+/** At most this many of my reports may wait (QUEUED or RUNNING) at once. */
+export const REPORTS_MAX_PENDING = 5;
