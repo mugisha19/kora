@@ -90,6 +90,8 @@ describe('SessionFacade', () => {
     await facade.restore();
     expect(store.isAuthenticated()).toBe(false);
 
+    // A device that had a session waits for the refresh, but not forever.
+    localStorage.setItem(PREFERENCE_KEYS.signedIn, '1');
     vi.useFakeTimers();
     vi.spyOn(TestBed.inject(AuthApi), 'refresh').mockReturnValue(NEVER);
     const restoring = facade.restore();
@@ -97,6 +99,19 @@ describe('SessionFacade', () => {
     await expect(restoring).resolves.toBeUndefined();
     vi.useRealTimers();
     expect(store.isAuthenticated()).toBe(false);
+  });
+
+  it('skips the refresh on a device that never had a session, and forgets a dead one', async () => {
+    const { facade, store } = setup();
+    const refresh = vi.spyOn(TestBed.inject(AuthApi), 'refresh');
+    await facade.restore();
+    expect(refresh).not.toHaveBeenCalled();
+
+    localStorage.setItem(PREFERENCE_KEYS.signedIn, '1');
+    await facade.restore();
+    expect(refresh).toHaveBeenCalledTimes(1);
+    expect(store.isAuthenticated()).toBe(false);
+    expect(localStorage.getItem(PREFERENCE_KEYS.signedIn)).toBeNull();
   });
 
   it('switches organization, announces it and opens its dashboard', async () => {
@@ -152,6 +167,8 @@ describe('SessionFacade', () => {
       .spyOn(AuthApi.prototype, 'refresh')
       .mockReturnValue(of(aSession('restored')));
     const expire = vi.spyOn(SessionFacade.prototype, 'expire').mockResolvedValue(true);
+    // This device had a session (see PREFERENCE_KEYS.signedIn).
+    localStorage.setItem(PREFERENCE_KEYS.signedIn, '1');
     setup([provideSessionRestore()]);
 
     await TestBed.inject(ApplicationInitStatus).donePromise;

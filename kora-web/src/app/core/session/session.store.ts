@@ -50,6 +50,7 @@ export const SessionStore = signalStore(
   withMethods((store, now = inject(NOW)) => ({
     /** A new or refreshed session from login, register, accept-invitation or refresh. */
     start(session: SessionResponse): void {
+      writePreference(PREFERENCE_KEYS.signedIn, '1');
       patchState(store, {
         accessToken: session.accessToken,
         expiresAt: now() + session.expiresIn * 1000,

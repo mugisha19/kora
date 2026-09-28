@@ -3,11 +3,13 @@ import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslocoService } from '@jsverse/transloco';
 import { catchError, firstValueFrom, of, timeout } from 'rxjs';
+import { toApiError } from '../api/api-error';
 import { SessionResponse } from '../api/api.models';
 import { AuthApi } from '../api/auth.api';
 import { MeApi } from '../api/me.api';
 import { safeReturnUrl } from '../auth/safe-return-url';
 import { LanguageService } from '../i18n/language.service';
+import { PREFERENCE_KEYS, readPreference, writePreference } from '../storage/preferences';
 import { SessionRefresher } from './session-refresher';
 import { SessionStore } from './session.store';
 
@@ -43,16 +45,19 @@ export class SessionFacade {
 
   /**
    * One silent refresh at start-up: the HttpOnly cookie survives reloads, the in-memory token
-   * doesn't. Resolves either way; a failure just means "signed out".
+   * doesn't. Resolves either way; a failure just means "signed out". A device that never had a
+   * session skips it: visitors see the sign-in page without waiting for a refresh that must fail.
    */
   async restore(): Promise<void> {
+    if (readPreference(PREFERENCE_KEYS.signedIn) !== '1') return;
     try {
       const session = await firstValueFrom(
         this.refresher.refresh().pipe(timeout(RESTORE_TIMEOUT_MS)),
       );
       this.language.useProfileLocale(session.user.locale);
-    } catch {
-      // No valid refresh cookie, API unreachable or too slow: start signed out.
+    } catch (error: unknown) {
+      // No valid refresh cookie (forget the hint), API unreachable or too slow: start signed out.
+      if (toApiError(error).status === 401) writePreference(PREFERENCE_KEYS.signedIn, null);
     }
   }
 
@@ -74,6 +79,7 @@ export class SessionFacade {
   /** The refresh token was rejected mid-session: back to sign-in, then back here. */
   expire(): Promise<boolean> {
     this.store.clear();
+    writePreference(PREFERENCE_KEYS.signedIn, null);
     return this.router.navigate(['/login'], {
       queryParams: { returnUrl: this.router.url, reason: 'expired' },
     });
@@ -83,6 +89,7 @@ export class SessionFacade {
   async signOut(): Promise<boolean> {
     await firstValueFrom(this.authApi.logout().pipe(catchError(() => of(undefined))));
     this.store.clear();
+    writePreference(PREFERENCE_KEYS.signedIn, null);
     return this.router.navigateByUrl('/login');
   }
 }

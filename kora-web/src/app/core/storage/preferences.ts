@@ -9,6 +9,11 @@ export const PREFERENCE_KEYS = {
   theme: 'kora.theme',
   language: 'kora.lang',
   organization: 'kora.org',
+  /**
+   * A hint, not a credential: this device had a session. Without it, start-up skips the silent
+   * refresh (the refresh cookie is HttpOnly, so the page can't check for it) and shows sign-in at once.
+   */
+  signedIn: 'kora.signedIn',
 } as const;
 
 export type PreferenceKey = (typeof PREFERENCE_KEYS)[keyof typeof PREFERENCE_KEYS];
