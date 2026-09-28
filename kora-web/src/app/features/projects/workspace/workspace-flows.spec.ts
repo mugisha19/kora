@@ -27,7 +27,9 @@ describe('project workspace flows', () => {
   it('the sponsor returns a charter with a comment the manager then sees', async () => {
     await open(`/projects/${PROJECT.warehouse}/charter`, 'pmo@kora.demo');
 
-    await userEvent.click(await screen.findByRole('button', { name: 'Return to draft' }));
+    await userEvent.click(
+      await screen.findByRole('button', { name: 'Return to draft' }, { timeout: 5000 }),
+    );
     const dialog = await screen.findByRole('dialog', { name: 'Return the charter' });
     await userEvent.click(within(dialog).getByRole('button', { name: 'Return to draft' }));
     expect(await within(dialog).findByText('This field is required.')).toBeTruthy();

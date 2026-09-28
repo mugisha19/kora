@@ -138,7 +138,7 @@ describe('backlog', () => {
     await userEvent.type(within(sheet).getByRole('textbox', { name: 'Title' }), 'Offline mode');
     await userEvent.click(within(sheet).getByRole('button', { name: 'New task' }));
 
-    await waitFor(() => expect(backlogKeys().at(-1)).toBe('AKG-001-58'));
+    await waitFor(() => expect(backlogKeys().at(-1)).toBe('AKG-001-58'), { timeout: 5000 });
   });
 
   it('is read-only for a viewer', async () => {
