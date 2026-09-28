@@ -43,3 +43,17 @@ declare global {
     koraMock?: { reset(): void };
   }
 }
+
+/**
+ * Signs out and in as someone else, keeping the mock data: a hand-over between people in one
+ * journey. Works in any UI language (the account menu and sign-out are found by their icons).
+ */
+export async function switchUser(page: Page, role: DemoRole): Promise<void> {
+  await page.locator('kora-user-menu button').click();
+  await page.locator('[mat-menu-item]:has(mat-icon[svgicon="logout"])').click();
+  await expect(page).toHaveURL(/\/login$/);
+  await useEnglish(page);
+  await page.getByRole('button', { name: new RegExp(`^${role} `) }).click();
+  await expect(page).toHaveURL(/\/dashboard$/);
+  await expect(page.getByRole('main').getByRole('heading', { level: 1 })).toBeVisible();
+}
