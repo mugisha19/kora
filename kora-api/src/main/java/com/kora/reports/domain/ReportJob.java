@@ -146,6 +146,11 @@ public class ReportJob {
         this.completedAt = now;
     }
 
+    /** How the audit trail and activity feed name the job: its file, or what it will be until the file exists. */
+    public String getAuditLabel() {
+        return fileName != null ? fileName : type + " " + format;
+    }
+
     public ReportParams params() {
         return new ReportParams(projectId, portfolioId, dateFrom, dateTo);
     }

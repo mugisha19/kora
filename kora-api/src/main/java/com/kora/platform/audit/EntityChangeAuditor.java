@@ -243,7 +243,8 @@ final class EntityChangeAuditor implements PostInsertEventListener, PostUpdateEv
                 }
             }
             List<Method> labels = new ArrayList<>();
-            for (String getter : List.of("getKey", "getCode", "getName", "getTitle")) {
+            // An explicit label first, then the usual names; a file is known by its name.
+            for (String getter : List.of("getAuditLabel", "getKey", "getCode", "getName", "getTitle", "getFileName")) {
                 try {
                     Method method = type.getMethod(getter);
                     if (method.getReturnType() == String.class) {

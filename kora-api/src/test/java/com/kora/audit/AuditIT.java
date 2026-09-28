@@ -6,6 +6,7 @@ import static com.kora.support.TestPortfolios.read;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.jayway.jsonpath.JsonPath;
 import com.kora.organization.Role;
 import com.kora.platform.tenancy.TenantTransactions;
 import com.kora.support.IntegrationTest;
@@ -181,6 +182,28 @@ class AuditIT {
                 WHERE step <> 1
                 """, Long.class, admin.organizationId().toString());
         assertThat(gaps).isZero();
+    }
+
+    @Test
+    void filesAndReportsAreNamedInTheActivityFeed() {
+        assertThat(conforms(post("/api/v1/attachments/uploads", manager, """
+                        {"ownerType":"PROJECT","ownerId":"%s","fileName":"Minutes.pdf","contentType":"application/pdf",
+                         "sizeBytes":10}
+                        """.formatted(projectId))))
+                .hasStatus(HttpStatus.CREATED);
+        assertThat(conforms(post(
+                        "/api/v1/reports",
+                        manager,
+                        "{\"type\":\"EVM\",\"format\":\"XLSX\",\"params\":{\"projectId\":\"%s\"}}"
+                                .formatted(projectId))))
+                .hasStatus(HttpStatus.ACCEPTED);
+
+        List<Object> labels = JsonPath.read(
+                TestAccounts.body(get("/api/v1/projects/" + projectId + "/activity?limit=100", manager)),
+                "$.items[*].entityLabel");
+
+        // A file by its name; a report by what it is until its file exists.
+        assertThat(labels).contains("Minutes.pdf", "EVM XLSX");
     }
 
     private void rename(String taskId, String title) {
