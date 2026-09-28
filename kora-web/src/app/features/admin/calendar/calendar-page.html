@@ -48,6 +48,27 @@
 
     <section class="holidays" aria-labelledby="holidays-title">
       <h3 id="holidays-title">{{ 'admin.calendar.holidays' | transloco }}</h3>
+      <div class="public">
+        <mat-form-field subscriptSizing="dynamic">
+          <mat-label>{{ 'admin.calendar.year' | transloco }}</mat-label>
+          <mat-select [value]="year()" (selectionChange)="year.set($event.value)">
+            @for (y of years(); track y) {
+              <mat-option [value]="y">{{ y }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+        <button
+          mat-stroked-button
+          type="button"
+          [disabled]="changed() || adding() || stale()"
+          (click)="addPublicHolidays()"
+        >
+          {{ 'admin.calendar.addRwanda' | transloco: { year: year() } }}
+        </button>
+        <p class="kora-muted">
+          {{ (changed() ? 'admin.calendar.saveFirst' : 'admin.calendar.rwandaHint') | transloco }}
+        </p>
+      </div>
       @if (model().holidays.length) {
         <ul>
           @for (h of model().holidays; track h.date) {

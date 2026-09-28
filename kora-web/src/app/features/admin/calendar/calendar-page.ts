@@ -14,11 +14,15 @@ import { MatCheckbox } from '@angular/material/checkbox';
 import { MatError, MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInput } from '@angular/material/input';
+import { MatOption, MatSelect } from '@angular/material/select';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { firstValueFrom } from 'rxjs';
 import { ApiError } from '../../../core/api/api-error';
 import { DAYS_OF_WEEK, Holiday, WorkingCalendar } from '../../../core/api/api.models';
+import { ResourcesApi } from '../../../core/api/resources.api';
 import { ScheduleApi } from '../../../core/api/schedule.api';
+import { OrgClock } from '../../../core/session/org-clock';
+import { toApiError } from '../../../core/api/api-error';
 import { ErrorMessages } from '../../../core/errors/error-messages';
 import { LanguageService } from '../../../core/i18n/language.service';
 import { Notifier } from '../../../core/notify/notifier';
@@ -57,6 +61,8 @@ const byDate = (a: Holiday, b: Holiday) => a.date.localeCompare(b.date);
     MatIconButton,
     MatInput,
     MatLabel,
+    MatOption,
+    MatSelect,
     TranslocoPipe,
   ],
   templateUrl: './calendar-page.html',
@@ -64,6 +70,8 @@ const byDate = (a: Holiday, b: Holiday) => a.date.localeCompare(b.date);
 })
 export class CalendarPage {
   private readonly api = inject(ScheduleApi);
+  private readonly resources = inject(ResourcesApi);
+  private readonly clock = inject(OrgClock);
   private readonly notifier = inject(Notifier);
   private readonly transloco = inject(TranslocoService);
   protected readonly language = inject(LanguageService);
@@ -133,6 +141,41 @@ export class CalendarPage {
       this.holidayForm().reset();
     } else {
       focusFirstInvalid(this.host, this.injector);
+    }
+  }
+
+  /** This year and the next: the years whose Rwandan public holidays can be added. */
+  protected readonly years = computed(() => {
+    const year = Number(this.clock.today().slice(0, 4));
+    return [year, year + 1];
+  });
+  protected readonly year = linkedSignal(() => this.years()[0]);
+  protected readonly adding = signal(false);
+
+  /** Adds Rwanda's public holidays of a year (saved at once; Eid dates are added by hand). */
+  protected async addPublicHolidays(): Promise<void> {
+    const current = this.calendar.value();
+    if (!current) return;
+    this.adding.set(true);
+    this.formError.set(null);
+    try {
+      const updated = await firstValueFrom(
+        this.resources.addPublicHolidays(this.year(), current.version),
+      );
+      const before = current.holidays.length;
+      this.calendar.set(updated);
+      this.notifier.success(
+        this.transloco.translate('admin.calendar.holidaysAdded', {
+          count: updated.holidays.length - before,
+          year: this.year(),
+        }),
+      );
+    } catch (error: unknown) {
+      const apiError = toApiError(error);
+      if (apiError.status === 412) this.stale.set(true);
+      else this.formError.set(this.context.messages.message(apiError));
+    } finally {
+      this.adding.set(false);
     }
   }
 

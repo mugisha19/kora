@@ -387,6 +387,37 @@ describe('administration', () => {
         ),
       );
     });
+
+    it('adds Rwanda’s public holidays of the year chosen, keeping the existing ones', async () => {
+      await open(CalendarPage);
+      await screen.findByText('Christmas Day');
+
+      await userEvent.click(screen.getByRole('combobox', { name: 'Year' }));
+      await userEvent.click(await screen.findByRole('option', { name: '2027' }));
+      await userEvent.click(
+        screen.getByRole('button', { name: 'Add Rwanda’s public holidays for 2027' }),
+      );
+
+      expect(await screen.findByText(/Public holidays of 2027 added: \d+\./)).toBeTruthy();
+      const holidays = calendar().holidays;
+      // Easter is on 28 March in 2027.
+      expect(holidays).toContainEqual({ date: '2027-03-26', name: 'Good Friday' });
+      expect(holidays.map((h) => h.name)).toContain('Christmas Day');
+      expect(new Set(holidays.map((h) => h.date)).size).toBe(holidays.length);
+      expect(calendar().version).toBe(2);
+    });
+
+    it('asks to save or undo local changes before adding public holidays', async () => {
+      await open(CalendarPage);
+      await userEvent.click(await screen.findByRole('checkbox', { name: 'Sunday' }));
+
+      expect(
+        screen
+          .getByRole('button', { name: /Add Rwanda’s public holidays/ })
+          .hasAttribute('disabled'),
+      ).toBe(true);
+      expect(screen.getByText('Save or undo your changes first.')).toBeTruthy();
+    });
   });
 
   describe('ChangeControlPage', () => {
