@@ -54,3 +54,38 @@ web:e2e:
     expire_in: 7 days
     paths:
       - kora-web/playwright-report/
+
+# The Nginx image (Phase 10): built after the checks pass, smoke-checked, then scanned like on GitHub.
+web:image:
+  stage: image
+  extends: [.web-rules]
+  needs: ['web:quality']
+  image: docker:cli
+  services:
+    - name: docker:dind
+      alias: docker
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ''
+  script:
+    - docker build -t kora-web:$CI_COMMIT_SHORT_SHA kora-web
+    # The container starts and answers its health check (dind publishes its ports on the `docker` host).
+    - docker run -d --name web -p 8080:8080 kora-web:$CI_COMMIT_SHORT_SHA
+    - for i in $(seq 1 20); do wget -qO- http://docker:8080/healthz && break; sleep 1; done
+    - wget -qO- http://docker:8080/healthz
+    - docker save kora-web:$CI_COMMIT_SHORT_SHA -o kora-web-image.tar
+  artifacts:
+    expire_in: 1 day
+    paths:
+      - kora-web-image.tar
+
+web:image-scan:
+  stage: image
+  extends: [.web-rules]
+  needs: ['web:image']
+  image:
+    name: aquasec/trivy:0.74.0
+    entrypoint: ['']
+  script:
+    - trivy image --input kora-web-image.tar --scanners vuln --timeout 20m --severity CRITICAL --ignore-unfixed
+      --exit-code 1 --no-progress

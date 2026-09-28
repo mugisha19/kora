@@ -71,4 +71,32 @@ jobs:
           path: kora-web/playwright-report
           retention-days: 7
 
-  # The Nginx image job is added in Phase 10 together with the Dockerfile (see kora-web/docs/adr/0003).
+  image:
+    name: Nginx image, smoke check and vulnerability scan
+    needs: quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: docker/setup-buildx-action@v4
+      - uses: docker/build-push-action@v7
+        with:
+          context: kora-web
+          load: true
+          tags: kora-web:${{ github.sha }}
+          cache-from: type=gha,scope=kora-web
+          cache-to: type=gha,mode=max,scope=kora-web
+      # The container starts, serves the app with its security headers and a nonce, and hides the actuator.
+      - name: Smoke check
+        run: |
+          docker run -d --name web -p 8080:8080 kora-web:${{ github.sha }}
+          for i in $(seq 1 20); do curl -fs http://localhost:8080/healthz && break; sleep 1; done
+          curl -fsI http://localhost:8080/login | grep -i "^content-security-policy:.*script-src 'self';"
+          curl -fs http://localhost:8080/login | grep -q 'ngcspnonce="[0-9a-f]\{32\}"'
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/actuator/health)" = 404
+      # Trivy from its pinned image, as for the API: fails on critical vulnerabilities that have a fix.
+      - name: Scan the image
+        run: >
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:0.74.0
+          image --scanners vuln --timeout 20m --severity CRITICAL --ignore-unfixed --exit-code 1 --no-progress
+          kora-web:${{ github.sha }}
