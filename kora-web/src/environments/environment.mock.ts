@@ -16,6 +16,6 @@ export const environment: Environment = {
       { email: 'viewer@kora.demo', role: 'VIEWER' },
     ],
   },
-  contractVersion: '0.6.0',
+  contractVersion: '0.8.0',
   appVersion: '0.1.0',
 };
