@@ -60,6 +60,7 @@ test.describe('portfolios and projects', () => {
       'Changes',
       'Time',
       'Earned value',
+      'Activity',
     ]);
 
     await page.goto('/projects?q=AKG-020');
@@ -99,6 +100,7 @@ test.describe('portfolios and projects', () => {
       'Changes',
       'Time',
       'Earned value',
+      'Activity',
     ]);
 
     await page.goto(`/projects/${PROJECT.crm}/overview`);
@@ -202,6 +204,8 @@ test.describe('dashboard', () => {
   }
 
   test('portfolios, project list and workspace pass axe', async ({ page }) => {
+    // Five pages with axe each: more than the default budget when the whole suite runs at once.
+    test.setTimeout(60_000);
     await signInAs(page, 'PMO');
 
     for (const url of [

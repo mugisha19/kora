@@ -31,7 +31,15 @@ test.describe('app shell', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'Ikibaho' })).toBeVisible();
   });
 
-  test('the theme menu applies the choice immediately', async ({ page }) => {
+  test('the theme menu applies the choice immediately', async ({ page, isMobile }) => {
+    if (isMobile) {
+      // Phones choose the theme in Settings (the toolbar has no room for it).
+      await page.goto('/settings');
+      await page.getByRole('radio', { name: /Light/ }).click();
+      await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+      await expect(page.getByRole('button', { name: /Change theme/ })).toBeHidden();
+      return;
+    }
     await page.goto('/dashboard');
 
     await page.getByRole('button', { name: /Change theme/ }).click();

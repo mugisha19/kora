@@ -36,6 +36,8 @@ test.describe('smoke', () => {
     });
 
     test(`signed-in pages have no WCAG 2.1 AA violations (${scheme})`, async ({ page }) => {
+      // Five pages with axe each: more than the default budget when the whole suite runs at once.
+      test.setTimeout(60_000);
       await page.emulateMedia({ colorScheme: scheme });
       await signInAs(page);
 
