@@ -1,5 +1,6 @@
 import { MeResponse, Member } from '../core/api/api.models';
 import { PROJECT, ProjectSeed, createProjectSeed } from './data-projects';
+import { ActivitySeed, createActivitySeed } from './data-activity';
 import { GovernanceSeed, createGovernanceSeed } from './data-governance';
 import { TimeSeed, createTimeSeed } from './data-time';
 import { ScheduleSeed, createScheduleSeed } from './data-schedule';
@@ -31,7 +32,7 @@ export interface ResetTokenRecord {
 }
 
 export interface MockState
-  extends SeedData, ProjectSeed, WorkSeed, ScheduleSeed, GovernanceSeed, TimeSeed {
+  extends SeedData, ProjectSeed, WorkSeed, ScheduleSeed, GovernanceSeed, TimeSeed, ActivitySeed {
   refreshTokens: RefreshTokenRecord[];
   resetTokens: ResetTokenRecord[];
   /** Sign-in token buckets per lower-cased email, for the rate limit. */
@@ -44,7 +45,7 @@ export function must<T>(value: T | undefined, what: string): T {
   return value;
 }
 
-const STORAGE_KEY = 'kora.mock.db.v7';
+const STORAGE_KEY = 'kora.mock.db.v8';
 
 function storage(): Storage | null {
   try {
@@ -164,8 +165,9 @@ export class MockDb {
       'warehouse project',
     );
     const schedule = createScheduleSeed(now, warehouse.startDate);
+    const base = createSeed();
     return {
-      ...createSeed(),
+      ...base,
       ...projects,
       ...work,
       tasks: [...work.tasks, ...schedule.tasks],
@@ -174,6 +176,7 @@ export class MockDb {
       calendars: schedule.calendars,
       ...createGovernanceSeed(now),
       ...createTimeSeed(now, work.tasks),
+      ...createActivitySeed(now, work.tasks, base.memberships),
       refreshTokens: [],
       resetTokens: [],
       loginBuckets: {},

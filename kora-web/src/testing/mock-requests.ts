@@ -1,12 +1,14 @@
-import { getResponse } from 'msw';
 import { DEMO_PASSWORD, ORG_AKAGERA } from '../app/mocks/data';
-import { handlers } from '../app/mocks/handlers';
+import { respond } from '../app/mocks/respond';
 import { setMockLatency } from '../app/mocks/http';
 
 // Unit tests answer instantly: chained requests with simulated latency race the tests' waits.
 setMockLatency(0);
 
-/** Raw requests straight through the MSW handlers (no service worker, no Angular), for mock-API specs. */
+/**
+ * Raw requests straight through the MSW handlers and the outbox (no service worker, no Angular),
+ * for mock-API specs.
+ */
 const BASE = 'http://localhost/api/v1';
 
 export async function call(
@@ -14,8 +16,7 @@ export async function call(
   path: string,
   { body, headers = {} }: { body?: unknown; headers?: Record<string, string> } = {},
 ) {
-  const response = await getResponse(
-    handlers,
+  const response = await respond(
     new Request(`${BASE}${path}`, {
       method,
       headers: { 'Content-Type': 'application/json', ...headers },

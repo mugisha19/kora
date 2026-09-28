@@ -271,12 +271,16 @@ export function issueAccessToken(userId: string, now = Date.now()): string {
 
 /** The signed-in user id, or a 401 `auth.unauthenticated`. */
 export function authenticate(request: Request, r: Reply, now = Date.now()): string | Response {
-  const header = request.headers.get('Authorization') ?? '';
+  return (
+    userIdFromBearer(request.headers.get('Authorization') ?? '', now) ??
+    r.problem(401, 'auth.unauthenticated')
+  );
+}
+
+/** The user of a valid, unexpired `Bearer` access token (HTTP or a STOMP CONNECT), else null. */
+export function userIdFromBearer(header: string, now = Date.now()): string | null {
   const [, userId, expiresAt] = /^Bearer mock\.([^.]+)\.(\d+)\./.exec(header) ?? [];
-  if (!userId || Number(expiresAt) <= now || !db.user(userId)) {
-    return r.problem(401, 'auth.unauthenticated');
-  }
-  return userId;
+  return userId && Number(expiresAt) > now && db.user(userId) ? userId : null;
 }
 
 /** Starts a new refresh-token family (sign-in) or continues one (rotation). */
@@ -426,4 +430,42 @@ export function sortAndPage<T>(
     totalElements: items.length,
     totalPages: Math.ceil(items.length / size),
   };
+}
+
+/**
+ * Cursor paging for the feeds (notifications, activity, audit): `limit` 1–100 (default 20) and an
+ * opaque `cursor` from the previous page; `nextCursor` is absent on the last page.
+ */
+export function cursorPage<T>(
+  r: Reply,
+  url: URL,
+  items: readonly T[],
+): { items: T[]; nextCursor?: string } | Response {
+  const v = new Validator();
+  const limitText = url.searchParams.get('limit');
+  const limit = limitText === null ? 20 : Number(limitText);
+  if (!Number.isInteger(limit) || limit < 1 || limit > 100) {
+    v.add('limit', 'range', 'must be between 1 and 100', { min: 1, max: 100 });
+  }
+  const cursor = url.searchParams.get('cursor');
+  let offset = 0;
+  if (cursor !== null) {
+    const decoded = /^o(\d+)$/.exec(safeAtob(cursor));
+    if (decoded) offset = Number(decoded[1]);
+    else v.add('cursor', 'invalid', 'is not a cursor from this list');
+  }
+  if (!v.ok) return v.problem(r);
+  const next = offset + limit;
+  return {
+    items: items.slice(offset, next),
+    ...(next < items.length ? { nextCursor: btoa(`o${next}`) } : {}),
+  };
+}
+
+function safeAtob(text: string): string {
+  try {
+    return atob(text);
+  } catch {
+    return '';
+  }
 }

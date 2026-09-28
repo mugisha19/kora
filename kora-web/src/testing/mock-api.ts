@@ -19,6 +19,8 @@ import {
 import { TestBed } from '@angular/core/testing';
 import { getResponse } from 'msw';
 import { Observable, firstValueFrom } from 'rxjs';
+import { FileDownloader } from '../app/core/files/file-downloader';
+import { StorageUploader, UploadError, UploadEvent } from '../app/core/files/storage-uploader';
 import { SessionResponse } from '../app/core/api/api.models';
 import { AuthApi } from '../app/core/api/auth.api';
 import { API_INTERCEPTORS, RETRY_POLICY } from '../app/core/http/interceptors';
@@ -27,6 +29,7 @@ import { SessionStore } from '../app/core/session/session.store';
 import { DEMO_PASSWORD } from '../app/mocks/data';
 import { db } from '../app/mocks/db';
 import { handlers } from '../app/mocks/handlers';
+import { respond } from '../app/mocks/respond';
 import { setMockLatency } from '../app/mocks/http';
 
 // Unit tests answer instantly: chained requests with simulated latency race the tests' waits.
@@ -83,7 +86,7 @@ export class MockApiBackend implements HttpBackend {
       headers,
       body: hasBody ? JSON.stringify(req.body) : undefined,
     });
-    const response = await getResponse(handlers, request);
+    const response = await respond(request);
     if (!response) {
       return new HttpErrorResponse({ status: 404, statusText: 'No mock', url: req.url });
     }
@@ -114,11 +117,59 @@ export class MockApiBackend implements HttpBackend {
   }
 }
 
+/**
+ * Presigned uploads answered by the mock object store in-process (jsdom has no service worker):
+ * half-way progress, then done, or the store's refusal.
+ */
+@Injectable()
+export class MockStorageUploader {
+  upload(
+    url: string,
+    headers: Readonly<Record<string, string>>,
+    file: Blob,
+  ): Observable<UploadEvent> {
+    return new Observable<UploadEvent>((subscriber) => {
+      let cancelled = false;
+      subscriber.next({ type: 'progress', loaded: file.size / 2, total: file.size });
+      void file
+        .arrayBuffer()
+        .then((bytes) =>
+          respond(new Request(url, { method: 'PUT', headers: { ...headers }, body: bytes })),
+        )
+        .then((response) => {
+          if (cancelled) return;
+          if (response?.ok) {
+            subscriber.next({ type: 'done' });
+            subscriber.complete();
+          } else subscriber.error(new UploadError(response?.status ?? 0));
+        });
+      return () => {
+        cancelled = true;
+      };
+    });
+  }
+}
+
+/** Records the links a test downloaded instead of navigating jsdom. */
+@Injectable()
+export class RecordingDownloader {
+  readonly opened: { url: string; fileName?: string }[] = [];
+  readonly saved: { content: string; fileName: string; type: string }[] = [];
+  save(content: string, fileName: string, type: string): void {
+    this.saved.push({ content, fileName, type });
+  }
+  open(url: string, fileName?: string): void {
+    this.opened.push({ url, ...(fileName ? { fileName } : {}) });
+  }
+}
+
 /** HttpClient + the app's interceptor chain, answered by the mock API; no waiting on retries. */
 export function provideMockApi(): (Provider | EnvironmentProviders)[] {
   return [
     provideHttpClient(withInterceptors(API_INTERCEPTORS)),
     { provide: HttpBackend, useClass: MockApiBackend },
+    { provide: StorageUploader, useClass: MockStorageUploader },
+    { provide: FileDownloader, useClass: RecordingDownloader },
     { provide: REFRESH_RETRY_DELAY_MS, useValue: 0 },
     { provide: RETRY_POLICY, useValue: { maxRetries: 0, baseDelayMs: 0, maxRetryAfterSeconds: 0 } },
   ];
