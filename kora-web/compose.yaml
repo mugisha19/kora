@@ -1,0 +1,16 @@
+# The web app as a container, for a stack that runs without Node (Phase 10):
+#   docker compose --profile demo up --build     (from the repository root, with the API; see ../compose.yaml)
+# Nginx serves the production build and proxies /api and /ws to the API service by its name; it finds the API even
+# if it starts later, so there's no depends_on across the included compose files.
+services:
+  web:
+    profiles: ['demo']
+    build: .
+    image: kora-web:local
+    environment:
+      KORA_API_UPSTREAM: api:8080
+      # Browsers upload and download attachments straight from storage, through the port published on the host.
+      KORA_STORAGE_ORIGIN: http://localhost:8333
+    ports:
+      # The API's email links and its storage CORS rule expect the web on 4200.
+      - '127.0.0.1:4200:8080'

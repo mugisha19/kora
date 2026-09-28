@@ -1,0 +1,4 @@
+# Kora is an application behind a sign-in; there is nothing to index but the sign-in page.
+User-agent: *
+Disallow: /
+Allow: /login

@@ -1,0 +1,13 @@
+# Only what `ng build` needs goes into the image's build context.
+node_modules
+dist
+coverage
+test-results
+playwright-report
+.angular
+.npm
+e2e
+**/*.spec.ts
+src/testing
+.husky
+*.log

@@ -13,6 +13,7 @@
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
   </head>
   <body>
-    <kora-root></kora-root>
+    <!-- Nginx replaces the placeholder with a per-response nonce that its Content-Security-Policy allows. -->
+    <kora-root ngCspNonce="NGINX_CSP_NONCE"></kora-root>
   </body>
 </html>
