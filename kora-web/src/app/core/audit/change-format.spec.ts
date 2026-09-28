@@ -39,8 +39,10 @@ describe('ChangeFormat', () => {
     expect(format.value('ownerId', crypto.randomUUID())).toBe('someone no longer here');
     expect(format.value('status', 'IN_PROGRESS')).toBe('In progress');
     expect(format.value('escalated', true)).toBe('Yes');
-    expect(format.value('budget', 'Money[amount=1200000, currency=RWF]')).toMatch(/1,200,000/);
-    expect(format.value('budget', '1200000 RWF')).toMatch(/1,200,000/);
+    // Money is two fields in the audit: a number and a currency code.
+    expect(format.value('budgetAmount', 150000000)).toBe('150,000,000');
+    expect(format.value('budgetCurrency', 'RWF')).toBe('RWF');
+    expect(format.value('dueDate', '2026-10-05')).toBe('Oct 5, 2026');
     expect(format.value('title', '')).toBe('—');
   });
 

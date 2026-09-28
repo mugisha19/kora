@@ -3,11 +3,9 @@ import { TranslocoService } from '@jsverse/transloco';
 import { FieldChange } from '../api/api.models';
 import { LanguageService } from '../i18n/language.service';
 import { OrgDirectory } from '../people/org-directory';
-import { formatMoney } from '../../shared/format/money';
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-/** Money as the audit records it: `Money[amount=…, currency=RWF]`, or `1200000 RWF`. */
-const MONEY = /^(?:Money\[amount=(-?[\d.]+), currency=([A-Z]{3})\]|(-?\d+(?:\.\d+)?) ([A-Z]{3}))$/;
+const DATE = /^\d{4}-\d{2}-\d{2}$/;
 const ENUM = /^[A-Z][A-Z0-9_]+$/;
 /** Internal fields the API records but never shows (board order, sequence numbers, digests). */
 const HIDDEN = new Set(['rank', 'number', 'key', 'completedAt', 'sha256']);
@@ -22,7 +20,7 @@ export interface ChangeLine {
 /**
  * Audit changes and activity in words (features 18–19). Field names are the API's (`assigneeId`,
  * `reviewDate`): known ones are translated, the rest split into words. Values become people's
- * names, money in the UI language, and readable enum words.
+ * names, numbers and dates in the UI language, and readable enum words.
  */
 @Injectable({ providedIn: 'root' })
 export class ChangeFormat {
@@ -73,13 +71,13 @@ export class ChangeFormat {
     if (UUID.test(value) && /Id$/.test(field)) {
       return this.directory.nameOf(value) ?? this.transloco.translate('audit.someoneElse');
     }
-    const money = MONEY.exec(value);
-    if (money) {
-      const [, amount, currency, plainAmount, plainCurrency] = money;
-      return formatMoney(
-        { amount: amount ?? plainAmount, currency: currency ?? plainCurrency },
-        this.language.current(),
-      );
+    // Currency codes (budgetCurrency: RWF) stay as they are; enum names read as words.
+    if (/Currency$/.test(field)) return value;
+    if (DATE.test(value)) {
+      return new Intl.DateTimeFormat(this.language.current(), {
+        dateStyle: 'medium',
+        timeZone: 'UTC',
+      }).format(new Date(`${value}T00:00:00Z`));
     }
     if (ENUM.test(value)) return sentence(value.toLowerCase().replaceAll('_', ' '));
     return value;

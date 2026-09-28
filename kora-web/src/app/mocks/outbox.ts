@@ -226,25 +226,37 @@ const SKIPPED = new Set([
 ]);
 const SECRET = /password|token|secret|hash$/i;
 
-/** A field value as the API records it: scalars as they are, money as the API prints it. */
-function recorded(value: unknown): unknown {
-  if (value === null || typeof value !== 'object') return value;
-  const money = value as { amount?: unknown; currency?: unknown };
-  if (typeof money.amount === 'string' && typeof money.currency === 'string') {
-    return `Money[amount=${money.amount}, currency=${money.currency}]`;
+/**
+ * A record's fields as the API's entities store them: scalars as they are; money as two fields,
+ * `<name>Amount` (a number) and `<name>Currency`; other objects and lists are never audited.
+ */
+function flatten(row: Row | undefined): Row | undefined {
+  if (!row) return undefined;
+  const flat: Row = {};
+  for (const [key, value] of Object.entries(row)) {
+    if (value === null || typeof value !== 'object') {
+      flat[key] = value;
+      continue;
+    }
+    const money = value as { amount?: unknown; currency?: unknown };
+    if (typeof money.amount === 'string' && typeof money.currency === 'string') {
+      flat[`${key}Amount`] = Number(money.amount);
+      flat[`${key}Currency`] = money.currency;
+    }
   }
-  return undefined;
+  return flat;
 }
 
 /** Changed fields only; collections never appear, secrets appear without values. */
-export function diff(before?: Row, after?: Row): Record<string, FieldChange> {
+export function diff(beforeRow?: Row, afterRow?: Row): Record<string, FieldChange> {
+  const before = flatten(beforeRow);
+  const after = flatten(afterRow);
   const changes: Record<string, FieldChange> = {};
   const keys = new Set([...Object.keys(before ?? {}), ...Object.keys(after ?? {})]);
   for (const key of keys) {
     if (SKIPPED.has(key)) continue;
-    const from = before ? recorded(before[key]) : undefined;
-    const to = after ? recorded(after[key]) : undefined;
-    if (Array.isArray(before?.[key]) || Array.isArray(after?.[key])) continue;
+    const from = before?.[key];
+    const to = after?.[key];
     if (JSON.stringify(from) === JSON.stringify(to)) continue;
     if (from === undefined && to === undefined) continue;
     changes[key] = SECRET.test(key)
