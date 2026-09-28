@@ -41,6 +41,11 @@ export const ADMIN_ROUTES: Routes = [
         loadComponent: () =>
           import('./change-control/change-control-page').then((m) => m.ChangeControlPage),
       },
+      {
+        path: 'audit',
+        title: 'admin.tabs.audit',
+        loadComponent: () => import('./audit/audit-page').then((m) => m.AuditPage),
+      },
     ],
   },
 ];

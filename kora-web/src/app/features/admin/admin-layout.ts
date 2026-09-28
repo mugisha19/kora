@@ -58,5 +58,6 @@ export class AdminLayout {
     { path: 'organization', label: 'admin.tabs.organization' },
     { path: 'calendar', label: 'admin.tabs.calendar' },
     { path: 'change-control', label: 'admin.tabs.changeControl' },
+    { path: 'audit', label: 'admin.tabs.audit' },
   ] as const;
 }
