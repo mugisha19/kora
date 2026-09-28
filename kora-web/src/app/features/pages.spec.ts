@@ -44,7 +44,7 @@ describe('pages', () => {
       await render(SettingsPage, { providers });
 
       expect(screen.getByText('Web app version')).toBeTruthy();
-      expect(screen.getByText('0.1.0')).toBeTruthy();
+      expect(screen.getByText('1.0.0')).toBeTruthy();
       expect(screen.getByText('0.8.0')).toBeTruthy();
       // Unit tests build with the production environment file (live API).
       expect(screen.getByText('Live API')).toBeTruthy();
