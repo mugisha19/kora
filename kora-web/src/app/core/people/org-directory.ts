@@ -39,6 +39,11 @@ export class OrgDirectory {
     this.organization.hasValue() ? this.organization.value().currency : null,
   );
 
+  /** The organization's time zone: its "today" decides the current week and what is overdue. */
+  readonly timeZone = computed(() =>
+    this.organization.hasValue() ? this.organization.value().timeZone : null,
+  );
+
   /** Members holding one of `roles` (all members when omitted), by name. */
   peopleWith(roles?: readonly Role[]): Member[] {
     return this.people().filter((m) => !roles || roles.includes(m.role));

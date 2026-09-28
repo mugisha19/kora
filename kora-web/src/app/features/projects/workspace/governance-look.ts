@@ -1,5 +1,3 @@
-import { Injector } from '@angular/core';
-import { MatDialogConfig } from '@angular/material/dialog';
 import { ChangeRequestStatus, IssueStatus } from '../../../core/api/api.models';
 import { StatusTone } from '../../../shared/ui/status-chip';
 
@@ -28,19 +26,4 @@ export const CHANGE_STATUS_LOOK: Record<ChangeRequestStatus, { tone: StatusTone;
   IMPLEMENTED: { tone: 'success', icon: 'check' },
 };
 
-/**
- * A dialog that slides in from the right, full height — the task sheet's look. `injector` lets the
- * sheet use the tab's facade and the project's store.
- */
-export function sideSheet<D>(data: D, injector: Injector): MatDialogConfig<D> {
-  return {
-    data,
-    injector,
-    position: { right: '0' },
-    height: '100dvh',
-    width: 'min(560px, 100vw)',
-    maxWidth: '100vw',
-    panelClass: 'kora-side-sheet',
-    autoFocus: 'dialog',
-  };
-}
+export { sideSheet } from '../../../shared/ui/side-sheet';
