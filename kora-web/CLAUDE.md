@@ -60,8 +60,9 @@ facade, store, pages, components) · `src/app/mocks` (MSW handlers and demo data
 - Pages under a parent route (tabs, route-scoped stores, query parameters as inputs):
   `openRoute(routes, url, email)` from `src/testing/routes.ts`. Mock-API contract tests:
   `call()`/`signIn()` from `src/testing/mock-requests.ts`.
-- e2e: `signInAs(page, role)` from `e2e/support.ts` (demo buttons, fresh mock data); the PMO and
-  Member demo users have French/Kinyarwanda profiles, so call `useEnglish(page)` after signing in.
+- e2e: `signInAs(page, role)` from `e2e/support.ts` (demo buttons, fresh mock data);
+  `switchUser(page, role)` hands over to someone else in the same journey. The PMO and Member demo
+  users have French/Kinyarwanda profiles, so call `useEnglish(page)` after signing in.
 - Every new string goes into `public/i18n/en.json`, `fr.json` and `rw.json` in the same commit
   (the parity test fails otherwise).
 - e2e runs its own dev server on port 4210 (never reuses another app on 4200) and scans pages
@@ -71,7 +72,9 @@ facade, store, pages, components) · `src/app/mocks` (MSW handlers and demo data
 
 `npm start` (mock API) · `npm run start:api` (proxy to :8080) · `npm run lint` · `npm run test:ci` ·
 `npm run e2e` · `npm run verify` (everything CI runs) · `npm run icons` (after adding an icon name) ·
-`npm run api:generate` (after a contract change) · `npm run api:check`
+`npm run api:generate` (after a contract change) · `npm run api:check` · `docker build -t kora-web .`
+(the Nginx image) · `docker compose --profile demo up --build` (from the repository root: the whole
+stack on 4200)
 
 ## Git (shared working tree with the API session — see ADR 0002)
 

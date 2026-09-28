@@ -2,13 +2,13 @@
 
 ## Current status
 
-Phase 9 complete (tag `web-v0.9.0`). Waiting for "continue".
+Phase 10 complete (tag `web-v1.0.0`): all ten phases are done. The joint `v1.0.0` release (with the
+root README) is the user's call.
 
 ## Next step
 
-Phase 10 — end-to-end flows, performance, the Nginx Docker image (proxying `/api` and `/ws` to
-`api:8080`, published on 4200), the root compose include and the final README; tag v1.0.0 as the
-user decides. The API is complete (`api-v1.0.0`, contract 0.8.0 final).
+The joint release: the root README (drafted with the API session) and the `v1.0.0` tag, when the
+user decides. The API is complete (`api-v1.0.1`, contract 0.8.0 final).
 
 ## Checklist
 
@@ -22,7 +22,29 @@ user decides. The API is complete (`api-v1.0.0`, contract 0.8.0 final).
 - [x] 7. Risks + heat map, issues, stakeholders, change requests
 - [x] 8. Timesheets, resource heat map, EVM dashboard
 - [x] 9. Real-time notifications, activity feed, attachments, report exports
-- [ ] 10. E2E flows, performance, Nginx Docker image, final README; tag v1.0.0
+- [x] 10. E2E flows, performance, Nginx Docker image, final README; tag v1.0.0
+
+## Phase 10 — what exists
+
+- The web image: `kora-web/Dockerfile` (Node 24 build, unprivileged Nginx 1.31 runtime, health
+  check), `nginx/templates/` (proxy for `/api` and `/ws`, hidden actuator, SPA fallback, caching,
+  gzip, security headers with a per-response CSP nonce), `.dockerignore`
+- Compose: `kora-web/compose.yaml` (service `web`, profile demo, port 4200) and the root
+  `compose.yaml` including both apps: `docker compose --profile demo up --build`
+- CI: image build, smoke check and Trivy scan on GitHub (`web-ci.yml`) and GitLab
+  (`kora-web/.gitlab-ci.yml`)
+- Start-up skips the silent refresh on a device that never had a session; API requests carry a
+  32-hex correlation id also sent as `traceparent`
+- Performance: critical-CSS inlining off (for the CSP), bundle budget reviewed; Lighthouse on the
+  sign-in page (production image): desktop 99/100/100/100, mobile 80/100/100/100
+- Accessibility fixes found on the way: the brand link's visible text matches its name; a read-only
+  timesheet grid is keyboard-focusable on phones; the phone toolbar leaves the theme to Settings
+- A cross-feature journey e2e (time logged → approved → activity → report → notification) with a
+  `switchUser` helper; the mock audit records money as amount and currency, like the API
+- `robots.txt`, the web README, ADR 0013
+- Checked against the live API (`api-v1.0.1`) through the production image: CSP without violations,
+  STOMP through Nginx, uploads straight to storage, the new attachment labels
+- Tests: 568 unit tests (≈ 88% statements), 138 e2e tests (desktop and 375 px, axe)
 
 ## Phase 9 — what exists
 
@@ -319,3 +341,4 @@ default. Change requests go in `kora-api/docs/contract-requests.md` or to the AP
 - ADR 0010 — risks, issues, stakeholders and change control
 - ADR 0011 — timesheets, resources and earned value
 - ADR 0012 — live updates, audit trail, attachments and report exports
+- ADR 0013 — Nginx image, security headers and the full-stack compose

@@ -427,3 +427,27 @@ An audit trail is only evidence if it can't be edited: the application may inser
 never update or delete, and each row carries a hash of the previous one so a change anywhere
 breaks the chain. Exports to spreadsheets must neutralize cells that start with =, +, -, @ (or
 tab/return), or opening the file runs them as formulas.
+
+## Content-Security-Policy with a nonce (Phase 10)
+
+A CSP tells the browser where code may come from; `script-src 'self'` blocks any injected inline
+script, the main XSS payload. Inline `<style>` elements need either `'unsafe-inline'` or a nonce:
+a random value per response that the server puts both in the header and on the elements it
+trusts. Angular adds the nonce given by `ngCspNonce` to the styles it inserts; Nginx fills the
+placeholder with its request id. Anything that inlines scripts at build time (critical-CSS
+inlining) has to go, or be hashed.
+
+## Caching a single-page app (Phase 10)
+
+Bundles named after their content hash can be cached forever: a new build has new names. The page
+that references them must not be (`no-cache`: always revalidate), or users keep an old app. Files
+without a hash (translations, icons) revalidate. `no-store` would also work but keeps the page out
+of the back/forward cache.
+
+## Measuring performance (Phase 10)
+
+Lighthouse simulates a mid-range phone on a slow network with a 4× slower CPU; the desktop preset
+doesn't throttle the CPU. Most of an Angular app's cost at start is running the framework, so the
+levers are: ship less JavaScript before the first page (lazy routes, `@defer`), avoid waiting on
+the network before rendering (here: no refresh call for visitors who were never signed in), and
+cache aggressively after the first visit.

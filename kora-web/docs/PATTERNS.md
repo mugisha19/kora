@@ -157,3 +157,12 @@ proxy, a network failure) into a single `ApiError` shape, so later layers never 
   per (type, format); the web only queues a job and follows its states (`core/reports/`).
 - **Hash chain.** Audit rows chain their hashes; the admin page asks the API to verify the chain
   (`mocks/audit-chain.ts` mirrors it).
+
+## Phase 10
+
+- **Reverse proxy (one origin).** Nginx serves the app and forwards `/api` and `/ws`, so the
+  browser never needs CORS for the API and cookies stay first-party — `nginx/templates/`.
+- **Configuration by environment.** The image is the same everywhere; `KORA_API_UPSTREAM` and
+  `KORA_STORAGE_ORIGIN` are filled into the Nginx templates at start (twelve-factor).
+- **Composition of stacks.** The root `compose.yaml` only includes each app's compose file; each
+  app owns its services, build context and paths.
