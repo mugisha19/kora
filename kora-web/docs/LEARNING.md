@@ -368,3 +368,32 @@ The power/interest grid says how to treat people: manage closely (high power, hi
 keep satisfied, keep informed, monitor. The engagement matrix compares where each person is
 (unaware → leading) with where the project needs them; the gap is the work to do. Personal data
 is kept minimal and erased when someone is removed, leaving an anonymous record.
+
+## Earned value management (Phase 8)
+
+Three numbers tell the story: planned value (PV, the budgeted cost of the work scheduled by now),
+earned value (EV, the budgeted cost of the work actually done) and actual cost (AC, what that
+work cost). SV = EV − PV and SPI = EV ÷ PV say whether the project is ahead or behind; CV = EV −
+AC and CPI = EV ÷ AC say whether it is under or over budget. From CPI (and SPI) come forecasts:
+EAC = BAC ÷ CPI if today's efficiency continues, AC + (BAC − EV) if the variance was a one-off,
+or AC + (BAC − EV) ÷ (CPI × SPI) if cost and schedule pressure both continue; TCPI is the
+efficiency the rest of the work needs to finish on budget. Worked example: BAC 100,000, PV
+50,000, EV 40,000, AC 45,000 → SPI 0.80, CPI 0.89, EAC 112,500.
+
+## Measuring progress (Phase 8)
+
+EV depends on how "done" is measured: physical percent complete (reported), 0/100 (nothing until
+finished — conservative), 50/50 (half on start), or story points done. Each project picks one;
+changing it changes EV, so the report always says which method it used.
+
+## Capacity and utilization (Phase 8)
+
+Capacity is a person's weekly hours less public holidays and leave; utilization is planned hours
+÷ capacity. Under 70% wastes people, over 100% burns them out; the heat map shows both across
+all projects, and the what-if preview shows the effect of a change before it is saved.
+
+## Timesheets as the source of actual cost (Phase 8)
+
+Only approved hours count: AC = Σ approved hours × the person's cost rate on the day worked.
+Approval by the project's managers (the PMO for a manager's own time) keeps AC trustworthy;
+sent-back weeks come back to the person with the reason.

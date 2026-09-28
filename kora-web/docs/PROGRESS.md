@@ -2,13 +2,13 @@
 
 ## Current status
 
-Phase 7 complete (tag `web-v0.7.0`). Waiting for "continue".
+Phase 8 complete (tag `web-v0.8.0`). Waiting for "continue".
 
 ## Next step
 
-Phase 8 — timesheets, the resource heat map and the EVM dashboard (features 15–17). Contract
-0.6.0 is live since `api-v0.7.0`; see the backend notes in memory (timesheet approval, capacity,
-EVM formulas, dashboard trends).
+Phase 9 — real-time notifications (STOMP), activity feed, audit history, attachments and report
+exports (features 18–21). Contract 0.7.0 is live since `api-v0.8.0` and 0.8.0 (reports) since
+`api-v0.9.0`; see the backend notes in memory.
 
 ## Checklist
 
@@ -20,9 +20,46 @@ EVM formulas, dashboard trends).
 - [x] 5. Kanban, backlog, sprints
 - [x] 6. Gantt with dependencies and critical path
 - [x] 7. Risks + heat map, issues, stakeholders, change requests
-- [ ] 8. Timesheets, resource heat map, EVM dashboard
+- [x] 8. Timesheets, resource heat map, EVM dashboard
 - [ ] 9. Real-time notifications, activity feed, attachments, report exports
 - [ ] 10. E2E flows, performance, Nginx Docker image, final README; tag v1.0.0
+
+## Phase 8 — what exists
+
+- Mock API for the contract 0.6.0 operations: timesheets (week, entries, submit, approve, send
+  back, project list), cost rates, capacity and leave, allocations, the heat map, public holidays,
+  EVM report, series and settings, dashboard trends; EVM in exact BigInt money
+  (`mocks/evm.ts`), the health rule reads SPI and CPI — `mocks/{time,evm}-domain.ts`,
+  `handlers/{timesheet,resource}.handlers.ts`, demo data in `data-time.ts`
+- API clients: `core/api/{timesheets,resources,evm}.api.ts`; ISO-week helpers and `OrgClock`
+- `/timesheets` (and `/timesheets/2026-W40`): tasks × days grid, keyboard navigation, autosave,
+  quarter-hour and 24-hour checks, copy last week, add task, submit, sent-back notices —
+  `features/timesheets/`
+- `/resources`: utilization heat map with bands in words, start/weeks/team in the URL, a person's
+  sheet with capacity, leave and (PMO/admin) cost rates — `features/resources/`
+- Workspace Time tab: approvals (long-week flag, own time to the PMO, send back with a comment)
+  and planned hours with a what-if utilization preview — `workspace/time/`
+- Workspace Earned value tab: SPI/CPI gauges with zones, figures with explanations or the reason
+  they are missing, S-curve with a data table, method settings with `If-Match` — `workspace/evm/`
+- Dashboard: SPI/CPI KPI and the portfolio's monthly trend; Admin → Calendar adds Rwanda's public
+  holidays for a year
+- ADR 0011
+- Fixed along the way: the timesheet week route's pattern had lost its backslashes (week links
+  would not have matched); planned hours used the day's 0–24 parser and showed every saved week
+  as changed
+- Tests: 516 unit tests (≈ 89% statements), 126 e2e tests (desktop and 375 px, axe), including
+  the member's week from the keyboard, approvals, planned hours, the heat map and earned value
+
+## Feature acceptance criteria covered (Phase 8)
+
+- 15: a day over 24 hours is refused (store + unit + e2e); submitted and approved weeks are
+  read-only (unit + e2e); managers approve or send back with a comment, never their own time
+  (mock + unit + e2e); entry is keyboard-first (unit + e2e)
+- 16: capacity counts holidays and leave (mock + unit); over- and under-allocation are shown in
+  words (unit + e2e); planned-hours changes preview utilization before saving (unit + e2e)
+- 17: EVM figures match the textbook formulas (mock unit tests); the S-curve has a data table
+  (unit + e2e); methods are chosen per project and the report names them (unit); SPI/CPI feed
+  health and the dashboard trend (mock + unit)
 
 ## Phase 7 — what exists
 
@@ -218,9 +255,10 @@ EVM formulas, dashboard trends).
 
 ## Contract with kora-api
 
-Web types are generated from contract 0.6.0 (`kora-api/docs/openapi.yaml`); this build uses the
-0.1.1 to 0.3.0 operations. All of 0.1.1–0.6.0 is live on the real API (0.3.0 since `api-v0.4.0`,
-0.4.0 since `api-v0.5.0`, 0.5.0 since `api-v0.6.0`, 0.6.0 since `api-v0.7.0`). `npm run start:api` runs the app against the real API (needs Docker; it starts empty:
+Web types are generated from contract 0.8.0 (`kora-api/docs/openapi.yaml`); this build uses the
+0.1.1 to 0.6.0 operations. All of 0.1.1–0.8.0 is live on the real API (0.3.0 since `api-v0.4.0`,
+0.4.0 since `api-v0.5.0`, 0.5.0 since `api-v0.6.0`, 0.6.0 since `api-v0.7.0`, 0.7.0 since
+`api-v0.8.0`, 0.8.0 since `api-v0.9.0`). `npm run start:api` runs the app against the real API (needs Docker; it starts empty:
 register an organization first; emails in Mailpit at http://localhost:8025). Mock mode stays the
 default. Change requests go in `kora-api/docs/contract-requests.md` or to the API session directly.
 
@@ -235,3 +273,6 @@ default. Change requests go in `kora-api/docs/contract-requests.md` or to the AP
 - ADR 0006 — sign-in, session lifecycle and administration screens
 - ADR 0007 — portfolios, projects, dashboard, charter and WBS screens
 - ADR 0008 — Kanban board, backlog and sprints
+- ADR 0009 — Gantt schedule and working calendar
+- ADR 0010 — risks, issues, stakeholders and change control
+- ADR 0011 — timesheets, resources and earned value

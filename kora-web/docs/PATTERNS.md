@@ -127,3 +127,18 @@ proxy, a network failure) into a single `ApiError` shape, so later layers never 
   it navigates back, leaving the route closes it.
 - **Specification (server-side), in the URL.** Register filters (kind, category, owner, status,
   overdue, gap, quadrant, heat map cell) are query parameters mapped to API filters.
+
+## Phase 8
+
+- **Debounced autosave with a local draft.** `TimesheetStore` keeps the grid as text, validates it
+  on every keystroke and saves 800 ms after the last change; an invalid cell blocks the save and
+  keeps what was typed — `features/timesheets/timesheet.store.ts`.
+- **What-if preview.** Planned hours are a `linkedSignal` draft over the saved allocations; each
+  cell's utilization is recomputed from the heat map (all projects) minus the saved hours plus the
+  draft, so a manager sees the effect before saving — `workspace/time/time-tab.ts`.
+- **Strategy (server-side), chosen in the UI.** Percent-complete (physical, 0/100, 50/50, story
+  points) and EAC (typical, atypical, composite) methods are strategies the API applies; the tab
+  only picks one per project and the mock mirrors them in `mocks/evm.ts`.
+- **Value object for time.** ISO weeks and org-local dates are strings with pure helpers
+  (`shared/format/iso-week.ts`, `core/session/org-clock.ts`), never `Date` objects that shift
+  with the browser's time zone.
