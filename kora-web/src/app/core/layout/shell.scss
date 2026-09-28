@@ -57,6 +57,11 @@
   font: var(--mat-sys-title-large);
 }
 
+// The letter is drawn, not text: the link's visible text stays "Kora", matching its name.
+.logo::before {
+  content: 'K' / '';
+}
+
 .logo {
   display: grid;
   place-items: center;

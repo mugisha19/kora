@@ -18,7 +18,7 @@ import { ThemeMenu } from './theme-menu';
     }}</a>
     <header class="bar">
       <a class="brand" routerLink="/login" [attr.aria-label]="'app.home' | transloco">
-        <span class="logo" aria-hidden="true">K</span>
+        <span class="logo" aria-hidden="true"></span>
         <span>Kora</span>
       </a>
       <span class="spacer"></span>
@@ -66,6 +66,10 @@ import { ThemeMenu } from './theme-menu';
       color: inherit;
       text-decoration: none;
       font: var(--mat-sys-title-large);
+    }
+    /* The letter is drawn, not text: the link's visible text stays "Kora", matching its name. */
+    .logo::before {
+      content: 'K' / '';
     }
     .logo {
       display: grid;

@@ -119,6 +119,8 @@ describe('timesheets', () => {
     expect(screen.getAllByText('Submitted').length).toBeGreaterThan(0);
     expect(screen.queryAllByRole('textbox')).toHaveLength(0);
     expect(screen.getByRole('button', { name: 'This week' })).toBeTruthy();
+    // No cells to tab to: the scrolling grid itself takes focus (keyboard users on phones).
+    expect(screen.getByRole('region', { name: /^Week / }).getAttribute('tabindex')).toBe('0');
   });
 
   it('copies last week’s tasks into an empty week', async () => {

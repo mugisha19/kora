@@ -81,7 +81,7 @@
   <div
     class="grid-wrap"
     role="region"
-    tabindex="-1"
+    [attr.tabindex]="hasCells() ? -1 : 0"
     [attr.aria-labelledby]="'week-title'"
     (keydown)="onKeydown($event)"
   >

@@ -102,6 +102,11 @@ export class TimesheetPage {
       weekend: [5, 6].includes(this.store.days().indexOf(d)),
     }));
   });
+  /**
+   * The grid scrolls sideways on phones: reachable through its cells when it has any, otherwise the
+   * region itself takes focus (a submitted or approved week is read-only).
+   */
+  protected readonly hasCells = computed(() => this.store.rows().some((r) => !r.locked));
   protected readonly rejected = computed(() =>
     (this.store.data()?.sheets ?? []).filter((s) => s.status === 'REJECTED'),
   );
