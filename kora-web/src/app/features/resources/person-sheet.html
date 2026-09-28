@@ -1,0 +1,153 @@
+<div class="head">
+  <h2 mat-dialog-title>{{ data.user.fullName }}</h2>
+  <button mat-button type="button" class="close" (click)="close()">
+    <mat-icon svgIcon="close" aria-hidden="true" />
+    {{ 'common.close' | transloco }}
+  </button>
+</div>
+
+<mat-dialog-content tabindex="0">
+  @if (formError()) {
+    <div class="kora-notice error" role="alert">
+      <mat-icon svgIcon="error" aria-hidden="true" />
+      <p>{{ formError() }}</p>
+    </div>
+  }
+
+  @if (capacity.error()) {
+    <kora-error-state (retry)="capacity.reload()" />
+  } @else if (capacity.value(); as c) {
+    <section aria-labelledby="capacity-title">
+      <h3 id="capacity-title">{{ 'resources.capacity' | transloco }}</h3>
+      <p class="big">{{ 'resources.hoursPerWeek' | transloco: { hours: c.hoursPerWeek } }}</p>
+      @if (c.history.length) {
+        <ul class="plain">
+          @for (period of c.history; track period.validFrom) {
+            <li>
+              {{
+                'resources.fromDate'
+                  | transloco
+                    : {
+                        hours: period.hoursPerWeek,
+                        date: (period.validFrom | localizedDate: language.current()),
+                      }
+              }}
+            </li>
+          }
+        </ul>
+      }
+      @if (keeper()) {
+        <form class="inline" novalidate (submit)="changeHours($event)">
+          <mat-form-field>
+            <mat-label>{{ 'resources.newHours' | transloco }}</mat-label>
+            <input matInput inputmode="decimal" [formField]="hoursForm.hoursPerWeek" />
+            <span matTextSuffix>h</span>
+            <mat-error><kora-field-error [field]="hoursForm.hoursPerWeek" /></mat-error>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>{{ 'resources.validFrom' | transloco }}</mat-label>
+            <input matInput type="date" [formField]="hoursForm.validFrom" />
+          </mat-form-field>
+          <button mat-stroked-button type="submit">
+            {{ 'resources.changeHours' | transloco }}
+          </button>
+        </form>
+      }
+    </section>
+
+    <section aria-labelledby="leave-title">
+      <h3 id="leave-title">{{ 'resources.leave' | transloco }}</h3>
+      @if (c.leave.length) {
+        <ul class="plain">
+          @for (leave of c.leave; track leave.id) {
+            <li>
+              <span>
+                {{ leave.from | localizedDate: language.current() }} –
+                {{ leave.to | localizedDate: language.current() }}
+                @if (leave.reason) {
+                  · {{ leave.reason }}
+                }
+              </span>
+              @if (canLeave()) {
+                <button
+                  mat-icon-button
+                  type="button"
+                  [attr.aria-label]="
+                    'resources.cancelLeave'
+                      | transloco: { from: (leave.from | localizedDate: language.current()) }
+                  "
+                  (click)="cancelLeave(leave.id)"
+                >
+                  <mat-icon svgIcon="delete" aria-hidden="true" />
+                </button>
+              }
+            </li>
+          }
+        </ul>
+      } @else {
+        <p class="kora-muted">{{ 'resources.noLeave' | transloco }}</p>
+      }
+      @if (canLeave()) {
+        <form class="inline" novalidate (submit)="addLeave($event)">
+          <mat-form-field>
+            <mat-label>{{ 'resources.from' | transloco }}</mat-label>
+            <input matInput type="date" [formField]="leaveForm.from" />
+            <mat-error><kora-field-error [field]="leaveForm.from" /></mat-error>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>{{ 'resources.to' | transloco }}</mat-label>
+            <input matInput type="date" [formField]="leaveForm.to" />
+            <mat-error><kora-field-error [field]="leaveForm.to" /></mat-error>
+          </mat-form-field>
+          <mat-form-field class="grow">
+            <mat-label>{{ 'resources.reason' | transloco }}</mat-label>
+            <input matInput [formField]="leaveForm.reason" />
+          </mat-form-field>
+          <button mat-stroked-button type="submit">{{ 'resources.addLeave' | transloco }}</button>
+        </form>
+      }
+    </section>
+
+    @if (keeper()) {
+      <section aria-labelledby="rates-title">
+        <h3 id="rates-title">{{ 'resources.rates' | transloco }}</h3>
+        <p class="kora-muted">{{ 'resources.ratesHint' | transloco }}</p>
+        @if (rates.value(); as list) {
+          @if (list.length) {
+            <ul class="plain">
+              @for (rate of list; track rate.id) {
+                <li>
+                  {{
+                    'resources.rateFrom'
+                      | transloco
+                        : {
+                            rate: (rate.hourlyRate | money: language.current()),
+                            date: (rate.validFrom | localizedDate: language.current()),
+                          }
+                  }}
+                </li>
+              }
+            </ul>
+          } @else {
+            <p class="kora-muted">{{ 'resources.noRate' | transloco }}</p>
+          }
+        }
+        <form class="inline" novalidate (submit)="addRate($event)">
+          <mat-form-field>
+            <mat-label>{{ 'resources.hourlyRate' | transloco }}</mat-label>
+            <input matInput inputmode="decimal" [formField]="rateForm.amount" />
+            <span matTextSuffix>{{ currency() }}</span>
+            <mat-error><kora-field-error [field]="rateForm.amount" /></mat-error>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>{{ 'resources.validFrom' | transloco }}</mat-label>
+            <input matInput type="date" [formField]="rateForm.validFrom" />
+          </mat-form-field>
+          <button mat-stroked-button type="submit">{{ 'resources.addRate' | transloco }}</button>
+        </form>
+      </section>
+    }
+  } @else {
+    <kora-loading-state />
+  }
+</mat-dialog-content>
