@@ -12,7 +12,9 @@
     "settings": "Paramètres",
     "admin": "Administration",
     "portfolios": "Portefeuilles",
-    "projects": "Projets"
+    "projects": "Projets",
+    "timesheets": "Feuilles de temps",
+    "resources": "Ressources"
   },
   "theme": {
     "label": "Thème",
@@ -79,7 +81,8 @@
       "changes": "Demandes de changement en attente",
       "later": "Disponible dans une version ultérieure",
       "risksNote": "Note de 15 ou plus",
-      "changesNote": "Soumises ou en examen"
+      "changesNote": "Soumises ou en examen",
+      "spiCpiNote": "Σ EV ÷ Σ PV et Σ EV ÷ Σ AC"
     },
     "charts": {
       "title": "Répartitions",
@@ -101,6 +104,10 @@
       "subtitle": "Risques ouverts notés 15 ou plus, sur les projets affichés.",
       "review": "revue le {{ date }}",
       "none": "Aucun risque critique ouvert."
+    },
+    "trends": {
+      "title": "Performance des délais et des coûts par mois",
+      "month": "Mois"
     }
   },
   "settings": {
@@ -261,6 +268,12 @@
         "not_in_review": "Cette demande n’attend pas de décision.",
         "self_approval": "Personne ne décide de sa propre demande de changement.",
         "invalid_transition": "La demande ne peut pas faire cela depuis son statut actuel."
+      },
+      "timesheets": {
+        "locked": "Le temps de ce projet est soumis ou approuvé et ne peut pas changer.",
+        "empty": "Il n’y a rien à soumettre cette semaine.",
+        "not_submitted": "Seule une feuille de temps soumise peut être approuvée ou renvoyée.",
+        "self_approval": "Personne n’approuve son propre temps."
       }
     },
     "fields": {
@@ -452,7 +465,12 @@
       "errors": {
         "noDays": "Choisissez au moins un jour travaillé.",
         "duplicate": "Cette date est déjà un jour férié."
-      }
+      },
+      "year": "Année",
+      "addRwanda": "Ajouter les jours fériés du Rwanda pour {{ year }}",
+      "rwandaHint": "Dates fixes, Vendredi saint, lundi de Pâques et Umuganura. L’Aïd el-Fitr et l’Aïd el-Adha sont annoncés chaque année : ajoutez-les à la main.",
+      "saveFirst": "Enregistrez ou annulez d’abord vos modifications.",
+      "holidaysAdded": "Jours fériés de {{ year }} ajoutés : {{ count }}."
     },
     "changeControl": {
       "intro": "Qui approuve une demande de changement dépend de son ampleur. Le chef de projet approuve toujours.",
@@ -666,7 +684,9 @@
       "risks": "Risques",
       "issues": "Problèmes",
       "stakeholders": "Parties prenantes",
-      "change-requests": "Changements"
+      "change-requests": "Changements",
+      "time": "Temps",
+      "evm": "Valeur acquise"
     },
     "overview": {
       "details": "Détails"
@@ -1601,5 +1621,265 @@
     "requested": "Demandée par {{ name }}, soumise le {{ date }}",
     "emptyTitle": "Rien ne vous attend",
     "emptyMessage": "Les demandes de changement qui attendent votre décision apparaissent ici."
+  },
+  "timesheetStatus": {
+    "DRAFT": "Brouillon",
+    "SUBMITTED": "Soumise",
+    "APPROVED": "Approuvée",
+    "REJECTED": "Renvoyée"
+  },
+  "utilizationBand": {
+    "UNDER": "Sous-chargé",
+    "HEALTHY": "Équilibré",
+    "OVER": "Surchargé"
+  },
+  "utilizationBandRule": {
+    "UNDER": "moins de 70 %",
+    "HEALTHY": "70–100 %",
+    "OVER": "plus de 100 %"
+  },
+  "percentCompleteMethod": {
+    "PHYSICAL": {
+      "name": "Avancement physique",
+      "hint": "Chaque lot de travail acquiert son pourcentage d’avancement déclaré (ou issu des tâches)."
+    },
+    "ZERO_HUNDRED": {
+      "name": "0/100",
+      "hint": "Un lot de travail n’acquiert rien tant qu’il n’est pas terminé."
+    },
+    "FIFTY_FIFTY": {
+      "name": "50/50",
+      "hint": "La moitié au démarrage d’un lot, le reste à la fin."
+    },
+    "STORY_POINTS": {
+      "name": "Points de récit",
+      "hint": "Le budget au prorata des points de récit terminés."
+    }
+  },
+  "eacMethod": {
+    "TYPICAL": {
+      "name": "Typique (BAC ÷ CPI)",
+      "hint": "L’efficacité des coûts actuelle se maintient jusqu’à la fin."
+    },
+    "ATYPICAL": {
+      "name": "Atypique (AC + BAC − EV)",
+      "hint": "L’écart constaté était ponctuel ; le reste suit le plan."
+    },
+    "COMPOSITE": {
+      "name": "Composite (avec SPI)",
+      "hint": "Les pressions sur les coûts et les délais se maintiennent."
+    }
+  },
+  "timesheets": {
+    "title": "Feuilles de temps",
+    "subtitle": "Vos heures par tâche et par jour. Le brouillon s’enregistre pendant la saisie ; soumettez quand la semaine est finie.",
+    "weekLabel": "Semaine {{ number }}",
+    "previousWeek": "Semaine précédente",
+    "nextWeek": "Semaine suivante",
+    "thisWeek": "Cette semaine",
+    "sheetsLabel": "Statut par projet",
+    "sentBack": "{{ project }} a été renvoyée par {{ name }} :",
+    "keyboardHelp": "Saisissez les heures par quarts (7,5). Les flèches passent d’une case à l’autre ; Entrée descend.",
+    "gridCaption": "Heures par tâche et par jour",
+    "task": "Tâche",
+    "total": "Total",
+    "dailyTotal": "Total par jour",
+    "cellLabel": "{{ task }}, {{ day }}, heures",
+    "removeRow": "Retirer {{ task }} de la semaine",
+    "empty": "Aucune tâche pour l’instant. Ajoutez les tâches sur lesquelles vous avez travaillé.",
+    "overDay": "plus de 24 heures",
+    "saving": "Enregistrement…",
+    "saved": "Toutes les modifications sont enregistrées.",
+    "addTask": "Ajouter une tâche",
+    "addTaskTitle": "Ajouter une tâche à la semaine",
+    "project": "Projet",
+    "projectHint": "Projets en cours où vous saisissez du temps.",
+    "noTasks": "Toutes les tâches de ce projet sont déjà dans la semaine.",
+    "copyLastWeek": "Copier les tâches de la semaine dernière",
+    "copied": "Tâches copiées de la semaine dernière : {{ count }}.",
+    "submit": "Soumettre la semaine",
+    "submitTitle": "Soumettre cette semaine ?",
+    "submitMessage": "Les {{ hours }} h de la semaine partent en approbation auprès des responsables de chaque projet. Le temps soumis ne peut plus changer sauf s’il est renvoyé.",
+    "submitted": "Semaine soumise pour approbation.",
+    "readOnly": "Cette semaine est soumise : elle ne peut changer que si un responsable la renvoie.",
+    "errors": {
+      "quarters": "Saisissez les heures par quarts de 0 à 24, comme 7,5.",
+      "dayOver24": "Une journée compte au plus 24 heures, tous projets confondus.",
+      "notOnTeam": "Vous ne saisissez du temps que sur les projets que vous gérez ou auxquels vous contribuez."
+    }
+  },
+  "time": {
+    "approvals": "Feuilles de temps à approuver",
+    "status": "Statut",
+    "anyStatus": "Tout statut",
+    "hours": "{{ hours }} h",
+    "longWeek": "Plus de {{ hours }} h",
+    "view": "Voir",
+    "viewFor": "Voir la feuille de temps de {{ name }}",
+    "approve": "Approuver",
+    "approveFor": "Approuver la feuille de temps de {{ name }}",
+    "reject": "Renvoyer",
+    "rejectFor": "Renvoyer la feuille de temps de {{ name }}",
+    "rejectTitle": "Renvoyer la semaine {{ week }} de {{ name }}",
+    "rejectComment": "Que faut-il changer ?",
+    "approved": "Semaine {{ week }} de {{ name }} approuvée.",
+    "rejected": "Semaine {{ week }} renvoyée à {{ name }}.",
+    "ownTime": "Votre propre temps : le PMO l’approuve.",
+    "noneTitle": "Rien à approuver",
+    "noneMessage": "Les feuilles de temps soumises pour ce projet apparaissent ici.",
+    "logYours": "Les responsables approuvent ici le temps du projet. Saisissez le vôtre sur",
+    "sheetTitle": "{{ name }} · semaine {{ week }}",
+    "entries": "Heures par tâche et par jour",
+    "notes": "Notes",
+    "plan": "Heures prévues",
+    "planHelp": "Heures par personne et par semaine sur ce projet. En dessous : sa charge sur tous ses projets — essayez des changements avant d’enregistrer.",
+    "planCaption": "Heures prévues par personne et par semaine, avec la charge",
+    "cellLabel": "{{ name }}, semaine du {{ week }}, heures prévues",
+    "whatIf": "Modifications pas encore enregistrées (aperçu) : {{ count }}",
+    "discard": "Annuler",
+    "savePlan": "Enregistrer les heures prévues",
+    "allocationsSaved": "Heures prévues enregistrées.",
+    "errors": {
+      "hours": "Saisissez des heures entre 0 et 168."
+    }
+  },
+  "resources": {
+    "title": "Ressources",
+    "subtitle": "Qui est surchargé ou sous-chargé, semaine par semaine, sur tous les projets.",
+    "startingWeek": "Semaine de départ",
+    "weeks": "Semaines",
+    "weekCount": "{{ count }} semaines",
+    "team": "Équipe",
+    "everyone": "Tout le monde",
+    "legend": "Niveaux de charge",
+    "heatmapLabel": "Carte de charge",
+    "caption": "Heures prévues en part de la capacité, par personne et par semaine",
+    "person": "Personne",
+    "weekOf": "Semaine du",
+    "noCapacity": "Pas de capacité",
+    "cellDetail": "{{ allocated }} h prévues sur {{ capacity }} h de capacité ; {{ actual }} h saisies",
+    "help": "La capacité compte les heures hebdomadaires moins les jours fériés et les congés. Choisissez une personne pour voir sa capacité et ses congés.",
+    "emptyTitle": "Personne à afficher",
+    "emptyMessage": "Essayez une autre équipe.",
+    "capacity": "Capacité",
+    "hoursPerWeek": "{{ hours }} h par semaine",
+    "fromDate": "{{ hours }} h par semaine à partir du {{ date }}",
+    "newHours": "Heures hebdomadaires",
+    "validFrom": "À partir du",
+    "changeHours": "Modifier les heures",
+    "hoursChanged": "Capacité de {{ name }} modifiée.",
+    "leave": "Congés",
+    "noLeave": "Aucun congé enregistré.",
+    "from": "Du",
+    "to": "Au",
+    "reason": "Motif (facultatif)",
+    "addLeave": "Ajouter un congé",
+    "leaveAdded": "Congé enregistré pour {{ name }}.",
+    "cancelLeave": "Annuler le congé du {{ from }}",
+    "leaveCancelled": "Congé annulé.",
+    "rates": "Taux de coût",
+    "ratesHint": "Confidentiels : seuls les administrateurs et le PMO les voient. Les heures coûtent le taux du jour travaillé.",
+    "noRate": "Pas encore de taux : ses heures approuvées ne coûtent rien en valeur acquise.",
+    "rateFrom": "{{ rate }} de l’heure à partir du {{ date }}",
+    "hourlyRate": "Taux horaire",
+    "addRate": "Ajouter un taux",
+    "rateAdded": "Taux de coût ajouté.",
+    "errors": {
+      "hours": "Saisissez des heures entre 0 et 80.",
+      "leaveOrder": "La fin ne peut pas précéder le début."
+    }
+  },
+  "evm": {
+    "asOf": "Au {{ date }} · avancement par {{ method }} · prévision par {{ eac }}",
+    "noBudgetTitle": "Pas encore de budget dans l’OTP",
+    "noBudgetMessage": "La valeur acquise a besoin de coûts prévus sur les lots de travail.",
+    "unrated": "Heures approuvées sans taux pour leur jour : {{ hours }} h. Elles ne coûtent rien dans l’AC.",
+    "indices": "Indices de performance",
+    "figures": "Chiffres",
+    "zone": {
+      "OFF": "En dérive",
+      "RISK": "À risque",
+      "ON": "Conforme"
+    },
+    "metrics": {
+      "bac": {
+        "name": "Budget à l’achèvement",
+        "short": "BAC",
+        "hint": "Le coût prévu de tout l’OTP."
+      },
+      "pv": {
+        "name": "Valeur planifiée",
+        "short": "PV",
+        "hint": "Le coût prévu du travail planifié à ce jour."
+      },
+      "ev": {
+        "name": "Valeur acquise",
+        "short": "EV",
+        "hint": "Le coût prévu du travail réalisé à ce jour."
+      },
+      "ac": {
+        "name": "Coût réel",
+        "short": "AC",
+        "hint": "Heures approuvées × taux de coût."
+      },
+      "sv": {
+        "name": "Écart de délai",
+        "short": "SV",
+        "negative": "En retard de {{ amount }} de travail.",
+        "positive": "En avance de {{ amount }} de travail.",
+        "zero": "Exactement dans les délais."
+      },
+      "cv": {
+        "name": "Écart de coût",
+        "short": "CV",
+        "negative": "Dépassement de {{ amount }}.",
+        "positive": "Économie de {{ amount }}.",
+        "zero": "Exactement dans le budget."
+      },
+      "spi": {
+        "name": "Performance des délais",
+        "short": "SPI",
+        "hint": "Pour chaque unité de travail planifiée à ce jour, {{ spi }} est réalisée."
+      },
+      "cpi": {
+        "name": "Performance des coûts",
+        "short": "CPI",
+        "hint": "Pour chaque {{ one }} dépensé, {{ cpi }} de travail est acquis."
+      },
+      "eac": {
+        "name": "Estimation à l’achèvement",
+        "short": "EAC",
+        "hint": "Le coût total attendu ({{ method }})."
+      },
+      "etc": {
+        "name": "Estimation pour achever",
+        "short": "ETC",
+        "hint": "Ce qu’il reste à dépenser pour finir."
+      },
+      "vac": {
+        "name": "Écart à l’achèvement",
+        "short": "VAC",
+        "negative": "Dépassement attendu du budget de {{ amount }}.",
+        "positive": "Fin attendue {{ amount }} sous le budget.",
+        "zero": "Fin attendue exactement dans le budget."
+      },
+      "tcpi": {
+        "name": "Performance à atteindre",
+        "short": "TCPI",
+        "hint": "Chaque {{ one }} restant à dépenser doit acquérir {{ tcpi }} pour finir dans le budget."
+      }
+    },
+    "curve": {
+      "title": "Courbe en S : PV, EV et AC par semaine",
+      "weekEnding": "Semaine finissant le"
+    },
+    "settings": {
+      "title": "Méthodes",
+      "percentComplete": "Mesurer l’avancement par",
+      "eac": "Prévoir le coût par",
+      "save": "Enregistrer les méthodes",
+      "saved": "Méthodes de valeur acquise enregistrées.",
+      "stale": "Quelqu’un d’autre a changé les méthodes pendant votre choix. Voici les siennes ; choisissez à nouveau."
+    }
   }
 }

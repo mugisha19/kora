@@ -12,7 +12,9 @@
     "settings": "Igenamiterere",
     "admin": "Ubuyobozi",
     "portfolios": "Portefeuye",
-    "projects": "Imishinga"
+    "projects": "Imishinga",
+    "timesheets": "Amasaha y’akazi",
+    "resources": "Abakozi n’ubushobozi"
   },
   "theme": {
     "label": "Isura",
@@ -79,7 +81,8 @@
       "changes": "Ubusabe bw’impinduka butegereje",
       "later": "Bizaboneka mu ivugururwa rizaza",
       "risksNote": "Amanota 15 cyangwa arenga",
-      "changesNote": "Byoherejwe cyangwa birimo gusuzumwa"
+      "changesNote": "Byoherejwe cyangwa birimo gusuzumwa",
+      "spiCpiNote": "Σ EV ÷ Σ PV na Σ EV ÷ Σ AC"
     },
     "charts": {
       "title": "Isaranganya",
@@ -101,6 +104,10 @@
       "subtitle": "Ingaruka zifunguye zifite amanota 15 cyangwa arenga, mu mishinga igaragara.",
       "review": "isuzuma ku ya {{ date }}",
       "none": "Nta ngaruka zikomeye cyane zifunguye."
+    },
+    "trends": {
+      "title": "Imikorere ku gihe n’ikiguzi buri kwezi",
+      "month": "Ukwezi"
     }
   },
   "settings": {
@@ -261,6 +268,12 @@
         "not_in_review": "Iki cyifuzo ntigitegereje icyemezo.",
         "self_approval": "Nta muntu ufata icyemezo ku cyifuzo cye bwite.",
         "invalid_transition": "Icyifuzo ntigishobora gukora ibyo uhereye ku miterere yacyo y’ubu."
+      },
+      "timesheets": {
+        "locked": "Amasaha y’uwo mushinga yoherejwe cyangwa yemejwe kandi ntashobora guhinduka.",
+        "empty": "Nta cyo kohereza muri iki cyumweru.",
+        "not_submitted": "Amasaha yoherejwe ni yo yonyine ashobora kwemezwa cyangwa kugarurwa.",
+        "self_approval": "Nta muntu wemeza amasaha ye bwite."
       }
     },
     "fields": {
@@ -452,7 +465,12 @@
       "errors": {
         "noDays": "Hitamo nibura umunsi umwe w’akazi.",
         "duplicate": "Iyo tariki isanzwe ari umunsi mukuru."
-      }
+      },
+      "year": "Umwaka",
+      "addRwanda": "Ongeraho iminsi mikuru y’u Rwanda ya {{ year }}",
+      "rwandaHint": "Amatariki adahinduka, Kuwa Gatanu Mutagatifu, Kuwa Mbere wa Pasika n’Umuganura. Eid al-Fitr na Eid al-Adha bitangazwa buri mwaka: bishyiremo n’intoki.",
+      "saveFirst": "Banza ubike cyangwa ureke impinduka zawe.",
+      "holidaysAdded": "Iminsi mikuru {{ count }} ya {{ year }} yongeweho."
     },
     "changeControl": {
       "intro": "Uwemeza icyifuzo cy’impinduka biterwa n’ingano yacyo. Umuyobozi w’umushinga ahora acyemeza.",
@@ -666,7 +684,9 @@
       "risks": "Ingaruka",
       "issues": "Ibibazo",
       "stakeholders": "Abafatanyabikorwa",
-      "change-requests": "Impinduka"
+      "change-requests": "Impinduka",
+      "time": "Igihe",
+      "evm": "Agaciro kagezweho"
     },
     "overview": {
       "details": "Ibisobanuro birambuye"
@@ -1601,5 +1621,265 @@
     "requested": "Cyasabwe na {{ name }}, cyoherejwe ku ya {{ date }}",
     "emptyTitle": "Nta kigutegereje",
     "emptyMessage": "Ibyifuzo by’impinduka bikeneye icyemezo cyawe bigaragara hano."
+  },
+  "timesheetStatus": {
+    "DRAFT": "Umushinga",
+    "SUBMITTED": "Byoherejwe",
+    "APPROVED": "Byemejwe",
+    "REJECTED": "Byagaruwe"
+  },
+  "utilizationBand": {
+    "UNDER": "Munsi",
+    "HEALTHY": "Biringaniye",
+    "OVER": "Birenze"
+  },
+  "utilizationBandRule": {
+    "UNDER": "munsi ya 70%",
+    "HEALTHY": "70–100%",
+    "OVER": "hejuru ya 100%"
+  },
+  "percentCompleteMethod": {
+    "PHYSICAL": {
+      "name": "Ijanisha ry’ibyakozwe",
+      "hint": "Buri gice cy’akazi kinjiza ijanisha ryacyo ryatanzwe (cyangwa rituruka ku bikorwa)."
+    },
+    "ZERO_HUNDRED": {
+      "name": "0/100",
+      "hint": "Igice cy’akazi ntikinjiza na kimwe kitararangira."
+    },
+    "FIFTY_FIFTY": {
+      "name": "50/50",
+      "hint": "Igice iyo gitangiye, igisigaye iyo kirangiye."
+    },
+    "STORY_POINTS": {
+      "name": "Amanota y’inkuru",
+      "hint": "Ingengo y’imari ukurikije amanota y’inkuru yarangiye."
+    }
+  },
+  "eacMethod": {
+    "TYPICAL": {
+      "name": "Isanzwe (BAC ÷ CPI)",
+      "hint": "Uko amafaranga akoreshwa ubu bizakomeza kugeza ku iherezo."
+    },
+    "ATYPICAL": {
+      "name": "Idasanzwe (AC + BAC − EV)",
+      "hint": "Itandukaniro ryabaye rimwe gusa; ibisigaye bizakurikiza igenamigambi."
+    },
+    "COMPOSITE": {
+      "name": "Ivanze (na SPI)",
+      "hint": "Igitutu ku kiguzi n’igihe bizakomeza."
+    }
+  },
+  "timesheets": {
+    "title": "Amasaha y’akazi",
+    "subtitle": "Amasaha yawe kuri buri gikorwa n’umunsi. Umushinga ubikwa uko wandika; ohereza icyumweru kirangiye.",
+    "weekLabel": "Icyumweru cya {{ number }}",
+    "previousWeek": "Icyumweru gishize",
+    "nextWeek": "Icyumweru gitaha",
+    "thisWeek": "Iki cyumweru",
+    "sheetsLabel": "Imiterere kuri buri mushinga",
+    "sentBack": "{{ project }} byagaruwe na {{ name }}:",
+    "keyboardHelp": "Andika amasaha mu bice bya kane (7.5). Utwambi tugukura mu kazu kajya mu kandi; Enter imanura.",
+    "gridCaption": "Amasaha kuri buri gikorwa n’umunsi",
+    "task": "Igikorwa",
+    "total": "Igiteranyo",
+    "dailyTotal": "Igiteranyo cy’umunsi",
+    "cellLabel": "{{ task }}, {{ day }}, amasaha",
+    "removeRow": "Kura {{ task }} mu cyumweru",
+    "empty": "Nta bikorwa biraboneka. Ongeraho ibikorwa wakozeho.",
+    "overDay": "birenze amasaha 24",
+    "saving": "Birabikwa…",
+    "saved": "Impinduka zose zabitswe.",
+    "addTask": "Ongeraho igikorwa",
+    "addTaskTitle": "Ongeraho igikorwa mu cyumweru",
+    "project": "Umushinga",
+    "projectHint": "Imishinga irimo gukorwa wandikaho amasaha.",
+    "noTasks": "Ibikorwa byose by’uyu mushinga bisanzwe biri mu cyumweru.",
+    "copyLastWeek": "Kopa ibikorwa by’icyumweru gishize",
+    "copied": "Ibikorwa {{ count }} byakopwe mu cyumweru gishize.",
+    "submit": "Ohereza icyumweru",
+    "submitTitle": "Kohereza iki cyumweru?",
+    "submitMessage": "Amasaha {{ hours }} yoherezwa ku bayobozi ba buri mushinga ngo bayemeze. Amasaha yoherejwe ntashobora guhinduka keretse agaruwe.",
+    "submitted": "Icyumweru cyoherejwe ngo cyemezwe.",
+    "readOnly": "Iki cyumweru cyoherejwe: gishobora guhinduka ari uko umuyobozi akigaruye.",
+    "errors": {
+      "quarters": "Andika amasaha mu bice bya kane hagati ya 0 na 24, nka 7.5.",
+      "dayOver24": "Umunsi ugira amasaha 24 ntarengwa ku mishinga yose.",
+      "notOnTeam": "Wandika amasaha gusa ku mishinga uyobora cyangwa ukoraho."
+    }
+  },
+  "time": {
+    "approvals": "Amasaha yo kwemeza",
+    "status": "Imiterere",
+    "anyStatus": "Imiterere iyo ari yo yose",
+    "hours": "{{ hours }} h",
+    "longWeek": "Hejuru ya {{ hours }} h",
+    "view": "Reba",
+    "viewFor": "Reba amasaha ya {{ name }}",
+    "approve": "Emeza",
+    "approveFor": "Emeza amasaha ya {{ name }}",
+    "reject": "Garura",
+    "rejectFor": "Garura amasaha ya {{ name }}",
+    "rejectTitle": "Garura icyumweru cya {{ week }} cya {{ name }}",
+    "rejectComment": "Ni iki gikwiye guhinduka?",
+    "approved": "Icyumweru cya {{ week }} cya {{ name }} cyemejwe.",
+    "rejected": "Icyumweru cya {{ week }} cyagarujwe kwa {{ name }}.",
+    "ownTime": "Amasaha yawe bwite: PMO ni yo iyemeza.",
+    "noneTitle": "Nta cyo kwemeza",
+    "noneMessage": "Amasaha yoherejwe kuri uyu mushinga agaragara hano.",
+    "logYours": "Abayobozi bemeza amasaha y’umushinga hano. Andika ayawe kuri",
+    "sheetTitle": "{{ name }} · icyumweru cya {{ week }}",
+    "entries": "Amasaha kuri buri gikorwa n’umunsi",
+    "notes": "Ibisobanuro",
+    "plan": "Amasaha ateganyijwe",
+    "planHelp": "Amasaha kuri buri muntu buri cyumweru kuri uyu mushinga. Munsi yayo: uko akoreshwa ku mishinga yose — gerageza impinduka mbere yo kubika.",
+    "planCaption": "Amasaha ateganyijwe kuri buri muntu n’icyumweru, n’uko akoreshwa",
+    "cellLabel": "{{ name }}, icyumweru cya {{ week }}, amasaha ateganyijwe",
+    "whatIf": "Impinduka {{ count }} zitarabikwa (igerageza)",
+    "discard": "Reka",
+    "savePlan": "Bika amasaha ateganyijwe",
+    "allocationsSaved": "Amasaha ateganyijwe yabitswe.",
+    "errors": {
+      "hours": "Andika amasaha hagati ya 0 na 168."
+    }
+  },
+  "resources": {
+    "title": "Abakozi n’ubushobozi",
+    "subtitle": "Ufite akazi kenshi cyangwa gake, icyumweru ku cyumweru, ku mishinga yose.",
+    "startingWeek": "Icyumweru cyo gutangiriraho",
+    "weeks": "Ibyumweru",
+    "weekCount": "Ibyumweru {{ count }}",
+    "team": "Itsinda",
+    "everyone": "Bose",
+    "legend": "Ibyiciro by’ikoreshwa",
+    "heatmapLabel": "Ikarita y’ubushobozi",
+    "caption": "Amasaha ateganyijwe ugereranyije n’ubushobozi, kuri buri muntu n’icyumweru",
+    "person": "Umuntu",
+    "weekOf": "Icyumweru cya",
+    "noCapacity": "Nta bushobozi",
+    "cellDetail": "Amasaha {{ allocated }} ateganyijwe kuri {{ capacity }} y’ubushobozi; {{ actual }} yanditswe",
+    "help": "Ubushobozi bubara amasaha y’icyumweru ukuyemo iminsi mikuru n’ikiruhuko. Hitamo umuntu urebe ubushobozi bwe n’ikiruhuko.",
+    "emptyTitle": "Nta muntu wo kwerekana",
+    "emptyMessage": "Gerageza irindi tsinda.",
+    "capacity": "Ubushobozi",
+    "hoursPerWeek": "Amasaha {{ hours }} mu cyumweru",
+    "fromDate": "Amasaha {{ hours }} mu cyumweru guhera ku ya {{ date }}",
+    "newHours": "Amasaha y’icyumweru",
+    "validFrom": "Guhera",
+    "changeHours": "Hindura amasaha",
+    "hoursChanged": "Ubushobozi bwa {{ name }} bwahinduwe.",
+    "leave": "Ikiruhuko",
+    "noLeave": "Nta kiruhuko cyanditswe.",
+    "from": "Kuva",
+    "to": "Kugeza",
+    "reason": "Impamvu (si ngombwa)",
+    "addLeave": "Ongeraho ikiruhuko",
+    "leaveAdded": "Ikiruhuko cyanditswe kuri {{ name }}.",
+    "cancelLeave": "Kuraho ikiruhuko cyo ku ya {{ from }}",
+    "leaveCancelled": "Ikiruhuko cyakuweho.",
+    "rates": "Igiciro cy’isaha",
+    "ratesHint": "Ibanga: abayobozi ba sisitemu na PMO ni bo bonyine babibona. Amasaha abarwa ku giciro cy’umunsi yakozweho.",
+    "noRate": "Nta giciro kiraboneka: amasaha ye yemejwe nta kiguzi agira mu gaciro kagezweho.",
+    "rateFrom": "{{ rate }} ku isaha guhera ku ya {{ date }}",
+    "hourlyRate": "Igiciro cy’isaha",
+    "addRate": "Ongeraho igiciro",
+    "rateAdded": "Igiciro cy’isaha cyongeweho.",
+    "errors": {
+      "hours": "Andika amasaha hagati ya 0 na 80.",
+      "leaveOrder": "Itariki y’iherezo ntishobora kubanziriza iyo gutangira."
+    }
+  },
+  "evm": {
+    "asOf": "Ku ya {{ date }} · aho bigeze hakurikijwe {{ method }} · iteganya hakurikijwe {{ eac }}",
+    "noBudgetTitle": "Nta ngengo y’imari iri mu mbonerahamwe y’ibikorwa",
+    "noBudgetMessage": "Agaciro kagezweho gakenera ibiguzi biteganyijwe ku bice by’akazi.",
+    "unrated": "Amasaha {{ hours }} yemejwe nta giciro afite ku munsi wayo: nta kiguzi agira muri AC.",
+    "indices": "Ibipimo by’imikorere",
+    "figures": "Imibare",
+    "zone": {
+      "OFF": "Byarenze",
+      "RISK": "Biri mu kaga",
+      "ON": "Bigenda neza"
+    },
+    "metrics": {
+      "bac": {
+        "name": "Ingengo y’imari yose",
+        "short": "BAC",
+        "hint": "Ikiguzi giteganyijwe cy’imbonerahamwe y’ibikorwa yose."
+      },
+      "pv": {
+        "name": "Agaciro kateganyijwe",
+        "short": "PV",
+        "hint": "Ikiguzi giteganyijwe cy’akazi kagombaga gukorwa kugeza ubu."
+      },
+      "ev": {
+        "name": "Agaciro kagezweho",
+        "short": "EV",
+        "hint": "Ikiguzi giteganyijwe cy’akazi kakozwe kugeza ubu."
+      },
+      "ac": {
+        "name": "Ikiguzi nyacyo",
+        "short": "AC",
+        "hint": "Amasaha yemejwe × igiciro cy’isaha."
+      },
+      "sv": {
+        "name": "Itandukaniro ku gihe",
+        "short": "SV",
+        "negative": "Hari ubukererwe bw’akazi ka {{ amount }}.",
+        "positive": "Hari imbere y’igihe ku kazi ka {{ amount }}.",
+        "zero": "Biri ku gihe neza."
+      },
+      "cv": {
+        "name": "Itandukaniro ku kiguzi",
+        "short": "CV",
+        "negative": "Ingengo y’imari yarenzweho {{ amount }}.",
+        "positive": "Hari ubwizigame bwa {{ amount }}.",
+        "zero": "Biri mu ngengo y’imari neza."
+      },
+      "spi": {
+        "name": "Imikorere ku gihe",
+        "short": "SPI",
+        "hint": "Kuri buri gice cy’akazi cyateganyijwe kugeza ubu, {{ spi }} cyarakozwe."
+      },
+      "cpi": {
+        "name": "Imikorere ku kiguzi",
+        "short": "CPI",
+        "hint": "Kuri buri {{ one }} yakoreshejwe, hinjizwa akazi ka {{ cpi }}."
+      },
+      "eac": {
+        "name": "Igiteranyo giteganyijwe",
+        "short": "EAC",
+        "hint": "Ikiguzi cyose giteganyijwe ({{ method }})."
+      },
+      "etc": {
+        "name": "Igisigaye gukoreshwa",
+        "short": "ETC",
+        "hint": "Ibisigaye gukoreshwa kugira ngo birangire."
+      },
+      "vac": {
+        "name": "Itandukaniro ku iherezo",
+        "short": "VAC",
+        "negative": "Biteganyijwe kurenza ingengo y’imari ho {{ amount }}.",
+        "positive": "Biteganyijwe kurangira munsi y’ingengo y’imari ho {{ amount }}.",
+        "zero": "Biteganyijwe kurangira mu ngengo y’imari neza."
+      },
+      "tcpi": {
+        "name": "Imikorere ikenewe",
+        "short": "TCPI",
+        "hint": "Buri {{ one }} isigaye gukoreshwa igomba kwinjiza {{ tcpi }} kugira ngo birangire mu ngengo y’imari."
+      }
+    },
+    "curve": {
+      "title": "Umurongo wa S: PV, EV na AC buri cyumweru",
+      "weekEnding": "Icyumweru kirangira ku ya"
+    },
+    "settings": {
+      "title": "Uburyo",
+      "percentComplete": "Gupima aho bigeze hakoreshejwe",
+      "eac": "Guteganya ikiguzi hakoreshejwe",
+      "save": "Bika uburyo",
+      "saved": "Uburyo bw’agaciro kagezweho bwabitswe.",
+      "stale": "Undi muntu yahinduye uburyo mu gihe wahitagamo. Dore ubwe; ongera uhitemo."
+    }
   }
 }

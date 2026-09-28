@@ -12,7 +12,9 @@
     "settings": "Settings",
     "admin": "Administration",
     "portfolios": "Portfolios",
-    "projects": "Projects"
+    "projects": "Projects",
+    "timesheets": "Timesheets",
+    "resources": "Resources"
   },
   "theme": {
     "label": "Theme",
@@ -79,7 +81,8 @@
       "changes": "Pending change requests",
       "later": "Available in a later release",
       "risksNote": "Scoring 15 or more",
-      "changesNote": "Submitted or in review"
+      "changesNote": "Submitted or in review",
+      "spiCpiNote": "Σ EV ÷ Σ PV and Σ EV ÷ Σ AC"
     },
     "charts": {
       "title": "Distributions",
@@ -101,6 +104,10 @@
       "subtitle": "Open risks scoring 15 or more, across the projects in view.",
       "review": "review {{ date }}",
       "none": "No open critical risks."
+    },
+    "trends": {
+      "title": "Schedule and cost performance by month",
+      "month": "Month"
     }
   },
   "settings": {
@@ -261,6 +268,12 @@
         "not_in_review": "This request isn’t waiting for a decision.",
         "self_approval": "Nobody decides on their own change request.",
         "invalid_transition": "The request can’t do that from its current status."
+      },
+      "timesheets": {
+        "locked": "That project’s time is submitted or approved and can’t change.",
+        "empty": "There is nothing to submit this week.",
+        "not_submitted": "Only a submitted timesheet can be approved or sent back.",
+        "self_approval": "Nobody approves their own time."
       }
     },
     "fields": {
@@ -452,7 +465,12 @@
       "errors": {
         "noDays": "Choose at least one working day.",
         "duplicate": "That date is already a holiday."
-      }
+      },
+      "year": "Year",
+      "addRwanda": "Add Rwanda’s public holidays for {{ year }}",
+      "rwandaHint": "Fixed dates, Good Friday, Easter Monday and Umuganura. Eid al-Fitr and Eid al-Adha are announced each year: add them by hand.",
+      "saveFirst": "Save or undo your changes first.",
+      "holidaysAdded": "Public holidays of {{ year }} added: {{ count }}."
     },
     "changeControl": {
       "intro": "Who approves a change request depends on its size. The project manager always approves.",
@@ -666,7 +684,9 @@
       "risks": "Risks",
       "issues": "Issues",
       "stakeholders": "Stakeholders",
-      "change-requests": "Changes"
+      "change-requests": "Changes",
+      "time": "Time",
+      "evm": "Earned value"
     },
     "overview": {
       "details": "Details"
@@ -1601,5 +1621,265 @@
     "requested": "Requested by {{ name }}, submitted {{ date }}",
     "emptyTitle": "Nothing waits for you",
     "emptyMessage": "Change requests that need your decision appear here."
+  },
+  "timesheetStatus": {
+    "DRAFT": "Draft",
+    "SUBMITTED": "Submitted",
+    "APPROVED": "Approved",
+    "REJECTED": "Sent back"
+  },
+  "utilizationBand": {
+    "UNDER": "Under",
+    "HEALTHY": "Healthy",
+    "OVER": "Over"
+  },
+  "utilizationBandRule": {
+    "UNDER": "below 70%",
+    "HEALTHY": "70–100%",
+    "OVER": "above 100%"
+  },
+  "percentCompleteMethod": {
+    "PHYSICAL": {
+      "name": "Physical % complete",
+      "hint": "Each work package earns its reported (or task-based) percent complete."
+    },
+    "ZERO_HUNDRED": {
+      "name": "0/100",
+      "hint": "A work package earns nothing until it is finished."
+    },
+    "FIFTY_FIFTY": {
+      "name": "50/50",
+      "hint": "Half when a work package starts, the rest when it finishes."
+    },
+    "STORY_POINTS": {
+      "name": "Story points",
+      "hint": "The budget in proportion to the story points done."
+    }
+  },
+  "eacMethod": {
+    "TYPICAL": {
+      "name": "Typical (BAC ÷ CPI)",
+      "hint": "Today’s cost efficiency continues to the end."
+    },
+    "ATYPICAL": {
+      "name": "Atypical (AC + BAC − EV)",
+      "hint": "The variance so far was a one-off; the rest goes to plan."
+    },
+    "COMPOSITE": {
+      "name": "Composite (with SPI)",
+      "hint": "Cost and schedule pressure both continue."
+    }
+  },
+  "timesheets": {
+    "title": "Timesheets",
+    "subtitle": "Your hours per task and day. Drafts save as you type; submit when the week is done.",
+    "weekLabel": "Week {{ number }}",
+    "previousWeek": "Previous week",
+    "nextWeek": "Next week",
+    "thisWeek": "This week",
+    "sheetsLabel": "Status per project",
+    "sentBack": "{{ project }} was sent back by {{ name }}:",
+    "keyboardHelp": "Type hours in quarters (7.5). Arrow keys move between cells; Enter moves down.",
+    "gridCaption": "Hours per task and day",
+    "task": "Task",
+    "total": "Total",
+    "dailyTotal": "Total per day",
+    "cellLabel": "{{ task }}, {{ day }}, hours",
+    "removeRow": "Remove {{ task }} from the week",
+    "empty": "No tasks yet. Add the tasks you worked on.",
+    "overDay": "over 24 hours",
+    "saving": "Saving…",
+    "saved": "All changes saved.",
+    "addTask": "Add task",
+    "addTaskTitle": "Add a task to the week",
+    "project": "Project",
+    "projectHint": "Projects in progress where you log time.",
+    "noTasks": "Every task of this project is already in the week.",
+    "copyLastWeek": "Copy last week’s tasks",
+    "copied": "Tasks copied from last week: {{ count }}.",
+    "submit": "Submit week",
+    "submitTitle": "Submit this week?",
+    "submitMessage": "The week’s {{ hours }} h go to each project’s managers for approval. Submitted time can’t change unless it is sent back.",
+    "submitted": "Week submitted for approval.",
+    "readOnly": "This week is submitted: it can change only if a manager sends it back.",
+    "errors": {
+      "quarters": "Enter hours in quarters from 0 to 24, like 7.5.",
+      "dayOver24": "A day can have at most 24 hours over all projects.",
+      "notOnTeam": "You log time only on projects where you manage or contribute."
+    }
+  },
+  "time": {
+    "approvals": "Timesheets to approve",
+    "status": "Status",
+    "anyStatus": "Any status",
+    "hours": "{{ hours }} h",
+    "longWeek": "Over {{ hours }} h",
+    "view": "View",
+    "viewFor": "View the timesheet of {{ name }}",
+    "approve": "Approve",
+    "approveFor": "Approve the timesheet of {{ name }}",
+    "reject": "Send back",
+    "rejectFor": "Send back the timesheet of {{ name }}",
+    "rejectTitle": "Send back week {{ week }} of {{ name }}",
+    "rejectComment": "What needs to change?",
+    "approved": "Week {{ week }} of {{ name }} approved.",
+    "rejected": "Week {{ week }} sent back to {{ name }}.",
+    "ownTime": "Your own time: the PMO approves it.",
+    "noneTitle": "Nothing to approve",
+    "noneMessage": "Submitted timesheets for this project appear here.",
+    "logYours": "Managers approve the project’s time here. Log your own on",
+    "sheetTitle": "{{ name }} · week {{ week }}",
+    "entries": "Hours per task and day",
+    "notes": "Notes",
+    "plan": "Planned hours",
+    "planHelp": "Hours per person per week on this project. Under each: their utilization over all projects — try changes before saving.",
+    "planCaption": "Planned hours per person and week, with utilization",
+    "cellLabel": "{{ name }}, week of {{ week }}, planned hours",
+    "whatIf": "Changes not saved yet (preview): {{ count }}",
+    "discard": "Discard",
+    "savePlan": "Save planned hours",
+    "allocationsSaved": "Planned hours saved.",
+    "errors": {
+      "hours": "Enter hours from 0 to 168."
+    }
+  },
+  "resources": {
+    "title": "Resources",
+    "subtitle": "Who is over- or under-allocated, week by week, across all projects.",
+    "startingWeek": "Starting week",
+    "weeks": "Weeks",
+    "weekCount": "{{ count }} weeks",
+    "team": "Team",
+    "everyone": "Everyone",
+    "legend": "Utilization bands",
+    "heatmapLabel": "Capacity heat map",
+    "caption": "Planned hours as a share of capacity, per person and week",
+    "person": "Person",
+    "weekOf": "Week of",
+    "noCapacity": "No capacity",
+    "cellDetail": "{{ allocated }} h planned of {{ capacity }} h capacity; {{ actual }} h logged",
+    "help": "Capacity counts weekly hours less holidays and leave. Choose a person for their capacity and leave.",
+    "emptyTitle": "Nobody to show",
+    "emptyMessage": "Try another team.",
+    "capacity": "Capacity",
+    "hoursPerWeek": "{{ hours }} h a week",
+    "fromDate": "{{ hours }} h a week from {{ date }}",
+    "newHours": "Weekly hours",
+    "validFrom": "From",
+    "changeHours": "Change hours",
+    "hoursChanged": "Capacity of {{ name }} changed.",
+    "leave": "Leave",
+    "noLeave": "No leave recorded.",
+    "from": "From",
+    "to": "To",
+    "reason": "Reason (optional)",
+    "addLeave": "Add leave",
+    "leaveAdded": "Leave recorded for {{ name }}.",
+    "cancelLeave": "Cancel the leave from {{ from }}",
+    "leaveCancelled": "Leave cancelled.",
+    "rates": "Cost rates",
+    "ratesHint": "Confidential: only administrators and the PMO see them. Hours cost the rate of the day worked.",
+    "noRate": "No rate yet: their approved hours cost nothing in earned value.",
+    "rateFrom": "{{ rate }} an hour from {{ date }}",
+    "hourlyRate": "Hourly rate",
+    "addRate": "Add rate",
+    "rateAdded": "Cost rate added.",
+    "errors": {
+      "hours": "Enter hours from 0 to 80.",
+      "leaveOrder": "The end can’t be before the start."
+    }
+  },
+  "evm": {
+    "asOf": "As of {{ date }} · progress by {{ method }} · forecast by {{ eac }}",
+    "noBudgetTitle": "No budget in the WBS yet",
+    "noBudgetMessage": "Earned value needs planned costs on the work packages.",
+    "unrated": "Approved hours with no cost rate for their day: {{ hours }} h. They cost nothing in AC.",
+    "indices": "Performance indices",
+    "figures": "Figures",
+    "zone": {
+      "OFF": "Off track",
+      "RISK": "At risk",
+      "ON": "On track"
+    },
+    "metrics": {
+      "bac": {
+        "name": "Budget at completion",
+        "short": "BAC",
+        "hint": "The planned cost of the whole WBS."
+      },
+      "pv": {
+        "name": "Planned value",
+        "short": "PV",
+        "hint": "The planned cost of the work scheduled by now."
+      },
+      "ev": {
+        "name": "Earned value",
+        "short": "EV",
+        "hint": "The planned cost of the work done so far."
+      },
+      "ac": {
+        "name": "Actual cost",
+        "short": "AC",
+        "hint": "Approved hours × cost rates."
+      },
+      "sv": {
+        "name": "Schedule variance",
+        "short": "SV",
+        "negative": "Behind schedule by {{ amount }} of work.",
+        "positive": "Ahead of schedule by {{ amount }} of work.",
+        "zero": "Exactly on schedule."
+      },
+      "cv": {
+        "name": "Cost variance",
+        "short": "CV",
+        "negative": "Over budget by {{ amount }}.",
+        "positive": "Under budget by {{ amount }}.",
+        "zero": "Exactly on budget."
+      },
+      "spi": {
+        "name": "Schedule performance",
+        "short": "SPI",
+        "hint": "For each unit of work planned by now, {{ spi }} is done."
+      },
+      "cpi": {
+        "name": "Cost performance",
+        "short": "CPI",
+        "hint": "For every {{ one }} spent, {{ cpi }} of work is earned."
+      },
+      "eac": {
+        "name": "Estimate at completion",
+        "short": "EAC",
+        "hint": "The expected total cost ({{ method }})."
+      },
+      "etc": {
+        "name": "Estimate to complete",
+        "short": "ETC",
+        "hint": "What is still to spend to finish."
+      },
+      "vac": {
+        "name": "Variance at completion",
+        "short": "VAC",
+        "negative": "Expected to overrun the budget by {{ amount }}.",
+        "positive": "Expected to finish {{ amount }} under budget.",
+        "zero": "Expected to finish exactly on budget."
+      },
+      "tcpi": {
+        "name": "To-complete performance",
+        "short": "TCPI",
+        "hint": "Every {{ one }} still to spend must earn {{ tcpi }} to finish on budget."
+      }
+    },
+    "curve": {
+      "title": "S-curve: PV, EV and AC by week",
+      "weekEnding": "Week ending"
+    },
+    "settings": {
+      "title": "Methods",
+      "percentComplete": "Measure progress by",
+      "eac": "Forecast cost by",
+      "save": "Save methods",
+      "saved": "Earned value methods saved.",
+      "stale": "Someone else changed the methods while you were choosing. Here are theirs; choose again."
+    }
   }
 }
