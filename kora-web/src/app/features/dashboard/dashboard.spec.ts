@@ -58,6 +58,19 @@ describe('dashboard', () => {
         .map((row) => row.textContent?.replace(/\s+/g, ' ').trim()),
     ).toEqual(['Off track 1', 'At risk 1', 'On track 2', 'Not rated 3']);
     expect(screen.getByRole('table', { name: 'Projects by status' })).toBeTruthy();
+
+    // SPI and CPI by month end on the same figures as the KPI tile.
+    const trends = await screen.findByRole(
+      'table',
+      { name: 'Schedule and cost performance by month' },
+      { timeout: 5000 },
+    );
+    const months = within(trends).getAllByRole('row').slice(1);
+    expect(months).toHaveLength(6);
+    const last = within(months[5])
+      .getAllByRole('cell')
+      .map((c) => c.textContent?.trim());
+    expect(last.slice(-2)).toEqual(['0.87', '1.53']);
   });
 
   it('lists the projects that need attention worst first, with the reason', async () => {

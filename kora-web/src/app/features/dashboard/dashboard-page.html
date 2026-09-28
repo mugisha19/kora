@@ -72,7 +72,7 @@
           <span class="value"
             >{{ ratio(k.summary.portfolioSpi) }} / {{ ratio(k.summary.portfolioCpi) }}</span
           >
-          <span class="note">{{ 'dashboard.kpis.later' | transloco }}</span>
+          <span class="note">{{ 'dashboard.kpis.spiCpiNote' | transloco }}</span>
         </li>
         <li>
           <span class="label">{{ 'dashboard.kpis.risks' | transloco }}</span>
@@ -227,6 +227,17 @@
       [hidePageSize]="true"
       (page)="onPage($event)"
     />
+  }
+</section>
+
+<section class="trends" aria-labelledby="trends-title">
+  <h2 id="trends-title" class="visually-hidden">{{ 'dashboard.trends.title' | transloco }}</h2>
+  @if (trends.value(); as t) {
+    @if (t.months.length) {
+      <kora-trend-chart [months]="t.months" />
+    }
+  } @else if (trends.error()) {
+    <kora-error-state (retry)="trends.reload()" />
   }
 </section>
 

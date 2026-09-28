@@ -1,5 +1,10 @@
-import { PieChart } from 'echarts/charts';
-import { AriaComponent } from 'echarts/components';
+import { LineChart, PieChart } from 'echarts/charts';
+import {
+  AriaComponent,
+  GridComponent,
+  LegendComponent,
+  MarkLineComponent,
+} from 'echarts/components';
 import * as echarts from 'echarts/core';
 import { CanvasRenderer } from 'echarts/renderers';
 
@@ -8,6 +13,14 @@ import { CanvasRenderer } from 'echarts/renderers';
  * decal patterns), loaded on demand: this file is imported lazily by `provideEchartsCore`, so the
  * library never reaches the initial bundle.
  */
-echarts.use([PieChart, AriaComponent, CanvasRenderer]);
+echarts.use([
+  LineChart,
+  PieChart,
+  AriaComponent,
+  GridComponent,
+  LegendComponent,
+  MarkLineComponent,
+  CanvasRenderer,
+]);
 
 export { echarts };

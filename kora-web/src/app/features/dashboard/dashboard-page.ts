@@ -23,6 +23,7 @@ import { DASHBOARD_SORT_FIELDS, HEALTHS, PROJECT_STATUSES } from '../../core/api
 import { toApiError } from '../../core/api/api-error';
 import { DashboardApi } from '../../core/api/dashboard.api';
 import { PortfoliosApi } from '../../core/api/portfolios.api';
+import { EvmApi } from '../../core/api/evm.api';
 import { RisksApi } from '../../core/api/risks.api';
 import { SeverityChip } from '../../shared/ui/severity-chip';
 import { LanguageService } from '../../core/i18n/language.service';
@@ -36,6 +37,7 @@ import { HEALTH_LOOK, HealthChip, PROJECT_STATUS_LOOK } from '../../shared/ui/he
 import { LoadingState } from '../../shared/ui/loading-state';
 import { PageHeader } from '../../shared/ui/page-header';
 import { DistributionChart, Slice } from './distribution-chart';
+import { TrendChart } from './trend-chart';
 
 const PAGE_SIZE = 10;
 type SortField = (typeof DASHBOARD_SORT_FIELDS)[number];
@@ -79,6 +81,7 @@ type SortField = (typeof DASHBOARD_SORT_FIELDS)[number];
     RouterLink,
     SeverityChip,
     TranslocoPipe,
+    TrendChart,
   ],
   providers: [QueryParams],
   templateUrl: './dashboard-page.html',
@@ -94,6 +97,7 @@ export class DashboardPage {
   private readonly api = inject(DashboardApi);
   private readonly portfoliosApi = inject(PortfoliosApi);
   private readonly risksApi = inject(RisksApi);
+  private readonly evmApi = inject(EvmApi);
   private readonly session = inject(SessionStore);
   private readonly transloco = inject(TranslocoService);
   protected readonly language = inject(LanguageService);
@@ -128,6 +132,12 @@ export class DashboardPage {
   protected readonly summary = resource({
     params: () => ({ portfolioId: this.portfolioFilter(), org: this.org() }),
     loader: ({ params }) => firstValueFrom(this.api.summary(params.portfolioId)),
+  });
+
+  /** Monthly SPI and CPI of the projects in view (feature 17). */
+  protected readonly trends = resource({
+    params: () => ({ portfolioId: this.portfolioFilter(), org: this.org() }),
+    loader: ({ params }) => firstValueFrom(this.evmApi.trends(6, params.portfolioId)),
   });
 
   /** Open critical risks (15+) across the projects in view (feature 11's portfolio view). */
